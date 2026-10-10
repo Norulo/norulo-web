@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-22.04
+    env:
+      PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/node_modules/.cache/ms-playwright
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22.23.1"
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Run checks
+        run: npm run lint && npm run test
+      - name: Build browser-check assets
+        env:
+          VITE_APP_URL: http://127.0.0.1:4248
+          VITE_API_BASE_URL: /api
+          VITE_GITHUB_APP_SLUG: ""
+        run: npm run build
+      - name: Install browser engines
+        run: npx playwright install --with-deps chromium firefox webkit
+      - name: Check date-field layouts across browser engines
+        run: |
+          mkdir -p work/ci-validation
+          node scripts/check-date-layout.mjs > work/ci-validation/date-layout.json 2> work/ci-validation/date-layout.log
+      - name: Check phone and tablet layouts in Chromium and WebKit
+        run: node scripts/check-mobile-layout.mjs > work/ci-validation/mobile-layout.json 2> work/ci-validation/mobile-layout.log
+      - name: Check Billing usage layouts
+        run: node scripts/check-billing-usage-layout.mjs --browser=chromium > work/ci-validation/billing-layout.json 2> work/ci-validation/billing-layout.log
+      - name: Check spending overview composition layouts
+        run: node scripts/check-overview-layout.mjs --browser=chromium > work/ci-validation/overview-layout.json 2> work/ci-validation/overview-layout.log
+      - name: Check currency picker interactions and layouts
+        run: node scripts/check-currency-picker-layout.mjs > work/ci-validation/currency-layout.json 2> work/ci-validation/currency-layout.log
+      - name: Check Projects layout and accessibility
+        run: node scripts/check-projects-layout.mjs > work/ci-validation/projects-layout.json 2> work/ci-validation/projects-layout.log
+      - name: Upload browser validation evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-validation
+          path: work/ci-validation/
+          retention-days: 30
+          if-no-files-found: ignore
+      - name: Audit production dependencies
+        run: npm audit --omit=dev
+      - name: Check Cloudflare worker syntax
+        run: node --check worker.js

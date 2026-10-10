@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
+    <meta name="theme-color" content="#f8f7f6" />
+    <script id="nr-theme-bootstrap">
+      (() => {
+        let stored;
+        try {
+          stored = localStorage.getItem("nr-theme");
+        } catch {}
+        const theme =
+          stored === "light" || stored === "dark"
+            ? stored
+            : window.matchMedia?.("(prefers-color-scheme: dark)").matches
+              ? "dark"
+              : "light";
+        document.documentElement.setAttribute("data-theme", theme);
+        document
+          .querySelector('meta[name="theme-color"]')
+          ?.setAttribute("content", theme === "dark" ? "#080808" : "#f8f7f6");
+      })();
+    </script>
+    <title data-seo-managed="true">
+      Norulo — Project Expense Tracking for Developers and Teams
+    </title>
+    <meta
+      data-seo-managed="true"
+      name="description"
+      content="Track project and shared expenses, share a ledger with your team, and review totals by currency. GitHub repository links are optional."
+    />
+    <meta data-seo-managed="true" name="robots" content="index,follow" />
+    <link data-seo-managed="true" rel="canonical" href="https://norulo.com/" />
+    <meta data-seo-managed="true" property="og:type" content="website" />
+    <meta data-seo-managed="true" property="og:site_name" content="Norulo" />
+    <meta
+      data-seo-managed="true"
+      property="og:title"
+      content="Norulo — Project Expense Tracking for Developers and Teams"
+    />
+    <meta
+      data-seo-managed="true"
+      property="og:description"
+      content="Track project and shared expenses, share a ledger with your team, and review totals by currency. GitHub repository links are optional."
+    />
+    <meta data-seo-managed="true" property="og:url" content="https://norulo.com/" />
+    <meta data-seo-managed="true" property="og:locale" content="en_US" />
+    <meta
+      data-seo-managed="true"
+      property="og:image"
+      content="https://norulo.com/social-card.svg"
+    />
+    <meta data-seo-managed="true" property="og:image:width" content="1200" />
+    <meta data-seo-managed="true" property="og:image:height" content="630" />
+    <meta
+      data-seo-managed="true"
+      property="og:image:alt"
+      content="Norulo project expense ledger"
+    />
+    <meta data-seo-managed="true" name="twitter:card" content="summary_large_image" />
+    <meta
+      data-seo-managed="true"
+      name="twitter:title"
+      content="Norulo — Project Expense Tracking for Developers and Teams"
+    />
+    <meta
+      data-seo-managed="true"
+      name="twitter:description"
+      content="Track project and shared expenses, share a ledger with your team, and review totals by currency. GitHub repository links are optional."
+    />
+    <meta
+      data-seo-managed="true"
+      name="twitter:image"
+      content="https://norulo.com/social-card.svg"
+    />
+    <script data-seo-managed="true" type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://norulo.com/#organization",
+            "name": "Norulo",
+            "url": "https://norulo.com/",
+            "logo": "https://norulo.com/brand-mark.png",
+            "email": "contact@norulo.com"
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://norulo.com/#website",
+            "name": "Norulo",
+            "url": "https://norulo.com/",
+            "publisher": { "@id": "https://norulo.com/#organization" }
+          },
+          {
+            "@type": "SoftwareApplication",
+            "@id": "https://norulo.com/#software",
+            "name": "Norulo",
+            "url": "https://norulo.com/",
+            "applicationCategory": "DeveloperApplication",
+            "operatingSystem": "Web",
+            "description": "Track project and shared expenses, share a ledger with your team, and review totals by currency. GitHub repository links are optional.",
+            "publisher": { "@id": "https://norulo.com/#organization" }
+          }
+        ]
+      }
+    </script>
+    <link rel="preload" href="/fonts/geist-latin.woff2" as="font" type="font/woff2" crossorigin />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

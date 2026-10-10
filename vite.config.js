@@ -1,0 +1,58 @@
+import { resolve } from "node:path";
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+
+export default defineConfig({
+  plugins: [react()],
+  server: {
+    host: "0.0.0.0",
+    port: 5173,
+    proxy: {
+      "/api": {
+        target: "http://localhost:8080",
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api(?=\/|$)/, "") || "/",
+      },
+      "/health": {
+        target: "http://localhost:8080",
+        changeOrigin: true,
+      },
+      "/auth": {
+        target: "http://localhost:8080",
+        changeOrigin: true,
+      },
+      "/webhooks": {
+        target: "http://localhost:8080",
+        changeOrigin: true,
+      },
+    },
+  },
+  preview: {
+    host: "0.0.0.0",
+    port: 4173,
+  },
+  build: {
+    target: ["chrome111", "edge111", "firefox114", "safari16.4", "ios16.4"],
+    outDir: "dist",
+    sourcemap: false,
+    rollupOptions: {
+      input: {
+        index: resolve(__dirname, "index.html"),
+      },
+      output: {
+        manualChunks(id) {
+          const normalized = id.replace(/\\/g, "/");
+          if (!normalized.includes("/node_modules/")) return undefined;
+          if (
+            normalized.includes("/react/") ||
+            normalized.includes("/react-dom/") ||
+            normalized.includes("/scheduler/")
+          ) {
+            return "vendor-react";
+          }
+          return "vendor";
+        },
+      },
+    },
+  },
+});

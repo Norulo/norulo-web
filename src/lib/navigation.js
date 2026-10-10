@@ -1,0 +1,100 @@
+const SCREEN_TO_PATH = {
+  landing: "/",
+  login: "/login",
+  oauth: "/oauth",
+  ledgerProjects: "/projects",
+  ledgerOverview: "/overview",
+  ledgerCategories: "/categories",
+  ledgerShared: "/shared",
+  ledgerMembers: "/members",
+  apiKeys: "/api-keys",
+  settings: "/settings",
+  billing: "/billing",
+  pricing: "/pricing",
+  docs: "/developers/docs",
+  api: "/developers/api",
+  privacy: "/privacy",
+  terms: "/terms",
+  status: "/status",
+  notfound: "/404",
+};
+
+const PATH_TO_SCREEN = {};
+for (const [screen, path] of Object.entries(SCREEN_TO_PATH)) {
+  PATH_TO_SCREEN[path] = screen;
+}
+
+function cleanPathname(pathname) {
+  const raw = String(pathname || "/").split(/[?#]/, 1)[0] || "/";
+  return raw.endsWith("/") && raw !== "/" ? raw.slice(0, -1) : raw;
+}
+
+function hasRouteParams(params) {
+  return params && typeof params === "object" && Object.keys(params).length > 0;
+}
+
+export function screenHref(screen, params = {}) {
+  return pathFromScreen(screen, params);
+}
+
+export function screenFromPath(pathname) {
+  if (!pathname || pathname === "/") return "landing";
+  const clean = cleanPathname(pathname);
+  if (/^\/projects\/[A-Za-z0-9_-]+$/.test(clean)) return "ledgerProject";
+  return PATH_TO_SCREEN[clean] || null;
+}
+
+export function pathFromScreen(screen, params = {}) {
+  if (screen === "ledgerProject" && typeof params.id === "string" && params.id) {
+    return `/projects/${encodeURIComponent(params.id)}`;
+  }
+  return SCREEN_TO_PATH[screen] || "/404";
+}
+
+export function shouldHandleScreenLinkClick(event) {
+  if (event?.defaultPrevented) return false;
+  if (event?.button !== undefined && event.button !== 0) return false;
+  if (event?.metaKey || event?.ctrlKey || event?.shiftKey || event?.altKey) return false;
+  const target =
+    event?.currentTarget?.getAttribute?.("target") || event?.currentTarget?.target || "";
+  return !target || target === "_self";
+}
+
+export function screenLinkProps(go, screen, params = {}, disabled = false) {
+  if (disabled) {
+    const blockNavigation = (event) => event.preventDefault();
+    return {
+      role: "link",
+      "aria-disabled": true,
+      tabIndex: -1,
+      onClick: blockNavigation,
+      onAuxClick: blockNavigation,
+      onKeyDown: (event) => {
+        if (event.key === "Enter" || event.key === " ") blockNavigation(event);
+      },
+    };
+  }
+  return {
+    href: screenHref(screen, params),
+    onClick: (event) => {
+      if (typeof go !== "function") return;
+      if (!shouldHandleScreenLinkClick(event)) return;
+      const link = event.currentTarget;
+      const selection = link?.ownerDocument?.getSelection?.();
+      // A mouse drag over readable link text can still end in a click. Keep
+      // that selection available for copying; keyboard activation stays normal.
+      if (
+        event.detail > 0 &&
+        selection &&
+        !selection.isCollapsed &&
+        (link.contains(selection.anchorNode) || link.contains(selection.focusNode))
+      ) {
+        event.preventDefault();
+        return;
+      }
+      event.preventDefault();
+      if (hasRouteParams(params)) go(screen, params);
+      else go(screen);
+    },
+  };
+}

@@ -1,0 +1,109 @@
+import "./public.css";
+import { I } from "../icons.jsx";
+import { T, useLang } from "../i18n.jsx";
+import { signOut } from "../lib/auth.js";
+import { screenLinkProps } from "../lib/navigation.js";
+
+const HEADER_NAV = [
+  { key: "landing", labelEn: "Product", labelZh: "产品" },
+  { key: "pricing", labelEn: "Pricing", labelZh: "价格" },
+  { key: "docs", labelEn: "Docs", labelZh: "Docs" },
+  { key: "api", labelEn: "API", labelZh: "API" },
+  { key: "status", labelEn: "Status", labelZh: "状态" },
+];
+
+const FOOTER_LINKS = [
+  { key: "privacy", labelEn: "Privacy", labelZh: "隐私" },
+  { key: "terms", labelEn: "Terms", labelZh: "条款" },
+  { key: "pricing", labelEn: "Pricing", labelZh: "价格" },
+  { key: "docs", labelEn: "Docs", labelZh: "Docs" },
+  { key: "api", labelEn: "API", labelZh: "API" },
+  { key: "status", labelEn: "Status", labelZh: "状态" },
+];
+
+export function PublicHeader({ go, current, auth }) {
+  useLang();
+  const checkingSession = auth?.status === "checking";
+  const signedIn = !checkingSession && Boolean(auth?.authenticated);
+
+  return (
+    <header className="lp-top">
+      <a
+        className="brand"
+        aria-label={T("Go to Norulo home", "前往 Norulo 首页")}
+        {...screenLinkProps(go, "landing")}
+      >
+        <img
+          className="brand-mark"
+          src="/brand-mark.png"
+          alt=""
+          aria-hidden="true"
+          width="24"
+          height="24"
+        />
+        <span>Norulo</span>
+      </a>
+      <nav className="lp-nav">
+        {HEADER_NAV.map((item) => (
+          <a
+            key={item.key}
+            className="btn ghost sm"
+            {...screenLinkProps(go, item.key)}
+            aria-current={current === item.key ? "page" : undefined}
+          >
+            {T(item.labelEn, item.labelZh)}
+          </a>
+        ))}
+      </nav>
+      <div className="lp-header-actions">
+        {checkingSession ? (
+          <button className="btn sm" type="button" disabled>
+            <span className="spin">
+              <I.Refresh size={14} />
+            </span>
+            {T("Checking session...", "正在检查会话...")}
+          </button>
+        ) : signedIn ? (
+          <>
+            <button className="btn sm" onClick={signOut}>
+              {T("Sign out", "退出登录")}
+            </button>
+            <a className="btn primary sm" {...screenLinkProps(go, "ledgerProjects")}>
+              {T("Projects", "项目")}
+            </a>
+          </>
+        ) : (
+          <>
+            <a className="btn sm" {...screenLinkProps(go, "login")}>
+              {T("Sign in", "登录")}
+            </a>
+            <a className="btn primary sm" {...screenLinkProps(go, "login")}>
+              {T("Get started", "开始使用")}
+            </a>
+          </>
+        )}
+      </div>
+    </header>
+  );
+}
+
+export function PublicFooter({ go, current }) {
+  useLang();
+  return (
+    <footer className="lp-foot">
+      <div>{T("Copyright 2026 Norulo", "版权所有 © 2026 Norulo")}</div>
+      <div className="lp-foot-links">
+        {FOOTER_LINKS.map((item) => (
+          <a
+            key={item.key}
+            className="legal-foot-l"
+            {...screenLinkProps(go, item.key)}
+            aria-current={current === item.key ? "page" : undefined}
+          >
+            {T(item.labelEn, item.labelZh)}
+          </a>
+        ))}
+      </div>
+    </footer>
+  );
+}

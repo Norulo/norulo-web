@@ -68,10 +68,18 @@ The production build passed with `VITE_APP_URL=http://127.0.0.1:4248` and
 syntax checks, and `python3 scripts/sync-api-contract.py --check` passed.
 `npm audit --omit=dev` reported zero production dependency vulnerabilities.
 
-The Chromium Projects layout check passed in nine contexts and 69 states,
-including desktop, touch tablet, 390px phone and 320px layouts in all six
-languages. It used only bounded loopback GET fixtures, with no remote API,
-business writes or real provider acceptance. Chromium, Firefox and WebKit
-binaries were downloaded into `/workspace/.cache/ms-playwright`; the initial
-host validation reported missing WebKit system libraries. Further engine checks
-depend on installing those official browser runtime dependencies.
+The Projects layout check passed separately in Chromium and WebKit, each with
+nine contexts and 69 states, including desktop, touch tablet, 390px phone and
+320px layouts in all six languages. The shared date/layout check also passed
+in Chromium with four contexts and 258 states across project/shared expenses,
+recurring editors, categories and API keys, including live phone-width resizing.
+All browser checks used bounded loopback GET fixtures, with no remote API,
+business writes or real provider/device acceptance.
+
+Chromium, Firefox and WebKit binaries were downloaded into
+`/workspace/.cache/ms-playwright`. After official browser runtime dependencies
+were installed into a writable local prefix and verified, the additional checks
+ran through the managed environment's `browser-libs/run-with-browser-libs.sh`
+wrapper. The wrapper supplies the verified runtime libraries instead of relying
+on the host's system-wide library cache. Linux WebKit's native touch-point count
+is recorded; these checks do not claim physical iOS acceptance.

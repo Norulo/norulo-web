@@ -1,15 +1,18 @@
 # Norulo Web
 
 > Migration status: this checkout is the imported application rebranded to Norulo.
-> Domains under `norulo.com` are the intended destinations; this migration does
-> not deploy Workers or establish those domains, providers or GitHub Apps.
+> Domains under `norulo.com` are the intended destinations. Source/local checks
+> do not themselves establish domains, providers or GitHub Apps. The user has
+> authorized a separate production deployment to norulo.com and api.norulo.com;
+> preview deployment is excluded.
 > Dated release statements and files in `docs/validation` describe inherited
 > source-project history, with brand references updated, and are not evidence of
 > a Norulo release. See [migration notes](docs/migration.md) for current results.
 
 The public GitHub App slug stays empty until the Norulo App is configured.
-Existing brand icons and the raster social card await the user's replacement
-assets. Keep configured Cloudflare credentials in environment settings.
+The supplied Norulo logo is installed in all icons and social cards. See
+[brand assets](docs/branding.md) for its original file, checksum and reproducible
+asset commands. Keep configured Cloudflare credentials in environment settings.
 
 Norulo is a project expense ledger for developers and teams at [norulo.com](https://norulo.com). Norulo Web is its browser client; the current [product design](../norulo-server/docs/design/github-project-ledger/README.md) describes the shared Web/Server contract. Members sign in with GitHub, create named projects, record project or shared expenses, manage categories, and review per-currency reports in the selected ledger. GitHub repository links are optional. API keys and platform subscription billing are separate from user-entered expenses.
 

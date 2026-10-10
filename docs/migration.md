@@ -18,18 +18,22 @@ These settings are not proof of created Cloudflare resources or domain routing.
 The public GitHub App slug is deliberately empty until a real Norulo App is
 configured. No provider IDs, credentials or payment facts are invented.
 
-Cloudflare deployment, database activation, cron changes and remote provider
-acceptance were not performed by the migration. Existing Cloudflare credentials
+The user has authorized production Cloudflare publication at norulo.com and
+api.norulo.com, with preview publication excluded. Deployment is handled
+separately from these source/local checks; they do not establish published
+versions, database activation or provider acceptance. Existing Cloudflare credentials
 are retained in environment settings and never printed or saved in source.
 The imported validation directory describes source history, not Norulo release
 results. Historical source approvals are not authority for current operations.
 
-The original favicon, inline brand mark, apple-touch icon and raster social card
-are preserved pending replacement assets from the user. The SVG social card and
-its text generator are updated, but `public/social-card.png` still contains the
-source product's name and is not referenced by current SEO. Current metadata
-uses the rebranded SVG card; social platform SVG support differs, so a new PNG
-card is still needed before publication.
+The supplied Norulo logo is installed throughout the application, favicon,
+Apple touch icon and both social cards. Its original 1254px PNG is preserved
+byte-for-byte as `public/norulo-logo.png`, with SHA-256
+`a9632acbd7a5ad48ad5ff25d6269f617c7655446365344c9db42d504213c710f`.
+All inherited branded images were replaced, and SEO uses the regenerated PNG
+social card. Original-source revision queries prevent cached older icons from
+surviving the update. The obsolete monochrome dark-theme inversion is removed.
+See [brand assets](branding.md) for source provenance and exact formats.
 
 ## Local setup
 
@@ -83,3 +87,33 @@ ran through the managed environment's `browser-libs/run-with-browser-libs.sh`
 wrapper. The wrapper supplies the verified runtime libraries instead of relying
 on the host's system-wide library cache. Linux WebKit's native touch-point count
 is recorded; these checks do not claim physical iOS acceptance.
+
+## Brand completion and CI repair
+
+The supplied original logo now replaces every inherited branded image, with
+light/dark browser checks confirming the same 96px source image and no color
+filter. Current tracked text, paths, URLs, SVG metadata and built artifacts are
+reviewed together with raster/ICO imagery. Browser captures and full generated
+test logs remain in ignored environment work directories.
+
+[The initial Norulo Web CI run](https://github.com/Norulo/norulo-web/actions/runs/38048695520)
+failed a retained WebKit geometry assertion after narrowing the recurring-create
+form from 412px to 360px. The button's internal grid kept an 84px border box while
+its wrapped title, caption, spacing and padding required 98px. The owning CSS
+now uses a vertical flex content layout, keeping the outer equal-height grid,
+minimum height, padding and spacing. No assertions, tolerances or fixtures were
+weakened. The exact failing WebKit case and the complete Chromium/WebKit date
+checks pass locally after rebuilding, alongside all 1,654 unit tests.
+
+The final complete date-check command passed all four profiles in Chromium and
+WebKit (258 states per engine). This cloud instance's Firefox launch then timed
+out before any Firefox test started; its sandbox could not write
+`/proc/self/uid_map` and its software framebuffer could not initialize. That is
+a local runtime limitation, not Firefox acceptance. The unchanged official CI
+workflow retains all three engines for its Ubuntu runner.
+
+The final production assets were rebuilt with `VITE_APP_URL=https://norulo.com`,
+`VITE_API_BASE_URL=/api` and an empty public GitHub App slug. Production Worker
+configuration explicitly disables workers.dev and preview URLs. Offline Worker
+and API-contract checks pass. This build uses the supplied Norulo graphics and
+production canonical URLs; local fixture builds are not used for publication.

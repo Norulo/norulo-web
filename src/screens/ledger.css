@@ -527,11 +527,10 @@
   gap: 12px;
 }
 .ledger-screen .ledger-entry-types .btn {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  align-content: center;
-  justify-content: start;
-  justify-items: start;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
   text-align: start;
   white-space: normal;
   height: auto;
@@ -540,6 +539,10 @@
   line-height: 1.45;
   overflow-wrap: anywhere;
   gap: 6px;
+}
+.ledger-entry-types .btn > :is(strong, span) {
+  flex: 0 0 auto;
+  max-width: 100%;
 }
 .ledger-entry-types .btn > strong {
   font-size: var(--fs-lg);

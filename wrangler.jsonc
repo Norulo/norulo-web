@@ -2,6 +2,8 @@
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "norulo-web",
   "main": "./worker-entry.js",
+  "workers_dev": false,
+  "preview_urls": false,
   "compatibility_date": "2026-05-25",
   "routes": [
     {

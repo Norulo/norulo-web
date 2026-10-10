@@ -461,7 +461,7 @@ export function LoginScreen({ go, onAuthenticated, onOperationBusy } = {}) {
         <div className="brand auth-brand">
           <img
             className="brand-mark"
-            src="/brand-mark.png"
+            src="/brand-mark.png?v=a9632acbd7a5"
             alt=""
             aria-hidden="true"
             width="24"
@@ -600,7 +600,7 @@ export function OAuthScreen({ go, auth }) {
             </div>
             <img
               className="oauth-logo app"
-              src="/brand-mark.png"
+              src="/brand-mark.png?v=a9632acbd7a5"
               alt="Norulo"
               width="48"
               height="48"

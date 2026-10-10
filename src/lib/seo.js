@@ -1,6 +1,6 @@
 const SITE_NAME = "Norulo";
 const PRODUCTION_ORIGIN = "https://norulo.com";
-const SOCIAL_IMAGE_PATH = "/social-card.svg";
+const SOCIAL_IMAGE_PATH = "/social-card.png?v=a9632acbd7a5";
 
 const PAGE_DEFINITIONS = {
   landing: {
@@ -134,7 +134,7 @@ function publicSchema(definition, title, description, canonical, origin) {
       "@id": organizationId,
       name: SITE_NAME,
       url: `${origin}/`,
-      logo: `${origin}/brand-mark.png`,
+      logo: `${origin}/brand-mark.png?v=a9632acbd7a5`,
       email: "contact@norulo.com",
     },
     {

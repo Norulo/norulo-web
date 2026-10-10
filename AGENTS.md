@@ -7,12 +7,13 @@ Work in the existing checkout; cloud tasks are already isolated. Do not create
 Git worktrees unless the user explicitly asks. Use the selected branch and
 preserve the Norulo origin and all existing user changes.
 
-The current migration authorizes importing source, updating the brand and
-protocol names, local verification and publishing the migration to GitHub main.
-It does not authorize Cloudflare deployment, remote D1 operations, cron changes,
-provider authorization, real payments or remote user acceptance. Historical
-release records in `docs/validation` do not grant any present permission or
-establish that Norulo has been deployed. Follow the user's current task scope.
+The current task authorizes importing source, updating the brand and protocol
+names, local verification, GitHub main publication, and production Cloudflare
+publication for norulo.com and api.norulo.com. Preview publication is excluded.
+Use the current task's reviewed resource/binding configuration; historical
+release records in `docs/validation` do not grant permission or establish that
+Norulo has been deployed. Provider authorization, real payments and remote
+user acceptance require their own current scope. Follow the user's instructions.
 Never clear or print configured credentials, including the Cloudflare token.
 
 ## Product and shared contract
@@ -93,10 +94,13 @@ language/theme/menu keyboard behavior and cancel coalesced ResizeObserver work.
 Keep public/private route SEO, production canonical redirects, preview noindex,
 fixed-host HTTP GET/HEAD upgrades, strict Origin handling and local HTTP support.
 
-Brand icons and the raster social card remain source assets pending the user's
-replacement files. Do not create substitute logos or claim those assets have
-been fully rebranded. Use `public/brand-mark.png` for inline images and ICO only
-for browser favicon use.
+Use the exact supplied logo in `public/norulo-logo.png`; preserve its original
+bytes and provenance in `docs/branding.md`. Do not draw substitute logos or
+reinterpret the blue/cyan colors. The UI mark, Apple icon, ICO and both social
+cards derive from that source. Keep source-revision asset query strings aligned
+so browser caches cannot keep displaying an older icon. Do not invert the logo
+for dark themes. Use `public/brand-mark.png` for inline images and ICO only for
+browser favicon use. `npm run generate:social-card` rasterizes the local SVG.
 
 ## Local verification and external operations
 

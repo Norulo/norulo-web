@@ -51,7 +51,7 @@ export function Topbar({ go, breadcrumbs, loading = false, navigationDisabled = 
         >
           <img
             className="brand-mark"
-            src="/brand-mark.png"
+            src="/brand-mark.png?v=a9632acbd7a5"
             alt=""
             aria-hidden="true"
             width="24"

@@ -466,10 +466,6 @@
   }
 }
 
-[data-theme="dark"] .brand-mark {
-  filter: invert(1);
-}
-
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;

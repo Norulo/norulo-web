@@ -1018,7 +1018,7 @@ export function App() {
           <div className="brand session-check-brand">
             <img
               className="brand-mark"
-              src="/brand-mark.png"
+              src="/brand-mark.png?v=a9632acbd7a5"
               alt=""
               aria-hidden="true"
               width="24"

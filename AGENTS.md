@@ -16,6 +16,12 @@ Norulo has been deployed. Provider authorization, real payments and remote
 user acceptance require their own current scope. Follow the user's instructions.
 Never clear or print configured credentials, including the Cloudflare token.
 
+Current production status is recorded in `docs/deployment.md`. The frontend
+application is published, while the bound Server remains a setup bootstrap with
+503 responses. The user has explicitly deferred D1 creation and activation;
+do not create or modify D1 resources within the current scope. Publication and
+configured GitHub secrets do not establish OAuth or ledger acceptance.
+
 ## Product and shared contract
 
 Norulo is a project expense ledger for developers and teams at norulo.com.

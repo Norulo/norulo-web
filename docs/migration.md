@@ -11,12 +11,14 @@ Norulo. Browser preferences/events use `nr-`; cookie names use `nr_`, API keys
 use `nrk_`, and invitation links use `nri_`, matching the Server migration.
 The inline theme bootstrap's CSP hash is regenerated from its exact bytes.
 
-Intended production hosts are `norulo.com`, `www.norulo.com` and
-`api.norulo.com`; preview uses `preview.norulo.com` and
-`preview-api.norulo.com`. Worker names and bindings target only Norulo names.
-These settings are not proof of created Cloudflare resources or domain routing.
-The public GitHub App slug is deliberately empty until a real Norulo App is
-configured. No provider IDs, credentials or payment facts are invented.
+Production hosts are `norulo.com`, `www.norulo.com` and `api.norulo.com`.
+Retained preview configuration uses `preview.norulo.com` and
+`preview-api.norulo.com`; preview has not been deployed. Worker names and
+bindings target only Norulo names. The verified public GitHub App slug is
+`norulo` ([App](https://github.com/apps/norulo)). Production publication is
+recorded separately in [deployment status](deployment.md); source configuration
+alone does not prove provider acceptance or successful public HTTP checks.
+No provider IDs, credentials or payment facts are invented.
 
 The user has authorized production Cloudflare publication at norulo.com and
 api.norulo.com, with preview publication excluded. Deployment is handled
@@ -115,7 +117,12 @@ no fonts, fixtures, assertions, tolerances, minimum height, padding or spacing.
 The complete WebKit date/layout check also passes all four profiles and 258
 states after this content-sizing change. Lint, the production build, offline
 Worker configuration and generated OpenAPI checksum checks pass.
-Ubuntu CI remains the acceptance check for the original runner-specific case.
+The unchanged [Ubuntu CI run for this fix](https://github.com/Norulo/norulo-web/actions/runs/38054474964)
+passed on commit `646999650246e7990bb34ed3d0108162fa2bec16`, including the
+three-engine date/layout step, mobile, Billing, overview, currency and Projects
+checks, production dependency audit and Worker syntax. This confirms the
+original runner-specific case with its retained assertions. It does not
+establish real-device, provider, OAuth or production-ledger acceptance.
 
 The earlier complete date-check command passed all four profiles in Chromium and
 WebKit (258 states per engine). This cloud instance's Firefox launch then timed

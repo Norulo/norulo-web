@@ -1,15 +1,15 @@
 # Norulo Web
 
-> Migration status: this checkout is the imported application rebranded to Norulo.
-> Domains under `norulo.com` are the intended destinations. Source/local checks
-> do not themselves establish domains, providers or GitHub Apps. The user has
-> authorized a separate production deployment to norulo.com and api.norulo.com;
-> preview deployment is excluded.
-> Dated release statements and files in `docs/validation` describe inherited
-> source-project history, with brand references updated, and are not evidence of
-> a Norulo release. See [migration notes](docs/migration.md) for current results.
+> Current deployment: the Norulo frontend application has been published to
+> Cloudflare for `norulo.com` and `www.norulo.com`. The bound API Worker remains
+> a setup bootstrap that returns 503; the user has deferred D1 setup. GitHub
+> login and ledger operations have not completed production acceptance. Preview
+> publication is excluded. See [deployment status](docs/deployment.md) for the
+> exact version, CI result and public HTTP verification status.
+> Records in `docs/validation` describe inherited source history and do not
+> establish a Norulo release. See [migration notes](docs/migration.md).
 
-The public GitHub App slug stays empty until the Norulo App is configured.
+The verified public GitHub App slug is `norulo` ([App](https://github.com/apps/norulo)).
 The supplied Norulo logo is installed in all icons and social cards. See
 [brand assets](docs/branding.md) for its original file, checksum and reproducible
 asset commands. Keep configured Cloudflare credentials in environment settings.
@@ -20,7 +20,10 @@ Norulo is a project expense ledger for developers and teams at [norulo.com](http
 
 The shared pool records costs used across projects once in the selected ledger; it does not allocate or copy them into individual projects. Each currency is totaled separately, without currency conversion. Expenses are entered by users, authenticated API clients or configured recurring rules; linking a repository does not import bills or move money.
 
-As of 2026-10-06, the new workspace/team and multi-repository version is implemented, verified and released to preview. Its separate local native/UI evidence and actual remote publication checks are in the latest acceptance record; the original release history remains separately dated.
+The workspace/team and multi-repository implementation is included in the
+imported application. Current Norulo verification and publication are recorded
+in the migration and deployment notes; dated source acceptance records remain
+separate historical evidence.
 
 ## Workspaces and projects
 
@@ -105,9 +108,8 @@ activity and internal immutable audit/replay records remain.
 
 ## Project links and recurring expenses
 
-Implemented and published to `preview.norulo.com` on 2026-10-08; both Web and
-Server changes are on GitHub main. See the current acceptance for separate
-local/native and actual publication evidence.
+The imported application includes these features. Their dated source release
+records do not establish a Norulo preview or production backend release.
 
 Project settings and creation accept optional product links and, for standalone
 projects, development links. The Projects list provides product shortcuts;
@@ -141,7 +143,7 @@ each occurrence rechecks the key, membership, scopes and target permission.
 Revocation or expiry blocks execution until an authorized edit or resume grants
 current authority. Tokens and internal grants never appear in public rule DTOs.
 
-The Server checks due rules hourly in preview, with current membership, GitHub
+The Server implementation can check due rules hourly, with current membership, GitHub
 target access, category and owner quota checks, bounded catch-up and permanent
 period identity to prevent duplicate charges. At full expense capacity, owners
 who leave automatic oldest-expense replacement off receive an English email,
@@ -149,8 +151,9 @@ or an inbox item when email is unavailable. The plan preserves the first ten
 unresolved dates with individual Add to expenses actions; further failed dates
 are discarded while the ten remain unresolved. The
 [feature contract](../norulo-server/docs/planning/recurring-expenses-project-links.md)
-and current acceptance distinguish local/native tests from actual publication.
-Production D1 remains paused and has no recurring trigger.
+and [source validation history](docs/validation/README.md) distinguish source
+tests from current publication. Norulo production D1 setup is deferred and no
+recurring-expense execution is enabled by the bootstrap API Worker.
 
 ## Local development
 
@@ -161,7 +164,7 @@ npm run dev
 
 The development server runs at `http://localhost:5173`. Set `VITE_API_BASE_URL=/api` when proxying to a local Server Worker configured in `vite.config.js`. Set `VITE_GITHUB_APP_SLUG` only for the public GitHub installation link. Browser environment variables must never contain GitHub, Creem, or Jev secrets.
 
-`npm run check` runs lint, Vitest, and the production build. `npm run check:workers` checks the Worker configuration without publishing. `npm run deploy:workers` publishes and must be used only after the Server preview configuration and S17 local checks pass.
+`npm run check` runs lint, Vitest, and the production build. `npm run check:workers` checks the Worker configuration without publishing. `npm run deploy:workers` publishes and requires the current deployment scope and reviewed production bindings. The current task excludes preview publication.
 
 `npm run test:layout` checks the built app in Chromium, WebKit and Firefox with
 local read-only fixtures at desktop, tablet, iPhone-sized and Android-sized
@@ -209,8 +212,13 @@ license, and font sizes follow browser preferences through rem units.
 
 ## Cloudflare configuration
 
-`wrangler.jsonc` currently maps `norulo.com` and `www.norulo.com` to the Web Worker and sends API traffic to `https://api.norulo.com`. Coordinate the Server custom domain, OAuth callback, Cookie domain/SameSite, and allowed origins before preview or production deployment. Do not put secrets in `wrangler.jsonc`.
+`wrangler.jsonc` maps `norulo.com` and `www.norulo.com` to `norulo-web` and binds API traffic to `norulo-server-production`, with `https://api.norulo.com` as the configured API origin. The production frontend has been published with these custom domains and bindings. Coordinate OAuth callbacks, cookies and allowed origins before provider acceptance. Do not put secrets in `wrangler.jsonc`.
 
 Both configurations bind `ASSETS` and run the Worker first for HTML/API paths while serving `/assets/*` directly. This lets production apply route-specific SEO, private-page noindex and the `www` canonical redirect; production mode keeps public pages indexable. Preview mode adds a site-wide noindex header. The offline config guard checks both modes and routing shapes. This production-ready configuration does not activate or migrate the Server database.
 
-See [local acceptance](docs/validation/local-acceptance.md) for current verification, published versions and remaining authenticated/provider gates. The resumed audit and publication were explicitly authorized on 2026-10-06. Preview uses its separate configuration and the Server's persistent validation journal; production database activation requires its own migration and provider checks.
+See [deployment status](docs/deployment.md) for current published versions and
+remaining production gates, and [migration notes](docs/migration.md) for current
+checks. The [imported validation directory](docs/validation/README.md) is source
+history, including historical approvals; it is not current deployment authority.
+Preview configuration is retained for offline reference and remains undeployed.
+The user has deferred production database creation and activation.

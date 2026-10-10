@@ -523,7 +523,7 @@
 .ledger-entry-types > div {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr));
-  grid-auto-rows: 1fr;
+  grid-auto-rows: minmax(max-content, 1fr);
   gap: 12px;
 }
 .ledger-screen .ledger-entry-types .btn {

@@ -97,15 +97,27 @@ reviewed together with raster/ICO imagery. Browser captures and full generated
 test logs remain in ignored environment work directories.
 
 [The initial Norulo Web CI run](https://github.com/Norulo/norulo-web/actions/runs/38048695520)
-failed a retained WebKit geometry assertion after narrowing the recurring-create
-form from 412px to 360px. The button's internal grid kept an 84px border box while
-its wrapped title, caption, spacing and padding required 98px. The owning CSS
-now uses a vertical flex content layout, keeping the outer equal-height grid,
-minimum height, padding and spacing. No assertions, tolerances or fixtures were
-weakened. The exact failing WebKit case and the complete Chromium/WebKit date
-checks pass locally after rebuilding, alongside all 1,654 unit tests.
+and [the following run](https://github.com/Norulo/norulo-web/actions/runs/38050221905)
+failed the same retained WebKit geometry assertion after narrowing the
+recurring-create form from 412px to 360px. Its equal-height grid kept an 84px
+button border box while the wrapped title, caption, spacing and padding required
+98px. Changing the internal layout to flex was insufficient: this cloud
+instance's default button-font metrics kept the original titles on one line,
+so its passing local run did not exercise the CI failure.
 
-The final complete date-check command passed all four profiles in Chromium and
+The owning grid now uses `grid-auto-rows: minmax(max-content, 1fr)`, allowing the
+row to grow to fit all content while retaining equal card heights. A temporary
+actual-application probe forces a title to wrap during the same live resize;
+the original geometry assertion rejects the previous 84px cards and accepts the
+content-sized cards after rebuilding. Chromium and WebKit also pass repeated
+320px/360px/412px resizing with multiple-line titles and captions. This changes
+no fonts, fixtures, assertions, tolerances, minimum height, padding or spacing.
+The complete WebKit date/layout check also passes all four profiles and 258
+states after this content-sizing change. Lint, the production build, offline
+Worker configuration and generated OpenAPI checksum checks pass.
+Ubuntu CI remains the acceptance check for the original runner-specific case.
+
+The earlier complete date-check command passed all four profiles in Chromium and
 WebKit (258 states per engine). This cloud instance's Firefox launch then timed
 out before any Firefox test started; its sandbox could not write
 `/proc/self/uid_map` and its software framebuffer could not initialize. That is
@@ -113,7 +125,7 @@ a local runtime limitation, not Firefox acceptance. The unchanged official CI
 workflow retains all three engines for its Ubuntu runner.
 
 The final production assets were rebuilt with `VITE_APP_URL=https://norulo.com`,
-`VITE_API_BASE_URL=/api` and an empty public GitHub App slug. Production Worker
-configuration explicitly disables workers.dev and preview URLs. Offline Worker
+`VITE_API_BASE_URL=/api` and the verified public GitHub App slug `norulo`.
+Production Worker configuration explicitly disables workers.dev and preview URLs. Offline Worker
 and API-contract checks pass. This build uses the supplied Norulo graphics and
 production canonical URLs; local fixture builds are not used for publication.

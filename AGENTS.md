@@ -17,10 +17,17 @@ user acceptance require their own current scope. Follow the user's instructions.
 Never clear or print configured credentials, including the Cloudflare token.
 
 Current production status is recorded in `docs/deployment.md`. The frontend
-application is published, while the bound Server remains a setup bootstrap with
-503 responses. The user has explicitly deferred D1 creation and activation;
-do not create or modify D1 resources within the current scope. Publication and
-configured GitHub secrets do not establish OAuth or ledger acceptance.
+application and full Python Server are published. Direct and Web-proxied health
+checks return 200 with D1 configured; protected account reads return 401 when
+unauthenticated. The earlier setup bootstrap/503 and D1 deferral are historical.
+The new production D1 has been initialized once with all 12 canonical migrations;
+schema version 12 and its 77-object fingerprint were verified. Production uses
+an explicit activation overlay; the checked-in Server defaults remain paused.
+Do not repeat initialization. The user reports successful real GitHub sign-in;
+repository installation/permissions and ledger journeys remain unverified.
+Email sign-in is currently disabled and the user reported its unavailable
+message. Health checks do not establish email, scheduler or ledger acceptance.
+Preview publication remains excluded.
 
 ## Product and shared contract
 
@@ -123,6 +130,27 @@ and a loopback VITE_APP_URL. Disable the inherited Vite preview proxy for
 static captures because its `/api` prefix also catches the `/api-keys` document
 route. Finish builds before browser captures, which rely on a stable dist tree.
 Use strict free ports and bounded loopback fixtures; do not call remote APIs.
+
+## D1 cost controls
+
+- Develop and test against local D1 or SQLite by default. Browser fixtures must
+  remain local; do not generate test data through the production API.
+- Remote D1 writes are limited to necessary production migrations and real
+  business operations within the current authorized scope. Do not create
+  remote fixtures or seed data, clear/rebuild databases, run stress writes, or
+  use polling, retry loops or repeated writes as tests.
+- Before each remote operation, verify the account, database identity and
+  environment, then establish the exact SQL or affected records and a finite
+  batch. Review the schema and existing state before deciding a write is needed.
+  Never reuse an imported database ID or assume a named database is the target.
+- Record actual `rows_read` and `rows_written` from D1 result metadata for each
+  executed batch. Query counts are not row counts. If metrics are unavailable,
+  record that limitation instead of claiming zero or estimating actual usage.
+- Do not blindly retry a write after a timeout, network failure or unknown
+  outcome. Use bounded read-only checks of operation state, migration records
+  or idempotency results before deciding whether any further write is needed.
+  Preserve the existing in-flight guards and prohibition on automatic business
+  mutation retries.
 
 Cloudflare deployment requires current authorization and reviewed matching
 Server/Web bindings, domains, allowed origins, cookie settings and provider

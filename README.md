@@ -1,10 +1,13 @@
 # Norulo Web
 
 > Current deployment: the Norulo frontend application has been published to
-> Cloudflare for `norulo.com` and `www.norulo.com`. The bound API Worker remains
-> a setup bootstrap that returns 503; the user has deferred D1 setup. GitHub
-> login and ledger operations have not completed production acceptance. Preview
-> publication is excluded. See [deployment status](docs/deployment.md) for the
+> Cloudflare for `norulo.com` and `www.norulo.com`. The full Python Server is
+> published at `api.norulo.com`, with production D1/schema 12 verified. Direct
+> and proxied health checks return 200; unauthenticated account reads return 401.
+> The user reports successful GitHub login. Email login remains disabled and
+> unavailable; repository installation and ledger journeys remain unverified.
+> Preview publication is excluded. See
+> [deployment status](docs/deployment.md) for the
 > exact version, CI result and public HTTP verification status.
 > Records in `docs/validation` describe inherited source history and do not
 > establish a Norulo release. See [migration notes](docs/migration.md).
@@ -152,8 +155,9 @@ unresolved dates with individual Add to expenses actions; further failed dates
 are discarded while the ten remain unresolved. The
 [feature contract](../norulo-server/docs/planning/recurring-expenses-project-links.md)
 and [source validation history](docs/validation/README.md) distinguish source
-tests from current publication. Norulo production D1 setup is deferred and no
-recurring-expense execution is enabled by the bootstrap API Worker.
+tests from current publication. Norulo production D1 has been initialized and
+its schema verified. Recurring execution has not completed production acceptance
+and is not established by the successful full Server health checks.
 
 ## Local development
 
@@ -221,4 +225,7 @@ remaining production gates, and [migration notes](docs/migration.md) for current
 checks. The [imported validation directory](docs/validation/README.md) is source
 history, including historical approvals; it is not current deployment authority.
 Preview configuration is retained for offline reference and remains undeployed.
-The user has deferred production database creation and activation.
+The production D1 database is initialized with schema version 12 and the full
+Python Server is published. Health and unauthenticated access checks pass;
+the user reports successful GitHub sign-in. Email, repository installation and
+authenticated ledger acceptance remain pending.

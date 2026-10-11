@@ -286,6 +286,17 @@ async function measure(page, profile, lang, theme, usage, name, kind = "ledger")
       theme: document.documentElement.dataset.theme,
       lang: document.documentElement.lang,
       body: rect(document.querySelector(".set-body")),
+      // Content-box width of the container that switches usage rows between
+      // stacked and side-by-side layouts.
+      usageContainerWidth: (() => {
+        const section = region.closest(".billing-ledger-section") || region;
+        const style = getComputedStyle(section);
+        return (
+          section.clientWidth -
+          Number.parseFloat(style.paddingLeft) -
+          Number.parseFloat(style.paddingRight)
+        );
+      })(),
       region: rect(region),
       text: region.textContent,
       meters: region.querySelectorAll(
@@ -486,17 +497,26 @@ async function measure(page, profile, lang, theme, usage, name, kind = "ledger")
     );
   if (profile.touch && measured.refresh)
     assert(measured.refresh.height >= 44 - tolerance, `Small refresh touch target: ${details}`);
-  if (profile.width === 1024 && kind !== "jev") {
-    assert(measured.body.width < 568, `Intermediate set-body is not narrow enough: ${details}`);
-    assert(
-      measured.rows[1].rect.top >= measured.rows[0].rect.bottom,
-      `Narrow container did not stack rows: ${details}`
-    );
+  if (kind !== "jev") {
+    // Billing's section strip leaves the body at full content width; the
+    // usage container alone decides whether its two rows stack.
+    if (measured.usageContainerWidth < 592 - tolerance)
+      assert(
+        measured.rows[1].rect.top >= measured.rows[0].rect.bottom - tolerance,
+        `Narrow container did not stack rows: ${details}`
+      );
+    else if (measured.usageContainerWidth > 592 + tolerance)
+      assert(
+        Math.abs(measured.rows[1].rect.top - measured.rows[0].rect.top) <= tolerance &&
+          measured.rows[1].rect.left >= measured.rows[0].rect.right - tolerance,
+        `Wide container did not place rows side by side: ${details}`
+      );
   }
   return {
     name,
     kind,
     bodyWidth: measured.body.width,
+    usageContainerWidth: measured.usageContainerWidth,
     rows: measured.rows.map((row) => row.rect.width),
     coarse: measured.coarse,
     touchPoints: measured.touchPoints,

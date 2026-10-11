@@ -71,6 +71,8 @@ input[type="checkbox"] {
   --fs-2xl: 1rem;
   --fs-3xl: 1.125rem;
   --fs-4xl: 1.375rem;
+  --fs-page-title: 1.5rem;
+  --fs-section-title: 1.0625rem;
   --fs-value-primary: 2rem;
   --fs-value-primary-compact: 1.75rem;
   --fs-value-row: 1.5rem;
@@ -660,18 +662,20 @@ a.crumb-button:where(:not([aria-disabled="true"])):hover {
   display: none;
 }
 .side-h {
-  font-size: var(--fs-xs);
+  font-size: var(--fs-micro);
   font-weight: 600;
   letter-spacing: 0.08em;
-  color: var(--text-3);
+  color: var(--text-4);
   text-transform: uppercase;
-  padding: var(--space-3) 10px 6px;
+  padding: var(--space-2) 10px 6px;
 }
+/* Quiet resting items; the current page gets a neutral fill, an accent icon
+   and a hard 2px accent edge so location reads at a glance. */
 .side-i {
   display: flex;
   align-items: center;
   gap: 10px;
-  height: 38px;
+  height: 36px;
   padding: 0 10px;
   font-size: var(--fs-md);
   color: var(--text-2);
@@ -681,8 +685,8 @@ a.crumb-button:where(:not([aria-disabled="true"])):hover {
   text-align: left;
   min-width: 0;
   transition:
-    background 80ms var(--ease-out),
-    color 80ms var(--ease-out);
+    background 120ms var(--ease-out),
+    color 120ms var(--ease-out);
 }
 .side-i > span {
   min-width: 0;
@@ -695,7 +699,7 @@ a.crumb-button:where(:not([aria-disabled="true"])):hover {
   color: var(--text);
 }
 .side-i.active {
-  background: var(--accent-soft);
+  background: var(--bg-soft);
   color: var(--text);
   font-weight: 600;
   border-left-color: var(--accent);
@@ -704,7 +708,11 @@ a.crumb-button:where(:not([aria-disabled="true"])):hover {
   width: 15px;
   height: 15px;
   flex: 0 0 auto;
-  opacity: 0.8;
+  opacity: 0.7;
+}
+.side-i.active .ic {
+  color: var(--accent);
+  opacity: 1;
 }
 .side-i .badge {
   margin-left: auto;
@@ -721,36 +729,66 @@ a.crumb-button:where(:not([aria-disabled="true"])):hover {
   background: var(--bg);
 }
 
+/* Console content keeps a comfortable measure on very wide screens. */
 .main {
-  padding: var(--space-8) 36px calc(88px + env(safe-area-inset-bottom));
+  padding: var(--space-8) 40px calc(88px + env(safe-area-inset-bottom));
   min-width: 0;
-  max-width: none;
+  max-width: 1360px;
   width: 100%;
 }
 
+/* Page header: one title, one line of context, and a single action group
+   whose icon-only Reload always sits last. */
 .page-h {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: var(--space-4);
-  margin-bottom: var(--space-6);
+  gap: var(--space-4) var(--space-6);
+  margin-bottom: var(--space-8);
+}
+.page-h > div:first-child {
+  flex: 1 1 auto;
+  min-width: 0;
 }
 .page-h h1 {
-  font-size: var(--fs-4xl);
+  font-size: var(--fs-page-title);
   font-weight: 600;
-  letter-spacing: 0;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
 }
 .page-h .sub {
+  display: block;
   color: var(--text-3);
   font-size: var(--fs-md);
-  margin-top: var(--space-1);
+  line-height: 1.6;
+  margin-top: 6px;
+}
+.page-h h1,
+.page-h .sub {
+  overflow-wrap: anywhere;
 }
 .page-h .actions {
   display: flex;
+  flex: 0 0 auto;
+  align-items: center;
   gap: var(--space-2);
   justify-content: flex-end;
   flex-wrap: wrap;
 }
+.page-h .actions > .btn[aria-label] {
+  flex: 0 0 auto;
+  min-width: 34px;
+  padding: 0;
+}
+.page-h .actions > .btn.ghost[aria-label] {
+  border-color: var(--border);
+  color: var(--text-3);
+}
+.page-h .actions > .btn.ghost[aria-label]:where(:not(:disabled)):hover {
+  border-color: var(--border-strong);
+  color: var(--text);
+}
+/* Underline tabs: one hairline, a hard accent edge on the current view. */
 .view-tabs {
   display: flex;
   gap: var(--space-6);
@@ -764,9 +802,13 @@ a.crumb-button:where(:not([aria-disabled="true"])):hover {
   padding: 0 0 var(--space-3);
   border: 0;
   border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
   background: transparent;
   color: var(--text-3);
   font: 500 var(--fs-lg) var(--font-sans);
+  transition:
+    color 140ms var(--ease-out),
+    border-color 140ms var(--ease-out);
 }
 .view-tabs [role="tab"]:hover {
   color: var(--text);
@@ -958,11 +1000,22 @@ a.crumb-button:where(:not([aria-disabled="true"])):hover {
 .ledger-list > a {
   user-select: text;
 }
+/* Every console list shares one hover language: a faint tint plus a hard 2px
+   accent edge drawn inside the row, so rows read the same on every page. */
+:is(.ledger-list > article, .key-list > .key-row):not(.skeleton-row) {
+  transition:
+    background 160ms ease,
+    box-shadow 160ms ease;
+}
+:is(.ledger-list > article, .key-list > .key-row):not(.skeleton-row):hover,
+:is(.ledger-list > article, .key-list > .key-row):not(.skeleton-row):focus-within {
+  background: var(--bg-tint);
+  box-shadow: inset 2px 0 0 var(--accent);
+}
 
 /* Financial values share one hierarchy across records, reports and plans. */
 .financial-value,
-.numeric-count,
-.panel-h .count {
+.numeric-count {
   font-family: var(--font-display);
   font-weight: 700;
   font-variant-numeric: lining-nums tabular-nums;
@@ -1058,8 +1111,7 @@ a.crumb-button:where(:not([aria-disabled="true"])):hover {
 .financial-value-number {
   overflow-wrap: var(--financial-overflow-wrap, anywhere);
 }
-.numeric-count,
-.panel-h .count {
+.numeric-count {
   font-size: var(--fs-value-count);
 }
 .financial-unavailable {
@@ -1079,7 +1131,7 @@ a.crumb-button:where(:not([aria-disabled="true"])):hover {
   padding: 3px 7px;
   font: 500 var(--fs-xs)/1 var(--font-mono);
   line-height: 1.25;
-  letter-spacing: 0;
+  letter-spacing: 0.02em;
   background: var(--bg-soft);
   color: var(--text-2);
   border: 1px solid var(--border);
@@ -1163,27 +1215,47 @@ a.crumb-button:where(:not([aria-disabled="true"])):hover {
   padding-top: 0;
 }
 .panel > h2 {
-  font-size: var(--fs-3xl);
+  font-size: var(--fs-section-title);
   font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.4;
   margin: 0 0 var(--space-4);
 }
+/* Section header: a modest title with its record count beside it; icons step
+   back to the text tone and trailing controls align to the far edge. */
 .panel-h {
   display: flex;
   align-items: center;
   gap: 10px;
+  min-height: 28px;
   margin-bottom: var(--space-4);
 }
 .panel-h h2 {
-  font-size: var(--fs-3xl);
+  font-size: var(--fs-section-title);
   font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.4;
   margin: 0;
 }
 .panel-h > svg {
-  color: var(--accent);
+  width: 16px;
+  height: 16px;
+  color: var(--text-3);
 }
 .panel-h .count {
+  display: inline-flex;
+  align-items: center;
+  min-height: 20px;
+  padding: 0 6px;
+  border: 1px solid var(--border);
+  background: var(--bg-soft);
+  color: var(--text-2);
+  font: 500 var(--fs-xs) / 1.5 var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0;
+}
+.panel-h > :is(.btn, .panel-actions):last-child {
   margin-left: auto;
-  color: var(--text-3);
 }
 .panel-actions {
   display: flex;
@@ -1499,17 +1571,23 @@ details.panel[open] > summary.panel-h::after,
     line-height: 1.2;
   }
 
+  /* Phone views share one row of equal tabs; long labels wrap inside their
+     own cell instead of pushing a tab onto a second line. */
   .view-tabs {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
     gap: 0;
-    flex-wrap: wrap;
   }
   .view-tabs [role="tab"] {
-    flex: 1 1 96px;
+    min-width: 0;
     min-height: 48px;
-    padding: 10px var(--space-2);
+    padding: 10px var(--space-1);
     font-size: var(--fs-md);
+    line-height: 1.25;
     white-space: normal;
     overflow-wrap: anywhere;
+    hyphens: auto;
   }
 
   .side-i.active {
@@ -1544,14 +1622,21 @@ details.panel[open] > summary.panel-h::after,
     max-width: none;
   }
 
+  /* Phone header: the title block leads; actions follow in one row with the
+     primary action filling it and the icon-only Reload kept square at its
+     end. A header whose only action is Reload keeps it beside the title. */
   .page-h {
-    flex-direction: column;
-    align-items: stretch;
-    gap: var(--space-5);
-    margin-bottom: 28px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+    gap: var(--space-4) var(--space-3);
+    margin-bottom: var(--space-6);
+  }
+  .page-h > :first-child {
+    grid-column: 1 / -1;
   }
   .page-h h1 {
-    line-height: 1.18;
+    line-height: 1.2;
     letter-spacing: -0.025em;
     overflow-wrap: anywhere;
   }
@@ -1560,15 +1645,25 @@ details.panel[open] > summary.panel-h::after,
     line-height: 1.6;
   }
   .page-h .actions {
+    grid-column: 1 / -1;
+    flex-wrap: nowrap;
+    align-items: stretch;
     gap: var(--space-3);
   }
-
-  .page-h .actions {
-    align-items: stretch;
-  }
-
   .page-h .actions .btn {
     flex: 1 1 auto;
+  }
+  .page-h .actions > .btn[aria-label] {
+    flex: 0 0 var(--topbar-control-size);
+    width: var(--topbar-control-size);
+  }
+  .page-h:not(:has(> .actions > :not(.btn[aria-label]))) > :first-child {
+    grid-column: 1;
+  }
+  .page-h:not(:has(> .actions > :not(.btn[aria-label]))) > .actions {
+    grid-column: 2;
+    grid-row: 1;
+    width: auto;
   }
 }
 
@@ -1665,35 +1760,6 @@ details.panel[open] > summary.panel-h::after,
   font: 600 var(--fs-xs)/1 var(--font-mono);
 }
 
-.page-h .actions {
-  flex: 0 0 auto;
-}
-
-.page-h > div:first-child {
-  flex: 1 1 auto;
-  min-width: 0;
-}
-
-.page-h h1,
-.page-h .sub {
-  overflow-wrap: anywhere;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.page-h .sub {
-  display: block;
-  line-height: 1.45;
-}
-
-.page-h .sub {
-  gap: var(--space-2);
-}
-
-.page-h .actions {
-  align-items: center;
-}
-
 @media (max-width: 900px) {
   .topbar > div:last-child .btn.ghost.sm span,
   .topbar > div:last-child .btn.ghost.sm .kbd {
@@ -1712,14 +1778,6 @@ details.panel[open] > summary.panel-h::after,
   .page-h .actions {
     width: 100%;
     justify-content: flex-start;
-  }
-}
-
-@media (max-width: 760px) {
-  .page-h h1,
-  .page-h .sub {
-    overflow: visible;
-    text-overflow: clip;
   }
 }
 

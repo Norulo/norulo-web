@@ -565,326 +565,336 @@ export function SettingsScreen({ go, onSessionUpdated, onOperationBusy }) {
               {error}
             </div>
           )}
-          <section className="panel settings-profile-panel" aria-label={T("Profile", "个人资料")}>
+          <section className="panel settings-section settings-profile-panel" aria-label={T("Profile", "个人资料")}>
             <h2>{T("Profile", "个人资料")}</h2>
-            {session ? (
-              <>
-                <div className="set-row">
-                  <I.User size={18} />
-                  <span className="email-sign-in-identity">
-                    {user?.name || user?.login || user?.email || T("Account", "账户")}
-                  </span>
-                </div>
-                {user?.email && (
+            <div className="settings-section-body">
+              {session ? (
+                <>
                   <div className="set-row">
-                    <I.Mail size={16} />
-                    <span className="email-sign-in-identity">{user.email}</span>
+                    <I.User size={18} />
+                    <span className="email-sign-in-identity">
+                      {user?.name || user?.login || user?.email || T("Account", "账户")}
+                    </span>
                   </div>
-                )}
-                <button className="btn" onClick={leaveSession} disabled={controlsDisabled}>
-                  {T("Sign out", "退出登录")}
-                </button>
-              </>
-            ) : (
-              !loading && <p>{T("Account profile unavailable.", "账户资料暂不可用。")}</p>
-            )}
-          </section>
-          <section className="panel settings-sign-in-panel" aria-label={T("Sign-in methods", "登录方式")}>
-            <h2>{T("Sign-in methods", "登录方式")}</h2>
-            <div className="settings-sign-in-methods">
-              {loading && (
-                <p className="muted settings-sign-in-description">{T("Loading...", "正在加载...")}</p>
-              )}
-              {canConnectGitHub && (
-                <div className="panel-actions">
-                  <button
-                    className="btn"
-                    disabled={controlsDisabled}
-                    onClick={() =>
-                      runGitHubAction((signal) =>
-                        startGitHubLogin({ intent: "link", redirectTo: window.location.href, signal })
-                      )
-                    }
-                  >
-                    <I.Github size={16} />{" "}
-                    {githubProvider || githubReconnectRequired
-                      ? T("Reconnect GitHub", "重新连接 GitHub")
-                      : T("Connect GitHub account", {
-                          zh: "连接 GitHub 账户",
-                          ja: "GitHub アカウントを接続",
-                          ko: "GitHub 계정 연결",
-                          fr: "Connecter un compte GitHub",
-                          es: "Conectar cuenta de GitHub",
-                        })}
-                  </button>
-                </div>
-              )}
-              {loginEmail ? (
-                <div className="settings-email-method">
-                  <div className="settings-sign-in-email">
-                    <I.Mail size={16} />
-                    <div className="settings-sign-in-email-details">
-                      <span className="email-sign-in-identity">{loginEmail}</span>
-                      <span className="muted settings-sign-in-description">
-                        {T("Verified email", "已验证邮箱")}
-                      </span>
+                  {user?.email && (
+                    <div className="set-row">
+                      <I.Mail size={16} />
+                      <span className="email-sign-in-identity">{user.email}</span>
                     </div>
-                  </div>
-                  <p className="muted settings-sign-in-description">
-                    {T("Use email codes to sign in to this account.", "使用邮箱验证码登录此账户。")}
-                  </p>
-                </div>
-              ) : canLinkEmail ? (
-                <div className="settings-email-method">
-                  <p className="muted settings-sign-in-description">
-                    {T(
-                      "Link an email to sign in with a code. Your existing account and ledgers stay together.",
-                      "绑定邮箱后即可使用验证码登录，现有账户和账本保持不变。"
-                    )}
-                  </p>
-                  <EmailSignIn
-                    key={user.id}
-                    purpose="link"
-                    disabled={controlsDisabled && !emailActionRef.current}
-                    onBusy={emailBusy}
-                    onVerified={emailLinked}
-                  />
-                </div>
+                  )}
+                  <button className="btn" onClick={leaveSession} disabled={controlsDisabled}>
+                    {T("Sign out", "退出登录")}
+                  </button>
+                </>
               ) : (
-                !loading && (
-                  <p className="muted settings-sign-in-description">
-                    {T("Email sign-in information is unavailable.", "邮箱登录信息暂不可用。")}
-                  </p>
-                )
+                !loading && <p>{T("Account profile unavailable.", "账户资料暂不可用。")}</p>
               )}
             </div>
           </section>
-          <section className="panel settings-retention-panel" aria-label={retentionText("title")}>
-            <h2>{retentionText("title")}</h2>
-            <p className="muted">{retentionText("scope")}</p>
-            <p
-              className="muted"
-              id={retentionDescriptionId}
-              ref={retentionDescriptionRef}
-              tabIndex={0}
-            >
-              {retentionText("description")}
-            </p>
-            <p className="muted" id={retentionSelectionId}>
-              {retentionText("selection")}
-            </p>
-            <label
-              className={`settings-retention-control${controlsDisabled || retentionReloadRequired || !expenseRetention ? " settings-retention-control-disabled" : ""}`}
-            >
-              <input
-                ref={retentionSwitchRef}
-                type="checkbox"
-                role="switch"
-                aria-describedby={`${retentionDescriptionId} ${retentionSelectionId}`}
-                checked={expenseRetention?.autoRemoveOldestExpense === true}
-                disabled={controlsDisabled || retentionReloadRequired || !expenseRetention}
-                onChange={(event) => updateExpenseRetention(event.target.checked)}
-              />
-              <span>{retentionText("toggle")}</span>
-            </label>
-            {loading ? (
-              <p className="muted">{T("Loading...", "正在加载...")}</p>
-            ) : !expenseRetention ? (
-              <p className="muted">{retentionText("unavailable")}</p>
-            ) : (
-              <p className="muted" aria-live="polite">
-                {retentionText(expenseRetention.autoRemoveOldestExpense ? "on" : "off")}
-              </p>
-            )}
+          <section className="panel settings-section settings-sign-in-panel" aria-label={T("Sign-in methods", "登录方式")}>
+            <h2>{T("Sign-in methods", "登录方式")}</h2>
+            <div className="settings-section-body">
+              <div className="settings-sign-in-methods">
+                {loading && (
+                  <p className="muted settings-sign-in-description">{T("Loading...", "正在加载...")}</p>
+                )}
+                {canConnectGitHub && (
+                  <div className="panel-actions">
+                    <button
+                      className="btn"
+                      disabled={controlsDisabled}
+                      onClick={() =>
+                        runGitHubAction((signal) =>
+                          startGitHubLogin({ intent: "link", redirectTo: window.location.href, signal })
+                        )
+                      }
+                    >
+                      <I.Github size={16} />{" "}
+                      {githubProvider || githubReconnectRequired
+                        ? T("Reconnect GitHub", "重新连接 GitHub")
+                        : T("Connect GitHub account", {
+                            zh: "连接 GitHub 账户",
+                            ja: "GitHub アカウントを接続",
+                            ko: "GitHub 계정 연결",
+                            fr: "Connecter un compte GitHub",
+                            es: "Conectar cuenta de GitHub",
+                          })}
+                    </button>
+                  </div>
+                )}
+                {loginEmail ? (
+                  <div className="settings-email-method">
+                    <div className="settings-sign-in-email">
+                      <I.Mail size={16} />
+                      <div className="settings-sign-in-email-details">
+                        <span className="email-sign-in-identity">{loginEmail}</span>
+                        <span className="muted settings-sign-in-description">
+                          {T("Verified email", "已验证邮箱")}
+                        </span>
+                      </div>
+                    </div>
+                    <p className="muted settings-sign-in-description">
+                      {T("Use email codes to sign in to this account.", "使用邮箱验证码登录此账户。")}
+                    </p>
+                  </div>
+                ) : canLinkEmail ? (
+                  <div className="settings-email-method">
+                    <p className="muted settings-sign-in-description">
+                      {T(
+                        "Link an email to sign in with a code. Your existing account and ledgers stay together.",
+                        "绑定邮箱后即可使用验证码登录，现有账户和账本保持不变。"
+                      )}
+                    </p>
+                    <EmailSignIn
+                      key={user.id}
+                      purpose="link"
+                      disabled={controlsDisabled && !emailActionRef.current}
+                      onBusy={emailBusy}
+                      onVerified={emailLinked}
+                    />
+                  </div>
+                ) : (
+                  !loading && (
+                    <p className="muted settings-sign-in-description">
+                      {T("Email sign-in information is unavailable.", "邮箱登录信息暂不可用。")}
+                    </p>
+                  )
+                )}
+              </div>
+            </div>
           </section>
-          <section className="panel settings-jev-panel" aria-label={T("Jev settings", "Jev 设置")}>
-            <h2>{T("Jev settings", "Jev 设置")}</h2>
-            <p className="muted" id={jevDescriptionId} ref={jevDescriptionRef} tabIndex={0}>
-              {T(
-                "Controls Jev for your own ledger and its shared members. Other owners control their own ledgers.",
-                "此设置控制你自己的账本及其共享成员使用 Jev；其他所有者自行控制各自的账本。"
+          <section className="panel settings-section settings-retention-panel" aria-label={retentionText("title")}>
+            <h2>{retentionText("title")}</h2>
+            <div className="settings-section-body">
+              <p className="muted">{retentionText("scope")}</p>
+              <p
+                className="muted"
+                id={retentionDescriptionId}
+                ref={retentionDescriptionRef}
+                tabIndex={0}
+              >
+                {retentionText("description")}
+              </p>
+              <p className="muted" id={retentionSelectionId}>
+                {retentionText("selection")}
+              </p>
+              <label
+                className={`settings-retention-control${controlsDisabled || retentionReloadRequired || !expenseRetention ? " settings-retention-control-disabled" : ""}`}
+              >
+                <input
+                  ref={retentionSwitchRef}
+                  type="checkbox"
+                  role="switch"
+                  aria-describedby={`${retentionDescriptionId} ${retentionSelectionId}`}
+                  checked={expenseRetention?.autoRemoveOldestExpense === true}
+                  disabled={controlsDisabled || retentionReloadRequired || !expenseRetention}
+                  onChange={(event) => updateExpenseRetention(event.target.checked)}
+                />
+                <span>{retentionText("toggle")}</span>
+              </label>
+              {loading ? (
+                <p className="muted">{T("Loading...", "正在加载...")}</p>
+              ) : !expenseRetention ? (
+                <p className="muted">{retentionText("unavailable")}</p>
+              ) : (
+                <p className="muted" aria-live="polite">
+                  {retentionText(expenseRetention.autoRemoveOldestExpense ? "on" : "off")}
+                </p>
               )}
-            </p>
-            <label
-              className={`settings-jev-control${controlsDisabled || jevReloadRequired || !jevSettings?.eligible ? " settings-jev-control-disabled" : ""}`}
-            >
-              <input
-                ref={jevSwitchRef}
-                type="checkbox"
-                role="switch"
-                aria-describedby={jevDescriptionId}
-                checked={jevSettings?.eligible === true && jevSettings.enabled === true}
-                disabled={controlsDisabled || jevReloadRequired || !jevSettings?.eligible}
-                onChange={(event) => updateJev(event.target.checked)}
-              />
-              <span>{T("Enable Jev", "启用 Jev")}</span>
-            </label>
-            {loading ? (
-              <p className="muted">{T("Loading...", "正在加载...")}</p>
-            ) : !jevSettings ? (
-              <p className="muted">
+            </div>
+          </section>
+          <section className="panel settings-section settings-jev-panel" aria-label={T("Jev settings", "Jev 设置")}>
+            <h2>{T("Jev settings", "Jev 设置")}</h2>
+            <div className="settings-section-body">
+              <p className="muted" id={jevDescriptionId} ref={jevDescriptionRef} tabIndex={0}>
                 {T(
-                  "Jev settings are unavailable until reloaded.",
-                  "重新加载成功后才能使用 Jev 设置。"
+                  "Controls Jev for your own ledger and its shared members. Other owners control their own ledgers.",
+                  "此设置控制你自己的账本及其共享成员使用 Jev；其他所有者自行控制各自的账本。"
                 )}
               </p>
-            ) : !jevSettings.eligible ? (
-              <>
+              <label
+                className={`settings-jev-control${controlsDisabled || jevReloadRequired || !jevSettings?.eligible ? " settings-jev-control-disabled" : ""}`}
+              >
+                <input
+                  ref={jevSwitchRef}
+                  type="checkbox"
+                  role="switch"
+                  aria-describedby={jevDescriptionId}
+                  checked={jevSettings?.eligible === true && jevSettings.enabled === true}
+                  disabled={controlsDisabled || jevReloadRequired || !jevSettings?.eligible}
+                  onChange={(event) => updateJev(event.target.checked)}
+                />
+                <span>{T("Enable Jev", "启用 Jev")}</span>
+              </label>
+              {loading ? (
+                <p className="muted">{T("Loading...", "正在加载...")}</p>
+              ) : !jevSettings ? (
                 <p className="muted">
-                  {T("Jev settings require Pro or Max.", "Jev 设置需要 Pro 或 Max 权益。")}
-                </p>
-                <div className="panel-actions">
-                  <button
-                    className="btn"
-                    disabled={controlsDisabled}
-                    onClick={() => {
-                      if (!actionRef.current) go("pricing");
-                    }}
-                  >
-                    {T("View plans", "查看套餐")}
-                  </button>
-                </div>
-              </>
-            ) : (
-              <>
-                <p className="muted" role="status">
-                  {!jevSettings.enabled
-                    ? T(
-                        "Jev model checks are off. Local duplicate checks remain available.",
-                        "Jev 模型检查已关闭，仍可使用本地疑似重复检查。"
-                      )
-                    : jevSettings.available
-                      ? T(
-                          "Jev model choices and scores are enabled.",
-                          "已启用 Jev 模型选项和评分。"
-                        )
-                      : T(
-                          "Jev is currently unavailable. Your saved preference is on.",
-                          "Jev 当前暂不可用，你保存的偏好仍为开启。"
-                        )}
-                </p>
-                <p className="muted settings-jev-budget">
-                  {T("Monthly model allowance (USD)", "月度模型额度（美元）")}:{" "}
-                  {jevSettings.monthlyBudgetUsd}
-                </p>
-              </>
-            )}
-            <p className="muted">
-              {T(
-                "Turning Jev off stops model checks without changing saved expenses or resetting used allowance.",
-                "关闭 Jev 会停止模型检查，不会修改已保存的支出，也不会重置已使用的额度。"
-              )}
-            </p>
-          </section>
-          <section className="panel settings-github-panel" aria-label={T("GitHub access", "GitHub 授权")}>
-            <h2>{T("GitHub access", "GitHub 授权")}</h2>
-            {canConnectGitHub && githubReconnectRequired ? (
-              <p className="muted">
-                {T("Reconnect GitHub in Sign-in methods, then check repository access again.", {
-                  zh: "请先在「登录方式」中重新连接 GitHub，再检查仓库授权。",
-                  ja: "ログイン方法で GitHub に再接続してから、リポジトリへのアクセスを確認してください。",
-                  ko: "로그인 방식에서 GitHub를 다시 연결한 뒤 저장소 접근 권한을 확인하세요.",
-                  fr: "Reconnectez GitHub dans les méthodes de connexion, puis vérifiez à nouveau l’accès aux dépôts.",
-                  es: "Vuelve a conectar GitHub en los métodos de inicio de sesión y comprueba de nuevo el acceso a los repositorios.",
-                })}
-              </p>
-            ) : !githubReady ? (
-              <p className="muted">
-                {loading
-                  ? T("Loading...", "正在加载...")
-                  : T("GitHub access unavailable.", {
-                      zh: "GitHub 授权暂不可用。",
-                      ja: "GitHub のアクセス情報を取得できません。",
-                      ko: "GitHub 접근 정보를 불러올 수 없습니다.",
-                      fr: "Les accès GitHub sont indisponibles.",
-                      es: "El acceso a GitHub no está disponible.",
-                    })}
-              </p>
-            ) : needsGitHubAccount ? (
-              <p className="muted">
-                {T("Connect your GitHub account in Sign-in methods before authorizing repositories.", {
-                  zh: "请先在「登录方式」中连接 GitHub 账户，再授权仓库。",
-                  ja: "リポジトリを認可する前に、ログイン方法で GitHub アカウントを接続してください。",
-                  ko: "저장소를 승인하기 전에 로그인 방식에서 GitHub 계정을 연결하세요.",
-                  fr: "Connectez votre compte GitHub dans les méthodes de connexion avant d’autoriser des dépôts.",
-                  es: "Conecta tu cuenta de GitHub en los métodos de inicio de sesión antes de autorizar repositorios.",
-                })}
-              </p>
-            ) : (
-              <>
-                <p className="muted">
-                  {github?.connected
-                    ? T(
-                        `${repositoryCount} repositories authorized${accounts.length ? ` on ${accounts.join(", ")}` : ""}.`,
-                        `已授权 ${repositoryCount} 个仓库${accounts.length ? `（${accounts.join("、")}）` : ""}。`
-                      )
-                    : T(
-                        "Repository links are optional. Connect GitHub repositories to associate them with your projects.",
-                        "仓库关联为可选项，你可以连接 GitHub 仓库并将其关联到项目。"
-                      )}
-                </p>
-                <p className="github-next-step">
                   {T(
-                    "Open Projects to create a named project and record expenses. You can add or change repository links later.",
-                    "打开项目页面，为项目起名即可记账，仓库关联可在之后添加或修改。"
+                    "Jev settings are unavailable until reloaded.",
+                    "重新加载成功后才能使用 Jev 设置。"
                   )}
                 </p>
-                <GitHubAuthorizationGuidance />
-                {githubClosedNotice && githubClosedNotice.identity === user?.id && (
-                  <GitHubClosedNotice outcome={githubClosedNotice.outcome} />
-                )}
-                <div className="panel-actions">
-                  {github?.connected && (
+              ) : !jevSettings.eligible ? (
+                <>
+                  <p className="muted">
+                    {T("Jev settings require Pro or Max.", "Jev 设置需要 Pro 或 Max 权益。")}
+                  </p>
+                  <div className="panel-actions">
                     <button
-                      className="btn primary"
-                      disabled={busy}
+                      className="btn"
+                      disabled={controlsDisabled}
                       onClick={() => {
-                        if (!actionRef.current) go("ledgerProjects");
+                        if (!actionRef.current) go("pricing");
                       }}
                     >
-                      {T("Open projects", "打开项目")} <I.ArrowR size={14} />
+                      {T("View plans", "查看套餐")}
                     </button>
-                  )}
-                  <button
-                    className="btn"
-                    disabled={controlsDisabled}
-                    onClick={() =>
-                      runGitHubAction((signal) =>
-                        connectGitHubRepositories({ ...(github?.connected ? { add: true } : {}), signal })
-                      )
-                    }
-                  >
-                    {github?.connected
-                      ? T("Add account or organization", "添加账户或组织")
-                      : T("Connect repositories", "连接仓库")}
-                  </button>
-                </div>
-                {github?.connected && (
-                  <fieldset
-                    disabled={controlsDisabled}
-                    aria-label={T("Authorized GitHub installations", "已授权 GitHub 安装")}
-                    className="github-installations-fieldset"
-                  >
-                    <GitHubInstallationsList
-                      installations={github.installations}
-                      managingInstallationId={managingInstallationId}
-                      onManage={(installation) => {
-                        const installationId = installation?.id || installation?.installationId;
-                        runGitHubAction(
-                          (signal) =>
-                            manageGitHubInstallation(installationId, {
-                              githubIdentityId: installation?.manage?.githubIdentityId || undefined,
-                              redirectTo: window.location.href,
-                              signal,
-                            }),
-                          installationId
-                        );
-                      }}
-                    />
-                  </fieldset>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <p className="muted" role="status">
+                    {!jevSettings.enabled
+                      ? T(
+                          "Jev model checks are off. Local duplicate checks remain available.",
+                          "Jev 模型检查已关闭，仍可使用本地疑似重复检查。"
+                        )
+                      : jevSettings.available
+                        ? T(
+                            "Jev model choices and scores are enabled.",
+                            "已启用 Jev 模型选项和评分。"
+                          )
+                        : T(
+                            "Jev is currently unavailable. Your saved preference is on.",
+                            "Jev 当前暂不可用，你保存的偏好仍为开启。"
+                          )}
+                  </p>
+                  <p className="muted settings-jev-budget">
+                    {T("Monthly model allowance (USD)", "月度模型额度（美元）")}:{" "}
+                    {jevSettings.monthlyBudgetUsd}
+                  </p>
+                </>
+              )}
+              <p className="muted">
+                {T(
+                  "Turning Jev off stops model checks without changing saved expenses or resetting used allowance.",
+                  "关闭 Jev 会停止模型检查，不会修改已保存的支出，也不会重置已使用的额度。"
                 )}
-              </>
-            )}
+              </p>
+            </div>
+          </section>
+          <section className="panel settings-section settings-github-panel" aria-label={T("GitHub access", "GitHub 授权")}>
+            <h2>{T("GitHub access", "GitHub 授权")}</h2>
+            <div className="settings-section-body">
+              {canConnectGitHub && githubReconnectRequired ? (
+                <p className="muted">
+                  {T("Reconnect GitHub in Sign-in methods, then check repository access again.", {
+                    zh: "请先在「登录方式」中重新连接 GitHub，再检查仓库授权。",
+                    ja: "ログイン方法で GitHub に再接続してから、リポジトリへのアクセスを確認してください。",
+                    ko: "로그인 방식에서 GitHub를 다시 연결한 뒤 저장소 접근 권한을 확인하세요.",
+                    fr: "Reconnectez GitHub dans les méthodes de connexion, puis vérifiez à nouveau l’accès aux dépôts.",
+                    es: "Vuelve a conectar GitHub en los métodos de inicio de sesión y comprueba de nuevo el acceso a los repositorios.",
+                  })}
+                </p>
+              ) : !githubReady ? (
+                <p className="muted">
+                  {loading
+                    ? T("Loading...", "正在加载...")
+                    : T("GitHub access unavailable.", {
+                        zh: "GitHub 授权暂不可用。",
+                        ja: "GitHub のアクセス情報を取得できません。",
+                        ko: "GitHub 접근 정보를 불러올 수 없습니다.",
+                        fr: "Les accès GitHub sont indisponibles.",
+                        es: "El acceso a GitHub no está disponible.",
+                      })}
+                </p>
+              ) : needsGitHubAccount ? (
+                <p className="muted">
+                  {T("Connect your GitHub account in Sign-in methods before authorizing repositories.", {
+                    zh: "请先在「登录方式」中连接 GitHub 账户，再授权仓库。",
+                    ja: "リポジトリを認可する前に、ログイン方法で GitHub アカウントを接続してください。",
+                    ko: "저장소를 승인하기 전에 로그인 방식에서 GitHub 계정을 연결하세요.",
+                    fr: "Connectez votre compte GitHub dans les méthodes de connexion avant d’autoriser des dépôts.",
+                    es: "Conecta tu cuenta de GitHub en los métodos de inicio de sesión antes de autorizar repositorios.",
+                  })}
+                </p>
+              ) : (
+                <>
+                  <p className="muted">
+                    {github?.connected
+                      ? T(
+                          `${repositoryCount} repositories authorized${accounts.length ? ` on ${accounts.join(", ")}` : ""}.`,
+                          `已授权 ${repositoryCount} 个仓库${accounts.length ? `（${accounts.join("、")}）` : ""}。`
+                        )
+                      : T(
+                          "Repository links are optional. Connect GitHub repositories to associate them with your projects.",
+                          "仓库关联为可选项，你可以连接 GitHub 仓库并将其关联到项目。"
+                        )}
+                  </p>
+                  <p className="github-next-step">
+                    {T(
+                      "Open Projects to create a named project and record expenses. You can add or change repository links later.",
+                      "打开项目页面，为项目起名即可记账，仓库关联可在之后添加或修改。"
+                    )}
+                  </p>
+                  <GitHubAuthorizationGuidance />
+                  {githubClosedNotice && githubClosedNotice.identity === user?.id && (
+                    <GitHubClosedNotice outcome={githubClosedNotice.outcome} />
+                  )}
+                  <div className="panel-actions">
+                    {github?.connected && (
+                      <button
+                        className="btn primary"
+                        disabled={busy}
+                        onClick={() => {
+                          if (!actionRef.current) go("ledgerProjects");
+                        }}
+                      >
+                        {T("Open projects", "打开项目")} <I.ArrowR size={14} />
+                      </button>
+                    )}
+                    <button
+                      className="btn"
+                      disabled={controlsDisabled}
+                      onClick={() =>
+                        runGitHubAction((signal) =>
+                          connectGitHubRepositories({ ...(github?.connected ? { add: true } : {}), signal })
+                        )
+                      }
+                    >
+                      {github?.connected
+                        ? T("Add account or organization", "添加账户或组织")
+                        : T("Connect repositories", "连接仓库")}
+                    </button>
+                  </div>
+                  {github?.connected && (
+                    <fieldset
+                      disabled={controlsDisabled}
+                      aria-label={T("Authorized GitHub installations", "已授权 GitHub 安装")}
+                      className="github-installations-fieldset"
+                    >
+                      <GitHubInstallationsList
+                        installations={github.installations}
+                        managingInstallationId={managingInstallationId}
+                        onManage={(installation) => {
+                          const installationId = installation?.id || installation?.installationId;
+                          runGitHubAction(
+                            (signal) =>
+                              manageGitHubInstallation(installationId, {
+                                githubIdentityId: installation?.manage?.githubIdentityId || undefined,
+                                redirectTo: window.location.href,
+                                signal,
+                              }),
+                            installationId
+                          );
+                        }}
+                      />
+                    </fieldset>
+                  )}
+                </>
+              )}
+            </div>
           </section>
         </main>
       </ConsoleLayout>

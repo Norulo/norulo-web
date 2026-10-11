@@ -429,7 +429,7 @@ function LedgerSkeleton({ mode }) {
               </div>
               <div className="ledger-field ledger-project-status">
                 <span className="ledger-project-label-skeleton">
-                  <SkeletonLine className="sk-line sk-w-56" />
+                  {T("Project status", "项目状态")}
                 </span>
                 <select className="ledger-project-control-skeleton" disabled tabIndex={-1}>
                   <option>{T("All projects", "全部项目")}</option>
@@ -2320,6 +2320,15 @@ function ScopedLedgerScreen({
         <main id="main-content" tabIndex={-1} className={`main ledger-${mode}`} aria-busy={writing}>
           <div className="page-h">
             <div className={mode === "project" ? "ledger-project-identity" : undefined}>
+              {mode === "project" && (
+                <a
+                  className="ledger-back-link"
+                  {...screenLinkProps(go, "ledgerProjects", {}, writing)}
+                >
+                  <I.ArrowL size={14} aria-hidden="true" />
+                  <span>{T("Back to projects", "返回项目列表")}</span>
+                </a>
+              )}
               <h1>{title}</h1>
               <p className="sub">
                 {mode === "projects"
@@ -2346,6 +2355,18 @@ function ScopedLedgerScreen({
               {mode === "project" && data?.project && (
                 <ProjectExternalLinks project={data.project} />
               )}
+              {mode === "project" &&
+                Array.isArray(data?.project?.totals) &&
+                data.project.totals.length > 0 && (
+                  <dl className="ledger-project-summary">
+                    <dt>{T("Expense total", "支出合计")}</dt>
+                    <dd>
+                      {data.project.totals.map((total) => (
+                        <LedgerTotal key={total.currency} total={total} />
+                      ))}
+                    </dd>
+                  </dl>
+                )}
             </div>
             <div className="actions">
               {canManageProjects && mode === "projects" && data?.projects.items.length > 0 && (
@@ -2382,11 +2403,6 @@ function ScopedLedgerScreen({
                     ? T("Continue draft", "继续填写")
                     : T("Add expense")}
                 </button>
-              )}
-              {mode === "project" && (
-                <a className="btn ghost" {...screenLinkProps(go, "ledgerProjects", {}, writing)}>
-                  <I.ArrowL size={14} /> {T("Back to projects", "返回项目列表")}
-                </a>
               )}
               <button
                 className="btn ghost"

@@ -566,31 +566,41 @@
     animation: modalIn 220ms var(--ease-out) both;
   }
 }
+/* Section strip for pages with sibling destinations (API keys, billing):
+   the same underline language as ledger views, above a full-width body. */
 .with-side .set-shell {
   display: grid;
-  grid-template-columns: 176px minmax(0, 1fr);
-  gap: var(--space-12);
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
 }
 .set-side {
   display: flex;
-  flex-direction: column;
-  gap: 2px;
+  flex-wrap: wrap;
+  gap: 0 var(--space-6);
+  border-bottom: 1px solid var(--border);
+  margin-bottom: var(--space-2);
 }
 .set-side-i {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   align-items: center;
-  min-height: 36px;
+  min-height: 44px;
   height: auto;
   min-width: 0;
   max-width: 100%;
-  padding: var(--space-2) var(--space-3);
+  padding: 0 0 var(--space-3);
   border: 0;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
   background: transparent;
-  font-size: var(--fs-md);
-  color: var(--text-2);
+  font-size: var(--fs-lg);
+  font-weight: 500;
+  color: var(--text-3);
   text-align: left;
   line-height: 1.5;
+  transition:
+    color 140ms var(--ease-out),
+    border-color 140ms var(--ease-out);
 }
 .set-side-i > svg {
   flex-shrink: 0;
@@ -614,13 +624,12 @@
   }
 }
 .set-side-i:hover {
-  background: var(--bg-soft);
   color: var(--text);
 }
 .set-side-i.active {
-  background: var(--bg-soft);
+  border-bottom-color: var(--accent);
   color: var(--text);
-  font-weight: 500;
+  cursor: default;
 }
 .set-body {
   min-width: 0;
@@ -675,10 +684,6 @@
     text-align: left;
   }
 
-  .with-side .set-shell {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 0;
-  }
 
   .section-h {
     align-items: stretch;
@@ -686,15 +691,10 @@
     gap: 10px;
   }
 
-  .set-side {
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: var(--space-2);
-    padding-bottom: var(--space-4);
-  }
-
   .set-side-i {
     flex: 0 1 auto;
+    min-height: 48px;
+    font-size: var(--fs-md);
   }
 
   .set-row {

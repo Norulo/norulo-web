@@ -536,10 +536,20 @@ async function checkPresentation(page, name) {
         ...row.currency.fragments.map((fragment) => fragment.bottom),
         ...row.number.fragments.map((fragment) => fragment.bottom)
       );
+      const amountRight = Math.max(
+        row.currency.rect.right,
+        row.number.rect.right,
+        ...row.currency.fragments.map((fragment) => fragment.right),
+        ...row.number.fragments.map((fragment) => fragment.right)
+      );
       for (const group of row.actionGroups) {
+        // Wide ledgers place actions in their own column after the amount;
+        // narrow ones place them on the amount's line or below it. Either way
+        // the amount stays clear of its actions.
         assert(
-          group.rect.top >= amountBottom + 4 - tolerance,
-          `${name}: ordinary expense amount is not above its actions with a clear gap ${details}`
+          group.rect.top >= amountBottom + 4 - tolerance ||
+            group.rect.left >= amountRight + 8 - tolerance,
+          `${name}: ordinary expense amount is not clear of its actions ${details}`
         );
         assert(
           inside(group.rect, row.row) && insideInline(group.rect, row.side.rect),

@@ -3,14 +3,18 @@
 }
 .ledger-expense-pagination {
   margin-top: 16px;
+  gap: 8px;
+}
+.ledger-expense-pagination > .ledger-meta {
+  min-width: 4.5rem;
+  color: var(--text-3);
+  font-size: var(--fs-md);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
 }
 .ledger-screen .page-h .sub {
   max-width: 580px;
   line-height: 1.7;
-}
-.ledger-screen .page-h .actions > .btn[aria-label] {
-  flex: 0 0 34px;
-  padding: 0;
 }
 .ledger-screen .ledger-project .page-h {
   flex-wrap: wrap;
@@ -23,6 +27,59 @@
 }
 .ledger-project-identity h1 {
   overflow-wrap: anywhere;
+}
+/* The return path sits above the title as a quiet eyebrow, leaving the action
+   group to the page's real work. */
+.ledger-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 28px;
+  margin-bottom: var(--space-2);
+  color: var(--text-3);
+  font-size: var(--fs-md);
+  font-weight: 500;
+  transition: color 140ms var(--ease-out);
+}
+.ledger-back-link > svg {
+  transition: transform 160ms var(--ease-out);
+}
+.ledger-back-link:where(:not([aria-disabled="true"])):hover,
+.ledger-back-link:focus-visible {
+  color: var(--accent);
+}
+.ledger-back-link:where(:not([aria-disabled="true"])):hover > svg {
+  transform: translateX(-2px);
+}
+.ledger-back-link[aria-disabled="true"] {
+  opacity: 0.5;
+}
+/* All-time project spend from the Server, one figure per currency. */
+.ledger-project-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 16px;
+  margin-top: var(--space-5);
+}
+.ledger-project-summary dt {
+  color: var(--text-3);
+  font-size: var(--fs-micro);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.ledger-project-summary dd {
+  --financial-size: var(--fs-value-secondary);
+  /* FinancialValue supplies soft breaks between complete comma groups. */
+  --financial-overflow-wrap: normal;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 20px;
+  min-width: 0;
+  margin: 0;
+  font-variant-numeric: tabular-nums;
 }
 .ledger-project-identity > .ledger-project-shortcuts {
   display: flex;
@@ -395,11 +452,28 @@
 .ledger-your-projects .ledger-search:focus-within {
   border-color: var(--accent);
 }
-.ledger-your-projects .ledger-project-status > label {
+/* Search and status share one control row and one top edge; the status
+   label reads inline as the select's prefix. */
+.ledger-screen .main .ledger-your-projects .ledger-project-status {
+  display: flex;
+  flex: 0 1 auto;
+  align-items: center;
+  gap: 10px;
+}
+.ledger-your-projects .ledger-project-filters {
+  align-items: center;
+}
+.ledger-your-projects .ledger-project-status > :is(label, .ledger-project-label-skeleton) {
+  flex: 0 0 auto;
   color: var(--text-3);
-  font-size: var(--fs-sm);
+  font-size: var(--fs-md);
   font-weight: 500;
-  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+.ledger-screen .main .ledger-your-projects .ledger-project-status > select {
+  width: auto;
+  min-width: 10rem;
+  min-height: 44px;
 }
 .ledger-your-projects .ledger-search-guidance {
   gap: 2px;
@@ -556,6 +630,10 @@
     grid-template-columns: minmax(0, 1fr);
     gap: 12px;
   }
+  .ledger-screen .main .ledger-your-projects .ledger-project-status > select {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
   .ledger-your-projects .ledger-project-toolbar {
     align-items: stretch;
     flex-direction: column;
@@ -571,6 +649,13 @@
   line-height: 1.6;
   margin-bottom: 16px;
   max-width: 580px;
+}
+/* Category guidance is reference copy beside the list, not a lead-in. */
+.ledger-categories .panel-h + .ledger-help,
+.ledger-categories .panel-h + .ledger-help + .ledger-help {
+  max-width: 64ch;
+  color: var(--text-3);
+  font-size: var(--fs-md);
 }
 
 /* Primary records and secondary creation share one calm workspace. */
@@ -607,11 +692,6 @@
   padding-block: var(--ledger-row-padding, 16px);
   border-bottom: 1px solid var(--border);
   min-width: 0;
-  transition: background 160ms ease;
-}
-.ledger-screen .ledger-list > article:not(.skeleton-row):hover,
-.ledger-screen .ledger-list > article:not(.skeleton-row):focus-within {
-  background: var(--bg-tint);
 }
 .ledger-screen .ledger-list > :last-child {
   border-bottom: 0;
@@ -677,31 +757,89 @@
   max-width: 560px;
   margin-bottom: 6px;
 }
+/* Expense records read as one ledger table: every row shares the list's
+   description, amount and action columns, so amounts align on one edge and
+   Edit/Remove stay in a single column beside them. */
+.ledger-screen .ledger-list:has(> .ledger-expense-row) {
+  grid-template-columns: minmax(0, 1fr) auto auto;
+}
+.ledger-screen .ledger-expense-row {
+  grid-column: 1 / -1;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  grid-template-columns: subgrid;
+  align-items: center;
+  column-gap: 32px;
+}
 .ledger-screen .ledger-expense-row > .ledger-row-side {
+  grid-column: 2 / 4;
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  justify-items: end;
-  gap: 12px;
+  grid-template-columns: auto auto;
+  grid-template-columns: subgrid;
+  align-items: center;
+  column-gap: 24px;
   min-width: 0;
+}
+.ledger-screen .ledger-expense-row .ledger-amount {
+  justify-self: end;
+  text-align: right;
 }
 .ledger-screen .ledger-row-side > .ledger-actions {
   justify-content: flex-end;
+  flex-wrap: nowrap;
+  gap: 4px;
 }
 .ledger-screen .ledger-amount {
-  --financial-size: var(--fs-value-row);
+  --financial-size: var(--fs-value-secondary);
   min-width: 0;
   max-width: 100%;
   overflow-wrap: anywhere;
 }
+/* Purpose leads; date, category and an optional note share the second line
+   and wrap naturally when the note is long. */
+.ledger-screen .ledger-expense-row .ledger-row-main {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 10px;
+}
+.ledger-screen .ledger-expense-row .ledger-row-main > h3 {
+  flex: 1 0 100%;
+  margin: 0;
+  font-size: var(--fs-xl);
+  line-height: 1.45;
+}
+.ledger-screen .ledger-expense-row .ledger-row-main > p {
+  margin: 0;
+  min-width: 0;
+  font-size: var(--fs-md);
+  line-height: 1.55;
+}
+.ledger-screen .ledger-expense-row .ledger-meta {
+  font-variant-numeric: tabular-nums;
+}
+.ledger-screen .ledger-expense-row .ledger-row-main > p:not(.ledger-meta) {
+  padding-left: 10px;
+  border-left: 1px solid var(--border-strong);
+  color: var(--text-2);
+}
+/* Narrow lists stack the description over one line holding the amount and
+   its actions. */
 @container (max-width: 560px) {
   .ledger-screen .ledger-expense-row {
     grid-template-columns: minmax(0, 1fr);
+    row-gap: 10px;
   }
   .ledger-screen .ledger-expense-row > .ledger-row-side {
-    justify-items: start;
+    grid-column: 1;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px 16px;
   }
-  .ledger-screen .ledger-row-side > .ledger-actions {
-    justify-content: flex-start;
+  .ledger-screen .ledger-expense-row .ledger-amount {
+    justify-self: start;
+    text-align: left;
   }
 }
 .ledger-screen .ledger-form {
@@ -894,6 +1032,8 @@
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 175px), 1fr));
   gap: 16px;
 }
+/* Views and their tools share one bar: tabs on the hairline, tools at the
+   far edge, so the active view and what can be done to it read together. */
 .ledger-view-toolbar {
   display: flex;
   flex-wrap: wrap;
@@ -901,7 +1041,7 @@
   justify-content: space-between;
   gap: 12px 24px;
   border-bottom: 1px solid var(--border);
-  margin-bottom: 4px;
+  margin-bottom: 8px;
 }
 .ledger-view-toolbar > .view-tabs {
   flex-wrap: wrap;
@@ -914,8 +1054,18 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 8px;
+  gap: 4px;
+  margin-bottom: 10px;
+}
+.ledger-filter-count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  background: var(--accent);
+  color: var(--accent-fg);
+  font: 600 var(--fs-xs) / 1 var(--font-mono);
 }
 .ledger-filter-strip {
   max-width: 800px;
@@ -1262,9 +1412,6 @@
   .ledger-project-shortcuts > .ledger-meta {
     flex-basis: 100%;
   }
-  .ledger-screen .page-h .actions > .btn[aria-label] {
-    flex-basis: 44px;
-  }
   .ledger-screen .ledger-form {
     gap: 24px;
   }
@@ -1307,27 +1454,29 @@
     grid-template-columns: minmax(0, 1fr);
     align-items: start;
     gap: 12px;
-    padding-bottom: 12px;
+    border-bottom: 0;
     margin-bottom: 8px;
   }
   .ledger-view-toolbar > .view-tabs {
     width: 100%;
+    border-bottom: 1px solid var(--border);
   }
+  /* Tools form one segmented row of equal cells under the tabs. */
   .ledger-view-controls {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
+    gap: 8px;
     margin-bottom: 0;
   }
-  .ledger-view-controls > .btn {
-    flex: 1 1 120px;
-  }
-  .ledger-screen .ledger-categories .page-h {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    align-items: start;
-    gap: 16px;
-    margin-bottom: 24px;
-  }
-  .ledger-screen .ledger-categories .page-h .actions {
-    width: auto;
+  .ledger-screen .ledger-view-controls > .btn {
+    min-width: 0;
+    padding-inline: var(--space-2);
+    border-color: var(--border);
+    font-size: var(--fs-md);
+    line-height: 1.25;
+    white-space: normal;
+    text-align: center;
   }
   .ledger-screen .panel {
     padding: 24px 0;
@@ -1348,7 +1497,7 @@
     --ledger-split-header-gap: 24px;
   }
   .ledger-screen .ledger-list > article {
-    padding-block: 24px;
+    padding-block: 18px;
   }
   .ledger-screen .ledger-list h3,
   .ledger-screen .ledger-your-projects .ledger-list h2 {
@@ -1382,19 +1531,6 @@
   }
   .ledger-screen .ledger-category-row > .ledger-actions {
     grid-column: 1 / -1;
-  }
-  .ledger-screen .ledger-expense-row {
-    grid-template-columns: minmax(0, 1fr);
-  }
-  .ledger-screen .ledger-expense-row > .ledger-row-side {
-    justify-items: start;
-    width: 100%;
-  }
-  .ledger-screen .ledger-row-side > .ledger-actions {
-    justify-content: flex-start;
-  }
-  .ledger-screen .ledger-amount {
-    --financial-size: var(--fs-value-row-compact);
   }
 }
 @media (prefers-reduced-motion: reduce) {

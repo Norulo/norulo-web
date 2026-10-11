@@ -23,7 +23,7 @@
   grid-template-columns: minmax(0, 1fr) minmax(150px, 180px) 96px;
   align-items: center;
   gap: var(--space-4) var(--space-6);
-  padding-block: var(--space-6);
+  padding-block: var(--space-4);
 }
 .members-screen .member-list[data-manage="false"] .member-row {
   grid-template-columns: minmax(0, 1fr) minmax(80px, 120px);
@@ -36,26 +36,48 @@
 }
 .member-identity {
   display: grid;
-  grid-template-columns: 44px minmax(0, 1fr);
-  align-items: start;
-  gap: var(--space-4);
+  grid-template-columns: 36px minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-3);
   min-width: 0;
 }
 .member-avatar {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 44px;
-  height: 44px;
+  width: 36px;
+  height: 36px;
   border: 1px solid var(--border);
   background: var(--bg-soft);
   color: var(--text-2);
-  font: 600 var(--fs-lg)/1 var(--font-mono);
+  font: 600 var(--fs-md)/1 var(--font-mono);
 }
 .member-identity-copy {
   display: grid;
-  gap: var(--space-1);
+  gap: 2px;
   min-width: 0;
+}
+.members-screen .member-identity h3 {
+  font-size: var(--fs-xl);
+  line-height: 1.4;
+}
+/* Login and any role note share the second line, wrapping when long. */
+.members-screen .member-list .member-identity-copy {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 10px;
+}
+.members-screen .member-list .member-identity-copy > h3 {
+  flex: 1 0 100%;
+}
+.members-screen .member-identity-copy > p {
+  color: var(--text-3);
+  font-size: var(--fs-md);
+}
+.members-screen .member-list .member-identity-copy > .member-login + p {
+  padding-left: 10px;
+  border-left: 1px solid var(--border-strong);
 }
 .members-screen .member-identity h3,
 .members-screen .member-identity p {
@@ -64,7 +86,7 @@
 .member-login {
   min-width: 0;
   color: var(--text-3);
-  font: var(--fs-md)/1.5 var(--font-mono);
+  font: var(--fs-sm)/1.5 var(--font-mono);
   overflow-wrap: anywhere;
 }
 .members-screen .member-row .member-role {
@@ -177,6 +199,6 @@
 }
 @container (max-width: 560px) {
   .members-screen .member-list .member-row {
-    padding-block: var(--space-5);
+    padding-block: var(--space-4);
   }
 }

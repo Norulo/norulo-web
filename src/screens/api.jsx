@@ -132,6 +132,29 @@ function projectChoices(payload) {
 function ApiKeysSkeleton() {
   return (
     <div className="set-body api-keys-skeleton" aria-busy="true">
+      <section className="panel">
+        <div className="panel-h">
+          <SkeletonLine className="sk-square sk-size-16" />
+          <SkeletonLine className="sk-line sk-w-30 sk-h-16" />
+        </div>
+        <div className="key-list">
+          {Array.from({ length: 3 }, (_, index) => (
+            <div className="key-row skeleton-row" key={`api-key-row-skeleton-${index}`}>
+              <SkeletonLine className="sk-line sk-w-12 sk-h-22" />
+              <SkeletonLine className="sk-line sk-w-16" />
+              <div className="key-main">
+                <SkeletonLine className="sk-line sk-w-45 sk-h-16" />
+                <div className="key-meta">
+                  <SkeletonLine className="sk-line sk-w-26" />
+                  <SkeletonLine className="sk-line sk-w-24" />
+                  <SkeletonLine className="sk-line sk-w-18" />
+                </div>
+              </div>
+              <SkeletonLine className="sk-line sk-w-18 sk-h-28" />
+            </div>
+          ))}
+        </div>
+      </section>
       <div className="panel api-key-create">
         <div className="panel-h">
           <SkeletonLine className="sk-square sk-size-16" />
@@ -175,30 +198,6 @@ function ApiKeysSkeleton() {
           <SkeletonLine className="sk-line sk-w-22 sk-h-40" />
         </div>
       </div>
-
-      <section className="panel">
-        <div className="panel-h">
-          <SkeletonLine className="sk-square sk-size-16" />
-          <SkeletonLine className="sk-line sk-w-30 sk-h-16" />
-        </div>
-        <div className="key-list">
-          {Array.from({ length: 3 }, (_, index) => (
-            <div className="key-row skeleton-row" key={`api-key-row-skeleton-${index}`}>
-              <SkeletonLine className="sk-line sk-w-12 sk-h-22" />
-              <SkeletonLine className="sk-line sk-w-16" />
-              <div className="key-main">
-                <SkeletonLine className="sk-line sk-w-45 sk-h-16" />
-                <div className="key-meta">
-                  <SkeletonLine className="sk-line sk-w-26" />
-                  <SkeletonLine className="sk-line sk-w-24" />
-                  <SkeletonLine className="sk-line sk-w-18" />
-                </div>
-              </div>
-              <SkeletonLine className="sk-line sk-w-18 sk-h-28" />
-            </div>
-          ))}
-        </div>
-      </section>
     </div>
   );
 }
@@ -788,6 +787,55 @@ export function ApiKeysScreen({
                       </button>
                     </div>
                   )}
+                  <section className="panel">
+                    <div className="panel-h">
+                      <I.Code size={16} />
+                      <h2>{T("Keys", "密钥")}</h2>
+                      <span className="count">{keys.length}</span>
+                    </div>
+                    <div className="key-list">
+                      {keys.map((key) => (
+                        <div key={key.id || key.prefix || key.name} className="key-row">
+                          <div className="key-sev sev-bg-info">
+                            <I.Code size={12} /> {T("key", "key")}
+                          </div>
+                          <div className="key-id">{key.prefix || key.id || "-"}</div>
+                          <div className="key-main">
+                            <div className="key-t">{key.name}</div>
+                            <div className="key-meta">
+                              <span className="tag">
+                                {T("Created", "已创建")} {formatDate(key.createdAt)}
+                              </span>
+                              <span className="tag">
+                                {T("Last used", "最近使用")} {formatDate(key.lastUsedAt)}
+                              </span>
+                              {key.scopes.map((scope) => (
+                                <span className="tag" key={scope}>
+                                  {scope}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                          <button
+                            className="btn sm"
+                            disabled={controlsDisabled}
+                            onClick={() => requestRevokeKey(key)}
+                          >
+                            <I.X size={13} /> {T("Revoke", "吊销")}
+                          </button>
+                        </div>
+                      ))}
+                      {!loading && keys.length === 0 && (
+                        <div className="empty">
+                          <I.Code size={28} />
+                          <h3>
+                            {T("No API keys have been created yet.", "尚未创建任何 API 密钥。")}
+                          </h3>
+                        </div>
+                      )}
+                    </div>
+                  </section>
+
                   <form className="api-key-create panel" onSubmit={createKey}>
                     <div className="panel-h">
                       <I.Shield size={16} />
@@ -1114,55 +1162,6 @@ export function ApiKeysScreen({
                       </div>
                     </div>
                   </form>
-
-                  <section className="panel">
-                    <div className="panel-h">
-                      <I.Code size={16} />
-                      <h2>{T("Keys", "密钥")}</h2>
-                      <span className="count">{keys.length}</span>
-                    </div>
-                    <div className="key-list">
-                      {keys.map((key) => (
-                        <div key={key.id || key.prefix || key.name} className="key-row">
-                          <div className="key-sev sev-bg-info">
-                            <I.Code size={12} /> {T("key", "key")}
-                          </div>
-                          <div className="key-id">{key.prefix || key.id || "-"}</div>
-                          <div className="key-main">
-                            <div className="key-t">{key.name}</div>
-                            <div className="key-meta">
-                              <span className="tag">
-                                {T("Created", "已创建")} {formatDate(key.createdAt)}
-                              </span>
-                              <span className="tag">
-                                {T("Last used", "最近使用")} {formatDate(key.lastUsedAt)}
-                              </span>
-                              {key.scopes.map((scope) => (
-                                <span className="tag" key={scope}>
-                                  {scope}
-                                </span>
-                              ))}
-                            </div>
-                          </div>
-                          <button
-                            className="btn sm"
-                            disabled={controlsDisabled}
-                            onClick={() => requestRevokeKey(key)}
-                          >
-                            <I.X size={13} /> {T("Revoke", "吊销")}
-                          </button>
-                        </div>
-                      ))}
-                      {!loading && keys.length === 0 && (
-                        <div className="empty">
-                          <I.Code size={28} />
-                          <h3>
-                            {T("No API keys have been created yet.", "尚未创建任何 API 密钥。")}
-                          </h3>
-                        </div>
-                      )}
-                    </div>
-                  </section>
                 </div>
               )}
             </div>

@@ -68,8 +68,8 @@
   font-variant-numeric: tabular-nums;
 }
 .key-t {
-  font-size: var(--fs-md);
-  font-weight: 500;
+  font-size: var(--fs-lg);
+  font-weight: 600;
   line-height: 1.4;
   margin-bottom: var(--space-1);
   overflow-wrap: anywhere;

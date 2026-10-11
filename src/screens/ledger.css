@@ -418,15 +418,6 @@
   letter-spacing: 0;
   font-variant-numeric: tabular-nums;
 }
-.ledger-screen .ledger-your-projects .ledger-project-list > .ledger-project-row {
-  transition:
-    background 160ms ease,
-    box-shadow 160ms ease;
-}
-.ledger-screen .ledger-your-projects .ledger-project-list > .ledger-project-row:not(.skeleton-row):hover,
-.ledger-screen .ledger-your-projects .ledger-project-list > .ledger-project-row:not(.skeleton-row):focus-within {
-  box-shadow: inset 2px 0 0 var(--accent);
-}
 .ledger-screen .ledger-your-projects .ledger-project-row .ledger-row-main h2 {
   font-size: var(--fs-2xl);
   font-weight: 600;
@@ -495,22 +486,13 @@
 .ledger-your-projects .ledger-project-product-empty {
   color: var(--text-4);
 }
-.ledger-your-projects .empty {
-  border-style: solid;
-  border-color: var(--border);
-  background: transparent;
-}
-.ledger-your-projects .empty > svg {
-  color: var(--text-4);
-}
 .ledger-your-projects .empty h2 {
   margin-bottom: 6px;
   font-size: var(--fs-3xl);
   font-weight: 600;
 }
 @media (prefers-reduced-motion: reduce) {
-  .ledger-your-projects .ledger-project-title-link > svg,
-  .ledger-screen .ledger-your-projects .ledger-project-list > .ledger-project-row {
+  .ledger-your-projects .ledger-project-title-link > svg {
     transition: none;
   }
   .ledger-your-projects .ledger-project-row:hover .ledger-project-title-link > svg,
@@ -1015,8 +997,9 @@
   flex-shrink: 1;
   background: var(--accent);
 }
+/* Shared costs read as the neutral counterpart to accent project spend. */
 .ledger-summary-segment[data-target="shared"] {
-  background: var(--cat-sky);
+  background: var(--text-3);
 }
 .ledger-summary-breakdown {
   display: grid;
@@ -1042,7 +1025,7 @@
   background: var(--accent);
 }
 [data-target="shared"] .ledger-summary-key {
-  background: var(--cat-sky);
+  background: var(--text-3);
 }
 .ledger-summary-breakdown dd {
   display: grid;

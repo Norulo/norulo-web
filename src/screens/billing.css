@@ -50,7 +50,7 @@
 
 .sub-record-main b {
   display: block;
-  font-size: var(--fs-md);
+  font-size: var(--fs-lg);
   font-weight: 600;
   overflow-wrap: anywhere;
 }

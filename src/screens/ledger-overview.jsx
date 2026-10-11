@@ -117,8 +117,10 @@ function ScopedOverview({
                 type="button"
                 disabled={busy || !range}
                 onClick={reload}
+                aria-label={T("Reload")}
+                title={T("Reload")}
               >
-                <I.Refresh size={14} /> {T("Reload")}
+                <I.Refresh size={14} aria-hidden="true" />
               </button>
             </div>
           </div>

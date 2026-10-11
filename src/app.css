@@ -557,16 +557,6 @@
   box-shadow: inset 2px 0 0 var(--accent);
 }
 
-/* Empty states: a solid hairline frame instead of a dashed box. */
-:where(.with-side) .empty {
-  border-style: solid;
-  border-color: var(--border);
-  background: transparent;
-}
-:where(.with-side) .empty > svg {
-  color: var(--text-4);
-}
-
 /* Metadata reads as metadata: mono tags with a little tracking. */
 :where(.with-side) .tag {
   letter-spacing: 0.02em;

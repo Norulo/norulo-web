@@ -722,11 +722,14 @@ function MembersContent({
                   </button>
                 )}
                 <button
-                  className="btn"
+                  className="btn ghost"
+                  type="button"
                   onClick={reloadWithAccess}
                   disabled={loading || busy || accessRefreshing}
+                  aria-label={T("Reload", "重新加载")}
+                  title={T("Reload", "重新加载")}
                 >
-                  {T("Reload", "重新加载")}
+                  <I.Refresh size={14} aria-hidden="true" />
                 </button>
               </div>
             )}

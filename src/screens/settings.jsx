@@ -547,9 +547,18 @@ export function SettingsScreen({ go, onSessionUpdated, onOperationBusy }) {
               <h1>{T("Settings", "设置")}</h1>
               <p className="sub">{T("Account and sign-in methods", "账户与登录方式")}</p>
             </div>
-            <button className="btn" onClick={reload} disabled={controlsDisabled}>
-              {T("Reload", "重新加载")}
-            </button>
+            <div className="actions">
+              <button
+                className="btn ghost"
+                type="button"
+                onClick={reload}
+                disabled={controlsDisabled}
+                aria-label={T("Reload", "重新加载")}
+                title={T("Reload", "重新加载")}
+              >
+                <I.Refresh size={14} aria-hidden="true" />
+              </button>
+            </div>
           </div>
           {error && (
             <div className="notice notice-error" role="alert">
@@ -572,7 +581,7 @@ export function SettingsScreen({ go, onSessionUpdated, onOperationBusy }) {
                     <span className="email-sign-in-identity">{user.email}</span>
                   </div>
                 )}
-                <button className="btn sm" onClick={leaveSession} disabled={controlsDisabled}>
+                <button className="btn" onClick={leaveSession} disabled={controlsDisabled}>
                   {T("Sign out", "退出登录")}
                 </button>
               </>
@@ -589,7 +598,7 @@ export function SettingsScreen({ go, onSessionUpdated, onOperationBusy }) {
               {canConnectGitHub && (
                 <div className="panel-actions">
                   <button
-                    className="btn sm"
+                    className="btn"
                     disabled={controlsDisabled}
                     onClick={() =>
                       runGitHubAction((signal) =>
@@ -726,7 +735,7 @@ export function SettingsScreen({ go, onSessionUpdated, onOperationBusy }) {
                 </p>
                 <div className="panel-actions">
                   <button
-                    className="btn sm"
+                    className="btn"
                     disabled={controlsDisabled}
                     onClick={() => {
                       if (!actionRef.current) go("pricing");
@@ -837,7 +846,7 @@ export function SettingsScreen({ go, onSessionUpdated, onOperationBusy }) {
                     </button>
                   )}
                   <button
-                    className="btn sm"
+                    className="btn"
                     disabled={controlsDisabled}
                     onClick={() =>
                       runGitHubAction((signal) =>

@@ -32,6 +32,11 @@
   gap: var(--space-1);
 }
 
+/* Explanatory copy keeps a readable measure on wide screens. */
+.settings-screen .main > .panel p {
+  max-width: 72ch;
+}
+
 .settings-sign-in-description {
   margin: 0;
   line-height: 1.5;

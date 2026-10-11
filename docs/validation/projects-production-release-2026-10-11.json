@@ -1,0 +1,456 @@
+{
+  "recordedAtUTC": "2026-10-11T14:27:49.513929+00:00",
+  "scope": "Production frontend Projects UI and initial-loading release; Web only",
+  "sourceCommit": "4f0da82e957d1a8aec490a01aeda19b37bf41aff",
+  "production": {
+    "accountId": "84e421f26c708c0cf437e287eed11fa1",
+    "worker": "norulo-web",
+    "versionId": "bce7995f-6c1c-4481-ab44-7b1718ba059e",
+    "deploymentId": "d2ebde7c-d7ae-4d26-acec-cc462ea31c0f",
+    "deployedAtUTC": "2026-10-11T14:26:20.376943Z",
+    "trafficPercentage": 100,
+    "previousVersionId": "e0af6e92-9af1-4767-9fad-6ae591371aca",
+    "domains": [
+      "norulo.com",
+      "www.norulo.com"
+    ],
+    "settings": {
+      "placement": {},
+      "compatibility_date": "2026-05-25",
+      "compatibility_flags": [],
+      "tail_consumers": [],
+      "logpush": false,
+      "observability": {
+        "enabled": true,
+        "head_sampling_rate": 1,
+        "redact_query_string": true,
+        "logs": {
+          "enabled": true,
+          "head_sampling_rate": 0.01,
+          "persist": true,
+          "invocation_logs": false
+        },
+        "traces": {
+          "enabled": false,
+          "persist": true,
+          "head_sampling_rate": 1
+        }
+      },
+      "bindings": [
+        {
+          "name": "ASSETS",
+          "type": "assets"
+        },
+        {
+          "name": "NORULO_API_ORIGIN",
+          "text": "https://api.norulo.com",
+          "type": "plain_text"
+        },
+        {
+          "name": "NORULO_MODE",
+          "text": "production",
+          "type": "plain_text"
+        },
+        {
+          "environment": "production",
+          "name": "NORULO_SERVER",
+          "service": "norulo-server-production",
+          "type": "service"
+        }
+      ]
+    },
+    "subdomain": {
+      "enabled": false,
+      "previews_enabled": false
+    },
+    "serverVersionsBefore": [
+      {
+        "version_id": "15ebb291-af35-4600-87e9-0064d8fe33d0",
+        "percentage": 100
+      }
+    ],
+    "serverVersionsAfter": [
+      {
+        "version_id": "15ebb291-af35-4600-87e9-0064d8fe33d0",
+        "percentage": 100
+      }
+    ]
+  },
+  "build": {
+    "publicEnvironment": {
+      "VITE_APP_URL": "https://norulo.com",
+      "VITE_API_BASE_URL": "/api",
+      "VITE_GITHUB_APP_SLUG": "norulo"
+    },
+    "wranglerVersion": "4.136.3",
+    "productionBuild": "passed",
+    "offlineWorkerConfiguration": "passed",
+    "workerSyntax": "passed",
+    "wranglerDryRun": "passed",
+    "newAssetsUploaded": 35,
+    "assetsAlreadyUploaded": 21,
+    "manifestEntries": 57,
+    "originalPublicFilesByteIdentical": 13,
+    "buildLogSha256": "188b059746a7293c698b80430c95d30b14faad9e8754f1ece92337835527261d",
+    "deployOutputSha256": "dcb36040a17b11c5de491759c67fc3246d1a49fc8dcf73458d8e6b61714fad15",
+    "assetManifest": {
+      "_headers": {
+        "bytes": 776,
+        "sha256": "574cae34b5a945718326476f1602fefbf0be1397f9dbd0a48998a637c5fecb69"
+      },
+      "apple-touch-icon.png": {
+        "bytes": 16804,
+        "sha256": "109a0dfd5ce40069ffff2de602550760ce96bb369e860d8698b0283b1a9dbab2"
+      },
+      "brand-mark.png": {
+        "bytes": 6754,
+        "sha256": "863683d97199c2a85bce5b3d61c855bfdad069a92868561f1c5015b9219e77e1"
+      },
+      "favicon.ico": {
+        "bytes": 128875,
+        "sha256": "a15716aea6d56f256c133e4def0291a9c6857a437b4e3c88ac86eb869d9564ea"
+      },
+      "index.html": {
+        "bytes": 5332,
+        "sha256": "e2071eb70b4fb71df863da72beab8f2459392e367005fbc6f006ae99eabf2d64"
+      },
+      "norulo-logo.png": {
+        "bytes": 663100,
+        "sha256": "a9632acbd7a5ad48ad5ff25d6269f617c7655446365344c9db42d504213c710f"
+      },
+      "robots.txt": {
+        "bytes": 330,
+        "sha256": "80c2477041beca03786365b7c4da7da677ff13f37894034ba9f8f42a34efd716"
+      },
+      "sitemap.xml": {
+        "bytes": 982,
+        "sha256": "81f2d06e4575049dac67f011226f20adcca2165dc39bab85f9490f9494ea203b"
+      },
+      "social-card.png": {
+        "bytes": 40882,
+        "sha256": "0e1fd8c8aaa7dd1c414415cfe5c7cd1eafa9ea2b21005260fae9ecb8d352f026"
+      },
+      "social-card.svg": {
+        "bytes": 956475,
+        "sha256": "e307c8c0b5207d3283b901e6cee0d46bb4d15d6e9adb16b67483528509a44003"
+      },
+      "assets/auth-938rXkq0.js": {
+        "bytes": 11634,
+        "sha256": "8f7429c6ed741e690ef0d3babbe8eedfaa010477afa47ec6659672172a00e598"
+      },
+      "assets/billing-BssjfeIM.css": {
+        "bytes": 17188,
+        "sha256": "e8e9dde3fd862bbd286994978541a2060a2317254ba98da6c9fc0a792da71315"
+      },
+      "assets/catalog-Cyq8jWQT.js": {
+        "bytes": 128416,
+        "sha256": "46f9899e8dfb25d490c9dc567099a41be1067df0cb75427fa43bcecdc2527ac5"
+      },
+      "assets/i18n-Dz41h37D.js": {
+        "bytes": 8348,
+        "sha256": "ca60ae943e747f4fe16c9af0a600e1724e9d738740632c1d9369a2a6bc241e8b"
+      },
+      "assets/rolldown-runtime-QTnfLwEv.js": {
+        "bytes": 694,
+        "sha256": "5db5ba82eef00d1dee7e86e663098c9427d01183a88d357437daff295aec3e75"
+      },
+      "assets/activity-log-B7nT2wwt.js": {
+        "bytes": 8230,
+        "sha256": "1294e357e83ef3e990701de843d66b413b4bd1dda53b3dc520b6bbf5f7c36069"
+      },
+      "assets/catalog-BSSJK5xt.js": {
+        "bytes": 150277,
+        "sha256": "b06596eb5dc0159c9a26dae40eee0dbb1b3351cc2683504841ad159b97fdfd60"
+      },
+      "assets/navigation-t4ONNl4_.js": {
+        "bytes": 7820,
+        "sha256": "69a17e79655dbcadc77f6c2b6f016e8e22b51f62421323be843892fe3f58d76b"
+      },
+      "assets/shell-CJSkGOgz.js": {
+        "bytes": 6466,
+        "sha256": "6bc2aaa1ef49efa868520c76acad4c3b6f06a5fc00999e12f8ada30554c3a189"
+      },
+      "assets/api-W7MCAFZ9.css": {
+        "bytes": 3026,
+        "sha256": "14abc2407910deca10e106be9d6673ac11f9823285c4fce8a1372e908f483de4"
+      },
+      "assets/settings-CzaDXOF8.js": {
+        "bytes": 32729,
+        "sha256": "06808014dc77d6800efd270338c8b911e24a958448135d969bc38f9df96d31ee"
+      },
+      "assets/billing-XiaOhHQD.js": {
+        "bytes": 46225,
+        "sha256": "50104f0925999d41798da1a8ad778e5ffecb6e6d07aeae5e9dc9344355e9a258"
+      },
+      "assets/category-label-4RhtDPSA.js": {
+        "bytes": 202,
+        "sha256": "38e1d865f3d0fd4c734bf24c5cb49f7ea1bfb18fda52c6f2442b24e357ff9cec"
+      },
+      "assets/docs-B_qNShtH.css": {
+        "bytes": 9209,
+        "sha256": "78e58097bf5d93822a64d2a5f4aa72d267e5f23b342758d6a604cb2772e09356"
+      },
+      "assets/recurring-expenses-CwtTvo7v.js": {
+        "bytes": 14685,
+        "sha256": "33900bdbff8b37f2ced32b5037aa4661dbd66698a2d828f0975360fe9dd715fd"
+      },
+      "assets/legal-CPn_BtWb.css": {
+        "bytes": 5665,
+        "sha256": "48f4d0964761f14fbaf11025a1b387d459f177c66a1f140160b73cff2d3df6c2"
+      },
+      "assets/index-C69PMmVP.js": {
+        "bytes": 101747,
+        "sha256": "1abf1e528eecba6b37a548e7a7d44a2bcffb049206ec8c40c1254aceb7534d9f"
+      },
+      "assets/catalog-B1XFxbig.js": {
+        "bytes": 161530,
+        "sha256": "59182d7fa22b832ffe80f94682c6a1c9a16b4d670fa2d2296bc827cbbcd869df"
+      },
+      "assets/vendor-react-CvBZlOBd.js": {
+        "bytes": 139888,
+        "sha256": "50d04b32f87b646fc9caccf1f5d07f312d6d5612640ef88213ed599d466e07ac"
+      },
+      "assets/recurring-expenses-DcKoisPv.css": {
+        "bytes": 2380,
+        "sha256": "1f9c34a7497e3b12292bfdacd3a006a20c37a007dcae225133a8a82b1743e43d"
+      },
+      "assets/ledger-split-CvO5D-lH.js": {
+        "bytes": 1530,
+        "sha256": "4ee0ca89a4cda8a493a4934089dd394b70e9111cf21d9240f7b44e837b03aa62"
+      },
+      "assets/api-docs-D7jaZsun.js": {
+        "bytes": 312330,
+        "sha256": "3e68333c81e6a71449d1e6e48b26f299910057e1ad8b824fd8c9015f766c0751"
+      },
+      "assets/settings-BhR4Xutj.css": {
+        "bytes": 2190,
+        "sha256": "e3a521dab83f20bb72211aaac8fb680c0abf1292bc21c6131adf0d982f15c5e2"
+      },
+      "assets/members-D3MZcVWd.css": {
+        "bytes": 3584,
+        "sha256": "a7b3808ad219189d8b40f5219f7dff33c10d374e517d19cf51a5f039ccfa552b"
+      },
+      "assets/ledger-BRNZbDLA.js": {
+        "bytes": 111133,
+        "sha256": "e024a72c97777262d7bd9f87cac14d4f2edf47f53c7eeafc2b84a08961dec45f"
+      },
+      "assets/catalog-GZ03EZo6.js": {
+        "bytes": 145786,
+        "sha256": "369d31eb476aad0589762e9844a998fb0deb55dab057faa27c17079ea09b23e0"
+      },
+      "assets/index-CAQO-sb4.css": {
+        "bytes": 65425,
+        "sha256": "026027fa949aefea87a251afcdf96963579d860f48a3e21952f80c0b2595e138"
+      },
+      "assets/ledger-overview-BrcAFSjX.js": {
+        "bytes": 4738,
+        "sha256": "f63d6a69544548dfe0f31a01b49e8d5d473dd4549dd917ee022d11f7d9f8070e"
+      },
+      "assets/activity-log-Bj_liVMF.css": {
+        "bytes": 1760,
+        "sha256": "0326f21e87a89184ab4ab5b5176134fb6023736c553c66ef6e1a58bd1a4a659f"
+      },
+      "assets/ledger-summary-Dg50TZnR.js": {
+        "bytes": 5189,
+        "sha256": "fc83e1143fabe8b0de09bcfcacd4ff0b512f5867c00ca928b56ad3d43e082466"
+      },
+      "assets/legal-7EcBSYeL.js": {
+        "bytes": 29019,
+        "sha256": "acdb2a0bb7f571c036fd508cef2c5998467e9e010c987e61114772065b07d443"
+      },
+      "assets/recurring-schedule-fields-B8pkH4ds.js": {
+        "bytes": 5794,
+        "sha256": "142083ffc611c22d88652b19815441b563885b9d250ba057030f4b8bff3f94e5"
+      },
+      "assets/docs-B5fScU_f.js": {
+        "bytes": 65946,
+        "sha256": "43e71df08a27183d35af8c13ebe24e2ab768125ec139ef52729cc01b7d80c54b"
+      },
+      "assets/ledger-CjuFW0Ty.css": {
+        "bytes": 24127,
+        "sha256": "dba5d97051c325f0bdd66f1f042899a801134cf69d63aba86f66ccd9706cfef2"
+      },
+      "assets/norulo-CVj_7ub6.js": {
+        "bytes": 2482,
+        "sha256": "71cbbcdf80e84514bafb5758addb000e5e2984054a613e9f4d8c8ce6b4eccc5e"
+      },
+      "assets/skeleton-DcuWflyg.js": {
+        "bytes": 2635,
+        "sha256": "76ea2233a37bcbe744b7b69a5b5033b316cfa3df812fe650da51d349b9030f29"
+      },
+      "assets/api-3S6XgC8U.js": {
+        "bytes": 29486,
+        "sha256": "a3778acd957b1c0cc822345a6cf3e512ef409c37fbdafdc243a253c5a4f8895b"
+      },
+      "assets/vendor-CHwUWPSh.js": {
+        "bytes": 56389,
+        "sha256": "bb88671736f2acdd1ab57aa4ca82fd7fa055a58dc8bf06a9a3f41f49dcb355e1"
+      },
+      "assets/ledger-Bx8BdLCh.css": {
+        "bytes": 3457,
+        "sha256": "7d56ba535172bb9983a6c4be6a0c1277e40f62f9a935763ab577d255eb6871ef"
+      },
+      "assets/expense-charts-Cvv-4jiv.js": {
+        "bytes": 6782,
+        "sha256": "f34f89411bd6bccb412f5003c589e8d547c015d64ea7ac8d977f72250aa29c5b"
+      },
+      "assets/expense-charts-COT_w7RL.css": {
+        "bytes": 2774,
+        "sha256": "d48ac27fae4891574c608b2f7d0a28f7769c5b0507ab97874b5bc3cb8ab4e3b4"
+      },
+      "assets/members-CrlKM9CW.js": {
+        "bytes": 26791,
+        "sha256": "19fa3f9e332d9f8d9a84b36276fb116d4ef8920e730250ee81209751711c6924"
+      },
+      "assets/catalog-9OnYCKrF.js": {
+        "bytes": 150937,
+        "sha256": "5c0e7cdd1baf117d102523093519efc9cddb161bea5ef4220c527fc255dd3002"
+      },
+      "fonts/geist-latin.woff2": {
+        "bytes": 29400,
+        "sha256": "19f9c92546aa300c312235e3125af1b81394d8db9a4bc4a425cd5b641d2d54e1"
+      },
+      "fonts/geist-mono-latin.woff2": {
+        "bytes": 23128,
+        "sha256": "684ad5b531f81d43c1e8c7038262d5db7cdc1f68006e04d6c7769efa8d33c8cc"
+      },
+      "fonts/OFL.txt": {
+        "bytes": 4387,
+        "sha256": "1781d2806a07d91c4edf4740b88449fab7d0eadad53f7c351b94cd4d4eb8c00f"
+      },
+      "openapi/ledger-v1.json": {
+        "bytes": 235064,
+        "sha256": "3840fe42e307f0033c54189ff3e88a962270356179203a6e0f4eef9857521d54"
+      }
+    }
+  },
+  "applicationVerification": "See projects-ui-performance-local-2026-10-11.json for local test and three-engine UI evidence.",
+  "liveVerification": {
+    "verifiedAtUTC": "2026-10-11T14:27:58.627566+00:00",
+    "productionEntry": "/assets/index-C69PMmVP.js",
+    "assetCount": 7,
+    "health": {
+      "ok": true,
+      "service": "norulo-server",
+      "database": {
+        "type": "d1",
+        "configured": true
+      }
+    },
+    "checks": [
+      {
+        "url": "/",
+        "status": 200,
+        "contentType": "text/html",
+        "sha256": "d28cf2da8aed2b37a1fefe98c952b4d6664a1d139c7f90aee7583c35e47075f6",
+        "cacheControl": "no-cache",
+        "location": null
+      },
+      {
+        "url": "/projects",
+        "status": 200,
+        "contentType": "text/html",
+        "sha256": "36a434ae2974d6cc28af5dc1ca8eba27f15dba5cc5fa874f2a3576b2e55ba53a",
+        "cacheControl": "no-cache",
+        "location": null
+      },
+      {
+        "url": "/assets/index-C69PMmVP.js",
+        "status": 200,
+        "contentType": "text/javascript",
+        "sha256": "1abf1e528eecba6b37a548e7a7d44a2bcffb049206ec8c40c1254aceb7534d9f",
+        "cacheControl": "public, max-age=31536000, immutable",
+        "location": null
+      },
+      {
+        "url": "/assets/ledger-CjuFW0Ty.css",
+        "status": 200,
+        "contentType": "text/css",
+        "sha256": "dba5d97051c325f0bdd66f1f042899a801134cf69d63aba86f66ccd9706cfef2",
+        "cacheControl": "public, max-age=31536000, immutable",
+        "location": null
+      },
+      {
+        "url": "/assets/ledger-Bx8BdLCh.css",
+        "status": 200,
+        "contentType": "text/css",
+        "sha256": "7d56ba535172bb9983a6c4be6a0c1277e40f62f9a935763ab577d255eb6871ef",
+        "cacheControl": "public, max-age=31536000, immutable",
+        "location": null
+      },
+      {
+        "url": "/assets/i18n-Dz41h37D.js",
+        "status": 200,
+        "contentType": "text/javascript",
+        "sha256": "ca60ae943e747f4fe16c9af0a600e1724e9d738740632c1d9369a2a6bc241e8b",
+        "cacheControl": "public, max-age=31536000, immutable",
+        "location": null
+      },
+      {
+        "url": "/assets/ledger-BRNZbDLA.js",
+        "status": 200,
+        "contentType": "text/javascript",
+        "sha256": "e024a72c97777262d7bd9f87cac14d4f2edf47f53c7eeafc2b84a08961dec45f",
+        "cacheControl": "public, max-age=31536000, immutable",
+        "location": null
+      },
+      {
+        "url": "/assets/catalog-Cyq8jWQT.js",
+        "status": 200,
+        "contentType": "text/javascript",
+        "sha256": "46f9899e8dfb25d490c9dc567099a41be1067df0cb75427fa43bcecdc2527ac5",
+        "cacheControl": "public, max-age=31536000, immutable",
+        "location": null
+      },
+      {
+        "url": "/norulo-logo.png",
+        "status": 200,
+        "contentType": "image/png",
+        "sha256": "a9632acbd7a5ad48ad5ff25d6269f617c7655446365344c9db42d504213c710f",
+        "cacheControl": "no-cache",
+        "location": null
+      },
+      {
+        "url": "https://www.norulo.com/projects?source=projects-release-check",
+        "status": 308,
+        "contentType": null,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "cacheControl": null,
+        "location": "https://norulo.com/projects?source=projects-release-check"
+      },
+      {
+        "url": "/api/health",
+        "status": 200,
+        "contentType": "application/json",
+        "sha256": "fb437ad47c6e9f3241477d292e451632361c8432ff389ca9313c4995fab7eaee",
+        "cacheControl": null,
+        "location": null
+      },
+      {
+        "url": "/api/api/v1/me",
+        "status": 401,
+        "contentType": "application/json",
+        "sha256": "48220ecdf89ae5e130bd1bb8c1705c83a32388d380f556d02aab160247b16bdb",
+        "cacheControl": "no-store",
+        "location": null
+      }
+    ],
+    "scope": "Finite TLS-verified anonymous GET checks; no business writes, email sends, D1 SQL, cron invocation or authenticated acceptance"
+  },
+  "preserved": {
+    "webSettingsEqualBeforeAndAfter": true,
+    "serverActiveVersionUnchanged": true,
+    "workersDevEnabled": false,
+    "previewUrlsEnabled": false,
+    "compatibilityDate": "2026-05-25",
+    "logsSamplingRate": 0.01,
+    "queryRedaction": true,
+    "invocationLogsEnabled": false,
+    "tracesEnabled": false
+  },
+  "limits": [
+    "Anonymous read-only release checks establish deployment, asset consistency and proxy protection. They do not establish authenticated Projects interactions, physical-device acceptance or production Core Web Vitals.",
+    "Version metadata has_preview does not describe public preview access; actual subdomain and domain previews_enabled remain false.",
+    "No Server deployment, remote D1 SQL, business mutation, real email or manual cron invocation was performed."
+  ]
+}

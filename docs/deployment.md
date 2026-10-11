@@ -1,5 +1,13 @@
 # Norulo production deployment
 
+The latest frontend Projects release was verified on 2026-10-11. Web source
+`4f0da82e957d1a8aec490a01aeda19b37bf41aff` is deployed as version
+`bce7995f-6c1c-4481-ab44-7b1718ba059e` with 100% production traffic. See the
+[Projects production release record](validation/projects-production-release-2026-10-11.json).
+This Web-only release retained the production Server binding and its active
+version `15ebb291-af35-4600-87e9-0064d8fe33d0`. The dated release B history below
+remains evidence of that earlier release.
+
 Verified daily release B was checked on 2026-10-11 at 06:38:08.477224 UTC. This is a dated
 snapshot of the exact source commits and Worker versions below, not a guarantee
 about subsequent HEADs or deployments. Imported records in `validation/` remain
@@ -10,12 +18,12 @@ Release A's hourly publication is retained below as historical evidence.
 ## Published frontend
 
 Cloudflare publication of the frontend application completed successfully using
-Web main commit `bef23ee7cca378614cdf1e7cdcc8494601c86648`:
+Web main commit `4f0da82e957d1a8aec490a01aeda19b37bf41aff`:
 
 | Setting | Published value |
 | --- | --- |
 | Worker | `norulo-web` |
-| Version | `0c63c81e-1f91-4b72-bf3b-f949b7840ad8` |
+| Version | `bce7995f-6c1c-4481-ab44-7b1718ba059e` |
 | Custom domains | `norulo.com`, `www.norulo.com` |
 | Mode | `production` |
 | API origin | `https://api.norulo.com` |
@@ -27,6 +35,14 @@ The production build uses `VITE_APP_URL=https://norulo.com`,
 `VITE_API_BASE_URL=/api` and `VITE_GITHUB_APP_SLUG=norulo`. The public App is
 [Norulo](https://github.com/apps/norulo). The exact user-supplied logo and its
 derivatives are included; see [brand provenance](branding.md).
+
+The latest release passed a fresh explicit production build and offline Worker
+checks. Twelve TLS-verified anonymous GETs passed: homepage and Projects shell,
+seven byte-identical production assets, the path/query-preserving WWW redirect,
+API-proxy health and the unauthenticated account boundary. Web settings and
+Server runtime version matched their pre-deployment readback; logs retain 1%
+sampling, query redaction and disabled invocation logs/traces. These checks do
+not establish authenticated Projects or real-device acceptance.
 
 The [Ubuntu CI run](https://github.com/Norulo/norulo-web/actions/runs/38054474964)
 for migrated application source `646999650246e7990bb34ed3d0108162fa2bec16`

@@ -1,5 +1,12 @@
 # Norulo Web
 
+The user has now confirmed ordinary expense recording works. The current release
+also fixes mobile profile spacing and narrow-screen project setup steps. Empty
+payment configuration supports Free use; paid checkout remains unavailable until
+real payments are configured. See [production operations](https://github.com/Norulo/norulo-server/blob/main/docs/operations.md)
+and the dated free-launch verification in the deployment notes for acceptance
+limits, safe logging and daily scheduling.
+
 > Current deployment: the Norulo frontend application has been published to
 > Cloudflare for `norulo.com` and `www.norulo.com`. The full Python Server is
 > published at `api.norulo.com`, with production D1/schema 12 verified. Direct

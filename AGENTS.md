@@ -1,5 +1,12 @@
 # Norulo Web
 
+Current public-launch scope defers real payments. Preserve the truthful Free-only
+catalog and disabled paid checkout, Owner AI policy, user-confirmed real expense
+recording and the mobile profile/setup layout corrections. Production logging
+uses fixed code/status diagnostics with 1% sampling, no invocation logs/traces
+and redacted queries; it is not complete error capture or automatic alerting.
+See [the production runbook](../norulo-server/docs/operations.md) before incidents.
+
 ## Current repository and authority
 
 This repository contains the imported Web application, rebranded to Norulo.

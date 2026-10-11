@@ -4,7 +4,13 @@ import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { preview } from "vite";
-import { createMobileLayoutFixture } from "./mobile-layout-fixtures.mjs";
+import {
+  createMobileLayoutFixture,
+  MOBILE_ACCOUNT_NAME,
+  MOBILE_NORMAL_EMAIL,
+  MOBILE_NORMAL_NAME,
+  MOBILE_VERIFIED_EMAIL,
+} from "./mobile-layout-fixtures.mjs";
 import { checkEntryControlLayout } from "./entry-control-layout.mjs";
 
 // Build dist first. Finite loopback fixtures establish engine/layout evidence;
@@ -12,7 +18,9 @@ import { checkEntryControlLayout } from "./entry-control-layout.mjs";
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const baseURL = "http://127.0.0.1:4248";
 const tolerance = 1;
-const profiles = [
+const requested = process.argv.slice(2);
+const accountOnboarding = requested.includes("--scope=account-onboarding");
+const regularProfiles = [
   { name: "phone-320-en-light", width: 320, height: 720, lang: "en", theme: "light", touch: true },
   { name: "phone-320-fr-dark", width: 320, height: 720, lang: "fr", theme: "dark", touch: true },
   { name: "phone-390-zh-dark", width: 390, height: 844, lang: "zh", theme: "dark", touch: true },
@@ -52,15 +60,48 @@ const profiles = [
     touch: true,
   },
 ];
-const requested = process.argv.slice(2);
+const profiles = accountOnboarding
+  ? [
+      ...[360, 393, 420].flatMap((width) =>
+        ["en", "zh", "ja", "ko", "fr", "es"].map((lang) => ({
+          name: `phone-${width}-${lang}-account-onboarding`,
+          width,
+          height: 844,
+          lang,
+          theme: "light",
+          touch: true,
+        }))
+      ),
+      ...["en", "fr"].map((lang) => ({
+        name: `phone-393-${lang}-normal-account-onboarding`,
+        width: 393,
+        height: 844,
+        lang,
+        theme: "light",
+        touch: true,
+        accountIdentity: "normal",
+      })),
+      ...["en", "fr"].map((lang) => ({
+        name: `desktop-1440-${lang}-account-onboarding`,
+        width: 1440,
+        height: 1000,
+        lang,
+        theme: "light",
+        touch: false,
+      })),
+    ]
+  : regularProfiles;
 const saveScreenshots = requested.includes("--screenshots");
-const args = requested.filter((argument) => argument !== "--screenshots");
+const args = requested.filter(
+  (argument) => !["--screenshots", "--scope=account-onboarding"].includes(argument)
+);
 assert(
   args.length === 0 || (args.length === 1 && /^--browser=(chromium|webkit)$/.test(args[0])),
-  "Usage: node scripts/check-mobile-layout.mjs [--browser=chromium|webkit] [--screenshots]"
+  "Usage: node scripts/check-mobile-layout.mjs [--browser=chromium|webkit] [--scope=account-onboarding] [--screenshots]"
 );
 const engines = args.length ? [args[0].split("=")[1]] : ["chromium", "webkit"];
-assert(engines.length * profiles.length <= 20, "Context cap exceeded (20)");
+const maxContexts = accountOnboarding ? 44 : 20;
+assert(engines.length * profiles.length <= maxContexts, `Context cap exceeded (${maxContexts})`);
 const screenshotTouchSessions = new WeakMap();
 
 async function exists(path) {
@@ -74,15 +115,45 @@ async function exists(path) {
 
 async function settle(page) {
   await page.evaluate(async () => {
-    await document.fonts.ready;
-    // Read settled geometry after the existing finite entrance transitions;
-    // preserve real animations and ignore perpetual loading indicators.
-    const animations = document.getAnimations().filter((animation) => {
-      const end = animation.effect?.getComputedTiming().endTime;
-      return Number.isFinite(end) && end <= 1000;
-    });
-    await Promise.all(animations.map((animation) => animation.finished.catch(() => {})));
-    await new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done)));
+    let deadline;
+    try {
+      await Promise.race([
+        (async () => {
+          await document.fonts.ready;
+          // Read settled geometry after the existing finite entrance transitions;
+          // preserve real animations and ignore perpetual loading indicators.
+          await new Promise((done) => {
+            const check = () => {
+              const pending = document.getAnimations().some((animation) => {
+                const end = animation.effect?.getComputedTiming().endTime;
+                return Number.isFinite(end) && end <= 1000 &&
+                  !["finished", "idle"].includes(animation.playState);
+              });
+              // WebKit can leave animation.finished promises pending after a
+              // theme transition already reports finished. Observe actual
+              // playback without disabling or changing application animations.
+              if (pending) requestAnimationFrame(check);
+              else done();
+            };
+            check();
+          });
+          await new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done)));
+        })(),
+        new Promise((_, reject) => {
+          deadline = setTimeout(() => reject(new Error(`Layout did not settle: ${JSON.stringify({
+            fonts: document.fonts.status,
+            visibility: document.visibilityState,
+            animations: document.getAnimations().map((animation) => ({
+              playState: animation.playState,
+              currentTime: animation.currentTime,
+              endTime: animation.effect?.getComputedTiming().endTime,
+            })),
+          })}`)), 10000);
+        }),
+      ]);
+    } finally {
+      clearTimeout(deadline);
+    }
   });
 }
 
@@ -282,6 +353,7 @@ async function measure(page, report, name) {
   }
   report.states.push({
     name,
+    theme: measured.theme,
     viewport: measured.viewport,
     controls: measured.controls.length,
     bottomNavigation: phone && measured.nav.position === "fixed",
@@ -292,7 +364,13 @@ async function measure(page, report, name) {
   return measured;
 }
 
-const screenshotDir = join(root, "..", "work", "mobile-redesign-validation", "captures");
+const screenshotDir = join(
+  root,
+  "..",
+  "work",
+  accountOnboarding ? "account-onboarding-validation" : "mobile-redesign-validation",
+  "captures"
+);
 
 async function capture(page, report, name) {
   if (!saveScreenshots) return;
@@ -305,14 +383,37 @@ async function capture(page, report, name) {
   const reports =
     name === "shared-reports" &&
     (phone || (report.profile.width === 768 && report.profile.lang === "zh"));
-  if (!projects && !reports && !(phone && ["shared-form", "inbox"].includes(name))) return;
-  const path = join(screenshotDir, `${report.engine}-${report.profile.name}-${name}.png`);
+  const targeted =
+    accountOnboarding &&
+    ["en", "fr"].includes(report.profile.lang) &&
+    ["empty-projects", "sign-in-methods"].includes(name);
+  if (!targeted && !projects && !reports && !(phone && ["shared-form", "inbox"].includes(name)))
+    return;
+  const path = join(
+    screenshotDir,
+    `${report.engine}-${report.profile.name}-${name}${targeted ? `-${report.profile.theme}` : ""}.png`
+  );
   const previousScroll =
-    projects || reports ? await page.evaluate(() => ({ x: scrollX, y: scrollY })) : null;
+    targeted || projects || reports ? await page.evaluate(() => ({ x: scrollX, y: scrollY })) : null;
   if (previousScroll) {
     // Compose overview captures from the top while leaving the earlier focused
     // geometry measurement and subsequent interaction scroll state intact.
     await page.evaluate(() => window.scrollTo({ top: 0, left: 0, behavior: "instant" }));
+    await settle(page);
+  }
+  if (targeted && name === "sign-in-methods") {
+    await page.locator(".settings-sign-in-panel").evaluate((panel) => {
+      const bottomNavigation = document.querySelector(".mobile-tabbar");
+      const safeBottom = bottomNavigation?.getClientRects().length
+        ? bottomNavigation.getBoundingClientRect().top
+        : innerHeight;
+      const rect = panel.getBoundingClientRect();
+      if (rect.bottom > safeBottom) {
+        const header = document.querySelector(".topbar");
+        const safeTop = header?.getBoundingClientRect().bottom || 0;
+        scrollTo({ top: scrollY + rect.top - safeTop - 24, behavior: "instant" });
+      }
+    });
     await settle(page);
   }
   await page.screenshot({ path });
@@ -507,6 +608,97 @@ async function checkPreferences(page, report) {
     await toggle.click();
     assert.equal(await toggle.getAttribute("aria-expanded"), "false");
   }
+}
+
+async function setAccountTheme(page, report, theme) {
+  if (report.profile.theme === theme) return;
+  const phone = page.viewportSize().width <= 760;
+  if (phone) await activate(page.locator(".preferences-toggle"), report);
+  await page.locator(".theme-toggle").click();
+  assert.equal(await page.locator("html").getAttribute("data-theme"), theme);
+  if (phone) await page.locator(".preferences-toggle").click();
+  report.profile.theme = theme;
+}
+
+async function checkAccountOnboarding(page, report, name) {
+  await settle(page);
+  const measured = await page.evaluate(() => {
+    const box = (element) => {
+      const { left, right, top, bottom, width, height } = element.getBoundingClientRect();
+      return { left, right, top, bottom, width, height };
+    };
+    const content = (element) => ({
+      rect: box(element),
+      text: element.textContent.trim(),
+      visible: element.getClientRects().length > 0,
+      scrollWidth: element.scrollWidth,
+      clientWidth: element.clientWidth,
+      fontSize: Number.parseFloat(getComputedStyle(element).fontSize),
+    });
+    const steps = document.querySelector(".setup-steps");
+    const methods = document.querySelector(".settings-sign-in-methods");
+    const email = document.querySelector(".settings-email-method");
+    return {
+      steps: steps
+        ? Array.from(steps.children, (step) => ({
+            rect: box(step),
+            content: Array.from(step.querySelectorAll(".setup-number, strong, p, .btn"), content),
+          }))
+        : null,
+      profileIdentities: Array.from(
+        document.querySelectorAll(".settings-profile-panel .email-sign-in-identity"),
+        content
+      ),
+      methods: methods ? box(methods) : null,
+      githubButton: methods?.querySelector(".panel-actions .btn")
+        ? content(methods.querySelector(".panel-actions .btn"))
+        : null,
+      email: email
+        ? {
+            rect: box(email),
+            identity: content(email.querySelector(".email-sign-in-identity")),
+            status: content(email.querySelector(".settings-sign-in-email-details .muted")),
+            description: content(email.querySelector(":scope > p.settings-sign-in-description")),
+          }
+        : null,
+    };
+  });
+  const details = `${report.engine}/${report.profile.name}/${report.profile.theme}/${name}: ${JSON.stringify(measured)}`;
+  const within = (child, parent) => {
+    assert(child.left >= parent.left - tolerance && child.right <= parent.right + tolerance, details);
+  };
+  if (name === "empty-projects") {
+    assert.equal(measured.steps?.length, 3, `Missing empty-project steps: ${details}`);
+    for (const [index, step] of measured.steps.entries()) {
+      for (const item of step.content) {
+        assert(item.visible && item.text, `Step content hidden: ${details}`);
+        within(item.rect, step.rect);
+        assert(item.scrollWidth <= item.clientWidth + tolerance, `Step text overflows: ${details}`);
+      }
+      const previous = measured.steps[index - 1];
+      if (previous) {
+        if (report.profile.width <= 760)
+          assert(step.rect.top - previous.rect.bottom >= 8 - tolerance, `Phone steps overlap or crowd: ${details}`);
+        else
+          assert(step.rect.left - previous.rect.right >= 8 - tolerance, `Desktop steps overlap: ${details}`);
+      }
+    }
+  } else {
+    assert(measured.methods && measured.githubButton && measured.email, `Missing sign-in methods: ${details}`);
+    const { githubButton, email } = measured;
+    const expectedEmail = report.profile.accountIdentity === "normal" ? MOBILE_NORMAL_EMAIL : MOBILE_VERIFIED_EMAIL;
+    const expectedName = report.profile.accountIdentity === "normal" ? MOBILE_NORMAL_NAME : MOBILE_ACCOUNT_NAME;
+    assert.equal(email.identity.text, expectedEmail, `Verified email truncated: ${details}`);
+    assert(measured.profileIdentities.some((item) => item.text === expectedName), `Account name lost: ${details}`);
+    assert(email.rect.top - githubButton.rect.bottom >= 12 - tolerance, `GitHub action touches email: ${details}`);
+    assert(email.status.rect.top - email.identity.rect.bottom >= 3 - tolerance, `Email verification text overlaps: ${details}`);
+    assert(email.description.rect.top - email.status.rect.bottom >= 6 - tolerance, `Email description crowds verification: ${details}`);
+    for (const item of [...measured.profileIdentities, githubButton, email.identity, email.status, email.description]) {
+      within(item.rect, { left: 0, right: report.profile.width });
+      assert(item.scrollWidth <= item.clientWidth + tolerance, `Account text overflows: ${details}`);
+    }
+  }
+  report.states.push({ name: `${name}-geometry`, theme: report.profile.theme, measured });
 }
 
 async function checkModal(page, fixture, report) {
@@ -749,8 +941,8 @@ try {
       },
     });
     for (const profile of profiles) {
-      const fixture = createMobileLayoutFixture({ baseURL });
-      const report = { engine, version: activeBrowser.version(), profile, states: [] };
+      const fixture = createMobileLayoutFixture({ baseURL, accountOnboarding, accountIdentity: profile.accountIdentity });
+      const report = { engine, version: activeBrowser.version(), profile: { ...profile }, states: [] };
       const context = await activeBrowser.newContext({
         viewport: { width: profile.width, height: profile.height },
         locale: profile.lang === "zh" ? "zh-CN" : profile.lang,
@@ -777,6 +969,25 @@ try {
             ? "Coarse pointer, maxTouchPoints > 0 and genuine Playwright touchscreen taps"
             : `WebKit coarse-pointer geometry; reported maxTouchPoints=${initial.touchPoints}; no navigator overrides or claimed physical touch acceptance`
           : "Desktop fine-pointer geometry";
+        if (accountOnboarding) {
+          for (const theme of ["light", "dark"]) {
+            if (new URL(page.url()).pathname !== "/projects")
+              await navigate(page, report, "/projects", "ledgerProjects");
+            await setAccountTheme(page, report, theme);
+            await measure(page, report, "empty-projects-layout");
+            await checkAccountOnboarding(page, report, "empty-projects");
+            await capture(page, report, "empty-projects");
+            await navigate(page, report, "/settings", "settings");
+            await measure(page, report, "sign-in-methods-layout");
+            await checkAccountOnboarding(page, report, "sign-in-methods");
+            await capture(page, report, "sign-in-methods");
+          }
+          report.requests = fixture.assertClean();
+          assert.deepEqual(errors, [], `${engine}/${profile.name}: browser errors`);
+          results.push(report);
+          process.stderr.write(`${engine}/${profile.name}: both themes and two screens passed\n`);
+          continue;
+        }
         await capture(page, report, "projects");
         await checkPreferences(page, report);
         for (const [path, key] of [
@@ -850,7 +1061,7 @@ try {
         scope:
           "Local bounded GET-only fixtures, Chromium/WebKit and simulated viewports. No remote business requests, writes, polling or physical-device acceptance. Reduced viewport checks are not a native virtual keyboard. Linux WebKit maxTouchPoints is recorded without overriding navigator; touchscreen taps run on Chromium.",
         contexts: results.length,
-        maxContexts: 20,
+        maxContexts,
         perContextRequestCap: 160,
         perContextAPIReadCap: 80,
         states: results.reduce((sum, result) => sum + result.states.length, 0),

@@ -362,3 +362,25 @@ the successful browser-user-agent requests establish the above public HTTP
 results. No security setting was changed for these checks. The user's successful
 GitHub and email sign-ins are recorded separately above; repository installation
 and ledger acceptance are not established by these HTTP checks.
+
+## Free public use and mobile correction, 2026-10-11
+
+The user separately confirmed ordinary real expense recording succeeds. The
+current revision spaces the mobile sign-in methods, lets long addresses wrap,
+and stacks project setup steps on phones with smaller supporting type. Six
+languages and light/dark layouts are checked with finite local browser fixtures;
+they do not establish physical-device or financial/provider acceptance.
+
+Explicitly empty Creem products now return the genuine Free catalog. Paid prices
+are unavailable and month/year checkout stays disabled; real payments are
+deferred. Privacy copy accurately describes self-hosted fonts. The two generated
+REST artifacts reflect the canonical nullable catalog checkout action.
+
+Production logs disable automatic request/tracing details and redact queries.
+The Server retains emitted safe scheduler summaries; Web samples fixed transport
+error codes at 1%, so it does not capture every error. See
+[production operations](https://github.com/Norulo/norulo-server/blob/main/docs/operations.md) for partial
+scheduler failures, read-only natural-run checks and coordinated D1/DO recovery.
+No new email alert is enabled or test message sent. The dated
+[free-launch record](https://github.com/Norulo/norulo-server/blob/main/docs/validation/production-free-launch-2026-10-11.json)
+separates local validation from actual production readback.

@@ -1,3 +1,43 @@
+.settings-profile-panel .set-row,
+.settings-sign-in-email {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  align-items: start;
+  column-gap: var(--space-3);
+  min-width: 0;
+}
+
+.settings-profile-panel .set-row > svg,
+.settings-sign-in-email > svg {
+  margin-block-start: 0.2rem;
+}
+
+.settings-sign-in-methods,
+.settings-email-method,
+.settings-sign-in-email-details {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  min-width: 0;
+}
+
+.settings-sign-in-methods {
+  gap: var(--space-4);
+}
+
+.settings-email-method {
+  gap: var(--space-2);
+}
+
+.settings-sign-in-email-details {
+  gap: var(--space-1);
+}
+
+.settings-sign-in-description {
+  margin: 0;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
 .settings-jev-control,
 .settings-retention-control {
   display: grid;
@@ -40,6 +80,25 @@
 }
 
 @media (max-width: 760px) {
+  .settings-profile-panel .set-row + .set-row,
+  .settings-sign-in-email .email-sign-in-identity {
+    font-size: 0.9375rem;
+    line-height: 1.5;
+  }
+
+  .settings-sign-in-description {
+    font-size: var(--fs-md);
+  }
+
+  .settings-sign-in-methods > .panel-actions {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .settings-sign-in-methods > .panel-actions > .btn {
+    width: 100%;
+  }
+
   .settings-jev-control,
   .settings-retention-control {
     width: 100%;

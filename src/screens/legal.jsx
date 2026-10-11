@@ -175,8 +175,8 @@ export function PrivacyScreen({ go, auth }) {
         </p>
         <p>
           {T(
-            "The interface loads fonts from Google Fonts. Your browser sends font requests directly to Google, which receives technical request data such as your IP address.",
-            "界面从 Google Fonts 加载字体。浏览器会直接向 Google 发送字体请求，Google 会接收 IP 地址等技术请求数据。"
+            "Norulo hosts the interface fonts. Your browser loads font files from the same domain as the website.",
+            "Norulo 自行托管界面字体，浏览器从与网站相同的域名加载字体文件。"
           )}
         </p>
         <p>

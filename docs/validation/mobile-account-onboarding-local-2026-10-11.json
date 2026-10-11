@@ -1,0 +1,824 @@
+{
+  "type": "local_account_onboarding_layout_verification",
+  "recorded_at_utc": "2026-10-11T09:07:58.719417+00:00",
+  "result": "passed",
+  "scope": "Synthetic loopback GET-only fixtures for Settings email-only identity and empty Projects. This is layout evidence, not remote business or physical-device acceptance.",
+  "command": "npm run test:mobile-layout -- --scope=account-onboarding --screenshots",
+  "execution_wrapper": "/workspace/.norulo-environment/browser-libs/run-with-browser-libs.sh (verified local runtime libraries)",
+  "duration_seconds": 104.146,
+  "contexts": 44,
+  "states": 396,
+  "geometry_checks": 176,
+  "engine_context_counts": {
+    "chromium": 22,
+    "webkit": 22
+  },
+  "engine_versions": {
+    "chromium": "143.0.7499.4",
+    "webkit": "26.0"
+  },
+  "coverage": {
+    "phone_widths_px": [
+      360,
+      393,
+      420
+    ],
+    "phone_height_px": 844,
+    "locales": [
+      "en",
+      "zh",
+      "ja",
+      "ko",
+      "fr",
+      "es"
+    ],
+    "themes": [
+      "light",
+      "dark"
+    ],
+    "all_phone_width_locale_pairs": 18,
+    "extra_normal_identity_phone_profiles": [
+      {
+        "width": 393,
+        "locale": "en"
+      },
+      {
+        "width": 393,
+        "locale": "fr"
+      }
+    ],
+    "desktop_profiles": [
+      {
+        "width": 1440,
+        "height": 1000,
+        "locale": "en"
+      },
+      {
+        "width": 1440,
+        "height": 1000,
+        "locale": "fr"
+      }
+    ],
+    "identity_cases": [
+      "verified email-only account with long unbroken name and long email",
+      "normal-length verified email-only account"
+    ],
+    "screens": [
+      "empty Projects onboarding",
+      "Settings Profile and Sign-in methods"
+    ]
+  },
+  "assertions": {
+    "non_overlapping_steps": true,
+    "all_step_labels_and_descriptions_visible_and_preserved": true,
+    "profile_and_email_text_preserved_without_horizontal_overflow": true,
+    "signin_groups_have_clear_vertical_spacing": true,
+    "document_body_and_controls_fit_viewport": true,
+    "mobile_control_minimum_height_px": 44,
+    "mobile_input_minimum_font_px": 16,
+    "rounding_tolerance_px": 1,
+    "mobile_bottom_navigation_and_preferences_preserved": true,
+    "observed_spacing_minimums": {
+      "phone_step_gap_min_px": 20.0,
+      "desktop_step_gap_min_px": 24.0,
+      "github_action_to_email_gap_min_px": 16.0,
+      "email_to_verified_status_gap_min_px": 4.0,
+      "verified_status_to_description_gap_min_px": 8.0
+    }
+  },
+  "request_guards": {
+    "maximum_requests_per_context_observed": 50,
+    "maximum_api_reads_per_context_observed": 16,
+    "per_context_request_cap": 160,
+    "per_context_api_read_cap": 80,
+    "business_writes": 0,
+    "external_responses_delivered": 0,
+    "production_D1_operations": 0
+  },
+  "engine_limitations": {
+    "chromium": "Coarse-pointer contexts report maxTouchPoints > 0 and use Playwright touchscreen taps; these remain simulated viewports.",
+    "webkit": "Linux WebKit coarse-pointer contexts report maxTouchPoints 0; geometry is verified without overriding navigator or claiming physical touch."
+  },
+  "harness_repair": {
+    "initial_failure": "After theme switching, Linux WebKit reported fonts loaded, document visible and every finite animation finished, while the captured animation.finished promise remained unresolved.",
+    "change": "Observe live playState of finite application animations, then wait two animation frames; keep a 10-second failure deadline with diagnostics. Use viewport screenshots and scroll long email panels above the fixed bottom navigation.",
+    "application_animations_changed": false,
+    "layout_assertion_thresholds_reduced": false,
+    "historical_failed_attempts": [
+      {
+        "status": "/workspace/.norulo-environment/web-mobile-followup-checks/account-onboarding-layout.status.json",
+        "exit_code": 143,
+        "stderr": "/workspace/.norulo-environment/web-mobile-followup-checks/account-onboarding-layout.stderr.log",
+        "stderr_sha256": "b2f928731d8b446055de7fdc22be47b1ef5d384e920dc55ca16a0b32e1b8f0dc"
+      },
+      {
+        "status": "/workspace/.norulo-environment/web-mobile-followup-checks/account-onboarding-layout-final.status.json",
+        "exit_code": 1,
+        "stderr": "/workspace/.norulo-environment/web-mobile-followup-checks/account-onboarding-layout-final.stderr.log",
+        "stderr_sha256": "e0fcf45d424b666aec886be8d661a2a0529813eb1da618942ef5be711f6c472f"
+      }
+    ]
+  },
+  "source_and_harness_sha256": {
+    "src/screens/ledger.jsx": "6099cacab284c0a41039a3e972e671fc27cd58744cf836aa929cb3d0456dfd12",
+    "src/screens/ledger.css": "21ea24a446fa76490dbbb9bbde904c8c49d36dd16bfeeea68a5ad71e8cf9d347",
+    "src/screens/settings.jsx": "e99625a58d4343522ce60e3900ed98ca409297d7eed555e66121dde4882b4635",
+    "src/screens/settings.css": "3c6af37b3b39ba767ab9272722b7e28b1ff03d03667d6365f0eba0e8542d2f22",
+    "src/locales/ledger-screen.js": "dae9292be728813aaaadc6ac0dfce74e1bea0ca12af4aa13cb2d2e568007d473",
+    "src/i18n.jsx": "29a277e92722150591f93e14493b3412675d9d9e6d904942a84e368d43d9c776",
+    "styles/base.css": "1242383a6f6cb23b1fe9dfca11a998b487efa83546009f1d0cd8adab905e78e2",
+    "scripts/check-mobile-layout.mjs": "04dff9702386e63199a67b95db74661876addfc34edbcbf7618f648c296c5123",
+    "scripts/mobile-layout-fixtures.mjs": "fdaae2a5f713c728a239043d3ca06952404204fe46c92a031cf960a78b262917",
+    "scripts/mobile-layout-fixtures.test.js": "83bcecc5c61285e9b73dc35548318f9b02bacf38a23c946590b4201f5c00265e"
+  },
+  "build": {
+    "production_build_exit_code": 0,
+    "build_record": "/workspace/.norulo-environment/web-mobile-followup-checks/production-build.json",
+    "render_source_manifest_sha256": "cd2f126f3e3ae154cb872a9cd910f094646df295fff17a732788888d34dfe3bf",
+    "source_dist_manifest": "/workspace/.norulo-environment/web-mobile-followup-checks/source-dist-provenance.json",
+    "source_dist_manifest_file_sha256": "16ffbf4c7559b69207cf34b912cf675adc3f44227744c35f0a0a58afbef5b838",
+    "dist_manifest_sha256": "c3b68f257ecd52b24cf6c96e3d811ffc45200bf8f36c529ff8a79058c81d5a5a",
+    "dist_files": 55,
+    "public_assets_byte_identical_in_dist": true,
+    "public_asset_count": 13,
+    "original_logo_sha256": "a9632acbd7a5ad48ad5ff25d6269f617c7655446365344c9db42d504213c710f",
+    "old_brand_matches": 0,
+    "canonical": "https://norulo.com/",
+    "production_html_has_loopback_or_preview_host": false
+  },
+  "other_local_checks": {
+    "fixture_boundary_tests": {
+      "passed": 7,
+      "log": "/workspace/.norulo-environment/web-mobile-followup-checks/fixture-tests-final.log"
+    },
+    "lint": {
+      "exit_code": 0,
+      "log": "/workspace/.norulo-environment/web-mobile-followup-checks/lint-verified.log"
+    },
+    "harness_syntax": {
+      "exit_code": 0,
+      "log": "/workspace/.norulo-environment/web-mobile-followup-checks/harness-syntax.log"
+    },
+    "workers_offline": {
+      "exit_code": 0,
+      "log": "/workspace/.norulo-environment/web-mobile-followup-checks/workers.log"
+    },
+    "canonical_contract_sync_check": {
+      "exit_code": 0,
+      "log": "/workspace/.norulo-environment/web-mobile-followup-checks/contract.log"
+    },
+    "root_application_full_suite": {
+      "passed": 1664,
+      "files": 84,
+      "duration_seconds": 73.27,
+      "log": "/workspace/.norulo-environment/logs/free-launch-web-full-tests-20261011.log",
+      "scope_note": "Run by the root agent against the frozen application source; subsequent edits affect this layout harness only."
+    }
+  },
+  "raw_report": {
+    "path": "/workspace/.norulo-environment/web-mobile-followup-checks/account-onboarding-layout-verified.json",
+    "sha256": "1cf31f96c9dc6699244368ef0629055890515a699dec827f42c7e3cf0e18c3f8"
+  },
+  "screenshots": [
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/chromium-phone-360-en-account-onboarding-empty-projects-light.png",
+      "sha256": "c0f4765c213f327319c7bb4be047a15ad05d440aa856485fc049e28f1e0914c7",
+      "engine": "chromium",
+      "profile": "phone-360-en-account-onboarding",
+      "coarse": true,
+      "max_touch_points": 1
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/chromium-phone-360-en-account-onboarding-sign-in-methods-light.png",
+      "sha256": "9c2d2240483942ef659c182ef58e8b660c6280b1f13af355f9ab67b81d11b8d3",
+      "engine": "chromium",
+      "profile": "phone-360-en-account-onboarding",
+      "coarse": true,
+      "max_touch_points": 1
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/chromium-phone-360-en-account-onboarding-empty-projects-dark.png",
+      "sha256": "079493ad87d76f2de173c33cc1318a8d21261329933b4f00a0e1c9d1603b25f5",
+      "engine": "chromium",
+      "profile": "phone-360-en-account-onboarding",
+      "coarse": true,
+      "max_touch_points": 1
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/chromium-phone-360-en-account-onboarding-sign-in-methods-dark.png",
+      "sha256": "294ce227259f81f52a4eb923de847c5509be0940d8835e6f5610ae891caa551c",
+      "engine": "chromium",
+      "profile": "phone-360-en-account-onboarding",
+      "coarse": true,
+      "max_touch_points": 1
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/chromium-phone-360-fr-account-onboarding-empty-projects-light.png",
+      "sha256": "1bbb9e86b424021415157393a1ff652ce608473b0ebe10970c23bd06411af13f",
+      "engine": "chromium",
+      "profile": "phone-360-fr-account-onboarding",
+      "coarse": true,
+      "max_touch_points": 1
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/chromium-phone-360-fr-account-onboarding-sign-in-methods-light.png",
+      "sha256": "5e5bda63c7a1cf2ebe815c9513374fb8b65e89bd1a35c6bdc734a20c1fd97620",
+      "engine": "chromium",
+      "profile": "phone-360-fr-account-onboarding",
+      "coarse": true,
+      "max_touch_points": 1
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/chromium-phone-360-fr-account-onboarding-empty-projects-dark.png",
+      "sha256": "3f57a2d86f47137cd4aa7509476a8ad3a41d2646c6126674c666b7eff963c191",
+      "engine": "chromium",
+      "profile": "phone-360-fr-account-onboarding",
+      "coarse": true,
+      "max_touch_points": 1
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/chromium-phone-360-fr-account-onboarding-sign-in-methods-dark.png",
+      "sha256": "d6435b0eeff3cb17a4ccb3e34d9dbf823c340bc6c4cd5f683002ebc335334a91",
+      "engine": "chromium",
+      "profile": "phone-360-fr-account-onboarding",
+      "coarse": true,
+      "max_touch_points": 1
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/chromium-phone-393-en-account-onboarding-empty-projects-light.png",
+      "sha256": "e0825b5d17221ee845f2e7b65e8a99be8b1fd07313c7f54b5ba088bc8cdffdca",
+      "engine": "chromium",
+      "profile": "phone-393-en-account-onboarding",
+      "coarse": true,
+      "max_touch_points": 1
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/chromium-phone-393-en-account-onboarding-sign-in-methods-light.png",
+      "sha256": "0fa9f291bb9d5230e25031e9c18105585076a2e2ad435c181afd50fdda023470",
+      "engine": "chromium",
+      "profile": "phone-393-en-account-onboarding",
+      "coarse": true,
+      "max_touch_points": 1
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/chromium-phone-393-en-account-onboarding-empty-projects-dark.png",
+      "sha256": "4c84763ce4273e42507eb46aaefae0188cf3f9b5c34e99f7ae396c46212d0b23",
+      "engine": "chromium",
+      "profile": "phone-393-en-account-onboarding",
+      "coarse": true,
+      "max_touch_points": 1
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/chromium-phone-393-en-account-onboarding-sign-in-methods-dark.png",
+      "sha256": "a1afd30740dabf519703622c22aa3e9d8eabd6dc6bab88ad8fd0a6047ab25758",
+      "engine": "chromium",
+      "profile": "phone-393-en-account-onboarding",
+      "coarse": true,
+      "max_touch_points": 1
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/chromium-phone-393-fr-account-onboarding-empty-projects-light.png",
+      "sha256": "087f6daa5868e53199104a36676ba6fdc795164d3e12702ee2fe6ca965ee019d",
+      "engine": "chromium",
+      "profile": "phone-393-fr-account-onboarding",
+      "coarse": true,
+      "max_touch_points": 1
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/chromium-phone-393-fr-account-onboarding-sign-in-methods-light.png",
+      "sha256": "8f956a4d58581605e53f49f7845baeb06ffe0c8808ea3758fce34323c94eeeee",
+      "engine": "chromium",
+      "profile": "phone-393-fr-account-onboarding",
+      "coarse": true,
+      "max_touch_points": 1
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/chromium-phone-393-fr-account-onboarding-empty-projects-dark.png",
+      "sha256": "90731d3192babefb5c1fa177e850eb79959f17e469dca291efb7cfbb56874668",
+      "engine": "chromium",
+      "profile": "phone-393-fr-account-onboarding",
+      "coarse": true,
+      "max_touch_points": 1
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/chromium-phone-393-fr-account-onboarding-sign-in-methods-dark.png",
+      "sha256": "7bbeeb5cb5c59489c5b8865ab7191503b246b87d4bca55f97ad6de67fc96e979",
+      "engine": "chromium",
+      "profile": "phone-393-fr-account-onboarding",
+      "coarse": true,
+      "max_touch_points": 1
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/chromium-phone-420-en-account-onboarding-empty-projects-light.png",
+      "sha256": "a6cc33daf0743a604127a0495934d27cb2f7452fa9e237a701bee1509aa4bd3d",
+      "engine": "chromium",
+      "profile": "phone-420-en-account-onboarding",
+      "coarse": true,
+      "max_touch_points": 1
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/chromium-phone-420-en-account-onboarding-sign-in-methods-light.png",
+      "sha256": "e0fab32b3701e769d678ca991841022568aa86909ee33387839ce8171611547d",
+      "engine": "chromium",
+      "profile": "phone-420-en-account-onboarding",
+      "coarse": true,
+      "max_touch_points": 1
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/chromium-phone-420-en-account-onboarding-empty-projects-dark.png",
+      "sha256": "4a1247363d7ae8f7340de779b4a3641ebb0358a070a189643c06478e9085b0d9",
+      "engine": "chromium",
+      "profile": "phone-420-en-account-onboarding",
+      "coarse": true,
+      "max_touch_points": 1
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/chromium-phone-420-en-account-onboarding-sign-in-methods-dark.png",
+      "sha256": "0f22fe9fc416ba89da6153bf6314c639b9cb065c43e8b60ed9ca4bb89aee2ceb",
+      "engine": "chromium",
+      "profile": "phone-420-en-account-onboarding",
+      "coarse": true,
+      "max_touch_points": 1
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/chromium-phone-420-fr-account-onboarding-empty-projects-light.png",
+      "sha256": "e39b629791fb2d34a5cc1bd1b5a0ec326eb5ffa9c1c4fd3b383919557a29164d",
+      "engine": "chromium",
+      "profile": "phone-420-fr-account-onboarding",
+      "coarse": true,
+      "max_touch_points": 1
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/chromium-phone-420-fr-account-onboarding-sign-in-methods-light.png",
+      "sha256": "0407e555952bf12700836f67cb91262246ccbd50ca615cb01217b44472ec9153",
+      "engine": "chromium",
+      "profile": "phone-420-fr-account-onboarding",
+      "coarse": true,
+      "max_touch_points": 1
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/chromium-phone-420-fr-account-onboarding-empty-projects-dark.png",
+      "sha256": "6e35495098b5d6d7e7b0e1c637f6351d067afa99aad85b6d0895d524c1b05591",
+      "engine": "chromium",
+      "profile": "phone-420-fr-account-onboarding",
+      "coarse": true,
+      "max_touch_points": 1
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/chromium-phone-420-fr-account-onboarding-sign-in-methods-dark.png",
+      "sha256": "59ecf1434a02b9d3dc41f37f5f120e1f3c3918caa2e4eb48a64be7428a6a7c58",
+      "engine": "chromium",
+      "profile": "phone-420-fr-account-onboarding",
+      "coarse": true,
+      "max_touch_points": 1
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/chromium-phone-393-en-normal-account-onboarding-empty-projects-light.png",
+      "sha256": "e0825b5d17221ee845f2e7b65e8a99be8b1fd07313c7f54b5ba088bc8cdffdca",
+      "engine": "chromium",
+      "profile": "phone-393-en-normal-account-onboarding",
+      "coarse": true,
+      "max_touch_points": 1
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/chromium-phone-393-en-normal-account-onboarding-sign-in-methods-light.png",
+      "sha256": "b5bed8d53c89fe33ef43a6834fa0f532ddc0fef5737f2c4b351563b37204e905",
+      "engine": "chromium",
+      "profile": "phone-393-en-normal-account-onboarding",
+      "coarse": true,
+      "max_touch_points": 1
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/chromium-phone-393-en-normal-account-onboarding-empty-projects-dark.png",
+      "sha256": "4c84763ce4273e42507eb46aaefae0188cf3f9b5c34e99f7ae396c46212d0b23",
+      "engine": "chromium",
+      "profile": "phone-393-en-normal-account-onboarding",
+      "coarse": true,
+      "max_touch_points": 1
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/chromium-phone-393-en-normal-account-onboarding-sign-in-methods-dark.png",
+      "sha256": "b06c9af556bc383bb18ce5a41ec7e19bcd1fa5a337f29f430eee8d4bcd3f52f9",
+      "engine": "chromium",
+      "profile": "phone-393-en-normal-account-onboarding",
+      "coarse": true,
+      "max_touch_points": 1
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/chromium-phone-393-fr-normal-account-onboarding-empty-projects-light.png",
+      "sha256": "087f6daa5868e53199104a36676ba6fdc795164d3e12702ee2fe6ca965ee019d",
+      "engine": "chromium",
+      "profile": "phone-393-fr-normal-account-onboarding",
+      "coarse": true,
+      "max_touch_points": 1
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/chromium-phone-393-fr-normal-account-onboarding-sign-in-methods-light.png",
+      "sha256": "f35402a1c665c22e614226b40fe257c5237df089d49d5f7f6e909c10cc2e41d8",
+      "engine": "chromium",
+      "profile": "phone-393-fr-normal-account-onboarding",
+      "coarse": true,
+      "max_touch_points": 1
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/chromium-phone-393-fr-normal-account-onboarding-empty-projects-dark.png",
+      "sha256": "90731d3192babefb5c1fa177e850eb79959f17e469dca291efb7cfbb56874668",
+      "engine": "chromium",
+      "profile": "phone-393-fr-normal-account-onboarding",
+      "coarse": true,
+      "max_touch_points": 1
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/chromium-phone-393-fr-normal-account-onboarding-sign-in-methods-dark.png",
+      "sha256": "514494702be082f8c4af8c44a3cb7e30007b3738f46645a62294aea8ef203c7d",
+      "engine": "chromium",
+      "profile": "phone-393-fr-normal-account-onboarding",
+      "coarse": true,
+      "max_touch_points": 1
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/chromium-desktop-1440-en-account-onboarding-empty-projects-light.png",
+      "sha256": "66c0261a855ccabf820fa9a58a227d30e3f39e2cd601ae303a507651427a13ff",
+      "engine": "chromium",
+      "profile": "desktop-1440-en-account-onboarding",
+      "coarse": false,
+      "max_touch_points": 0
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/chromium-desktop-1440-en-account-onboarding-sign-in-methods-light.png",
+      "sha256": "7ef063eaae9491710e8c9cb3a38e2e5fbf832a9c3cd292afcd28dd01a6d39ad1",
+      "engine": "chromium",
+      "profile": "desktop-1440-en-account-onboarding",
+      "coarse": false,
+      "max_touch_points": 0
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/chromium-desktop-1440-en-account-onboarding-empty-projects-dark.png",
+      "sha256": "a3ca266438f5ef16d1145b969ffbb73178440f325bf48746cc451b71e7eb1942",
+      "engine": "chromium",
+      "profile": "desktop-1440-en-account-onboarding",
+      "coarse": false,
+      "max_touch_points": 0
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/chromium-desktop-1440-en-account-onboarding-sign-in-methods-dark.png",
+      "sha256": "357d7b5a7f83f769942beb89200580acff10099bb17df1edcadf9065e87c445f",
+      "engine": "chromium",
+      "profile": "desktop-1440-en-account-onboarding",
+      "coarse": false,
+      "max_touch_points": 0
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/chromium-desktop-1440-fr-account-onboarding-empty-projects-light.png",
+      "sha256": "a9c81217a9329ac71f788687ce597156610b9f950369085e996555f5963515d5",
+      "engine": "chromium",
+      "profile": "desktop-1440-fr-account-onboarding",
+      "coarse": false,
+      "max_touch_points": 0
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/chromium-desktop-1440-fr-account-onboarding-sign-in-methods-light.png",
+      "sha256": "1d66ca33422a1c8d7409a2bc08f8e77a9379f0c60b43872403d9f83c7f1cf03f",
+      "engine": "chromium",
+      "profile": "desktop-1440-fr-account-onboarding",
+      "coarse": false,
+      "max_touch_points": 0
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/chromium-desktop-1440-fr-account-onboarding-empty-projects-dark.png",
+      "sha256": "f6ab841fc10972a45887f500eef2e503d1df23b521df83570aaa3d565db23d1b",
+      "engine": "chromium",
+      "profile": "desktop-1440-fr-account-onboarding",
+      "coarse": false,
+      "max_touch_points": 0
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/chromium-desktop-1440-fr-account-onboarding-sign-in-methods-dark.png",
+      "sha256": "6dc36bc7d9868cdc5e27790e1bb243b6b28f137cdbd16d43a0da0631d927727c",
+      "engine": "chromium",
+      "profile": "desktop-1440-fr-account-onboarding",
+      "coarse": false,
+      "max_touch_points": 0
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/webkit-phone-360-en-account-onboarding-empty-projects-light.png",
+      "sha256": "1f4df8d710ba5b7b2f33bc18c1fceea29708b7764f7b4af09cf48a285ef1e52b",
+      "engine": "webkit",
+      "profile": "phone-360-en-account-onboarding",
+      "coarse": true,
+      "max_touch_points": 0
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/webkit-phone-360-en-account-onboarding-sign-in-methods-light.png",
+      "sha256": "99ea04fae65c12a538454e41666ab2f2b7f4c8c147e6ef436716788b955446fd",
+      "engine": "webkit",
+      "profile": "phone-360-en-account-onboarding",
+      "coarse": true,
+      "max_touch_points": 0
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/webkit-phone-360-en-account-onboarding-empty-projects-dark.png",
+      "sha256": "d9729e4f7eee2f8b60c9b6097b7c15ffdd5aaa41b3f8adfd4807b070a72b617f",
+      "engine": "webkit",
+      "profile": "phone-360-en-account-onboarding",
+      "coarse": true,
+      "max_touch_points": 0
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/webkit-phone-360-en-account-onboarding-sign-in-methods-dark.png",
+      "sha256": "d6d1aff762a7307ce98213a47568b3735b5d2b218d0ef473f4cc0d6a8dcdd6c5",
+      "engine": "webkit",
+      "profile": "phone-360-en-account-onboarding",
+      "coarse": true,
+      "max_touch_points": 0
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/webkit-phone-360-fr-account-onboarding-empty-projects-light.png",
+      "sha256": "844ef8c8f193ac8eb0466d77d04848d7a7a600fddd321d44e8ad87c5c7621f35",
+      "engine": "webkit",
+      "profile": "phone-360-fr-account-onboarding",
+      "coarse": true,
+      "max_touch_points": 0
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/webkit-phone-360-fr-account-onboarding-sign-in-methods-light.png",
+      "sha256": "e42965c21dca1d5d5316fc126770b32bec0242142cf59fabad52643bdab0f941",
+      "engine": "webkit",
+      "profile": "phone-360-fr-account-onboarding",
+      "coarse": true,
+      "max_touch_points": 0
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/webkit-phone-360-fr-account-onboarding-empty-projects-dark.png",
+      "sha256": "e939396a520a869dbf4798f1e2e28cd743e199acf32d0eacc9faa557d2c7eb38",
+      "engine": "webkit",
+      "profile": "phone-360-fr-account-onboarding",
+      "coarse": true,
+      "max_touch_points": 0
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/webkit-phone-360-fr-account-onboarding-sign-in-methods-dark.png",
+      "sha256": "1a24b9bac28cf2574cc03c3c1f3589d1fdaa81a535f52caa062b9645f1df2a97",
+      "engine": "webkit",
+      "profile": "phone-360-fr-account-onboarding",
+      "coarse": true,
+      "max_touch_points": 0
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/webkit-phone-393-en-account-onboarding-empty-projects-light.png",
+      "sha256": "bf17b3ff91449c2495a378dc70a8410a0e93b227ccc77222d340ed643b699d80",
+      "engine": "webkit",
+      "profile": "phone-393-en-account-onboarding",
+      "coarse": true,
+      "max_touch_points": 0
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/webkit-phone-393-en-account-onboarding-sign-in-methods-light.png",
+      "sha256": "2ee86a9979d0f10185445ddd1f3da842ca48e578d9a9fce44dd7a2da1be278a0",
+      "engine": "webkit",
+      "profile": "phone-393-en-account-onboarding",
+      "coarse": true,
+      "max_touch_points": 0
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/webkit-phone-393-en-account-onboarding-empty-projects-dark.png",
+      "sha256": "552bfd37300e50d3e1b39428ecf70af6b269a5589e4592c51d5fe35d03601f15",
+      "engine": "webkit",
+      "profile": "phone-393-en-account-onboarding",
+      "coarse": true,
+      "max_touch_points": 0
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/webkit-phone-393-en-account-onboarding-sign-in-methods-dark.png",
+      "sha256": "9f9f8144763fde0ef4b4eaac1f7aae13e5335e11280d1b25b89e9eecb0872edc",
+      "engine": "webkit",
+      "profile": "phone-393-en-account-onboarding",
+      "coarse": true,
+      "max_touch_points": 0
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/webkit-phone-393-fr-account-onboarding-empty-projects-light.png",
+      "sha256": "7c95cd454e42fe63ecb29de35646155ca58b9b6aaadd3475a8ed4136bcd12349",
+      "engine": "webkit",
+      "profile": "phone-393-fr-account-onboarding",
+      "coarse": true,
+      "max_touch_points": 0
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/webkit-phone-393-fr-account-onboarding-sign-in-methods-light.png",
+      "sha256": "a733d532ee9ffe97c2c031ce71a8f8cfbdfbf0866f19431322f3c87b441757ba",
+      "engine": "webkit",
+      "profile": "phone-393-fr-account-onboarding",
+      "coarse": true,
+      "max_touch_points": 0
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/webkit-phone-393-fr-account-onboarding-empty-projects-dark.png",
+      "sha256": "485c0e75574e93f42fad5198c7c5dac1516e457d10f5e0544bdaea55f63be901",
+      "engine": "webkit",
+      "profile": "phone-393-fr-account-onboarding",
+      "coarse": true,
+      "max_touch_points": 0
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/webkit-phone-393-fr-account-onboarding-sign-in-methods-dark.png",
+      "sha256": "6460007bd16dce397864fa4e4b25ac21a353c9f7dcb21f91688ee75cb767ac10",
+      "engine": "webkit",
+      "profile": "phone-393-fr-account-onboarding",
+      "coarse": true,
+      "max_touch_points": 0
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/webkit-phone-420-en-account-onboarding-empty-projects-light.png",
+      "sha256": "d08a80063b5eff8d4986499e20553d6b403d6d103e1964a415280c556c3f68ba",
+      "engine": "webkit",
+      "profile": "phone-420-en-account-onboarding",
+      "coarse": true,
+      "max_touch_points": 0
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/webkit-phone-420-en-account-onboarding-sign-in-methods-light.png",
+      "sha256": "99a2e7fc4e41de5b8e3ff5d256179414511e39fceaf6cd38d4d2a50385ad716e",
+      "engine": "webkit",
+      "profile": "phone-420-en-account-onboarding",
+      "coarse": true,
+      "max_touch_points": 0
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/webkit-phone-420-en-account-onboarding-empty-projects-dark.png",
+      "sha256": "e45013b5198e206191bd7a9fdab06e1c7f30a4a64e232295e060b0dc4e21ac28",
+      "engine": "webkit",
+      "profile": "phone-420-en-account-onboarding",
+      "coarse": true,
+      "max_touch_points": 0
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/webkit-phone-420-en-account-onboarding-sign-in-methods-dark.png",
+      "sha256": "614c40419e805f4567f6a99373a17d4a7c9e03dce11b314a220229a399d9f3d5",
+      "engine": "webkit",
+      "profile": "phone-420-en-account-onboarding",
+      "coarse": true,
+      "max_touch_points": 0
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/webkit-phone-420-fr-account-onboarding-empty-projects-light.png",
+      "sha256": "368c62d824a47c6a118675c745d863e2d32dd1b39ffb93815589cc38fcf98cab",
+      "engine": "webkit",
+      "profile": "phone-420-fr-account-onboarding",
+      "coarse": true,
+      "max_touch_points": 0
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/webkit-phone-420-fr-account-onboarding-sign-in-methods-light.png",
+      "sha256": "450dd89c90e17767c36604a792a1f629c1d0d7c1ca09e74a5f5fc1a881276f74",
+      "engine": "webkit",
+      "profile": "phone-420-fr-account-onboarding",
+      "coarse": true,
+      "max_touch_points": 0
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/webkit-phone-420-fr-account-onboarding-empty-projects-dark.png",
+      "sha256": "c2fca25c44d210dd7f139465ab647172f42409129e3643093ee62742f1f1522f",
+      "engine": "webkit",
+      "profile": "phone-420-fr-account-onboarding",
+      "coarse": true,
+      "max_touch_points": 0
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/webkit-phone-420-fr-account-onboarding-sign-in-methods-dark.png",
+      "sha256": "962a86dbc58a0486da55c36dc43868c309948bc3c645c0b76faaf2d74c33849d",
+      "engine": "webkit",
+      "profile": "phone-420-fr-account-onboarding",
+      "coarse": true,
+      "max_touch_points": 0
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/webkit-phone-393-en-normal-account-onboarding-empty-projects-light.png",
+      "sha256": "bf17b3ff91449c2495a378dc70a8410a0e93b227ccc77222d340ed643b699d80",
+      "engine": "webkit",
+      "profile": "phone-393-en-normal-account-onboarding",
+      "coarse": true,
+      "max_touch_points": 0
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/webkit-phone-393-en-normal-account-onboarding-sign-in-methods-light.png",
+      "sha256": "f000eb71cf66a51514c2127945bdbf5e2bdfb4134e5fa233680448f577008946",
+      "engine": "webkit",
+      "profile": "phone-393-en-normal-account-onboarding",
+      "coarse": true,
+      "max_touch_points": 0
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/webkit-phone-393-en-normal-account-onboarding-empty-projects-dark.png",
+      "sha256": "552bfd37300e50d3e1b39428ecf70af6b269a5589e4592c51d5fe35d03601f15",
+      "engine": "webkit",
+      "profile": "phone-393-en-normal-account-onboarding",
+      "coarse": true,
+      "max_touch_points": 0
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/webkit-phone-393-en-normal-account-onboarding-sign-in-methods-dark.png",
+      "sha256": "0763e5862469fa1cb5e0321a2a9c9b76829832356f11b425387bbe2c08dd1f9f",
+      "engine": "webkit",
+      "profile": "phone-393-en-normal-account-onboarding",
+      "coarse": true,
+      "max_touch_points": 0
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/webkit-phone-393-fr-normal-account-onboarding-empty-projects-light.png",
+      "sha256": "7c95cd454e42fe63ecb29de35646155ca58b9b6aaadd3475a8ed4136bcd12349",
+      "engine": "webkit",
+      "profile": "phone-393-fr-normal-account-onboarding",
+      "coarse": true,
+      "max_touch_points": 0
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/webkit-phone-393-fr-normal-account-onboarding-sign-in-methods-light.png",
+      "sha256": "3aedf3857c85c98a2c7663c75690a26cbba31c436b454ee72e3750543d457792",
+      "engine": "webkit",
+      "profile": "phone-393-fr-normal-account-onboarding",
+      "coarse": true,
+      "max_touch_points": 0
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/webkit-phone-393-fr-normal-account-onboarding-empty-projects-dark.png",
+      "sha256": "485c0e75574e93f42fad5198c7c5dac1516e457d10f5e0544bdaea55f63be901",
+      "engine": "webkit",
+      "profile": "phone-393-fr-normal-account-onboarding",
+      "coarse": true,
+      "max_touch_points": 0
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/webkit-phone-393-fr-normal-account-onboarding-sign-in-methods-dark.png",
+      "sha256": "136c5d231127089a83bb8ec0fab7e2f7b1bd683b4c18ae1eb4ff381e24a485c3",
+      "engine": "webkit",
+      "profile": "phone-393-fr-normal-account-onboarding",
+      "coarse": true,
+      "max_touch_points": 0
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/webkit-desktop-1440-en-account-onboarding-empty-projects-light.png",
+      "sha256": "7284395d2d3917cd7f0686a9040dffebf0e935a15fbeae73e3f1a01c2f381ab2",
+      "engine": "webkit",
+      "profile": "desktop-1440-en-account-onboarding",
+      "coarse": false,
+      "max_touch_points": 0
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/webkit-desktop-1440-en-account-onboarding-sign-in-methods-light.png",
+      "sha256": "809b688cb96932f672365a6a201a9c63497e6da6423b9e50a75eab839a0b5a87",
+      "engine": "webkit",
+      "profile": "desktop-1440-en-account-onboarding",
+      "coarse": false,
+      "max_touch_points": 0
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/webkit-desktop-1440-en-account-onboarding-empty-projects-dark.png",
+      "sha256": "b29d379e8b0373084e2e55b011a4e0bef36b456ced233fc3c7155b2341a24e4e",
+      "engine": "webkit",
+      "profile": "desktop-1440-en-account-onboarding",
+      "coarse": false,
+      "max_touch_points": 0
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/webkit-desktop-1440-en-account-onboarding-sign-in-methods-dark.png",
+      "sha256": "c143ee0c50ae0bedab0b0ef74a608b38ff187763d6d644a792917083d10ff834",
+      "engine": "webkit",
+      "profile": "desktop-1440-en-account-onboarding",
+      "coarse": false,
+      "max_touch_points": 0
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/webkit-desktop-1440-fr-account-onboarding-empty-projects-light.png",
+      "sha256": "d4fc265ca6e12507b08eb33542a0cb86d765ad1bfa7e489c355f2c9233e2ab58",
+      "engine": "webkit",
+      "profile": "desktop-1440-fr-account-onboarding",
+      "coarse": false,
+      "max_touch_points": 0
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/webkit-desktop-1440-fr-account-onboarding-sign-in-methods-light.png",
+      "sha256": "a685af994a26e062657ef8d848c7930f5b8a07c4e4736ed81a6ae125123e42e5",
+      "engine": "webkit",
+      "profile": "desktop-1440-fr-account-onboarding",
+      "coarse": false,
+      "max_touch_points": 0
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/webkit-desktop-1440-fr-account-onboarding-empty-projects-dark.png",
+      "sha256": "6f29e682433ea16002851bb5a13ce8fb921599c9b19e4e619365b092381695dd",
+      "engine": "webkit",
+      "profile": "desktop-1440-fr-account-onboarding",
+      "coarse": false,
+      "max_touch_points": 0
+    },
+    {
+      "path": "/workspace/work/account-onboarding-validation/captures/webkit-desktop-1440-fr-account-onboarding-sign-in-methods-dark.png",
+      "sha256": "8b133ff5841c70e9ac37092ed35e3758188b021a559c1b4f7f152b9d1a154d5a",
+      "engine": "webkit",
+      "profile": "desktop-1440-fr-account-onboarding",
+      "coarse": false,
+      "max_touch_points": 0
+    }
+  ]
+}

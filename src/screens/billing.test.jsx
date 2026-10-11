@@ -98,6 +98,38 @@ describe("BillingScreen", () => {
     };
   }
 
+  function withoutPaidSubscriptions() {
+    return {
+      provider: "disabled",
+      enabled: false,
+      currency: "USD",
+      page: { id: "pricing", checkoutAction: null, billingRoute: "/billing" },
+      plans: [...billingCatalog.plans, maxPlan].map((plan) => ({
+        ...plan,
+        entitlements: {
+          limits: {
+            projects: plan.id === "free" ? 3 : plan.id === "pro" ? 20 : 100,
+            expenseRecords: plan.id === "free" ? 100 : plan.id === "pro" ? 20000 : 100000,
+          },
+          jev: {
+            eligible: plan.id !== "free",
+            available: plan.id !== "free",
+            monthlyBudgetUsd: plan.id === "free" ? "0.00" : plan.id === "pro" ? "3.00" : "5.00",
+          },
+        },
+        prices:
+          plan.id === "free"
+            ? plan.prices
+            : Object.fromEntries(
+                ["month", "year"].map((interval) => [
+                  interval,
+                  { amount: null, currency: "USD", interval, configured: false },
+                ])
+              ),
+      })),
+    };
+  }
+
   function expectUsageValues(
     region,
     label,
@@ -1166,10 +1198,71 @@ describe("BillingScreen", () => {
       />
     );
 
-    const startPro = await screen.findByRole("button", { name: /start pro/i });
+    const pro = await screen.findByRole("heading", { name: "Norulo Pro" });
+    const startPro = within(pro.closest(".pricing-card")).getByRole("button", {
+      name: "Not open yet",
+    });
     expect(startPro).toBeDisabled();
     expect(noruloApi.billing.createCheckoutSession).not.toHaveBeenCalled();
     expect(navigate).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    [false, "Start free", "/login"],
+    [true, "Open projects", "/projects"],
+  ])(
+    "keeps Free accessible and paid checkout closed with unconfigured prices (signed in: %s)",
+    async (signedIn, freeAction, freeHref) => {
+      noruloApi.billing.getPlan.mockResolvedValue(withoutPaidSubscriptions());
+      const user = userEvent.setup();
+      const navigate = vi.fn();
+      render(<PricingScreen go={vi.fn()} auth={{ authenticated: signedIn }} navigate={navigate} />);
+
+      await screen.findByText("Free is available. Paid subscriptions are not open yet.");
+      const free = screen.getByRole("heading", { name: "Free" }).closest(".pricing-card");
+      expect(within(free).getByRole("link", { name: freeAction })).toHaveAttribute("href", freeHref);
+      expect(free).toHaveTextContent("$0");
+      expect(free).toHaveTextContent("Projects: 3");
+      expect(free).toHaveTextContent("Expense records: 100");
+      expect(free).toHaveTextContent("Jev: not included");
+      expect(free).not.toHaveTextContent("Jev assistance allowance");
+
+      for (const interval of ["monthly", "yearly"]) {
+        await user.click(screen.getByRole("button", { name: new RegExp(interval, "i") }));
+        for (const title of ["Norulo Pro", "Norulo Max"]) {
+          const paid = screen.getByRole("heading", { name: title }).closest(".pricing-card");
+          expect(paid).toHaveTextContent("Price unavailable");
+          expect(paid).not.toHaveTextContent("$0");
+          const checkout = within(paid).getByRole("button", { name: "Not open yet" });
+          expect(checkout).toBeDisabled();
+          await user.click(checkout);
+        }
+      }
+      expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+      expect(noruloApi.billing.createCheckoutSession).not.toHaveBeenCalled();
+      expect(navigate).not.toHaveBeenCalled();
+    }
+  );
+
+  it("retains the authenticated Free account and real usage when paid subscriptions are closed", async () => {
+    noruloApi.billing.getPlan.mockResolvedValue({
+      ...withoutPaidSubscriptions(),
+      account: { status: "none", plan: "free" },
+      ledgerUsage: {
+        workspaceId: "personal-owner",
+        projects: { used: 1, limit: 3 },
+        expenseRecords: { used: 7, limit: 100 },
+      },
+    });
+    render(<BillingScreen go={vi.fn()} navigate={vi.fn()} />);
+
+    const usage = await screen.findByRole("region", { name: "Ledger usage" });
+    expectUsageValues(usage, "Projects", 1, 3);
+    expectUsageValues(usage, "Expense records", 7, 100);
+    expect(screen.getByText("Free is available. Paid subscriptions are not open yet.")).toBeInTheDocument();
+    expect(screen.queryByRole("region", { name: "Jev usage" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+    expect(noruloApi.billing.createCheckoutSession).not.toHaveBeenCalled();
   });
 
   it("exposes billing legal side navigation as real screen links", async () => {

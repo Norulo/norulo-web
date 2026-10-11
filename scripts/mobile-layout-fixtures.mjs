@@ -3,7 +3,13 @@ import { createDateLayoutFixture, WORKSPACE_ID } from "./date-layout-fixtures.mj
 
 // Synthetic, bounded GET responses. This guard never forwards a business read
 // or any write to a Server. Reuse the contract-backed ledger/date DTOs.
-export function createMobileLayoutFixture({ baseURL }) {
+export const MOBILE_VERIFIED_EMAIL =
+  "verified.account.for.project.and.shared.expense.records@development.and.infrastructure.operations.example.com";
+export const MOBILE_ACCOUNT_NAME = "LongReadableAccountNameForProjectAndSharedExpenseOwnership".repeat(2);
+export const MOBILE_NORMAL_EMAIL = "taylor@example.com";
+export const MOBILE_NORMAL_NAME = "Taylor";
+
+export function createMobileLayoutFixture({ baseURL, accountOnboarding = false, accountIdentity = "long" }) {
   const base = new URL(baseURL);
   // Include self-hosted fonts and each visited screen's lazy CSS in the same
   // finite request allowance used by the multi-screen date checker.
@@ -53,6 +59,19 @@ export function createMobileLayoutFixture({ baseURL }) {
     };
   });
   function extraPayload(path) {
+    if (accountOnboarding && path === "/auth/session")
+      return {
+        authenticated: true,
+        user: {
+          id: WORKSPACE_ID,
+          name: accountIdentity === "normal" ? MOBILE_NORMAL_NAME : MOBILE_ACCOUNT_NAME,
+          email: accountIdentity === "normal" ? MOBILE_NORMAL_EMAIL : MOBILE_VERIFIED_EMAIL,
+          emailVerified: true,
+          providers: ["email"],
+        },
+      };
+    if (accountOnboarding && path === "/api/v1/projects")
+      return { items: [], nextCursor: null };
     if (path === "/api/v1/workspace-invitation-requests")
       return { items: longInbox ? inbox : [], hasMore: false };
     if (path === "/api/v1/recurring-expense-notifications")
@@ -84,7 +103,7 @@ export function createMobileLayoutFixture({ baseURL }) {
     )
       return { items: [], hasMore: false };
     if (path === "/api/integrations")
-      return { github: { connected: true, repositories: [], installations: [] } };
+      return { github: { connected: !accountOnboarding, repositories: [], installations: [] } };
     if (path === "/api/v1/account/jev")
       return {
         enabled: false,
@@ -159,7 +178,13 @@ export function createMobileLayoutFixture({ baseURL }) {
           await core.handle(route);
           return;
         }
-        assert.equal(url.search, "", `Unexpected extra-fixture query: ${record.path}`);
+        if (accountOnboarding && record.path === "/api/v1/projects") {
+          for (const key of url.searchParams.keys()) {
+            assert.equal(key, "limit", "Unexpected empty Projects query");
+            assert.equal(url.searchParams.getAll(key).length, 1, "Duplicate Projects query");
+            assert(/^(?:[1-9][0-9]?|100)$/.test(url.searchParams.get(key)), "Invalid Projects limit");
+          }
+        } else assert.equal(url.search, "", `Unexpected extra-fixture query: ${record.path}`);
         if (
           record.path === "/billing/plan" ||
           record.path.startsWith("/api/v1/account/") ||

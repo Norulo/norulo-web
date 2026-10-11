@@ -1173,8 +1173,8 @@ export function BillingScreen({ go, navigate = (url) => window.location.assign(u
                   {!billingEnabled && !error && (
                     <div className="muted">
                       {T(
-                        "Paid subscriptions are currently unavailable.",
-                        "Paid subscriptions are currently unavailable."
+                        "Free is available. Paid subscriptions are not open yet.",
+                        "Free 套餐可用，付费订阅尚未开放。"
                       )}
                     </div>
                   )}
@@ -1628,9 +1628,11 @@ export function PricingScreen({
                             </span>
                           )}
                           <I.Package size={14} />{" "}
-                          {signedIn
-                            ? T(`Start ${planLabel(paidPlan)}`, `升级 ${planLabel(paidPlan)}`)
-                            : T("Sign in to subscribe", "登录后订阅")}
+                          {!pricingLoading && plan?.enabled === false
+                            ? T("Not open yet", "尚未开放")
+                            : signedIn
+                              ? T(`Start ${planLabel(paidPlan)}`, `升级 ${planLabel(paidPlan)}`)
+                              : T("Sign in to subscribe", "登录后订阅")}
                         </button>
                       )}
                     </div>
@@ -1652,7 +1654,10 @@ export function PricingScreen({
             </p>
             {!billingEnabled && (
               <p className="muted">
-                {T("Paid subscriptions are currently unavailable.", "付费订阅暂不可用。")}
+                {T(
+                  "Free is available. Paid subscriptions are not open yet.",
+                  "Free 套餐可用，付费订阅尚未开放。"
+                )}
               </p>
             )}
           </div>

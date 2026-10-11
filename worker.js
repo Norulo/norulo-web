@@ -72,6 +72,7 @@ export async function proxyApiRequest(request, env, incomingUrl = new URL(reques
         await env.NORULO_SERVER.fetch(new Request(targetUrl, init)), request, incomingUrl
       );
     } catch {
+      console.error(JSON.stringify({ code: "NORULO_API_SERVICE_UNREACHABLE", status: 502 }));
       return json({ message: "Unable to reach Norulo API service." }, 502);
     }
   }
@@ -88,6 +89,7 @@ async function fetchUpstream(targetUrl, init) {
   try {
     return await fetch(targetUrl, init);
   } catch {
+    console.error(JSON.stringify({ code: "NORULO_API_UPSTREAM_UNREACHABLE", status: 502 }));
     return json({ message: "Unable to reach Norulo API upstream." }, 502);
   }
 }

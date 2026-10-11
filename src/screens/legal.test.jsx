@@ -157,8 +157,8 @@ describe("legal pages", () => {
   it("identifies infrastructure, model provider and functional browser storage", () => {
     render(<PrivacyScreen go={vi.fn()} />);
     expect(screen.getByText(/Cloudflare hosts/i)).toHaveTextContent("TypeSafe processes Jev");
-    expect(screen.getByText(/The interface loads fonts from Google Fonts/i)).toHaveTextContent(
-      "Your browser sends font requests directly to Google"
+    expect(screen.getByText(/Norulo hosts the interface fonts/i)).toHaveTextContent(
+      "Your browser loads font files from the same domain as the website"
     );
     expect(screen.getByText(/Optional GitHub data:/i)).toHaveTextContent(
       "encrypted GitHub access tokens"

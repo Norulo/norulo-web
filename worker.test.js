@@ -6,6 +6,7 @@ const originalFetch = globalThis.fetch;
 
 afterEach(() => {
   globalThis.fetch = originalFetch;
+  vi.restoreAllMocks();
 });
 
 describe("Cloudflare Worker API proxy", () => {
@@ -39,21 +40,27 @@ describe("Cloudflare Worker API proxy", () => {
   });
 
   it("does not fall back to external origin after a service-binding failure", async () => {
+    const diagnostic = vi.spyOn(console, "error").mockImplementation(() => {});
     const network = vi.fn();
     globalThis.fetch = network;
     const response = await worker.fetch(
-      new Request("https://norulo.com/api/auth/github/authorize"),
+      new Request("https://norulo.com/api/auth/github/authorize?code=private-code", {
+        headers: { Cookie: "nr_session=private-session" },
+      }),
       {
         NORULO_API_ORIGIN: "https://api.norulo.com",
         NORULO_SERVER: {
           fetch: vi.fn(async () => {
-            throw new Error("unavailable");
+            throw new Error("private-session private-code private-provider-body");
           }),
         },
       }
     );
     expect(response.status).toBe(502);
     expect(network).not.toHaveBeenCalled();
+    expect(diagnostic.mock.calls).toEqual([[JSON.stringify({
+      code: "NORULO_API_SERVICE_UNREACHABLE", status: 502,
+    })]]);
   });
 
   it("keeps each Edge visitor IP over the service binding without trusting client forwarding headers", async () => {
@@ -443,10 +450,13 @@ describe("Cloudflare Worker API proxy", () => {
   });
 
   it("returns a structured 502 when the backend fetch fails", async () => {
-    const fetchMock = vi.fn().mockRejectedValue(new Error("connection failed"));
+    const diagnostic = vi.spyOn(console, "error").mockImplementation(() => {});
+    const fetchMock = vi.fn().mockRejectedValue(new Error("private-token private-provider-body"));
     globalThis.fetch = fetchMock;
 
-    const response = await worker.fetch(new Request("https://norulo.com/api/auth/session"), {
+    const response = await worker.fetch(new Request("https://norulo.com/api/auth/session?code=private-code", {
+      headers: { Authorization: "Bearer private-token" },
+    }), {
       NORULO_API_ORIGIN: "https://api.norulo.com",
     });
 
@@ -454,6 +464,9 @@ describe("Cloudflare Worker API proxy", () => {
     await expect(response.json()).resolves.toEqual({
       message: "Unable to reach Norulo API upstream.",
     });
+    expect(diagnostic.mock.calls).toEqual([[JSON.stringify({
+      code: "NORULO_API_UPSTREAM_UNREACHABLE", status: 502,
+    })]]);
   });
 
   it("retries an explicit fallback origin for credentialless safe Cloudflare 1003 requests", async () => {

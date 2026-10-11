@@ -541,7 +541,7 @@ export function SettingsScreen({ go, onSessionUpdated, onOperationBusy }) {
               {error}
             </div>
           )}
-          <section className="panel" aria-label={T("Profile", "个人资料")}>
+          <section className="panel settings-profile-panel" aria-label={T("Profile", "个人资料")}>
             <h2>{T("Profile", "个人资料")}</h2>
             {session ? (
               <>
@@ -565,67 +565,75 @@ export function SettingsScreen({ go, onSessionUpdated, onOperationBusy }) {
               !loading && <p>{T("Account profile unavailable.", "账户资料暂不可用。")}</p>
             )}
           </section>
-          <section className="panel" aria-label={T("Sign-in methods", "登录方式")}>
+          <section className="panel settings-sign-in-panel" aria-label={T("Sign-in methods", "登录方式")}>
             <h2>{T("Sign-in methods", "登录方式")}</h2>
-            {loading && <p className="muted">{T("Loading...", "正在加载...")}</p>}
-            {canConnectGitHub && (
-              <div className="panel-actions">
-                <button
-                  className="btn sm"
-                  disabled={controlsDisabled}
-                  onClick={() =>
-                    runGitHubAction((signal) =>
-                      startGitHubLogin({ intent: "link", redirectTo: window.location.href, signal })
-                    )
-                  }
-                >
-                  <I.Github size={16} />{" "}
-                  {githubProvider || githubReconnectRequired
-                    ? T("Reconnect GitHub", "重新连接 GitHub")
-                    : T("Connect GitHub account", {
-                        zh: "连接 GitHub 账户",
-                        ja: "GitHub アカウントを接続",
-                        ko: "GitHub 계정 연결",
-                        fr: "Connecter un compte GitHub",
-                        es: "Conectar cuenta de GitHub",
-                      })}
-                </button>
-              </div>
-            )}
-            {loginEmail ? (
-              <>
-                <div className="set-row">
-                  <I.Mail size={16} />
-                  <span className="email-sign-in-identity">{loginEmail}</span>
-                  <span className="muted">{T("Verified email", "已验证邮箱")}</span>
+            <div className="settings-sign-in-methods">
+              {loading && (
+                <p className="muted settings-sign-in-description">{T("Loading...", "正在加载...")}</p>
+              )}
+              {canConnectGitHub && (
+                <div className="panel-actions">
+                  <button
+                    className="btn sm"
+                    disabled={controlsDisabled}
+                    onClick={() =>
+                      runGitHubAction((signal) =>
+                        startGitHubLogin({ intent: "link", redirectTo: window.location.href, signal })
+                      )
+                    }
+                  >
+                    <I.Github size={16} />{" "}
+                    {githubProvider || githubReconnectRequired
+                      ? T("Reconnect GitHub", "重新连接 GitHub")
+                      : T("Connect GitHub account", {
+                          zh: "连接 GitHub 账户",
+                          ja: "GitHub アカウントを接続",
+                          ko: "GitHub 계정 연결",
+                          fr: "Connecter un compte GitHub",
+                          es: "Conectar cuenta de GitHub",
+                        })}
+                  </button>
                 </div>
-                <p className="muted">
-                  {T("Use email codes to sign in to this account.", "使用邮箱验证码登录此账户。")}
-                </p>
-              </>
-            ) : canLinkEmail ? (
-              <>
-                <p className="muted">
-                  {T(
-                    "Link an email to sign in with a code. Your existing account and ledgers stay together.",
-                    "绑定邮箱后即可使用验证码登录，现有账户和账本保持不变。"
-                  )}
-                </p>
-                <EmailSignIn
-                  key={user.id}
-                  purpose="link"
-                  disabled={controlsDisabled && !emailActionRef.current}
-                  onBusy={emailBusy}
-                  onVerified={emailLinked}
-                />
-              </>
-            ) : (
-              !loading && (
-                <p className="muted">
-                  {T("Email sign-in information is unavailable.", "邮箱登录信息暂不可用。")}
-                </p>
-              )
-            )}
+              )}
+              {loginEmail ? (
+                <div className="settings-email-method">
+                  <div className="settings-sign-in-email">
+                    <I.Mail size={16} />
+                    <div className="settings-sign-in-email-details">
+                      <span className="email-sign-in-identity">{loginEmail}</span>
+                      <span className="muted settings-sign-in-description">
+                        {T("Verified email", "已验证邮箱")}
+                      </span>
+                    </div>
+                  </div>
+                  <p className="muted settings-sign-in-description">
+                    {T("Use email codes to sign in to this account.", "使用邮箱验证码登录此账户。")}
+                  </p>
+                </div>
+              ) : canLinkEmail ? (
+                <div className="settings-email-method">
+                  <p className="muted settings-sign-in-description">
+                    {T(
+                      "Link an email to sign in with a code. Your existing account and ledgers stay together.",
+                      "绑定邮箱后即可使用验证码登录，现有账户和账本保持不变。"
+                    )}
+                  </p>
+                  <EmailSignIn
+                    key={user.id}
+                    purpose="link"
+                    disabled={controlsDisabled && !emailActionRef.current}
+                    onBusy={emailBusy}
+                    onVerified={emailLinked}
+                  />
+                </div>
+              ) : (
+                !loading && (
+                  <p className="muted settings-sign-in-description">
+                    {T("Email sign-in information is unavailable.", "邮箱登录信息暂不可用。")}
+                  </p>
+                )
+              )}
+            </div>
           </section>
           <section className="panel settings-retention-panel" aria-label={retentionText("title")}>
             <h2>{retentionText("title")}</h2>

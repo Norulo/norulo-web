@@ -3975,7 +3975,11 @@
                 "const": "pricing"
               },
               "checkoutAction": {
-                "type": "object",
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "description": "Null when provider billing is disabled; Free remains available without checkout.",
                 "required": [
                   "method",
                   "href"
@@ -7416,5 +7420,5 @@
       }
     }
   },
-  "x-norulo-source-sha256": "c4046838b398d6b43fc42871edce99628a01e78d3942698795fb1aedca3aba36"
+  "x-norulo-source-sha256": "a1708a433fc827153564b8dbec48268d8fe83aa32ac041cb9630483aac67936f"
 }

@@ -60,6 +60,16 @@
   min-width: 0;
   color: var(--text-2);
 }
+.setup-steps li > div {
+  min-width: 0;
+  max-width: 100%;
+}
+.setup-steps .btn {
+  max-width: 100%;
+  height: auto;
+  white-space: normal;
+  text-align: start;
+}
 .setup-number {
   display: flex;
   align-items: center;
@@ -76,9 +86,11 @@
   color: var(--text);
 }
 .setup-steps strong {
+  display: block;
   color: var(--text);
   font-size: var(--fs-lg);
   font-weight: 600;
+  overflow-wrap: anywhere;
 }
 .setup-steps p {
   margin-top: 4px;
@@ -1151,17 +1163,32 @@
     margin-bottom: 0;
   }
   .setup-steps {
-    gap: 12px;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
   }
   .setup-steps li {
-    flex-direction: column;
-    gap: 8px;
+    gap: 12px;
+  }
+  .setup-number {
+    flex-basis: 28px;
+    width: 28px;
+    height: 28px;
+    font-size: var(--fs-xs);
+  }
+  .ledger-setup-panel .panel-h h2 {
+    font-size: var(--fs-lg);
   }
   .setup-steps p {
-    display: none;
+    font-size: var(--fs-sm);
   }
   .setup-steps strong {
     font-size: var(--fs-md);
+    line-height: 1.5;
+  }
+  .setup-steps .btn {
+    justify-content: flex-start;
+    padding-inline: 0;
+    font-size: inherit;
   }
   .ledger-screen .ledger-category-row,
   .ledger-screen .ledger-expense-row {

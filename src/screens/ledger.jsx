@@ -2443,7 +2443,7 @@ function ScopedLedgerScreen({
           {data && mode === "projects" && (
             <>
               {canManageProjects && data.projects.items.length === 0 && (
-                <section className="panel" aria-label={T("Get started", "开始使用")}>
+                <section className="panel ledger-setup-panel" aria-label={T("Get started", "开始使用")}>
                   <div className="panel-h">
                     <h2>{T("A clear path to your first expense", "三步，记下第一笔支出")}</h2>
                   </div>

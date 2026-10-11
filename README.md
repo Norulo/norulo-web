@@ -4,8 +4,17 @@
 > Cloudflare for `norulo.com` and `www.norulo.com`. The full Python Server is
 > published at `api.norulo.com`, with production D1/schema 12 verified. Direct
 > and proxied health checks return 200; unauthenticated account reads return 401.
-> The user reports successful GitHub login. Email login remains disabled and
-> unavailable; repository installation and ledger journeys remain unverified.
+> The user reports successful GitHub login. Production email authentication is
+> enabled with sender `login@auth.norulo.com`; the user confirmed receiving the
+> code and successfully signing in. Repository installation, account linking
+> and ledger journeys remain unverified. AI quality verification passed with 36
+> valid direct-provider responses; local monthly Owner-quota checks also passed.
+> Its Server-only key is bound in the cloud network configuration. AI remains
+> disabled in production and source configuration. Production recurring passed
+> local native Worker/Durable Object verification and independent review; its
+> live flag remains disabled and its cron is not installed. The final activation
+> release is planned after both main branches are committed/pushed together.
+> Real Worker/provider HTTPS and paid business journeys remain unverified.
 > Preview publication is excluded. See
 > [deployment status](docs/deployment.md) for the
 > exact version, CI result and public HTTP verification status.
@@ -157,7 +166,15 @@ are discarded while the ten remain unresolved. The
 and [source validation history](docs/validation/README.md) distinguish source
 tests from current publication. Norulo production D1 has been initialized and
 its schema verified. Recurring execution has not completed production acceptance
-and is not established by the successful full Server health checks.
+and is not established by the successful full Server health checks. Manual rule
+management uses the ordinary production API and ledger write permissions;
+it does not depend on the scheduler execution flag. Manual-category rules use
+the Owner's record/write allowance for Free and paid plans; automatic category
+selection additionally requires eligible, available Jev. Production scheduling
+passed canonical local native Worker/Durable Object verification, including
+one actual Free Owner occurrence, duplicate/idle handling and cold-restart
+fail-closed behavior. Its live execution flag remains `0` and no cron is
+installed; production activation remains planned.
 
 ## Local development
 
@@ -227,5 +244,19 @@ history, including historical approvals; it is not current deployment authority.
 Preview configuration is retained for offline reference and remains undeployed.
 The production D1 database is initialized with schema version 12 and the full
 Python Server is published. Health and unauthenticated access checks pass;
-the user reports successful GitHub sign-in. Email, repository installation and
-authenticated ledger acceptance remain pending.
+the user reports successful GitHub sign-in. Email authentication is enabled;
+the user confirmed code delivery and successful email login. Repository
+installation, account linking and authenticated ledger acceptance remain
+pending. See the deployment notes for the remaining work order.
+
+The final Server suite passed 2,923 tests in 106.75 seconds. Fresh AI quality
+verification passed with 36 valid direct-provider responses, no retries and no
+D1 use. Local monthly
+Owner-quota checks and production recurring local native verification also
+passed. The 2026-10-11 preflight still shows D1/email `1`/`1`, AI `0`/`0`, recurring
+`0` and no cron. `TYPESAFE_API_KEY` is a Server Worker secret and must never be
+added to Web/Vite settings. Real Worker/provider HTTPS and paid end-to-end
+behavior remain unverified limitations, rather than extra pre-release quality
+calls. Commit/push both final main branches together, then deploy those final
+versions with the reviewed activation configuration; do not make interim
+commits, pushes or deployments.

@@ -24,9 +24,28 @@ The new production D1 has been initialized once with all 12 canonical migrations
 schema version 12 and its 77-object fingerprint were verified. Production uses
 an explicit activation overlay; the checked-in Server defaults remain paused.
 Do not repeat initialization. The user reports successful real GitHub sign-in;
-repository installation/permissions and ledger journeys remain unverified.
-Email sign-in is currently disabled and the user reported its unavailable
-message. Health checks do not establish email, scheduler or ledger acceptance.
+repository installation/permissions, account linking and ledger journeys remain
+unverified.
+Production email authentication is now enabled through an explicit activation
+overlay, with `login@auth.norulo.com` as sender and a separate SQLite Durable
+Object admission limiter that does not use D1 for rate limiting. Checked-in D1
+and email-auth defaults remain paused. The user confirmed receipt of the email
+code and successful email sign-in; this is user-confirmed acceptance, not an
+agent-initiated remote send. AI quality verification has now passed with 36
+valid direct-provider responses, independently reviewed, without retries or D1
+use. The Server-only `TYPESAFE_API_KEY` is the fourth Worker secret and is bound
+in cloud network configuration revision 11. Local monthly Owner-quota checks
+passed. Production recurring passed canonical local native Worker/Durable Object
+verification and independent evidence review. The final Server suite passed
+2,923 tests. Read-only production preflight on 2026-10-11 still shows D1/email
+flags `1`/`1`, AI flags `0`/`0`, recurring flag `0` and no cron. Final AI/recurring
+activation is planned after both main branches are committed/pushed together;
+it has not been deployed. Real Worker-to-provider HTTPS and real paid business
+journeys remain unverified limitations, rather than additional release gates or
+requirements for another quality call. Never expose the key in Web/Vite
+variables. Deploy only the final production versions; do not make interim
+commits, pushes or deployments.
+Health checks do not establish scheduler or ledger acceptance.
 Preview publication remains excluded.
 
 ## Product and shared contract

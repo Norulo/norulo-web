@@ -49,6 +49,8 @@
   container-name: projects;
 }
 .setup-steps {
+  --setup-title-height: 44px;
+  --setup-number-size: 32px;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   list-style: none;
@@ -65,9 +67,16 @@
   min-width: 0;
   max-width: 100%;
 }
-.setup-steps .btn {
+.setup-steps strong > .btn {
+  justify-content: flex-start;
   max-width: 100%;
+  min-height: var(--setup-title-height);
   height: auto;
+  padding: 0;
+  border-width: 0;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
   white-space: normal;
   text-align: start;
 }
@@ -75,9 +84,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  flex: 0 0 32px;
-  width: 32px;
-  height: 32px;
+  flex: 0 0 var(--setup-number-size);
+  width: var(--setup-number-size);
+  height: var(--setup-number-size);
+  margin-top: calc((var(--setup-title-height) - var(--setup-number-size)) / 2);
   background: var(--bg-soft);
   color: var(--text-3);
   font: 500 var(--fs-sm) var(--font-mono);
@@ -87,10 +97,14 @@
   color: var(--text);
 }
 .setup-steps strong {
-  display: block;
-  color: var(--text);
-  font-size: var(--fs-lg);
-  font-weight: 600;
+  display: flex;
+  align-items: center;
+  min-height: var(--setup-title-height);
+  color: var(--text-2);
+  font-size: var(--fs-md);
+  font-weight: 500;
+  line-height: 1.5;
+  letter-spacing: -0.01em;
   overflow-wrap: anywhere;
 }
 .setup-steps p {
@@ -1345,6 +1359,8 @@
     margin-bottom: 0;
   }
   .setup-steps {
+    --setup-title-height: 48px;
+    --setup-number-size: 28px;
     grid-template-columns: minmax(0, 1fr);
     gap: 20px;
   }
@@ -1352,9 +1368,6 @@
     gap: 12px;
   }
   .setup-number {
-    flex-basis: 28px;
-    width: 28px;
-    height: 28px;
     font-size: var(--fs-xs);
   }
   .ledger-setup-panel .panel-h h2 {
@@ -1362,15 +1375,6 @@
   }
   .setup-steps p {
     font-size: var(--fs-sm);
-  }
-  .setup-steps strong {
-    font-size: var(--fs-md);
-    line-height: 1.5;
-  }
-  .setup-steps .btn {
-    justify-content: flex-start;
-    padding-inline: 0;
-    font-size: inherit;
   }
   .ledger-screen .ledger-category-row,
   .ledger-screen .ledger-expense-row {

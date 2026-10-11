@@ -1527,7 +1527,7 @@ describe("ledger screens", () => {
     await screen.findByText(/No repositories are available yet/);
     expect(github.connect).not.toHaveBeenCalled();
     fireEvent.click(screen.getByRole("button", { name: "Manage GitHub access" }));
-    await waitFor(() => expect(github.connect).toHaveBeenCalledWith({ add: true }));
+    await waitFor(() => expect(github.connect).toHaveBeenCalledWith({ add: true, signal: expect.any(AbortSignal) }));
     expect(await screen.findByRole("option", { name: "alice/project" })).toBeInTheDocument();
     expect(api.createProject).not.toHaveBeenCalled();
   });

@@ -1778,6 +1778,7 @@ details.panel[open] > summary.panel-h::after,
   grid-template-columns: 18px minmax(0, 1fr) auto;
   gap: 10px;
   align-items: center;
+  min-height: 44px;
   min-width: 0;
   padding: var(--space-3) 14px;
   border-bottom: 1px solid var(--border);

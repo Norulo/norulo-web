@@ -25,7 +25,7 @@ vi.mock("./api/norulo.js", () => ({
     integrations: { list: vi.fn(), getGitHubAuthorizeUrl: vi.fn() },
   },
 }));
-const harness = vi.hoisted(() => ({ enabled: false, apis: {}, captures: [] }));
+const harness = vi.hoisted(() => ({ enabled: false, apis: {}, captures: [], authorizationRevisions: [] }));
 vi.mock("./screens/ledger.jsx", async () => {
   const { useEffect, useState } = await import("react");
   const { Topbar } = await import("./shell.jsx");
@@ -70,7 +70,10 @@ vi.mock("./screens/ledger.jsx", async () => {
     );
   }
   return {
-    LedgerScreen: (props) => (harness.enabled ? <ScopedLedger {...props} /> : <h1>Projects</h1>),
+    LedgerScreen: (props) => {
+      harness.authorizationRevisions.push(props.authorizationRevision);
+      return harness.enabled ? <ScopedLedger {...props} /> : <h1>Projects</h1>;
+    },
   };
 });
 vi.mock("./api/ledger.js", () => ({
@@ -87,6 +90,7 @@ beforeEach(() => {
   harness.enabled = false;
   harness.apis = {};
   harness.captures = [];
+  harness.authorizationRevisions = [];
   createLedgerApi.mockImplementation((id, notify) => {
     harness.captures.push({ id, notify });
     return harness.apis[id] || {};
@@ -196,6 +200,39 @@ it("establishes GitHub renewal from the confirmed account and clears it on unmou
   view.unmount();
   expect(captureGitHubRefreshScope()).toBeNull();
   expect(scope.controller.signal.aborted).toBe(true);
+});
+
+it.each(["redirecting", "verified"])("handles %s repository authorization continuation without refreshing during navigation", async (status) => {
+  window.history.replaceState({}, "", "/projects?repoAuth=1");
+  noruloApi.auth.getSession.mockResolvedValue({ authenticated: true, user: { id: "alice" } });
+  const completion = pending();
+  const authorize = vi.spyOn(await import("./lib/auth.js"), "connectGitHubRepositories")
+    .mockReturnValueOnce(completion.promise);
+  const view = render(<App />);
+  await screen.findByRole("heading", { name: "Projects" });
+  expect(authorize).toHaveBeenCalledOnce();
+  const signal = authorize.mock.calls[0][0].signal;
+  expect(signal.aborted).toBe(false);
+  expect(window.location.search).toBe("");
+  await act(async () => completion.resolve(status === "redirecting" ? { status } : undefined));
+  expect(harness.authorizationRevisions.at(-1)).toBe(status === "redirecting" ? 0 : 1);
+  view.unmount();
+  expect(signal.aborted).toBe(true);
+});
+
+it("discards authorization continuation after leaving its page", async () => {
+  window.history.replaceState({}, "", "/projects?repoAuth=1");
+  noruloApi.auth.getSession.mockResolvedValue({ authenticated: true, user: { id: "alice" } });
+  const completion = pending();
+  const authorize = vi.spyOn(await import("./lib/auth.js"), "connectGitHubRepositories")
+    .mockReturnValueOnce(completion.promise);
+  const view = render(<App />);
+  await screen.findByRole("heading", { name: "Projects" });
+  const signal = authorize.mock.calls[0][0].signal;
+  view.unmount();
+  expect(signal.aborted).toBe(true);
+  await act(async () => completion.resolve());
+  expect(harness.authorizationRevisions).not.toContain(1);
 });
 
 it("does not establish GitHub renewal from a display login without a confirmed account ID", async () => {

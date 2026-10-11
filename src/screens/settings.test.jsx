@@ -136,7 +136,7 @@ describe("product settings", () => {
     expect(screen.queryByText(/review output language/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/scan history/i)).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: /^connect repositories$/i }));
-    await waitFor(() => expect(connectGitHubRepositories).toHaveBeenCalledWith({}));
+    await waitFor(() => expect(connectGitHubRepositories).toHaveBeenCalledWith({ signal: expect.any(AbortSignal) }));
     fireEvent.click(screen.getByRole("button", { name: /sign out/i }));
     expect(signOut).toHaveBeenCalledTimes(1);
   });
@@ -152,6 +152,44 @@ describe("product settings", () => {
     fireEvent.click(screen.getByRole("button", { name: /^reload$/i }));
     expect(await screen.findByText("Taylor")).toBeInTheDocument();
   });
+
+  it.each(["Connect GitHub account", "Reconnect GitHub", "Connect repositories", "Manage team-a GitHub App installation"])(
+    "keeps %s navigation locked and does not reload Settings while leaving for GitHub",
+    async (label) => {
+      if (label === "Connect GitHub account")
+        noruloApi.auth.getSession.mockResolvedValue({ ...session, user: { ...session.user, providers: ["email"], emailVerified: true } });
+      if (label.startsWith("Manage")) noruloApi.integrations.list.mockResolvedValue(connectedGitHub);
+      const authorize = label.startsWith("Manage")
+        ? manageGitHubInstallation
+        : label === "Connect repositories"
+          ? connectGitHubRepositories
+          : startGitHubLogin;
+      authorize.mockResolvedValueOnce({ status: "redirecting" });
+      const onOperationBusy = vi.fn();
+      const view = render(<SettingsScreen go={vi.fn()} onOperationBusy={onOperationBusy} />);
+      const button = await screen.findByRole("button", { name: label });
+
+      await act(async () => fireEvent.click(button));
+      fireEvent.click(button);
+      fireEvent.click(screen.getByRole("button", { name: "Reload" }));
+
+      expect(authorize).toHaveBeenCalledOnce();
+      const signal = label.startsWith("Manage") ? authorize.mock.calls[0][1].signal : authorize.mock.calls[0][0].signal;
+      expect(signal.aborted).toBe(false);
+      expect(button).toBeDisabled();
+      expect(screen.getByRole("button", { name: "Reload" })).toBeDisabled();
+      expect(screen.getByRole("button", { name: "Sign out" })).toBeDisabled();
+      expect(screen.getByText("Taylor")).toBeVisible();
+      expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+      for (const read of [noruloApi.auth.getSession, noruloApi.integrations.list, noruloApi.account.getJev, noruloApi.account.getExpenseRetention])
+        expect(read).toHaveBeenCalledOnce();
+      expect(onOperationBusy).toHaveBeenCalledExactlyOnceWith(true);
+
+      view.unmount();
+      expect(signal.aborted).toBe(true);
+      expect(onOperationBusy).toHaveBeenLastCalledWith(false);
+    }
+  );
 
   it("keeps account reconnect available when integration reads require reauthorization", async () => {
     noruloApi.auth.getSession.mockResolvedValue({
@@ -519,7 +557,7 @@ describe("product settings", () => {
       fireEvent.click(button);
       fireEvent.click(button);
       expect(connectGitHubRepositories).toHaveBeenCalledExactlyOnceWith(
-        connected ? { add: true } : {}
+        { ...(connected ? { add: true } : {}), signal: expect.any(AbortSignal) }
       );
       expect(button).toBeDisabled();
       expect(screen.getByRole("button", { name: "Reload" })).toBeDisabled();
@@ -585,6 +623,7 @@ describe("product settings", () => {
     expect(manageGitHubInstallation).toHaveBeenCalledExactlyOnceWith("101", {
       githubIdentityId: "identity_a",
       redirectTo: window.location.href,
+      signal: expect.any(AbortSignal),
     });
     expect(first).toBeDisabled();
     expect(second).toBeDisabled();

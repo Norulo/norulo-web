@@ -673,8 +673,9 @@
 .ledger-screen .disclosure .ledger-fields {
   margin-bottom: 16px;
 }
+/* Selection labels keep the shared checkbox/name row layout. */
 .ledger-screen .main .ledger-field,
-.ledger-screen .main label {
+.ledger-screen .main label:not(.api-scope-row) {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: 8px;
@@ -1086,9 +1087,6 @@
   .ledger-screen .main select,
   .ledger-screen .main textarea {
     font-size: var(--fs-2xl);
-  }
-  .ledger-screen .main .api-scope-row {
-    min-height: 44px;
   }
 }
 @media (max-width: 760px) {

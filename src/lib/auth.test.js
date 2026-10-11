@@ -55,7 +55,90 @@ describe("auth redirects", () => {
     setGitHubRefreshIdentity("usr_one");
     window.history.replaceState({}, "", "/?screen=login#ignored");
   });
-  afterEach(() => setGitHubRefreshIdentity(null));
+  afterEach(() => {
+    setGitHubRefreshIdentity(null);
+    vi.unstubAllGlobals();
+  });
+
+  function mockNavigation() {
+    const browser = window;
+    const assign = vi.fn();
+    const reload = vi.fn();
+    vi.stubGlobal("window", {
+      location: { href: browser.location.href, hash: browser.location.hash, origin: browser.location.origin, assign, reload },
+      addEventListener: browser.addEventListener.bind(browser),
+      removeEventListener: browser.removeEventListener.bind(browser),
+      dispatchEvent: browser.dispatchEvent.bind(browser),
+    });
+    return { assign, reload };
+  }
+
+  it.each(["login", "repository identity", "install fallback", "manage fallback"])(
+    "reports %s full-page navigation without verifying provider completion",
+    async (flow) => {
+      const { assign } = mockNavigation();
+      const oauthUrl = "https://github.com/login/oauth/authorize?client_id=app";
+      const installationUrl = "https://github.com/apps/norulo/installations/new";
+      noruloApi.auth.getGitHubAuthorizeUrl.mockResolvedValue({ url: oauthUrl });
+      noruloApi.integrations.getGitHubAuthorizeUrl.mockResolvedValue({ url: installationUrl });
+      noruloApi.integrations.createGitHubInstallationManageSession.mockResolvedValue({ url: installationUrl });
+      openGitHubInstallPopup.mockReturnValue(null);
+      if (flow === "repository identity")
+        noruloApi.integrations.getGitHubAuthorizeUrl.mockRejectedValueOnce(
+          Object.assign(new Error("GitHub identity required"), { code: "GITHUB_IDENTITY_REQUIRED" })
+        );
+
+      const outcome = await (flow === "login"
+        ? startGitHubLogin()
+        : flow === "manage fallback"
+          ? manageGitHubInstallation("999")
+          : connectGitHubRepositories());
+
+      expect(outcome).toEqual({ status: "redirecting" });
+      expect(assign).toHaveBeenCalledExactlyOnceWith(
+        ["login", "repository identity"].includes(flow) ? oauthUrl : installationUrl
+      );
+      expect(noruloApi.repositories.sync).not.toHaveBeenCalled();
+    }
+  );
+
+  it("restores a full-page GitHub navigation only once when the old page returns from cache", async () => {
+    const { reload } = mockNavigation();
+    noruloApi.auth.getGitHubAuthorizeUrl.mockResolvedValue({ url: "https://github.com/login/oauth/authorize" });
+    await startGitHubLogin();
+    window.dispatchEvent(new PageTransitionEvent("pageshow", { persisted: false }));
+    expect(reload).not.toHaveBeenCalled();
+    window.dispatchEvent(new PageTransitionEvent("pageshow", { persisted: true }));
+    window.dispatchEvent(new PageTransitionEvent("pageshow", { persisted: true }));
+    expect(reload).toHaveBeenCalledOnce();
+  });
+
+  it.each(["lifecycle", "account"])("removes cache restoration after %s cancellation", async (cancellation) => {
+    const { reload } = mockNavigation();
+    const controller = new AbortController();
+    noruloApi.auth.getGitHubAuthorizeUrl.mockResolvedValue({ url: "https://github.com/login/oauth/authorize" });
+    await startGitHubLogin({ signal: controller.signal });
+    if (cancellation === "lifecycle") controller.abort();
+    else setGitHubRefreshIdentity("usr_other");
+    window.dispatchEvent(new PageTransitionEvent("pageshow", { persisted: true }));
+    expect(reload).not.toHaveBeenCalled();
+  });
+
+  it("does not restore from cache when navigation fails or GitHub authorization uses a popup", async () => {
+    const { assign, reload } = mockNavigation();
+    noruloApi.auth.getGitHubAuthorizeUrl.mockResolvedValue({ url: "https://github.com/login/oauth/authorize" });
+    assign.mockImplementationOnce(() => { throw new Error("navigation failed"); });
+    await expect(startGitHubLogin()).rejects.toThrow("navigation failed");
+    noruloApi.integrations.getGitHubAuthorizeUrl.mockResolvedValue({ url: "https://github.com/apps/norulo/installations/new" });
+    openGitHubInstallPopup.mockResolvedValue(closedWithAccessForNavigation());
+    await connectGitHubRepositories();
+    window.dispatchEvent(new PageTransitionEvent("pageshow", { persisted: true }));
+    expect(reload).not.toHaveBeenCalled();
+  });
+
+  function closedWithAccessForNavigation() {
+    return { status: "closed_unverified", repositories: { githubAccess: "authorized", items: [{ fullName: "alice/service" }] } };
+  }
 
   it("returns from GitHub login to the dashboard so slow session checks show a neutral restore state", async () => {
     noruloApi.auth.getGitHubAuthorizeUrl.mockRejectedValueOnce(new Error("stop"));

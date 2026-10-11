@@ -79,6 +79,15 @@
   opacity: 0.4;
 }
 
+.settings-jev-panel > .panel-actions {
+  margin-block: var(--space-3);
+}
+
+.settings-github-panel > .panel-actions {
+  margin-block-start: var(--space-4);
+  gap: var(--space-3);
+}
+
 @media (max-width: 760px) {
   .settings-profile-panel .set-row + .set-row,
   .settings-sign-in-email .email-sign-in-identity {

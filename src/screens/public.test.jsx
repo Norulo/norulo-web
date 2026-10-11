@@ -121,6 +121,22 @@ describe("repository authorization outcomes", () => {
     expect(screen.queryByRole("status")).not.toBeInTheDocument();
   });
 
+  it("keeps the OAuth page locked without internal navigation during a full-page GitHub redirect", async () => {
+    connectGitHubRepositories.mockResolvedValueOnce({ status: "redirecting" });
+    const go = vi.fn();
+    const view = render(<OAuthScreen go={go} auth={signedIn} />);
+    const connect = screen.getByRole("button", { name: "Connect GitHub repositories" });
+    await act(async () => fireEvent.click(connect));
+    fireEvent.click(connect);
+    expect(connect).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Back" })).toBeDisabled();
+    expect(connectGitHubRepositories).toHaveBeenCalledOnce();
+    expect(go).not.toHaveBeenCalled();
+    const signal = connectGitHubRepositories.mock.calls[0][0].signal;
+    view.unmount();
+    expect(signal.aborted).toBe(true);
+  });
+
   it.each(["unmount", "identity change"])(
     "aborts and ignores an obsolete authorization after %s",
     async (transition) => {
@@ -324,6 +340,23 @@ describe("public navigation links", () => {
     expect(screen.getByRole("button", { name: "Send code" })).toBeDisabled();
     await act(async () => reject(new Error("GitHub unavailable")));
     await waitFor(() => expect(screen.getByRole("textbox", { name: "Email" })).toBeEnabled());
+  });
+
+  it("keeps GitHub login and email actions locked until full-page navigation leaves the document", async () => {
+    startGitHubLogin.mockClear().mockResolvedValueOnce({ status: "redirecting" });
+    const onOperationBusy = vi.fn();
+    const view = render(<LoginScreen go={vi.fn()} onOperationBusy={onOperationBusy} />);
+    await act(async () => fireEvent.click(screen.getByRole("button", { name: "Continue with GitHub" })));
+    const opening = screen.getByRole("button", { name: "Opening GitHub..." });
+    fireEvent.click(opening);
+    expect(opening).toBeDisabled();
+    expect(screen.getByRole("textbox", { name: "Email" })).toBeDisabled();
+    expect(startGitHubLogin).toHaveBeenCalledOnce();
+    expect(onOperationBusy).toHaveBeenCalledExactlyOnceWith(true);
+    const signal = startGitHubLogin.mock.calls[0][0].signal;
+    view.unmount();
+    expect(signal.aborted).toBe(true);
+    expect(onOperationBusy).toHaveBeenLastCalledWith(false);
   });
 
   it("keeps the public-page frame on one shared horizontal baseline", () => {

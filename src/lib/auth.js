@@ -85,6 +85,31 @@ function assertAuthorizationActive(scope, signal) {
     throw new DOMException("Account changed", "AbortError");
 }
 
+function redirectToGitHub(url, scope, signal) {
+  assertAuthorizationActive(scope, signal);
+  const signals = [signal, scope?.controller.signal].filter(Boolean);
+  const cleanup = () => {
+    window.removeEventListener("pageshow", restoreFromCache);
+    signals.forEach((activeSignal) => activeSignal.removeEventListener("abort", cleanup));
+  };
+  const restoreFromCache = (event) => {
+    if (!event.persisted) return;
+    cleanup();
+    // OAuth keeps the current page locked while navigation is pending. A page
+    // restored from Safari's back/forward cache needs a fresh session/access read.
+    if (!signals.some((activeSignal) => activeSignal.aborted)) window.location.reload();
+  };
+  window.addEventListener("pageshow", restoreFromCache);
+  signals.forEach((activeSignal) => activeSignal.addEventListener("abort", cleanup, { once: true }));
+  try {
+    window.location.assign(url);
+  } catch (failure) {
+    cleanup();
+    throw failure;
+  }
+  return { status: "redirecting" };
+}
+
 async function verifyConnectedRepositories({ scope, signal, syncPayload }) {
   assertAuthorizationActive(scope, signal);
   const payload = await noruloApi.repositories.sync(syncPayload, { scope, signal });
@@ -162,7 +187,7 @@ export async function startGitHubLogin({
     throw new Error("GitHub authorize URL is missing from the auth response.");
   }
 
-  window.location.assign(safeGitHubAuthorizeUrl(result.url, "GitHub authorize URL"));
+  return redirectToGitHub(safeGitHubAuthorizeUrl(result.url, "GitHub authorize URL"), scope, signal);
 }
 
 export async function connectGitHubRepositories({
@@ -188,13 +213,12 @@ export async function connectGitHubRepositories({
   } catch (error) {
     assertAuthorizationActive(scope, signal);
     if (needsGitHubIdentity(error)) {
-      await startGitHubLogin({
+      return startGitHubLogin({
         intent: "link",
         redirectTo: getContinueRepositoryRedirectUrl(repositoryRedirect),
         signal,
         scope,
       });
-      return;
     }
     throw error;
   }
@@ -222,8 +246,7 @@ export async function connectGitHubRepositories({
     : undefined;
   const completion = openGitHubInstallPopup(authorizeUrl, popupSyncPayload, { scope, signal, nonce });
   if (!completion) {
-    window.location.assign(authorizeUrl);
-    return;
+    return redirectToGitHub(authorizeUrl, scope, signal);
   }
   try {
     const outcome = await completion;
@@ -274,8 +297,7 @@ export async function manageGitHubInstallation(
   const completion = openGitHubInstallPopup(manageUrl, popupSyncPayload, { scope, signal, nonce });
   if (!completion) {
     markGitHubRepositoryAccessRefreshNeeded();
-    window.location.assign(manageUrl);
-    return;
+    return redirectToGitHub(manageUrl, scope, signal);
   }
   try {
     const outcome = await completion;

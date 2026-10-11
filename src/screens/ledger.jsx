@@ -1715,9 +1715,14 @@ function ScopedLedgerScreen({
     setGitHubOutcome(null);
     pendingGitHubOutcome.current = null;
     const request = requestId.current;
+    let redirecting = false;
     try {
-      await callback();
+      const outcome = await callback();
       if (request !== requestId.current) return false;
+      if (outcome?.status === "redirecting") {
+        redirecting = true;
+        return false;
+      }
       resetExpensePage();
       writeRefreshPending.current = true;
       setLoading(true);
@@ -1742,23 +1747,50 @@ function ScopedLedgerScreen({
       }
       return false;
     } finally {
-      if (!writeRefreshPending.current) {
+      if (request === requestId.current && !writeRefreshPending.current && !redirecting) {
         inFlight.current = false;
         if (mounted.current) setBusy(false);
       }
     }
   };
 
+  const gitHubController = () => {
+    const controller = new AbortController();
+    loginController.current = controller;
+    const onAbort = () => {
+      if (loginController.current !== controller) return;
+      loginController.current = null;
+      inFlight.current = false;
+      if (mounted.current) setBusy(false);
+    };
+    controller.signal.addEventListener("abort", onAbort, { once: true });
+    return {
+      controller,
+      finish: () => {
+        controller.signal.removeEventListener("abort", onAbort);
+        if (loginController.current === controller) loginController.current = null;
+      },
+    };
+  };
+
   const manageGitHubAccess = () => {
     const request = requestId.current;
     return action(async () => {
-      const outcome = await connectGitHubRepositories({ add: true });
-      if (
-        mounted.current &&
-        request === requestId.current &&
-        outcome?.status === "closed_unverified"
-      )
-        pendingGitHubOutcome.current = { outcome, scope: loadedScope.current };
+      const operation = gitHubController();
+      let redirecting = false;
+      try {
+        const outcome = await connectGitHubRepositories({ add: true, signal: operation.controller.signal });
+        redirecting = outcome?.status === "redirecting";
+        if (
+          mounted.current &&
+          request === requestId.current &&
+          outcome?.status === "closed_unverified"
+        )
+          pendingGitHubOutcome.current = { outcome, scope: loadedScope.current };
+        return outcome;
+      } finally {
+        if (!redirecting) operation.finish();
+      }
     });
   };
 
@@ -1795,16 +1827,21 @@ function ScopedLedgerScreen({
     setBusy(true);
     setActionError("");
     const request = requestId.current;
-    const controller = new AbortController();
-    loginController.current = controller;
+    const operation = gitHubController();
+    const controller = operation.controller;
+    let redirecting = false;
     try {
-      await startGitHubLogin({ signal: controller.signal });
+      const outcome = await startGitHubLogin({ signal: controller.signal });
+      redirecting = outcome?.status === "redirecting";
     } catch (failure) {
       if (!controller.signal.aborted && request === requestId.current)
         setActionError(errorText(failure));
     } finally {
-      inFlight.current = false;
-      if (mounted.current) setBusy(false);
+      if (!redirecting && loginController.current === controller) {
+        operation.finish();
+        inFlight.current = false;
+        if (mounted.current) setBusy(false);
+      }
     }
   };
 

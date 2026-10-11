@@ -211,6 +211,16 @@ export function SettingsScreen({ go, onSessionUpdated, onOperationBusy }) {
     };
     githubActionRef.current = operation;
     actionRef.current = true;
+    operation.controller.signal.addEventListener("abort", () => {
+      if (githubActionRef.current !== operation) return;
+      githubActionRef.current = null;
+      actionRef.current = false;
+      if (mountedRef.current) {
+        onOperationBusyRef.current?.(false);
+        setBusy(false);
+        setManagingInstallationId("");
+      }
+    }, { once: true });
     setBusy(true);
     setManagingInstallationId(installationId);
     setError("");
@@ -218,10 +228,15 @@ export function SettingsScreen({ go, onSessionUpdated, onOperationBusy }) {
     const live = () =>
       mountedRef.current &&
       githubActionRef.current === operation &&
+      !operation.controller.signal.aborted &&
       sessionRef.current?.user?.id === operation.identity;
     try {
       const outcome = await action(operation.controller.signal);
       if (!live()) return;
+      if (outcome?.status === "redirecting") {
+        operation.redirecting = true;
+        return;
+      }
       const refreshed = await load();
       if (
         live() &&
@@ -241,7 +256,7 @@ export function SettingsScreen({ go, onSessionUpdated, onOperationBusy }) {
         );
       }
     } finally {
-      if (githubActionRef.current === operation) {
+      if (githubActionRef.current === operation && !operation.redirecting) {
         githubActionRef.current = null;
         actionRef.current = false;
         onOperationBusyRef.current?.(false);
@@ -709,15 +724,17 @@ export function SettingsScreen({ go, onSessionUpdated, onOperationBusy }) {
                 <p className="muted">
                   {T("Jev settings require Pro or Max.", "Jev 设置需要 Pro 或 Max 权益。")}
                 </p>
-                <button
-                  className="btn sm"
-                  disabled={controlsDisabled}
-                  onClick={() => {
-                    if (!actionRef.current) go("pricing");
-                  }}
-                >
-                  {T("View plans", "查看套餐")}
-                </button>
+                <div className="panel-actions">
+                  <button
+                    className="btn sm"
+                    disabled={controlsDisabled}
+                    onClick={() => {
+                      if (!actionRef.current) go("pricing");
+                    }}
+                  >
+                    {T("View plans", "查看套餐")}
+                  </button>
+                </div>
               </>
             ) : (
               <>
@@ -750,7 +767,7 @@ export function SettingsScreen({ go, onSessionUpdated, onOperationBusy }) {
               )}
             </p>
           </section>
-          <section className="panel" aria-label={T("GitHub access", "GitHub 授权")}>
+          <section className="panel settings-github-panel" aria-label={T("GitHub access", "GitHub 授权")}>
             <h2>{T("GitHub access", "GitHub 授权")}</h2>
             {canConnectGitHub && githubReconnectRequired ? (
               <p className="muted">
@@ -823,8 +840,8 @@ export function SettingsScreen({ go, onSessionUpdated, onOperationBusy }) {
                     className="btn sm"
                     disabled={controlsDisabled}
                     onClick={() =>
-                      runGitHubAction(() =>
-                        connectGitHubRepositories(github?.connected ? { add: true } : {})
+                      runGitHubAction((signal) =>
+                        connectGitHubRepositories({ ...(github?.connected ? { add: true } : {}), signal })
                       )
                     }
                   >
@@ -845,10 +862,11 @@ export function SettingsScreen({ go, onSessionUpdated, onOperationBusy }) {
                       onManage={(installation) => {
                         const installationId = installation?.id || installation?.installationId;
                         runGitHubAction(
-                          () =>
+                          (signal) =>
                             manageGitHubInstallation(installationId, {
                               githubIdentityId: installation?.manage?.githubIdentityId || undefined,
                               redirectTo: window.location.href,
+                              signal,
                             }),
                           installationId
                         );

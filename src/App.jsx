@@ -981,16 +981,20 @@ export function App() {
     if (continuedRepositoryAuthorization.current || !repositoryAuthorizationRequested()) return;
     continuedRepositoryAuthorization.current = true;
     clearRepositoryAuthorizationRequest();
-    connectGitHubRepositories()
-      .then(() => {
+    const controller = new AbortController();
+    connectGitHubRepositories({ signal: controller.signal })
+      .then((outcome) => {
+        if (controller.signal.aborted || outcome?.status === "redirecting") return;
         setRepositoryAuthorizationRevision((value) => value + 1);
       })
       .catch((error) => {
+        if (controller.signal.aborted) return;
         setRepositoryAuthorizationError(
           error?.message || "Unable to connect GitHub repository access."
         );
       });
-  }, [auth.status, auth.authenticated, screen]);
+    return () => controller.abort();
+  }, [auth.status, auth.authenticated, screen, identity]);
 
   // Show the back-to-top button once the user has scrolled past the threshold,
   // and hide it again when they return to the top. This lets long list pages

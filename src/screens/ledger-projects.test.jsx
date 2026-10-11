@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { LedgerScreen } from "./ledger.jsx";
 
 const api = vi.hoisted(() => ({
@@ -670,6 +670,44 @@ describe("Projects authorization and creation", () => {
     expect(github.connect).toHaveBeenCalledTimes(1);
     expect(api.repositories).toHaveBeenCalledTimes(2);
     expect(api.createProject).not.toHaveBeenCalled();
+  });
+
+  it.each(["completed", "failed"])("releases a %s GitHub popup lifecycle before later operations", async (result) => {
+    if (result === "failed") github.connect.mockRejectedValueOnce(new Error("GitHub denied authorization"));
+    const view = render(<LedgerScreen go={vi.fn()} mode="projects" />);
+    await openGitHubLinks();
+    const button = await screen.findByRole("button", { name: /Manage GitHub access/i });
+    await act(async () => fireEvent.click(button));
+    await waitFor(() => expect(screen.getByRole("button", { name: /Manage GitHub access/i })).toBeEnabled());
+    const signal = github.connect.mock.calls[0][0].signal;
+    expect(signal.aborted).toBe(false);
+    view.unmount();
+    // Finished authorization no longer owns the lifecycle abort that can unlock a write.
+    expect(signal.aborted).toBe(false);
+  });
+
+  it.each(["installation", "account reconnect"])("keeps Projects locked without another read during %s full-page navigation", async (flow) => {
+    if (flow === "account reconnect") {
+      api.repositories.mockResolvedValue({ items: [], nextCursor: null, githubAccess: "reauthorization_required" });
+      github.login.mockResolvedValueOnce({ status: "redirecting" });
+    } else github.connect.mockResolvedValueOnce({ status: "redirecting" });
+    const workspace = { id: "usr_first", revision: 1, permissions: { manageProjects: true, manageCategories: true, writeExpenses: true } };
+    const view = render(<LedgerScreen go={vi.fn()} mode="projects" workspace={workspace} />);
+    await openGitHubLinks();
+    const button = await screen.findByRole("button", { name: flow === "installation" ? /Manage GitHub access/i : "Reconnect GitHub" });
+    await act(async () => fireEvent.click(button));
+    fireEvent.click(button);
+    expect(button).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Create project" })).toBeDisabled();
+    expect(api.projects).toHaveBeenCalledOnce();
+    expect(api.repositories).toHaveBeenCalledOnce();
+    const authorize = flow === "installation" ? github.connect : github.login;
+    expect(authorize).toHaveBeenCalledOnce();
+    const signal = authorize.mock.calls[0][0].signal;
+    view.rerender(<LedgerScreen go={vi.fn()} mode="projects" workspace={{ ...workspace, id: "usr_second" }} />);
+    expect(signal.aborted).toBe(true);
+    await waitFor(() => expect(screen.getByLabelText("Project name")).toBeEnabled());
+    view.unmount();
   });
 
   it("refreshes after closing GitHub and shows a neutral notice only after the required reload", async () => {

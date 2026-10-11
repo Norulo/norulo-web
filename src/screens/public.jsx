@@ -572,13 +572,17 @@ export function OAuthScreen({ go, auth }) {
     try {
       const outcome = await connectGitHubRepositories({ signal: operation.controller.signal });
       if (!live()) return;
+      if (outcome?.status === "redirecting") {
+        operation.redirecting = true;
+        return;
+      }
       if (outcome?.status === "closed_unverified")
         setGithubClosedNotice({ identity: operation.identity, outcome });
       else go("ledgerProjects");
     } catch (authError) {
       if (live()) setError(getRepositoryAuthErrorMessage(authError));
     } finally {
-      if (actionRef.current === operation) {
+      if (actionRef.current === operation && !operation.redirecting) {
         actionRef.current = null;
         if (mountedRef.current) setAuthing(false);
       }

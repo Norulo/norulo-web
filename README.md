@@ -9,11 +9,16 @@
 > code and successfully signing in. Repository installation, account linking
 > and ledger journeys remain unverified. AI quality verification passed with 36
 > valid direct-provider responses; local monthly Owner-quota checks also passed.
-> Its Server-only key is bound in the cloud network configuration. AI remains
-> disabled in production and source configuration. Production recurring passed
-> local native Worker/Durable Object verification and independent review; its
-> live flag remains disabled and its cron is not installed. The final activation
-> release is planned after both main branches are committed/pushed together.
+> Its Server-only key is bound in the cloud network configuration. Verified
+> release A on 2026-10-11 enables AI and production recurring with all five
+> activation flags `1` and one hourly cron. Checked-in flags retain safe `0`
+> defaults. Recurring passed local native Worker/Durable Object verification
+> and independent review. Exact source commits and versions are recorded as
+> a dated release snapshot in the deployment notes.
+> The requested daily version is prepared for UTC `10 16 * * *` (Beijing 00:10)
+> with up to eight logical Owner lanes. LOCAL capacity profiles and the final
+> 3,009-test Server regression run passed; final publication/deployment has not
+> occurred. Release A's actual cron is still hourly.
 > Real Worker/provider HTTPS and paid business journeys remain unverified.
 > Preview publication is excluded. See
 > [deployment status](docs/deployment.md) for the
@@ -70,7 +75,7 @@ reports/export, activity and member governance. Keys add explicit scopes and
 optional project restrictions. Member governance requires whole-ledger keys;
 invitation applications use the applicant's independent account session.
 
-The [API guide](https://preview.norulo.com/developers/api) includes a runnable
+The [API guide](https://norulo.com/developers/api) includes a runnable
 first-expense example, full update/concurrency examples and the complete endpoint
 reference. `scripts/sync-api-contract.py` generates the reference and downloadable
 OpenAPI JSON from Server's `openapi/ledger-v1.yaml`; run it with `--check` after
@@ -155,7 +160,7 @@ each occurrence rechecks the key, membership, scopes and target permission.
 Revocation or expiry blocks execution until an authorized edit or resume grants
 current authority. Tokens and internal grants never appear in public rule DTOs.
 
-The Server implementation can check due rules hourly, with current membership, GitHub
+Server scheduled checks revalidate current membership, GitHub
 target access, category and owner quota checks, bounded catch-up and permanent
 period identity to prevent duplicate charges. At full expense capacity, owners
 who leave automatic oldest-expense replacement off receive an English email,
@@ -173,8 +178,45 @@ the Owner's record/write allowance for Free and paid plans; automatic category
 selection additionally requires eligible, available Jev. Production scheduling
 passed canonical local native Worker/Durable Object verification, including
 one actual Free Owner occurrence, duplicate/idle handling and cold-restart
-fail-closed behavior. Its live execution flag remains `0` and no cron is
-installed; production activation remains planned.
+fail-closed behavior. Verified release A enables its live execution flag and
+one hourly `0 * * * *` cron, using a separate production SQLite Durable Object.
+Live scheduled financial acceptance remains unverified.
+
+The user's daily execution schedule is prepared as `10 16 * * *` UTC, which is
+00:10 the next day in Beijing. Each rule keeps its own timezone and Server-owned
+`next_run_at`; rule frequencies remain weekly, monthly, quarterly or yearly.
+One global run covers all timezones, with up to roughly 24 hours of timing delay
+plus backlog delay while preserving the original period date. Exact midnight in
+each timezone is not promised. The prepared implementation processes up to eight
+Owners concurrently in logical lanes; each chunk is bounded to 20 handled
+occurrences and 800 native SQL statements. It bounds the day to 10,000 handled
+outcomes, 5,000 selected Owners and 8,192 child RPCs, with page/carry/deferred
+collections limited to 64 entries each. These are scheduler bounds, not a daily
+D1 write budget or a guarantee of thousands of records for one Owner.
+
+Actual Owner commercial allowances still apply, including Free 10 writes/minute
+and 100 records, and Pro 60 writes/minute. A known minute-quota denial releases
+its lane and continues next minute without SQL heartbeats. Financial uncertainty
+stops the affected Owner; an unresolved transport/completion outcome stops new
+Root work after already-started siblings finish. Owner calls have a 120-second
+hard deadline; Root uses a 600-second soft deadline, awaits started calls and
+stays within the platform's 900-second wall limit. Prepared limits of 300,000ms
+CPU and 9,000 subrequests await official configuration readback; standard usage
+metadata does not prove a paid Cloudflare subscription.
+
+Independent code review, 230 focused checks and three new fault checks passed.
+The smoke and both larger native profiles passed against the same final source:
+1,000 local expenses across 200 Free Owners, five each, in 33.985 seconds;
+3,000 across 600 Free Owners, five each, in 107.635 seconds (rounded durations).
+Observed concurrency peaked at eight and Owner native SQL at 178 statements.
+See the [LOCAL load record](../norulo-server/docs/validation/production-recurring-load-native-local-2026-10-11.json).
+These measurements do not establish an online SLA or thousands of expenses for
+a single Owner; actual commercial quotas were retained. The final Server suite
+passed 3,009 tests in 115.01 seconds. The earlier minimal daily native pass is
+a historical checkpoint. A prior genuine production capacity query found
+zero total/active/due rules (`rows_read: 1`, `rows_written: 0`); no production
+fixture was added. Final daily publication/deployment remains pending and will
+retain email/AI activation and all four Server secrets.
 
 ## Local development
 
@@ -249,14 +291,22 @@ the user confirmed code delivery and successful email login. Repository
 installation, account linking and authenticated ledger acceptance remain
 pending. See the deployment notes for the remaining work order.
 
-The final Server suite passed 2,923 tests in 106.75 seconds. Fresh AI quality
-verification passed with 36 valid direct-provider responses, no retries and no
-D1 use. Local monthly
-Owner-quota checks and production recurring local native verification also
-passed. The 2026-10-11 preflight still shows D1/email `1`/`1`, AI `0`/`0`, recurring
-`0` and no cron. `TYPESAFE_API_KEY` is a Server Worker secret and must never be
-added to Web/Vite settings. Real Worker/provider HTTPS and paid end-to-end
+The release A Server suite passed 2,942 tests in 106.73 seconds, including 19
+packaging regressions. Fresh AI quality verification passed with 36 valid
+direct-provider responses, no retries and no
+D1 use. Local monthly Owner-quota checks and production recurring local native
+verification also passed. The 2026-10-11 release A readback shows D1/email
+`1`/`1`, AI `1`/`1`, recurring `1` and one hourly cron. `TYPESAFE_API_KEY` is a
+Server Worker secret and must never be added to Web/Vite settings. Real
+Worker/provider HTTPS and paid end-to-end
 behavior remain unverified limitations, rather than extra pre-release quality
-calls. Commit/push both final main branches together, then deploy those final
-versions with the reviewed activation configuration; do not make interim
-commits, pushes or deployments.
+calls. Creem billing remains optional and unconfigured. The release notes record
+the exact verified commits and versions; later documentation publication or
+redeployment must be recorded from its own actual readback.
+The prepared daily scheduler's LOCAL capacity proof and final 3,009-test Server
+suite passed. Provider limit readback and actual deployment remain pending.
+The Web API guide's direct/proxy examples, default URL and six-locale
+availability copy were corrected for production, along with its README link.
+All 15 existing related API-guide/docs tests and lint passed after that change.
+The earlier 1,654-test pass predates this correction; a final production build
+will include it before publication.

@@ -121,13 +121,13 @@ export const API_GUIDE_COPY = {
     },
   ],
   availability: [
-    "The current ledger release is available in Preview. Production database access remains paused; production can return 503 D1_ACCESS_PAUSED. Preview and production accounts, keys and data are separate. Use the Preview API and a Preview key for the current integration; this documentation does not activate production.",
+    "The production ledger API is available at api.norulo.com and through the /api proxy on norulo.com. Use a production account and a key issued for the same ledger. Accounts, keys and data remain isolated between environments.",
     {
-      zh: "当前账本版本在 Preview 可用，生产数据库访问仍暂停，生产可能返回 503 D1_ACCESS_PAUSED。Preview 和生产账户、密钥及数据相互隔离；当前接入请使用 Preview API 和 Preview 密钥。文档更新不会启用生产。",
-      ja: "現在の台帳バージョンは Preview で利用できます。本番データベースへのアクセスは停止中で、503 D1_ACCESS_PAUSED が返る場合があります。Preview と本番のアカウント、キー、データは別です。現在の連携には Preview API と Preview キーを使ってください。この文書は本番環境を有効にしません。",
-      ko: "현재 원장 버전은 Preview에서 사용할 수 있습니다. 프로덕션 데이터베이스 접근은 계속 중지되어 있으며 503 D1_ACCESS_PAUSED가 반환될 수 있습니다. Preview와 프로덕션의 계정, 키, 데이터는 분리되어 있습니다. 현재 연동에는 Preview API와 Preview 키를 사용하세요. 이 문서가 프로덕션을 활성화하지는 않습니다.",
-      fr: "La version actuelle du registre est disponible en Preview. L’accès à la base de production reste suspendu et peut renvoyer 503 D1_ACCESS_PAUSED. Les comptes, clés et données de Preview et de production sont séparés. Utilisez l’API Preview et une clé Preview pour l’intégration actuelle ; cette documentation n’active pas la production.",
-      es: "La versión actual del libro está disponible en Preview. El acceso a la base de producción sigue en pausa y puede devolver 503 D1_ACCESS_PAUSED. Las cuentas, claves y datos de Preview y producción están separados. Para la integración actual usa la API Preview y una clave Preview; esta documentación no activa producción.",
+      zh: "生产账本 API 可通过 api.norulo.com 直连，也可通过 norulo.com 的 /api 代理访问。请使用生产账户和在同一账本签发的密钥。不同环境的账户、密钥及数据仍相互隔离。",
+      ja: "本番の台帳 API は api.norulo.com に直接接続するか、norulo.com の /api プロキシ経由で利用できます。本番アカウントと同じ台帳で発行されたキーを使用してください。環境間でアカウント、キー、データは分離されています。",
+      ko: "프로덕션 원장 API는 api.norulo.com에 직접 연결하거나 norulo.com의 /api 프록시를 통해 이용할 수 있습니다. 프로덕션 계정과 같은 원장에서 발급한 키를 사용하세요. 환경별 계정, 키, 데이터는 계속 분리되어 있습니다.",
+      fr: "L’API du registre de production est accessible directement sur api.norulo.com ou via le proxy /api de norulo.com. Utilisez un compte de production et une clé émise pour le même registre. Les comptes, clés et données restent isolés entre environnements.",
+      es: "La API del libro de producción está disponible directamente en api.norulo.com y mediante el proxy /api de norulo.com. Usa una cuenta de producción y una clave emitida para el mismo libro. Las cuentas, claves y datos siguen aislados entre entornos.",
     },
   ],
   cookies: [

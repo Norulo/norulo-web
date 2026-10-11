@@ -38,7 +38,7 @@ export function integrationSections(base) {
       code("projectExpense", 'api "/api/v1/projects?limit=50" | jq .\n# Replace only the target in the create body with a real project ID:\n# "target": {"kind":"project","projectId":"prj_FROM_PROJECTS_RESPONSE"}'),
     ]},
     { id: "environments", title: "environments", blocks: [paragraph("base"),
-      code("directUrls", "Preview:    https://preview-api.norulo.com\nProduction: https://api.norulo.com\n\nGET <direct-base>/api/v1/me\nGET https://preview.norulo.com/api/api/v1/me"), paragraph("availability"), paragraph("cookies") ]},
+      code("directUrls", "Direct:    https://api.norulo.com\nWeb proxy: https://norulo.com/api\n\nGET https://api.norulo.com/api/v1/me\nGET https://norulo.com/api/api/v1/me"), paragraph("availability"), paragraph("cookies") ]},
     { id: "permissions", title: "permissions", blocks: [paragraph("authority"),
       { rows: [
         ["profile:read", "profileScope"], ["projects:read / projects:write", "projectScope"],

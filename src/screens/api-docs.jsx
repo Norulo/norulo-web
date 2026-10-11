@@ -11,11 +11,7 @@ import { PublicFooter, PublicHeader } from "./public-layout.jsx";
 
 function baseUrl() {
   const configured = String(env.VITE_PUBLIC_API_BASE_URL || env.VITE_API_BASE_URL || "").trim();
-  if (!configured)
-    return typeof window !== "undefined" &&
-      /^(www\.)?norulo\.com$/.test(window.location.hostname)
-      ? "https://api.norulo.com"
-      : "https://preview-api.norulo.com";
+  if (!configured) return "https://api.norulo.com";
   if (/^[a-z][a-z0-9+.-]*:/i.test(configured)) return configured.replace(/\/$/, "");
   return configured.startsWith("/") && typeof window !== "undefined"
     ? new URL(configured, window.location.origin).href.replace(/\/$/, "")

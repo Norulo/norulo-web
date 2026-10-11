@@ -36,17 +36,58 @@ valid direct-provider responses, independently reviewed, without retries or D1
 use. The Server-only `TYPESAFE_API_KEY` is the fourth Worker secret and is bound
 in cloud network configuration revision 11. Local monthly Owner-quota checks
 passed. Production recurring passed canonical local native Worker/Durable Object
-verification and independent evidence review. The final Server suite passed
-2,923 tests. Read-only production preflight on 2026-10-11 still shows D1/email
-flags `1`/`1`, AI flags `0`/`0`, recurring flag `0` and no cron. Final AI/recurring
-activation is planned after both main branches are committed/pushed together;
-it has not been deployed. Real Worker-to-provider HTTPS and real paid business
+verification and independent evidence review. The release A Server suite passed
+2,942 tests. Verified release A on 2026-10-11 at 05:38:43 UTC has all five
+D1/email/AI/recurring activation flags `1` and one hourly `0 * * * *` cron.
+AI and production recurring are enabled; checked-in flags remain `0` as safe
+defaults. The original D1 and email admission namespace were preserved, and
+production recurring uses its own SQLite Durable Object. Exact deployed source
+commits and Worker versions are recorded in `docs/deployment.md`; this is a
+dated release snapshot, not a guarantee about later HEADs or versions.
+The user now requested one daily production cron, prepared as `10 16 * * *`
+UTC (Beijing 00:10). Release A remains hourly until the final daily deployment.
+The prepared scheduler scales through up to eight logical Owner lanes, with
+20 handled occurrences and 800 native SQL statements per chunk. Root limits
+remain 10,000 handled outcomes per day, 5,000 selected Owners, 8,192 child RPCs
+and at most 64 entries in each page/carry/deferred collection. Owner calls have
+a 120-second hard deadline; Root stops new dispatch at its 600-second soft
+deadline and waits for already-started calls within the 900-second platform
+wall limit. Prepared CPU/subrequest limits are 300,000ms/9,000; actual provider
+readback and account-plan eligibility remain unverified. Standard usage metadata
+does not establish a paid Cloudflare subscription.
+Each rule's own timezone still
+determines `next_run_at` and period date; weekly/monthly/quarterly/yearly rule
+frequencies remain unchanged. Allow up to roughly 24 hours plus backlog delay,
+not exact local-midnight execution. Commercial Owner allowances remain enforced,
+including Free 10 writes/minute and 100 records, and Pro 60 writes/minute.
+Known minute-quota denials release their lane and continue next minute without
+SQL heartbeats. Financially uncertain outcomes stop that Owner; unresolved RPC
+transport/completion stops new Root work after started siblings finish. Never
+blindly retry. Do not promise thousands of daily records for one Owner or treat
+scheduler limits as a D1 write budget. Independent review, 230 focused checks
+and three new fault checks passed. All three final-source LOCAL native profiles
+passed: the smoke profile, 1,000 expenses across 200 Free Owners (five each,
+33.985 seconds), and 3,000 across 600 Free Owners (five each, 107.635 seconds).
+Observed concurrency peaked at eight and Owner native SQL at 178 statements.
+These are local measurements, not an online SLA or a single-Owner capacity
+claim. See the [local load record](../norulo-server/docs/validation/production-recurring-load-native-local-2026-10-11.json).
+The final Server full suite passed 3,009 tests in 115.01 seconds. Preserve AI/email
+activation and all four secrets in the final production release. Publish both
+main branches before deployment, then record actual configuration/version
+readback. Preview deployment remains excluded.
+Real Worker-to-provider HTTPS and real paid business
 journeys remain unverified limitations, rather than additional release gates or
 requirements for another quality call. Never expose the key in Web/Vite
-variables. Deploy only the final production versions; do not make interim
-commits, pushes or deployments.
+variables. Publish both final main branches together before matching production
+deployments; update release records from actual readback, not planned versions.
 Health checks do not establish scheduler or ledger acceptance.
 Preview publication remains excluded.
+The Web API guide now uses production direct/proxy examples and a production
+default URL, with corrected availability copy in all six locales. Explicit
+configured local/preview bases and security guards are retained. Fifteen
+existing API-guide/docs tests and lint passed after this copy/URL correction;
+the earlier 1,654-test pass predates it. The final production build and
+publication will be recorded from the final source.
 
 ## Product and shared contract
 

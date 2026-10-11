@@ -1,0 +1,525 @@
+{
+  "recordedAtUTC": "2026-10-11T15:00:19.545856+00:00",
+  "scope": "Local source fix, regression validation, and production publication preparation",
+  "sourceCommit": "0f66199068dc4b0144e45c158f1fe378dce2792b",
+  "changes": [
+    "Repository checkbox and full name share each vertically listed row; shared row minimum height is 44px",
+    "Full-page GitHub OAuth/install/manage navigation returns redirecting; screens skip departing-page reads and retain operation ownership",
+    "Abort and account changes clean up operations; persisted back/forward cache restores trigger one fresh document load",
+    "View plans has 12px before and after; GitHub action group has 16px above and 12px between buttons"
+  ],
+  "rootCause": {
+    "repositoryLayout": "Ledger form label grid overrode the shared checkbox/name grid",
+    "loadFailed": "location.assign resolved before document navigation completed; Settings then launched four reads that Safari canceled while departing",
+    "buttonSpacing": "Reset paragraph margins and absent action-group spacing left buttons adjacent to supporting text"
+  },
+  "localValidation": {
+    "npmCi": "passed with committed lockfile",
+    "lint": "passed",
+    "unitTests": {
+      "filesPassed": 84,
+      "testsPassed": 1694,
+      "durationSeconds": 71.18,
+      "maxWorkers": 2
+    },
+    "productionBuild": "passed",
+    "workerConfiguration": "passed offline",
+    "wranglerDryRun": "passed",
+    "independentSourceReview": "passed",
+    "originalLogoSha256": "a9632acbd7a5ad48ad5ff25d6269f617c7655446365344c9db42d504213c710f",
+    "publicAssetsByteIdenticalToDist": 13,
+    "browserEvidenceSha256": "0cdf84477a1321943430ff711561d654245a83f8ae5d7045ffa794e0d25c134a",
+    "browserContexts": [
+      {
+        "engine": "chromium",
+        "version": "143.0.7499.4",
+        "width": 1280,
+        "viewPlansGapAbove": 12,
+        "viewPlansGapBelow": 12,
+        "githubActionsGapAbove": 16,
+        "minimumRepositoryRowHeight": 48,
+        "documentWidthsFitViewport": true,
+        "requests": {
+          "inherited": {
+            "total": 47,
+            "api": 7,
+            "blockedFonts": 0,
+            "writes": 0,
+            "externalDelivered": 0
+          },
+          "overrides": [
+            {
+              "path": "/auth/session",
+              "method": "GET",
+              "query": "",
+              "workspace": null
+            },
+            {
+              "path": "/auth/session",
+              "method": "GET",
+              "query": "",
+              "workspace": null
+            },
+            {
+              "path": "/api/integrations",
+              "method": "GET",
+              "query": "",
+              "workspace": null
+            },
+            {
+              "path": "/auth/session",
+              "method": "GET",
+              "query": "",
+              "workspace": null
+            },
+            {
+              "path": "/api/v1/projects",
+              "method": "GET",
+              "query": "?limit=25",
+              "workspace": "usr_date_layout"
+            },
+            {
+              "path": "/api/v1/repositories",
+              "method": "GET",
+              "query": "",
+              "workspace": "usr_date_layout"
+            }
+          ],
+          "writes": 0,
+          "externalDelivered": 0
+        }
+      },
+      {
+        "engine": "chromium",
+        "version": "143.0.7499.4",
+        "width": 1024,
+        "viewPlansGapAbove": 12,
+        "viewPlansGapBelow": 12,
+        "githubActionsGapAbove": 16,
+        "minimumRepositoryRowHeight": 48,
+        "documentWidthsFitViewport": true,
+        "requests": {
+          "inherited": {
+            "total": 47,
+            "api": 7,
+            "blockedFonts": 0,
+            "writes": 0,
+            "externalDelivered": 0
+          },
+          "overrides": [
+            {
+              "path": "/auth/session",
+              "method": "GET",
+              "query": "",
+              "workspace": null
+            },
+            {
+              "path": "/auth/session",
+              "method": "GET",
+              "query": "",
+              "workspace": null
+            },
+            {
+              "path": "/api/integrations",
+              "method": "GET",
+              "query": "",
+              "workspace": null
+            },
+            {
+              "path": "/auth/session",
+              "method": "GET",
+              "query": "",
+              "workspace": null
+            },
+            {
+              "path": "/api/v1/projects",
+              "method": "GET",
+              "query": "?limit=25",
+              "workspace": "usr_date_layout"
+            },
+            {
+              "path": "/api/v1/repositories",
+              "method": "GET",
+              "query": "",
+              "workspace": "usr_date_layout"
+            }
+          ],
+          "writes": 0,
+          "externalDelivered": 0
+        }
+      },
+      {
+        "engine": "chromium",
+        "version": "143.0.7499.4",
+        "width": 390,
+        "viewPlansGapAbove": 12,
+        "viewPlansGapBelow": 12,
+        "githubActionsGapAbove": 16,
+        "minimumRepositoryRowHeight": 48,
+        "documentWidthsFitViewport": true,
+        "requests": {
+          "inherited": {
+            "total": 46,
+            "api": 7,
+            "blockedFonts": 0,
+            "writes": 0,
+            "externalDelivered": 0
+          },
+          "overrides": [
+            {
+              "path": "/auth/session",
+              "method": "GET",
+              "query": "",
+              "workspace": null
+            },
+            {
+              "path": "/auth/session",
+              "method": "GET",
+              "query": "",
+              "workspace": null
+            },
+            {
+              "path": "/api/integrations",
+              "method": "GET",
+              "query": "",
+              "workspace": null
+            },
+            {
+              "path": "/auth/session",
+              "method": "GET",
+              "query": "",
+              "workspace": null
+            },
+            {
+              "path": "/api/v1/projects",
+              "method": "GET",
+              "query": "?limit=25",
+              "workspace": "usr_date_layout"
+            },
+            {
+              "path": "/api/v1/repositories",
+              "method": "GET",
+              "query": "",
+              "workspace": "usr_date_layout"
+            }
+          ],
+          "writes": 0,
+          "externalDelivered": 0
+        }
+      },
+      {
+        "engine": "chromium",
+        "version": "143.0.7499.4",
+        "width": 320,
+        "viewPlansGapAbove": 12,
+        "viewPlansGapBelow": 12,
+        "githubActionsGapAbove": 16,
+        "minimumRepositoryRowHeight": 48,
+        "documentWidthsFitViewport": true,
+        "requests": {
+          "inherited": {
+            "total": 46,
+            "api": 7,
+            "blockedFonts": 0,
+            "writes": 0,
+            "externalDelivered": 0
+          },
+          "overrides": [
+            {
+              "path": "/auth/session",
+              "method": "GET",
+              "query": "",
+              "workspace": null
+            },
+            {
+              "path": "/auth/session",
+              "method": "GET",
+              "query": "",
+              "workspace": null
+            },
+            {
+              "path": "/api/integrations",
+              "method": "GET",
+              "query": "",
+              "workspace": null
+            },
+            {
+              "path": "/auth/session",
+              "method": "GET",
+              "query": "",
+              "workspace": null
+            },
+            {
+              "path": "/api/v1/projects",
+              "method": "GET",
+              "query": "?limit=25",
+              "workspace": "usr_date_layout"
+            },
+            {
+              "path": "/api/v1/repositories",
+              "method": "GET",
+              "query": "",
+              "workspace": "usr_date_layout"
+            }
+          ],
+          "writes": 0,
+          "externalDelivered": 0
+        }
+      },
+      {
+        "engine": "webkit",
+        "version": "26.0",
+        "width": 1280,
+        "viewPlansGapAbove": 12,
+        "viewPlansGapBelow": 12,
+        "githubActionsGapAbove": 16,
+        "minimumRepositoryRowHeight": 48,
+        "documentWidthsFitViewport": true,
+        "requests": {
+          "inherited": {
+            "total": 39,
+            "api": 7,
+            "blockedFonts": 0,
+            "writes": 0,
+            "externalDelivered": 0
+          },
+          "overrides": [
+            {
+              "path": "/auth/session",
+              "method": "GET",
+              "query": "",
+              "workspace": null
+            },
+            {
+              "path": "/auth/session",
+              "method": "GET",
+              "query": "",
+              "workspace": null
+            },
+            {
+              "path": "/api/integrations",
+              "method": "GET",
+              "query": "",
+              "workspace": null
+            },
+            {
+              "path": "/auth/session",
+              "method": "GET",
+              "query": "",
+              "workspace": null
+            },
+            {
+              "path": "/api/v1/projects",
+              "method": "GET",
+              "query": "?limit=25",
+              "workspace": "usr_date_layout"
+            },
+            {
+              "path": "/api/v1/repositories",
+              "method": "GET",
+              "query": "",
+              "workspace": "usr_date_layout"
+            }
+          ],
+          "writes": 0,
+          "externalDelivered": 0
+        }
+      },
+      {
+        "engine": "webkit",
+        "version": "26.0",
+        "width": 1024,
+        "viewPlansGapAbove": 12,
+        "viewPlansGapBelow": 12,
+        "githubActionsGapAbove": 16,
+        "minimumRepositoryRowHeight": 48,
+        "documentWidthsFitViewport": true,
+        "requests": {
+          "inherited": {
+            "total": 39,
+            "api": 7,
+            "blockedFonts": 0,
+            "writes": 0,
+            "externalDelivered": 0
+          },
+          "overrides": [
+            {
+              "path": "/auth/session",
+              "method": "GET",
+              "query": "",
+              "workspace": null
+            },
+            {
+              "path": "/auth/session",
+              "method": "GET",
+              "query": "",
+              "workspace": null
+            },
+            {
+              "path": "/api/integrations",
+              "method": "GET",
+              "query": "",
+              "workspace": null
+            },
+            {
+              "path": "/auth/session",
+              "method": "GET",
+              "query": "",
+              "workspace": null
+            },
+            {
+              "path": "/api/v1/projects",
+              "method": "GET",
+              "query": "?limit=25",
+              "workspace": "usr_date_layout"
+            },
+            {
+              "path": "/api/v1/repositories",
+              "method": "GET",
+              "query": "",
+              "workspace": "usr_date_layout"
+            }
+          ],
+          "writes": 0,
+          "externalDelivered": 0
+        }
+      },
+      {
+        "engine": "webkit",
+        "version": "26.0",
+        "width": 390,
+        "viewPlansGapAbove": 12,
+        "viewPlansGapBelow": 12,
+        "githubActionsGapAbove": 16,
+        "minimumRepositoryRowHeight": 48,
+        "documentWidthsFitViewport": true,
+        "requests": {
+          "inherited": {
+            "total": 37,
+            "api": 7,
+            "blockedFonts": 0,
+            "writes": 0,
+            "externalDelivered": 0
+          },
+          "overrides": [
+            {
+              "path": "/auth/session",
+              "method": "GET",
+              "query": "",
+              "workspace": null
+            },
+            {
+              "path": "/auth/session",
+              "method": "GET",
+              "query": "",
+              "workspace": null
+            },
+            {
+              "path": "/api/integrations",
+              "method": "GET",
+              "query": "",
+              "workspace": null
+            },
+            {
+              "path": "/auth/session",
+              "method": "GET",
+              "query": "",
+              "workspace": null
+            },
+            {
+              "path": "/api/v1/projects",
+              "method": "GET",
+              "query": "?limit=25",
+              "workspace": "usr_date_layout"
+            },
+            {
+              "path": "/api/v1/repositories",
+              "method": "GET",
+              "query": "",
+              "workspace": "usr_date_layout"
+            }
+          ],
+          "writes": 0,
+          "externalDelivered": 0
+        }
+      },
+      {
+        "engine": "webkit",
+        "version": "26.0",
+        "width": 320,
+        "viewPlansGapAbove": 12,
+        "viewPlansGapBelow": 12,
+        "githubActionsGapAbove": 16,
+        "minimumRepositoryRowHeight": 48,
+        "documentWidthsFitViewport": true,
+        "requests": {
+          "inherited": {
+            "total": 37,
+            "api": 7,
+            "blockedFonts": 0,
+            "writes": 0,
+            "externalDelivered": 0
+          },
+          "overrides": [
+            {
+              "path": "/auth/session",
+              "method": "GET",
+              "query": "",
+              "workspace": null
+            },
+            {
+              "path": "/auth/session",
+              "method": "GET",
+              "query": "",
+              "workspace": null
+            },
+            {
+              "path": "/api/integrations",
+              "method": "GET",
+              "query": "",
+              "workspace": null
+            },
+            {
+              "path": "/auth/session",
+              "method": "GET",
+              "query": "",
+              "workspace": null
+            },
+            {
+              "path": "/api/v1/projects",
+              "method": "GET",
+              "query": "?limit=25",
+              "workspace": "usr_date_layout"
+            },
+            {
+              "path": "/api/v1/repositories",
+              "method": "GET",
+              "query": "",
+              "workspace": "usr_date_layout"
+            }
+          ],
+          "writes": 0,
+          "externalDelivered": 0
+        }
+      }
+    ]
+  },
+  "productionPreparation": {
+    "publicBuildVariables": {
+      "VITE_APP_URL": "https://norulo.com",
+      "VITE_API_BASE_URL": "/api",
+      "VITE_GITHUB_APP_SLUG": "norulo"
+    },
+    "reviewedAccountId": "84e421f26c708c0cf437e287eed11fa1",
+    "reviewedWorker": "norulo-web",
+    "serverBinding": "norulo-server-production",
+    "productionBaselineReadback": "passed; existing bindings, domains, logging and disabled preview matched source configuration",
+    "publicationStatus": "not published; awaiting explicit user authorization after automatic approval rejection",
+    "rejectedAction": "git push origin HEAD:main",
+    "rejectionReason": "Default-branch publication is a consequential remote mutation; current request did not explicitly authorize this exact push",
+    "remoteDeploymentsOrBusinessWritesPerformed": 0
+  },
+  "limitations": [
+    "Local WebKit engine evidence does not establish physical iPad or real GitHub authorization acceptance"
+  ]
+}

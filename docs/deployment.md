@@ -1,6 +1,16 @@
 # Norulo production deployment
 
-The latest frontend Projects release was verified on 2026-10-11. Web source
+The latest frontend GitHub navigation and Settings/repository layout release
+was verified on 2026-10-11. Web source
+`678b49fbd4f7e2cb5ff93f259866b7166c6850c0` is deployed as version
+`d2e48265-698c-4b4f-9824-170614a53a0c` with 100% production traffic. See the
+[GitHub/Settings production release record](validation/github-settings-production-release-2026-10-11.json).
+The user explicitly authorized GitHub main publication and Cloudflare deployment.
+The prior local record's pending-publication state is historical. This Web-only
+release preserved production bindings, domains, logging and disabled preview
+URLs; Server remains at version `15ebb291-af35-4600-87e9-0064d8fe33d0`.
+
+The previous frontend Projects release was verified on 2026-10-11. Web source
 `4f0da82e957d1a8aec490a01aeda19b37bf41aff` is deployed as version
 `bce7995f-6c1c-4481-ab44-7b1718ba059e` with 100% production traffic. See the
 [Projects production release record](validation/projects-production-release-2026-10-11.json).
@@ -18,12 +28,12 @@ Release A's hourly publication is retained below as historical evidence.
 ## Published frontend
 
 Cloudflare publication of the frontend application completed successfully using
-Web main commit `4f0da82e957d1a8aec490a01aeda19b37bf41aff`:
+Web main commit `678b49fbd4f7e2cb5ff93f259866b7166c6850c0`:
 
 | Setting | Published value |
 | --- | --- |
 | Worker | `norulo-web` |
-| Version | `bce7995f-6c1c-4481-ab44-7b1718ba059e` |
+| Version | `d2e48265-698c-4b4f-9824-170614a53a0c` |
 | Custom domains | `norulo.com`, `www.norulo.com` |
 | Mode | `production` |
 | API origin | `https://api.norulo.com` |
@@ -36,7 +46,20 @@ The production build uses `VITE_APP_URL=https://norulo.com`,
 [Norulo](https://github.com/apps/norulo). The exact user-supplied logo and its
 derivatives are included; see [brand provenance](branding.md).
 
-The latest release passed a fresh explicit production build and offline Worker
+The GitHub/Settings release passed all 1,694 tests in 84 files, lint, an explicit
+production build, offline Worker checks and Wrangler dry-run. Eight finite local
+Chromium/WebKit contexts checked 1280/1024/390/320px layouts. Repository selection
+rows align their checkbox and full name and have at least 44px height. View plans
+has 12px above/below; GitHub actions have 16px above and 12px between buttons.
+Full-page GitHub redirects stop departing-page reads and keep operation ownership;
+cached-page return restores account data through one fresh document load.
+Sixteen finite TLS-verified anonymous GETs confirmed the three page shells,
+eleven byte-identical assets, proxy health and unauthenticated account boundary.
+Official readback confirmed 100% traffic and preserved runtime configuration.
+These checks do not establish physical-device or actual GitHub authorization
+acceptance.
+
+The previous Projects release passed a fresh explicit production build and offline Worker
 checks. Twelve TLS-verified anonymous GETs passed: homepage and Projects shell,
 seven byte-identical production assets, the path/query-preserving WWW redirect,
 API-proxy health and the unauthenticated account boundary. Web settings and

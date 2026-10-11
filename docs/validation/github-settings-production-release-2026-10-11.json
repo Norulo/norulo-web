@@ -1,0 +1,730 @@
+{
+  "recordedAtUTC": "2026-10-11T15:05:19.790701+00:00",
+  "scope": "User-authorized production Web release for GitHub navigation errors and repository/Settings layout corrections",
+  "sourceCommit": "678b49fbd4f7e2cb5ff93f259866b7166c6850c0",
+  "applicationChangeCommit": "0f66199068dc4b0144e45c158f1fe378dce2792b",
+  "githubMainPublishedBeforeDeployment": true,
+  "userPublicationAuthorization": "User explicitly requested committing/pushing GitHub main and deploying Cloudflare after completion",
+  "preparationRecord": "github-settings-local-2026-10-11.json; its pre-authorization blocked status is historical and superseded by this verified release",
+  "production": {
+    "accountId": "84e421f26c708c0cf437e287eed11fa1",
+    "worker": "norulo-web",
+    "versionId": "d2e48265-698c-4b4f-9824-170614a53a0c",
+    "deploymentId": "872a7554-b6bc-49bd-a2f9-c401fa568c05",
+    "deployedAtUTC": "2026-10-11T15:02:50.36185Z",
+    "trafficPercentage": 100,
+    "previousVersions": [
+      {
+        "version_id": "bce7995f-6c1c-4481-ab44-7b1718ba059e",
+        "percentage": 100
+      }
+    ],
+    "serverVersionsBefore": [
+      {
+        "version_id": "15ebb291-af35-4600-87e9-0064d8fe33d0",
+        "percentage": 100
+      }
+    ],
+    "serverVersionsAfter": [
+      {
+        "version_id": "15ebb291-af35-4600-87e9-0064d8fe33d0",
+        "percentage": 100
+      }
+    ],
+    "serverDeploymentUnchanged": true,
+    "settings": {
+      "placement": {},
+      "compatibility_date": "2026-05-25",
+      "compatibility_flags": [],
+      "usage_model": "standard",
+      "tags": [],
+      "tail_consumers": [],
+      "logpush": false,
+      "observability": {
+        "enabled": true,
+        "head_sampling_rate": 1,
+        "redact_query_string": true,
+        "logs": {
+          "enabled": true,
+          "head_sampling_rate": 0.01,
+          "persist": true,
+          "invocation_logs": false
+        },
+        "traces": {
+          "enabled": false,
+          "persist": true,
+          "head_sampling_rate": 1
+        }
+      },
+      "annotations": {
+        "workers/message": "Fix GitHub redirects and repository/settings layouts (678b49f)",
+        "workers/tag": "github-settings-678b49f",
+        "workers/triggered_by": "version_upload"
+      },
+      "bindings": [
+        {
+          "name": "ASSETS",
+          "type": "assets"
+        },
+        {
+          "name": "NORULO_API_ORIGIN",
+          "text": "https://api.norulo.com",
+          "type": "plain_text"
+        },
+        {
+          "name": "NORULO_MODE",
+          "text": "production",
+          "type": "plain_text"
+        },
+        {
+          "environment": "production",
+          "name": "NORULO_SERVER",
+          "service": "norulo-server-production",
+          "type": "service"
+        }
+      ]
+    },
+    "settingsPreservedExceptVersionAnnotations": true,
+    "subdomain": {
+      "enabled": false,
+      "previews_enabled": false
+    },
+    "domains": [
+      {
+        "id": "2f6b9d39a4b359f1736b677aa970089771b18a63",
+        "zone_id": "deef49a196452b7efa6f9b7128e4d37b",
+        "zone_name": "norulo.com",
+        "hostname": "norulo.com",
+        "service": "norulo-web",
+        "environment": "production",
+        "cert_id": "468c0502-5327-4132-bb62-3122c82893fc",
+        "previews_enabled": false,
+        "enabled": true
+      },
+      {
+        "id": "fb25c8848df7117c1dd36925d17e2babee33b492",
+        "zone_id": "deef49a196452b7efa6f9b7128e4d37b",
+        "zone_name": "norulo.com",
+        "hostname": "www.norulo.com",
+        "service": "norulo-web",
+        "environment": "production",
+        "cert_id": "bcde9ed5-2381-4d71-806e-68e0f255b602",
+        "previews_enabled": false,
+        "enabled": true
+      }
+    ]
+  },
+  "localValidation": {
+    "npmCi": "passed with committed lockfile",
+    "lint": "passed",
+    "unitTests": {
+      "filesPassed": 84,
+      "testsPassed": 1694,
+      "durationSeconds": 71.18,
+      "maxWorkers": 2
+    },
+    "productionBuild": "passed",
+    "workerConfiguration": "passed offline",
+    "wranglerDryRun": "passed",
+    "independentSourceReview": "passed",
+    "originalLogoSha256": "a9632acbd7a5ad48ad5ff25d6269f617c7655446365344c9db42d504213c710f",
+    "publicAssetsByteIdenticalToDist": 13,
+    "browserEvidenceSha256": "0cdf84477a1321943430ff711561d654245a83f8ae5d7045ffa794e0d25c134a",
+    "browserContexts": [
+      {
+        "engine": "chromium",
+        "version": "143.0.7499.4",
+        "width": 1280,
+        "viewPlansGapAbove": 12,
+        "viewPlansGapBelow": 12,
+        "githubActionsGapAbove": 16,
+        "minimumRepositoryRowHeight": 48,
+        "documentWidthsFitViewport": true,
+        "requests": {
+          "inherited": {
+            "total": 47,
+            "api": 7,
+            "blockedFonts": 0,
+            "writes": 0,
+            "externalDelivered": 0
+          },
+          "overrides": [
+            {
+              "path": "/auth/session",
+              "method": "GET",
+              "query": "",
+              "workspace": null
+            },
+            {
+              "path": "/auth/session",
+              "method": "GET",
+              "query": "",
+              "workspace": null
+            },
+            {
+              "path": "/api/integrations",
+              "method": "GET",
+              "query": "",
+              "workspace": null
+            },
+            {
+              "path": "/auth/session",
+              "method": "GET",
+              "query": "",
+              "workspace": null
+            },
+            {
+              "path": "/api/v1/projects",
+              "method": "GET",
+              "query": "?limit=25",
+              "workspace": "usr_date_layout"
+            },
+            {
+              "path": "/api/v1/repositories",
+              "method": "GET",
+              "query": "",
+              "workspace": "usr_date_layout"
+            }
+          ],
+          "writes": 0,
+          "externalDelivered": 0
+        }
+      },
+      {
+        "engine": "chromium",
+        "version": "143.0.7499.4",
+        "width": 1024,
+        "viewPlansGapAbove": 12,
+        "viewPlansGapBelow": 12,
+        "githubActionsGapAbove": 16,
+        "minimumRepositoryRowHeight": 48,
+        "documentWidthsFitViewport": true,
+        "requests": {
+          "inherited": {
+            "total": 47,
+            "api": 7,
+            "blockedFonts": 0,
+            "writes": 0,
+            "externalDelivered": 0
+          },
+          "overrides": [
+            {
+              "path": "/auth/session",
+              "method": "GET",
+              "query": "",
+              "workspace": null
+            },
+            {
+              "path": "/auth/session",
+              "method": "GET",
+              "query": "",
+              "workspace": null
+            },
+            {
+              "path": "/api/integrations",
+              "method": "GET",
+              "query": "",
+              "workspace": null
+            },
+            {
+              "path": "/auth/session",
+              "method": "GET",
+              "query": "",
+              "workspace": null
+            },
+            {
+              "path": "/api/v1/projects",
+              "method": "GET",
+              "query": "?limit=25",
+              "workspace": "usr_date_layout"
+            },
+            {
+              "path": "/api/v1/repositories",
+              "method": "GET",
+              "query": "",
+              "workspace": "usr_date_layout"
+            }
+          ],
+          "writes": 0,
+          "externalDelivered": 0
+        }
+      },
+      {
+        "engine": "chromium",
+        "version": "143.0.7499.4",
+        "width": 390,
+        "viewPlansGapAbove": 12,
+        "viewPlansGapBelow": 12,
+        "githubActionsGapAbove": 16,
+        "minimumRepositoryRowHeight": 48,
+        "documentWidthsFitViewport": true,
+        "requests": {
+          "inherited": {
+            "total": 46,
+            "api": 7,
+            "blockedFonts": 0,
+            "writes": 0,
+            "externalDelivered": 0
+          },
+          "overrides": [
+            {
+              "path": "/auth/session",
+              "method": "GET",
+              "query": "",
+              "workspace": null
+            },
+            {
+              "path": "/auth/session",
+              "method": "GET",
+              "query": "",
+              "workspace": null
+            },
+            {
+              "path": "/api/integrations",
+              "method": "GET",
+              "query": "",
+              "workspace": null
+            },
+            {
+              "path": "/auth/session",
+              "method": "GET",
+              "query": "",
+              "workspace": null
+            },
+            {
+              "path": "/api/v1/projects",
+              "method": "GET",
+              "query": "?limit=25",
+              "workspace": "usr_date_layout"
+            },
+            {
+              "path": "/api/v1/repositories",
+              "method": "GET",
+              "query": "",
+              "workspace": "usr_date_layout"
+            }
+          ],
+          "writes": 0,
+          "externalDelivered": 0
+        }
+      },
+      {
+        "engine": "chromium",
+        "version": "143.0.7499.4",
+        "width": 320,
+        "viewPlansGapAbove": 12,
+        "viewPlansGapBelow": 12,
+        "githubActionsGapAbove": 16,
+        "minimumRepositoryRowHeight": 48,
+        "documentWidthsFitViewport": true,
+        "requests": {
+          "inherited": {
+            "total": 46,
+            "api": 7,
+            "blockedFonts": 0,
+            "writes": 0,
+            "externalDelivered": 0
+          },
+          "overrides": [
+            {
+              "path": "/auth/session",
+              "method": "GET",
+              "query": "",
+              "workspace": null
+            },
+            {
+              "path": "/auth/session",
+              "method": "GET",
+              "query": "",
+              "workspace": null
+            },
+            {
+              "path": "/api/integrations",
+              "method": "GET",
+              "query": "",
+              "workspace": null
+            },
+            {
+              "path": "/auth/session",
+              "method": "GET",
+              "query": "",
+              "workspace": null
+            },
+            {
+              "path": "/api/v1/projects",
+              "method": "GET",
+              "query": "?limit=25",
+              "workspace": "usr_date_layout"
+            },
+            {
+              "path": "/api/v1/repositories",
+              "method": "GET",
+              "query": "",
+              "workspace": "usr_date_layout"
+            }
+          ],
+          "writes": 0,
+          "externalDelivered": 0
+        }
+      },
+      {
+        "engine": "webkit",
+        "version": "26.0",
+        "width": 1280,
+        "viewPlansGapAbove": 12,
+        "viewPlansGapBelow": 12,
+        "githubActionsGapAbove": 16,
+        "minimumRepositoryRowHeight": 48,
+        "documentWidthsFitViewport": true,
+        "requests": {
+          "inherited": {
+            "total": 39,
+            "api": 7,
+            "blockedFonts": 0,
+            "writes": 0,
+            "externalDelivered": 0
+          },
+          "overrides": [
+            {
+              "path": "/auth/session",
+              "method": "GET",
+              "query": "",
+              "workspace": null
+            },
+            {
+              "path": "/auth/session",
+              "method": "GET",
+              "query": "",
+              "workspace": null
+            },
+            {
+              "path": "/api/integrations",
+              "method": "GET",
+              "query": "",
+              "workspace": null
+            },
+            {
+              "path": "/auth/session",
+              "method": "GET",
+              "query": "",
+              "workspace": null
+            },
+            {
+              "path": "/api/v1/projects",
+              "method": "GET",
+              "query": "?limit=25",
+              "workspace": "usr_date_layout"
+            },
+            {
+              "path": "/api/v1/repositories",
+              "method": "GET",
+              "query": "",
+              "workspace": "usr_date_layout"
+            }
+          ],
+          "writes": 0,
+          "externalDelivered": 0
+        }
+      },
+      {
+        "engine": "webkit",
+        "version": "26.0",
+        "width": 1024,
+        "viewPlansGapAbove": 12,
+        "viewPlansGapBelow": 12,
+        "githubActionsGapAbove": 16,
+        "minimumRepositoryRowHeight": 48,
+        "documentWidthsFitViewport": true,
+        "requests": {
+          "inherited": {
+            "total": 39,
+            "api": 7,
+            "blockedFonts": 0,
+            "writes": 0,
+            "externalDelivered": 0
+          },
+          "overrides": [
+            {
+              "path": "/auth/session",
+              "method": "GET",
+              "query": "",
+              "workspace": null
+            },
+            {
+              "path": "/auth/session",
+              "method": "GET",
+              "query": "",
+              "workspace": null
+            },
+            {
+              "path": "/api/integrations",
+              "method": "GET",
+              "query": "",
+              "workspace": null
+            },
+            {
+              "path": "/auth/session",
+              "method": "GET",
+              "query": "",
+              "workspace": null
+            },
+            {
+              "path": "/api/v1/projects",
+              "method": "GET",
+              "query": "?limit=25",
+              "workspace": "usr_date_layout"
+            },
+            {
+              "path": "/api/v1/repositories",
+              "method": "GET",
+              "query": "",
+              "workspace": "usr_date_layout"
+            }
+          ],
+          "writes": 0,
+          "externalDelivered": 0
+        }
+      },
+      {
+        "engine": "webkit",
+        "version": "26.0",
+        "width": 390,
+        "viewPlansGapAbove": 12,
+        "viewPlansGapBelow": 12,
+        "githubActionsGapAbove": 16,
+        "minimumRepositoryRowHeight": 48,
+        "documentWidthsFitViewport": true,
+        "requests": {
+          "inherited": {
+            "total": 37,
+            "api": 7,
+            "blockedFonts": 0,
+            "writes": 0,
+            "externalDelivered": 0
+          },
+          "overrides": [
+            {
+              "path": "/auth/session",
+              "method": "GET",
+              "query": "",
+              "workspace": null
+            },
+            {
+              "path": "/auth/session",
+              "method": "GET",
+              "query": "",
+              "workspace": null
+            },
+            {
+              "path": "/api/integrations",
+              "method": "GET",
+              "query": "",
+              "workspace": null
+            },
+            {
+              "path": "/auth/session",
+              "method": "GET",
+              "query": "",
+              "workspace": null
+            },
+            {
+              "path": "/api/v1/projects",
+              "method": "GET",
+              "query": "?limit=25",
+              "workspace": "usr_date_layout"
+            },
+            {
+              "path": "/api/v1/repositories",
+              "method": "GET",
+              "query": "",
+              "workspace": "usr_date_layout"
+            }
+          ],
+          "writes": 0,
+          "externalDelivered": 0
+        }
+      },
+      {
+        "engine": "webkit",
+        "version": "26.0",
+        "width": 320,
+        "viewPlansGapAbove": 12,
+        "viewPlansGapBelow": 12,
+        "githubActionsGapAbove": 16,
+        "minimumRepositoryRowHeight": 48,
+        "documentWidthsFitViewport": true,
+        "requests": {
+          "inherited": {
+            "total": 37,
+            "api": 7,
+            "blockedFonts": 0,
+            "writes": 0,
+            "externalDelivered": 0
+          },
+          "overrides": [
+            {
+              "path": "/auth/session",
+              "method": "GET",
+              "query": "",
+              "workspace": null
+            },
+            {
+              "path": "/auth/session",
+              "method": "GET",
+              "query": "",
+              "workspace": null
+            },
+            {
+              "path": "/api/integrations",
+              "method": "GET",
+              "query": "",
+              "workspace": null
+            },
+            {
+              "path": "/auth/session",
+              "method": "GET",
+              "query": "",
+              "workspace": null
+            },
+            {
+              "path": "/api/v1/projects",
+              "method": "GET",
+              "query": "?limit=25",
+              "workspace": "usr_date_layout"
+            },
+            {
+              "path": "/api/v1/repositories",
+              "method": "GET",
+              "query": "",
+              "workspace": "usr_date_layout"
+            }
+          ],
+          "writes": 0,
+          "externalDelivered": 0
+        }
+      }
+    ]
+  },
+  "build": {
+    "productionPublicVariables": {
+      "VITE_APP_URL": "https://norulo.com",
+      "VITE_API_BASE_URL": "/api",
+      "VITE_GITHUB_APP_SLUG": "norulo"
+    },
+    "wranglerVersion": "4.136.3",
+    "distFileCount": 57,
+    "newAssetsUploaded": 22,
+    "assetsAlreadyUploaded": 34,
+    "buildLogSha256": "e8ba94787d8b4a72b099e7581aff969fc039598af168830c61e2e26b464b803b",
+    "dryRunLogSha256": "162cda51ef7dd4fe8fb1eb514cf337bc37a89eadfcf234cc26ca71a3c59fe1e3",
+    "deployOutputSha256": "c8b850d7a15339be2433c3475b95872af92eb3a9dae33eac2c3f91cde0ebae7e"
+  },
+  "remoteReadOnlyChecks": {
+    "recordedAtUTC": "2026-10-11T15:03:21.949343+00:00",
+    "scope": "Finite anonymous TLS-verified GETs; no authenticated business operations or writes",
+    "requests": [
+      {
+        "path": "/assets/auth-Ds1ha4hM.js",
+        "status": 200,
+        "bytes": 11996,
+        "sha256": "1a173beea4a42e010f76c76719c5dc92a73c9e4a1b333aecfa19205696e74f4e"
+      },
+      {
+        "path": "/assets/index-Da16tz4G.css",
+        "status": 200,
+        "bytes": 65441,
+        "sha256": "737295ce34233910c129bc49a104ce0e5cfe7ea2ce99a53cf5bf1093be90838e"
+      },
+      {
+        "path": "/assets/index-Qy8sfiot.js",
+        "status": 200,
+        "bytes": 101952,
+        "sha256": "bf84f1975883bf3d514923a50a1a5d504f3fa392498c74f2fc0db8d0e7a9f3ff"
+      },
+      {
+        "path": "/assets/ledger-BeR5fQdt.js",
+        "status": 200,
+        "bytes": 111643,
+        "sha256": "8ee4e27df14759807d50e84e4336b8c20fa099185a030bee61232c1f68b144fa"
+      },
+      {
+        "path": "/assets/ledger-Bg89Fret.css",
+        "status": 200,
+        "bytes": 24095,
+        "sha256": "0f3e39f76b78419711ebc1d42889d4c627de1f5ebdb2f68c69896c83d6cb0eb2"
+      },
+      {
+        "path": "/assets/ledger-Bx8BdLCh.css",
+        "status": 200,
+        "bytes": 3457,
+        "sha256": "7d56ba535172bb9983a6c4be6a0c1277e40f62f9a935763ab577d255eb6871ef"
+      },
+      {
+        "path": "/assets/ledger-overview-qhM3Si94.js",
+        "status": 200,
+        "bytes": 4738,
+        "sha256": "05734aa469437b556f9fc3beab80217ebec21156df35bd8da9937fc82d0cf74c"
+      },
+      {
+        "path": "/assets/ledger-split-D_YdDgU5.js",
+        "status": 200,
+        "bytes": 1530,
+        "sha256": "75defa211099f8b4449368244dbcff9d8f335231e5148060acb8bfaeb1f7cdaf"
+      },
+      {
+        "path": "/assets/ledger-summary-BUweih3b.js",
+        "status": 200,
+        "bytes": 5189,
+        "sha256": "00604836837dc9106f663ff5bb5b4cdb8c9d415be38d8ed109f32f460fa4d323"
+      },
+      {
+        "path": "/assets/settings-DF6wfJtn.css",
+        "status": 200,
+        "bytes": 2344,
+        "sha256": "cfe11fd4f690d114f0fe4a664ca8c208f9ffde4407d606b729491ab18558fe39"
+      },
+      {
+        "path": "/assets/settings-DR7tqvkT.js",
+        "status": 200,
+        "bytes": 33075,
+        "sha256": "7dfdfece1905682db244d1c4b16f9e06c5e1fafb9503a3ead2d48e67f9857c6c"
+      },
+      {
+        "path": "/",
+        "status": 200,
+        "bytes": 5327
+      },
+      {
+        "path": "/settings",
+        "status": 200,
+        "bytes": 2536
+      },
+      {
+        "path": "/projects",
+        "status": 200,
+        "bytes": 2536
+      },
+      {
+        "path": "/api/health",
+        "status": 200,
+        "body": {
+          "ok": true,
+          "service": "norulo-server",
+          "database": {
+            "type": "d1",
+            "configured": true
+          }
+        }
+      },
+      {
+        "path": "/api/api/v1/me",
+        "status": 401
+      }
+    ],
+    "passed": true
+  },
+  "remoteAuthenticatedBusinessOrFixtureWritesPerformed": 0,
+  "limitations": [
+    "Anonymous remote GETs verify publication, assets and access boundaries; physical iPad and real GitHub authorization acceptance were not agent-operated"
+  ]
+}

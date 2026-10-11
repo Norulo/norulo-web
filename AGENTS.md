@@ -36,25 +36,27 @@ valid direct-provider responses, independently reviewed, without retries or D1
 use. The Server-only `TYPESAFE_API_KEY` is the fourth Worker secret and is bound
 in cloud network configuration revision 11. Local monthly Owner-quota checks
 passed. Production recurring passed canonical local native Worker/Durable Object
-verification and independent evidence review. The release A Server suite passed
-2,942 tests. Verified release A on 2026-10-11 at 05:38:43 UTC has all five
-D1/email/AI/recurring activation flags `1` and one hourly `0 * * * *` cron.
+verification and independent evidence review. Verified release B on 2026-10-11
+at 06:38:08.477224 UTC has all five D1/email/AI/recurring activation flags `1`
+and one daily `10 16 * * *` cron. Release A's 05:38:43 UTC hourly configuration
+and 2,942-test Server result remain dated historical evidence.
 AI and production recurring are enabled; checked-in flags remain `0` as safe
 defaults. The original D1 and email admission namespace were preserved, and
 production recurring uses its own SQLite Durable Object. Exact deployed source
 commits and Worker versions are recorded in `docs/deployment.md`; this is a
 dated release snapshot, not a guarantee about later HEADs or versions.
-The user now requested one daily production cron, prepared as `10 16 * * *`
-UTC (Beijing 00:10). Release A remains hourly until the final daily deployment.
-The prepared scheduler scales through up to eight logical Owner lanes, with
+The daily production cron runs at 16:10 UTC (Beijing 00:10 the next day).
+See the [daily release record](../norulo-server/docs/validation/production-daily-release-2026-10-11.json)
+for release B's exact source commits, Worker versions and read-only verification.
+The published scheduler scales through up to eight logical Owner lanes, with
 20 handled occurrences and 800 native SQL statements per chunk. Root limits
 remain 10,000 handled outcomes per day, 5,000 selected Owners, 8,192 child RPCs
 and at most 64 entries in each page/carry/deferred collection. Owner calls have
 a 120-second hard deadline; Root stops new dispatch at its 600-second soft
 deadline and waits for already-started calls within the 900-second platform
-wall limit. Prepared CPU/subrequest limits are 300,000ms/9,000; actual provider
-readback and account-plan eligibility remain unverified. Standard usage metadata
-does not establish a paid Cloudflare subscription.
+wall limit. Official configuration GETs verified CPU/subrequest limits of
+300,000ms/9,000 in release B. Account-plan eligibility remains unverified;
+standard usage metadata does not establish a paid Cloudflare subscription.
 Each rule's own timezone still
 determines `next_run_at` and period date; weekly/monthly/quarterly/yearly rule
 frequencies remain unchanged. Allow up to roughly 24 hours plus backlog delay,
@@ -71,10 +73,12 @@ passed: the smoke profile, 1,000 expenses across 200 Free Owners (five each,
 Observed concurrency peaked at eight and Owner native SQL at 178 statements.
 These are local measurements, not an online SLA or a single-Owner capacity
 claim. See the [local load record](../norulo-server/docs/validation/production-recurring-load-native-local-2026-10-11.json).
-The final Server full suite passed 3,009 tests in 115.01 seconds. Preserve AI/email
-activation and all four secrets in the final production release. Publish both
-main branches before deployment, then record actual configuration/version
-readback. Preview deployment remains excluded.
+The final Server full suite passed 3,009 tests in 115.01 seconds. Release B
+retained AI/email activation, all four secret binding names, the original D1
+and both independent Durable Object namespaces. Both main branches were
+published before matching production deployment. Subsequent deployments must
+use their own actual configuration/version readback. Preview deployment remains
+excluded.
 Real Worker-to-provider HTTPS and real paid business
 journeys remain unverified limitations, rather than additional release gates or
 requirements for another quality call. Never expose the key in Web/Vite
@@ -85,9 +89,11 @@ Preview publication remains excluded.
 The Web API guide now uses production direct/proxy examples and a production
 default URL, with corrected availability copy in all six locales. Explicit
 configured local/preview bases and security guards are retained. Fifteen
-existing API-guide/docs tests and lint passed after this copy/URL correction;
-the earlier 1,654-test pass predates it. The final production build and
-publication will be recorded from the final source.
+existing API-guide/docs tests passed in 3.84 seconds, and lint passed after this
+copy/URL correction; the earlier 1,654-test pass predates it. Release B's fresh
+production build and offline Worker check passed with the corrected guide.
+All 55 dist artifacts were checked for old branding; all 13 public assets
+matched dist byte-for-byte and the original logo checksum was unchanged.
 
 ## Product and shared contract
 

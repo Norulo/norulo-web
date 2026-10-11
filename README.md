@@ -10,15 +10,17 @@
 > and ledger journeys remain unverified. AI quality verification passed with 36
 > valid direct-provider responses; local monthly Owner-quota checks also passed.
 > Its Server-only key is bound in the cloud network configuration. Verified
-> release A on 2026-10-11 enables AI and production recurring with all five
-> activation flags `1` and one hourly cron. Checked-in flags retain safe `0`
+> release B on 2026-10-11 at 06:38:08.477224 UTC enables AI and production
+> recurring with all five activation flags `1` and one daily `10 16 * * *` cron
+> (Beijing 00:10 the next day). Checked-in flags retain safe `0`
 > defaults. Recurring passed local native Worker/Durable Object verification
 > and independent review. Exact source commits and versions are recorded as
 > a dated release snapshot in the deployment notes.
-> The requested daily version is prepared for UTC `10 16 * * *` (Beijing 00:10)
-> with up to eight logical Owner lanes. LOCAL capacity profiles and the final
-> 3,009-test Server regression run passed; final publication/deployment has not
-> occurred. Release A's actual cron is still hourly.
+> The published daily scheduler uses up to eight logical Owner lanes. LOCAL
+> capacity profiles and the final 3,009-test Server regression run passed;
+> official configuration GETs verified 300,000ms CPU and 9,000 subrequests.
+> Release A's hourly configuration remains dated history. Release B is a
+> verified snapshot, not a guarantee about subsequent HEADs or deployments.
 > Real Worker/provider HTTPS and paid business journeys remain unverified.
 > Preview publication is excluded. See
 > [deployment status](docs/deployment.md) for the
@@ -178,16 +180,16 @@ the Owner's record/write allowance for Free and paid plans; automatic category
 selection additionally requires eligible, available Jev. Production scheduling
 passed canonical local native Worker/Durable Object verification, including
 one actual Free Owner occurrence, duplicate/idle handling and cold-restart
-fail-closed behavior. Verified release A enables its live execution flag and
-one hourly `0 * * * *` cron, using a separate production SQLite Durable Object.
+fail-closed behavior. Verified release B enables its live execution flag and
+one daily `10 16 * * *` cron, using a separate production SQLite Durable Object.
 Live scheduled financial acceptance remains unverified.
 
-The user's daily execution schedule is prepared as `10 16 * * *` UTC, which is
+The user's daily execution schedule is enabled as `10 16 * * *` UTC, which is
 00:10 the next day in Beijing. Each rule keeps its own timezone and Server-owned
 `next_run_at`; rule frequencies remain weekly, monthly, quarterly or yearly.
 One global run covers all timezones, with up to roughly 24 hours of timing delay
 plus backlog delay while preserving the original period date. Exact midnight in
-each timezone is not promised. The prepared implementation processes up to eight
+each timezone is not promised. The published implementation processes up to eight
 Owners concurrently in logical lanes; each chunk is bounded to 20 handled
 occurrences and 800 native SQL statements. It bounds the day to 10,000 handled
 outcomes, 5,000 selected Owners and 8,192 child RPCs, with page/carry/deferred
@@ -200,9 +202,9 @@ its lane and continues next minute without SQL heartbeats. Financial uncertainty
 stops the affected Owner; an unresolved transport/completion outcome stops new
 Root work after already-started siblings finish. Owner calls have a 120-second
 hard deadline; Root uses a 600-second soft deadline, awaits started calls and
-stays within the platform's 900-second wall limit. Prepared limits of 300,000ms
-CPU and 9,000 subrequests await official configuration readback; standard usage
-metadata does not prove a paid Cloudflare subscription.
+stays within the platform's 900-second wall limit. Release B's official
+configuration readback verified limits of 300,000ms CPU and 9,000 subrequests;
+standard usage metadata does not prove a paid Cloudflare subscription.
 
 Independent code review, 230 focused checks and three new fault checks passed.
 The smoke and both larger native profiles passed against the same final source:
@@ -215,8 +217,11 @@ a single Owner; actual commercial quotas were retained. The final Server suite
 passed 3,009 tests in 115.01 seconds. The earlier minimal daily native pass is
 a historical checkpoint. A prior genuine production capacity query found
 zero total/active/due rules (`rows_read: 1`, `rows_written: 0`); no production
-fixture was added. Final daily publication/deployment remains pending and will
-retain email/AI activation and all four Server secrets.
+fixture was added. The [daily release record](../norulo-server/docs/validation/production-daily-release-2026-10-11.json)
+records release B's actual versions and readback; email/AI activation, all four
+Server secret binding names, the original D1 and both Durable Object namespaces
+were retained. Live scheduled financial and paid-provider journeys remain
+unverified.
 
 ## Local development
 
@@ -295,18 +300,21 @@ The release A Server suite passed 2,942 tests in 106.73 seconds, including 19
 packaging regressions. Fresh AI quality verification passed with 36 valid
 direct-provider responses, no retries and no
 D1 use. Local monthly Owner-quota checks and production recurring local native
-verification also passed. The 2026-10-11 release A readback shows D1/email
-`1`/`1`, AI `1`/`1`, recurring `1` and one hourly cron. `TYPESAFE_API_KEY` is a
+verification also passed. The 2026-10-11 release B readback shows D1/email
+`1`/`1`, AI `1`/`1`, recurring `1` and one daily cron. `TYPESAFE_API_KEY` is a
 Server Worker secret and must never be added to Web/Vite settings. Real
 Worker/provider HTTPS and paid end-to-end
 behavior remain unverified limitations, rather than extra pre-release quality
 calls. Creem billing remains optional and unconfigured. The release notes record
 the exact verified commits and versions; later documentation publication or
 redeployment must be recorded from its own actual readback.
-The prepared daily scheduler's LOCAL capacity proof and final 3,009-test Server
-suite passed. Provider limit readback and actual deployment remain pending.
+The published daily scheduler's LOCAL capacity proof and final 3,009-test Server
+suite passed. Release B verified the actual CPU/subrequest limits and deployment
+configuration; account subscription/billing eligibility remains unverified.
 The Web API guide's direct/proxy examples, default URL and six-locale
 availability copy were corrected for production, along with its README link.
-All 15 existing related API-guide/docs tests and lint passed after that change.
-The earlier 1,654-test pass predates this correction; a final production build
-will include it before publication.
+All 15 existing related API-guide/docs tests passed in 3.84 seconds, and lint
+passed after that change. The earlier 1,654-test pass predates this correction;
+release B's fresh production build and offline Worker check passed with the
+corrected guide. All 55 dist artifacts were checked for old branding; all 13
+public assets matched dist byte-for-byte and the original logo hash was unchanged.

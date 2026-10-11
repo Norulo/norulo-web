@@ -1,20 +1,21 @@
 # Norulo production deployment
 
-Verified release A was checked on 2026-10-11 at 05:38:43 UTC. This is a dated
+Verified daily release B was checked on 2026-10-11 at 06:38:08.477224 UTC. This is a dated
 snapshot of the exact source commits and Worker versions below, not a guarantee
 about subsequent HEADs or deployments. Imported records in `validation/` remain
 source history. See the cross-repository
-[production release record](../../norulo-server/docs/validation/production-release-2026-10-11.json).
+[daily production release record](../../norulo-server/docs/validation/production-daily-release-2026-10-11.json).
+Release A's hourly publication is retained below as historical evidence.
 
 ## Published frontend
 
 Cloudflare publication of the frontend application completed successfully using
-Web main commit `3531f8ab23ac976f6e17caf1c2246dcbf5ea125c`:
+Web main commit `bef23ee7cca378614cdf1e7cdcc8494601c86648`:
 
 | Setting | Published value |
 | --- | --- |
 | Worker | `norulo-web` |
-| Version | `26697b80-76dc-405b-a0c0-c2ea7c0735f7` |
+| Version | `0c63c81e-1f91-4b72-bf3b-f949b7840ad8` |
 | Custom domains | `norulo.com`, `www.norulo.com` |
 | Mode | `production` |
 | API origin | `https://api.norulo.com` |
@@ -53,21 +54,24 @@ The subsequent Web API-guide correction changes production direct/proxy URL
 examples, the unset-config default URL, availability copy in all six locales
 and the README guide link. Explicit local/preview configuration and security
 guards remain supported. All 15 existing API-guide/docs checks in four test
-files passed, along with lint. The earlier full 1,654-test/build result predates
-this correction; the final production build will include the corrected guide.
+files passed in 3.84 seconds, along with lint. The earlier full 1,654-test/build
+result predates this correction. Release B's fresh production build and offline
+Worker check passed with the corrected guide. The final asset audit checked
+all 55 dist artifacts for old branding and all 13 public assets against dist
+byte-for-byte; the original logo hash was unchanged.
 
 ## Published backend and remaining acceptance
 
 The full Python `norulo-server-production` Worker has been published at
 `api.norulo.com` from Server main commit
-`ebd11baf0da9d6aa83f8718b55e0c630e04108bd`, version
-`b5642a63-1643-418a-b494-bb7bcf427050`. Release A readback verified all 19 public
+`ded49a46b06f5f79e2996f58d773d66acaddc0a0`, version
+`e2e4e02d-ac9a-4c20-852f-f6cbfe5b5ae4`. Release B readback verified all 19 public
 variables and four secret binding names, the existing `DB`, `EMAIL` and
 `EMAIL_ADMISSION` bindings, and the new independent `RECURRING_SCHEDULER`
 binding. Both Workers have workers.dev and preview URLs disabled. Secret
 values are not stored in these documents or browser builds. The frontend has
 the matching production Server service binding. The API-guide correction is
-prepared for the subsequent daily release and is not part of release A.
+included in release B's published frontend.
 
 The earlier email-enabled release `815a1216-4468-4591-be58-e339d4d2c154` and
 secret revision `ec33db03-2fd4-49a4-8430-9e1cb13fc340` are historical; release A
@@ -149,7 +153,7 @@ Real native Worker-to-provider HTTPS and real paid end-to-end behavior remain
 unverified limitations. These
 are not requirements for another pre-release quality call; direct-provider
 quality, monthly Owner-quota enforcement and local native guard checks passed.
-Production AI configuration is enabled in verified release A; real paid
+Production AI configuration is enabled in verified release B; real paid
 end-to-end/provider acceptance is not established by its successful readback.
 
 ## Release A recurring local native verification
@@ -169,8 +173,9 @@ synthetic local Free Owner, and verified duplicate-hour/idle handling,
 cold-restart deduplication and fail-closed handling of an unknown durable marker.
 No remote fixture, D1 operation, provider call or live cron was used. See the
 [native verification record](../../norulo-server/docs/validation/production-recurring-native-local-2026-10-11.json)
-for its scope and limitations. Production recurring is now enabled with an
-hourly cron; live scheduled financial acceptance remains unverified. Its
+for its scope and limitations. Release A enabled production recurring with an
+hourly cron; release B supersedes it with the daily cron described below.
+Live scheduled financial acceptance remains unverified. Its
 independent SQLite Durable Object namespace is
 `b3f41def1906481e9c72662debf4b505`, separate from email admission and preview
 accounting. The existing email namespace
@@ -183,13 +188,13 @@ rules are available to Free and paid plans within the Owner's record/write
 allowance and the Server's rule cap; automatic category selection additionally
 requires eligible, available Jev. No client preview-only assumption was found.
 
-## Verified release A configuration
+## Verified release B configuration
 
 Email delivery/code/login acceptance has been confirmed by the user. Fresh
 direct-provider AI quality, monthly Owner-quota local checks, production
 recurring native checks and final Web/Server local verification have passed.
-Seven read-only Cloudflare GETs checked at 05:38:43 UTC on 2026-10-11 confirmed
-release A's actual configuration:
+Seven read-only Cloudflare GETs checked at 06:38:08.477224 UTC on 2026-10-11
+confirmed release B's actual configuration:
 
 | Runtime setting | Observed value |
 | --- | --- |
@@ -198,9 +203,11 @@ release A's actual configuration:
 | `NORULO_JEV_SUGGESTIONS_ENABLED` | `1` |
 | `NORULO_JEV_SUGGESTIONS_EVALUATED` | `1` |
 | `NORULO_RECURRING_EXPENSES_ENABLED` | `1` |
-| Cron schedules | One: `0 * * * *` |
+| Cron schedules | One: `10 16 * * *` |
+| Server CPU limit | `300000`ms |
+| Server subrequest limit | `9000` |
 
-The cron was created at 05:37:56 UTC on 2026-10-11. Both main commits named above
+The daily cron was created at 06:37:31.428958 UTC on 2026-10-11. Both main commits named above
 were published before matching production deployment. This release check made
 no remote D1 SQL operation, application mutation, provider request, manual cron
 invocation, email send, migration replay or automatic retry. Checked-in flags
@@ -209,26 +216,39 @@ remain safe `0` defaults; activation overlays describe the deployed state.
 Real paid end-to-end and Worker/provider HTTPS remain explicitly unverified
 after the completed local/direct-provider checks; they are not additional
 pre-release quality-call requirements. Creem billing remains optional and
-unconfigured. Publication of this release record and any subsequent matching
-deployment are separate from release A and must use their own actual readback.
+unconfigured. The sanitized release B readback has SHA-256
+`a75f9b828cf69e7f691d1770cc39830af77044b31d8864d777284b43bad7a162`;
+its portable copy is linked above. Publication of these documentation updates
+and any subsequent matching deployment are separate from release B and must
+use their own actual readback.
 
-## Prepared daily scheduler and capacity verification
+## Historical release A
+
+Release A was verified at 05:38:43 UTC on 2026-10-11 with all five activation
+flags `1` and one hourly `0 * * * *` cron, created at 05:37:56 UTC. Its Server
+main commit was `ebd11baf0da9d6aa83f8718b55e0c630e04108bd`, Worker version
+`b5642a63-1643-418a-b494-bb7bcf427050`; its Web main commit was
+`3531f8ab23ac976f6e17caf1c2246dcbf5ea125c`, Worker version
+`26697b80-76dc-405b-a0c0-c2ea7c0735f7`. That dated hourly checkpoint is
+superseded by release B, not rewritten. See the
+[release A record](../../norulo-server/docs/validation/production-release-2026-10-11.json).
+
+## Published daily scheduler and local capacity verification
 
 The user requested daily execution and accepted the recommended production
 schedule `10 16 * * *` UTC: 16:10 UTC, or 00:10 the next day in Beijing. This
-daily configuration and expanded cross-Owner scheduler are prepared locally;
-capacity native verification and the latest full Server suite passed. Provider
-limit readback and final main publication/deployment are pending. Release A's actual
-configuration above remains hourly until that deployment. Its release evidence
-is preserved. Final publication is production only and will retain email/AI
-activation, all four secret names, the existing D1 and admission bindings.
+daily configuration and expanded cross-Owner scheduler are published in verified
+release B. Capacity native verification and the latest full Server suite passed;
+official configuration GETs verified its limits. Production publication retained
+email/AI activation, all four secret names, the existing D1 and both independent
+Durable Object namespaces. Preview publication remains excluded.
 
 Each rule's timezone independently computes `next_run_at` and its original
 occurrence date. Weekly, monthly, quarterly and yearly rule frequencies remain
 available; no daily rule frequency was added. One global cron covers all
 timezones. A due occurrence can wait up to roughly 24 hours for the next run,
 plus backlog delay, and records its original period date. Exact midnight in each
-timezone is not promised. The prepared scheduler dispatches up to eight logical
+timezone is not promised. The published scheduler dispatches up to eight logical
 Owner lanes, with at most 20 handled occurrences and 800 native SQL statements
 per chunk. Daily Root bounds are 10,000 handled outcomes, 5,000 selected Owners
 and 8,192 child RPCs; page, carry and deferred collections each remain at most
@@ -238,8 +258,8 @@ budget.
 
 Owner calls have a 120-second hard deadline. Root stops dispatching new calls
 at its 600-second soft deadline, then awaits already-started calls within the
-900-second platform wall limit. Prepared Worker limits are 300,000ms CPU and
-9,000 subrequests and require official configuration GET readback. Account
+900-second platform wall limit. Official configuration GETs verified Worker
+limits of 300,000ms CPU and 9,000 subrequests in release B. Account
 subscription/billing eligibility is unknown; `standard` usage metadata is not
 complete paid-plan proof.
 
@@ -283,10 +303,12 @@ bundle was verified. Release A's 2,942-test result above is historical and is
 not this final run.
 
 The production API-guide text/URL correction passed 15 existing related Web
-tests and lint; a final production build remains planned. The final daily Server
-verification and actual release B versions/readback will be recorded when
-available, including actual CPU/subrequest limits and account-plan limitations.
-Commit/push both final main branches before the daily production deployment.
+tests in 3.84 seconds and lint. Its fresh production build and offline Worker
+check passed before release B's production publication. Exact source commits,
+Worker versions, CPU/subrequest limits and finite read-only checks are recorded
+above and in the daily release record. These verified configuration limits do
+not establish account subscription/billing eligibility or an online capacity
+SLA. Subsequent main publication and deployment require their own dated readback.
 
 ## D1 development and operating cost rules
 
@@ -305,7 +327,8 @@ ongoing development rules, also recorded in [AGENTS.md](../AGENTS.md).
 
 ## Public HTTP verification
 
-Release A's TLS-verified read-only checks passed on 2026-10-11: direct and
+Release B's TLS-verified read-only checks passed at 06:38:08.477224 UTC on
+2026-10-11: direct and
 Web-proxied health returned 200; both protected account endpoints returned 401;
 and the homepage returned 200. All five responses had no Set-Cookie. The
 original logo checksum was unchanged, and

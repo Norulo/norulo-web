@@ -118,7 +118,7 @@ describe("Project links in the real ledger views", () => {
         const view = render(
           <LedgerScreen api={client(current)} go={go} mode={mode} projectId="prj_one" />
         );
-        await screen.findByRole("link", { name: "Product" });
+        await screen.findByRole("link", { name: mode === "projects" ? "product.example.com" : "Product" });
         const links = view.container.querySelectorAll(
           ".ledger-project-links > a, .ledger-row-main h2 > a"
         );
@@ -207,7 +207,7 @@ describe("Project links in the real ledger views", () => {
     expect(within(row).queryByRole("link", { name: "team" })).not.toBeInTheDocument();
     expect(screen.queryByText("secret/private")).not.toBeInTheDocument();
     expect(within(row).queryByRole("link", { name: "Development" })).not.toBeInTheDocument();
-    const productLink = within(row).getByRole("link", { name: "Product" });
+    const productLink = within(row).getByRole("link", { name: "product.example.com" });
     expect(productLink).toHaveAttribute("href", "https://product.example.com/");
     expect(productLink).toHaveAttribute("target", "_blank");
     expect(productLink).toHaveAttribute("rel", "noopener noreferrer");
@@ -219,7 +219,7 @@ describe("Project links in the real ledger views", () => {
     expect(go).toHaveBeenCalledExactlyOnceWith("ledgerProject", { id: "prj_one" });
   });
 
-  it("leaves no product shortcut or helper text for an unsafe or missing product URL", async () => {
+  it("shows a placeholder without a product shortcut for an unsafe or missing product URL", async () => {
     const unlinked = project({
       developmentUrl: "http://localhost:3000/app",
       productUrl: "javascript:alert(1)",
@@ -230,7 +230,9 @@ describe("Project links in the real ledger views", () => {
     expect(within(row).queryByRole("link", { name: "Development" })).not.toBeInTheDocument();
     expect(within(row).queryByRole("link", { name: "Product" })).not.toBeInTheDocument();
     expect(within(row).queryByText("No repositories linked")).not.toBeInTheDocument();
-    expect(row.querySelector(".ledger-project-associations")).toBeEmptyDOMElement();
+    const associations = row.querySelector(".ledger-project-associations");
+    expect(associations.querySelector("a")).toBeNull();
+    expect(associations).toHaveTextContent("—");
   });
 
   it("retains authorized GitHub shortcuts and repository disclosure on project detail", async () => {

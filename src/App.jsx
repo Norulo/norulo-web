@@ -589,7 +589,7 @@ export function App() {
     accessRefreshing,
   ]);
 
-  const go = (nextScreen, params = {}) => {
+  const go = useCallback((nextScreen, params = {}) => {
     if (pageOperationRef.current === currentScreenKeyRef.current) return;
     const path = pathFromScreen(nextScreen, params);
     const historyState = { screen: nextScreen };
@@ -601,7 +601,7 @@ export function App() {
     setScreen(screenFromPath(path) || "notfound");
     setRouteVersion((value) => value + 1);
     window.scrollTo({ top: 0 });
-  };
+  }, []);
 
   useEffect(() => {
     const onPopState = () => {

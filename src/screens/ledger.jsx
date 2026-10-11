@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { ledgerApi } from "../api/ledger.js";
 import { EXPENSE_CAPACITY_COPY, EXPENSE_CAPACITY_ERRORS } from "../locales/expense-capacity.js";
@@ -9,7 +9,7 @@ import { ProjectRepositoryPicker } from "../components/project-repository-picker
 import { ConsoleLayout } from "../components/console-layout.jsx";
 import { FinancialValue } from "../components/financial-value.jsx";
 import { CurrencyPicker } from "../components/currency-picker.jsx";
-import { RecurringExpenses, RecurringScheduleFields } from "../components/recurring-expenses.jsx";
+import { RecurringScheduleFields } from "../components/recurring-schedule-fields.jsx";
 import {
   PROJECT_URL_MAX_BYTES,
   githubOrganizationHref,
@@ -17,10 +17,8 @@ import {
   normalizeProjectUrl,
   projectUrlHref,
 } from "../lib/project-links.js";
-import { ExpenseCharts } from "../components/expense-charts.jsx";
 import { LedgerSummary } from "../components/ledger-summary.jsx";
 import { formatLedgerTotal, minorAmount } from "../lib/ledger-summary.js";
-import { ActivityLog } from "../components/activity-log.jsx";
 import { ConfirmDialog } from "../components/confirm-dialog.jsx";
 import { ExpenseReviewDialog } from "../components/expense-review-dialog.jsx";
 import { env } from "../config/env.js";
@@ -42,6 +40,16 @@ import { Topbar, Sidebar, ViewTabs } from "../shell.jsx";
 import "./ledger.css";
 
 const EXPENSE_PAGE_SIZE = 10;
+const PROJECT_PAGE_SIZE = 25;
+const ExpenseCharts = lazy(() =>
+  import("../components/expense-charts.jsx").then((module) => ({ default: module.ExpenseCharts }))
+);
+const RecurringExpenses = lazy(() =>
+  import("../components/recurring-expenses.jsx").then((module) => ({ default: module.RecurringExpenses }))
+);
+const ActivityLog = lazy(() =>
+  import("../components/activity-log.jsx").then((module) => ({ default: module.ActivityLog }))
+);
 
 function validateExpensePage(page) {
   if (
@@ -388,14 +396,22 @@ function ReportGroups({ title, groups, error, categories = [], dimension, icon: 
       ) : rows.length === 0 ? (
         <p>{T("No expenses in this range.")}</p>
       ) : (
-        <ExpenseCharts
-          title={title}
-          groups={rows}
-          categories={categories}
-          dimension={dimension}
-          formatTotal={formatTotal}
-          minorAmount={minorAmount}
-        />
+        <Suspense fallback={
+          <div className="skeleton-stack" aria-busy="true">
+            <SkeletonLine className="sk-line sk-w-65 sk-h-20" />
+            <SkeletonLine className="sk-line sk-w-42 sk-h-40" />
+            <SkeletonLine className="sk-line sk-w-70 sk-h-40" />
+          </div>
+        }>
+          <ExpenseCharts
+            title={title}
+            groups={rows}
+            categories={categories}
+            dimension={dimension}
+            formatTotal={formatTotal}
+            minorAmount={minorAmount}
+          />
+        </Suspense>
       )}
     </section>
   );
@@ -408,8 +424,17 @@ function LedgerSkeleton({ mode }) {
         <section className="panel ledger-your-projects" aria-hidden="true">
           <div className="ledger-project-toolbar">
             <div className="ledger-project-filters">
-              <SkeletonLine className="sk-line sk-w-70 sk-h-40" />
-              <SkeletonLine className="sk-line sk-w-26 sk-h-40" />
+              <div className="ledger-search">
+                <SkeletonLine className="sk-line sk-w-70" />
+              </div>
+              <div className="ledger-field ledger-project-status">
+                <span className="ledger-project-label-skeleton">
+                  <SkeletonLine className="sk-line sk-w-56" />
+                </span>
+                <select className="ledger-project-control-skeleton" disabled tabIndex={-1}>
+                  <option>{T("All projects", "全部项目")}</option>
+                </select>
+              </div>
             </div>
           </div>
           <div className="ledger-search-guidance">
@@ -1346,7 +1371,7 @@ function ScopedLedgerScreen({
     const load = async () => {
       if (mode === "projects") {
         return {
-          projects: await api.projects({}, options),
+          projects: await api.projects({ limit: PROJECT_PAGE_SIZE }, options),
           repositories: null,
           repositoryError: null,
         };
@@ -1544,7 +1569,7 @@ function ScopedLedgerScreen({
     try {
       const next =
         kind === "projects"
-          ? await api.projects({ cursor }, { signal: controller.signal })
+          ? await api.projects({ cursor, limit: PROJECT_PAGE_SIZE }, { signal: controller.signal })
           : await api.repositories({ cursor }, { signal: controller.signal });
       if (controller.signal.aborted || request !== requestId.current) return;
       if (kind === "repositories" && next.githubRefreshError) {
@@ -3316,33 +3341,43 @@ function ScopedLedgerScreen({
                     </section>
                   )}
                 </LedgerSplit>
-                <RecurringExpenses
-                  api={api}
-                  target={target}
-                  categories={data.categories}
-                  canManage={canWriteExpenses}
-                  beginOperation={beginRecurringOperation}
-                  onExpensesChanged={refreshRecurringExpenses}
-                  disabled={
-                    parentBusy ||
-                    reviewBusy ||
-                    reviewReadBusy ||
-                    loading ||
-                    loadingMore ||
-                    accessRefreshing
-                  }
-                  reloadSignal={revision}
-                  onAccessChanged={onAccessChanged}
-                  formatTotal={formatRecurringTotal}
-                  renderExpenseForm={(props) => (
-                    <ExpenseForm
-                      {...props}
-                      api={api}
-                      target={target}
-                      categories={data.categories}
-                    />
+                <Suspense fallback={
+                  <section className="panel" aria-busy="true">
+                    <div className="panel-h">
+                      <I.Refresh size={20} aria-hidden="true" />
+                      <h2>{T("Recurring plans")}</h2>
+                    </div>
+                    <p role="status">{T("Loading recurring schedules…")}</p>
+                  </section>
+                }>
+                  <RecurringExpenses
+                    api={api}
+                    target={target}
+                    categories={data.categories}
+                    canManage={canWriteExpenses}
+                    beginOperation={beginRecurringOperation}
+                    onExpensesChanged={refreshRecurringExpenses}
+                    disabled={
+                      parentBusy ||
+                      reviewBusy ||
+                      reviewReadBusy ||
+                      loading ||
+                      loadingMore ||
+                      accessRefreshing
+                    }
+                    reloadSignal={revision}
+                    onAccessChanged={onAccessChanged}
+                    formatTotal={formatRecurringTotal}
+                    renderExpenseForm={(props) => (
+                      <ExpenseForm
+                        {...props}
+                        api={api}
+                        target={target}
+                        categories={data.categories}
+                      />
                   )}
                 />
+                </Suspense>
               </div>
               <div
                 role="tabpanel"
@@ -3771,14 +3806,24 @@ function ScopedLedgerScreen({
                 tabIndex={0}
                 hidden={view !== "activity"}
               >
-                <ActivityLog
-                  api={api}
-                  target={target}
-                  active={view === "activity"}
-                  disabled={loading || writing || accessRefreshing}
-                  reloadSignal={revision}
-                  onAccessChanged={onAccessChanged}
-                />
+                <Suspense fallback={
+                  <section className="panel" aria-busy="true">
+                    <div className="panel-h">
+                      <I.Clock size={20} aria-hidden="true" />
+                      <h2>{T("Operation log")}</h2>
+                    </div>
+                    <p role="status">{T("Loading operation log…")}</p>
+                  </section>
+                }>
+                  <ActivityLog
+                    api={api}
+                    target={target}
+                    active={view === "activity"}
+                    disabled={loading || writing || accessRefreshing}
+                    reloadSignal={revision}
+                    onAccessChanged={onAccessChanged}
+                  />
+                </Suspense>
               </div>
             </>
           )}

@@ -1210,15 +1210,19 @@ describe("ledger screens", () => {
       "article"
     );
     const website = screen.getByRole("link", { name: "Website" }).closest("article");
-    expect(within(infrastructure).getByRole("link", { name: "Product" })).toHaveAttribute(
+    expect(within(infrastructure).getByRole("link", { name: "platform.example" })).toHaveAttribute(
       "href",
       "https://platform.example/"
     );
-    expect(within(website).getByRole("link", { name: "Product" })).toHaveAttribute(
+    expect(within(website).getByRole("link", { name: "website.example" })).toHaveAttribute(
       "href",
       "https://website.example/"
     );
-    expect(screen.getAllByRole("link", { name: "Product" })).toHaveLength(2);
+    expect(document.querySelectorAll(".ledger-project-product-link")).toHaveLength(2);
+    for (const name of ["Standalone project", "Legacy project"]) {
+      const row = screen.getByRole("link", { name }).closest("article");
+      expect(row.querySelector(".ledger-project-associations")).toHaveTextContent("—");
+    }
     expect(screen.queryByRole("link", { name: "Development" })).not.toBeInTheDocument();
     for (const metadata of [
       "2 repositories",
@@ -2218,6 +2222,7 @@ describe("ledger screens", () => {
     render(<LedgerScreen go={vi.fn()} mode="shared" />);
     fireEvent.click(await screen.findByRole("tab", { name: "Reports" }));
     const chart = screen.getByRole("heading", { name: "Expenses over time" }).closest("section");
+    await within(chart).findByRole("button", { name: /2026-09-01/ });
     const currencyChart = chart.querySelector('figure.expense-chart[data-currency="USD"]');
     for (const [date, amount] of [
       ["2026-09-01", "USD 180,143,985,094,819.82"],
@@ -2266,8 +2271,8 @@ describe("ledger screens", () => {
     const categories = screen
       .getByRole("heading", { name: "Expenses by category" })
       .closest("section");
-    expect(within(timeseries).getByText("Each currency has its own scale.")).toBeVisible();
-    expect(within(categories).getByText("Each currency has its own scale.")).toBeVisible();
+    expect(await within(timeseries).findByText("Each currency has its own scale.")).toBeVisible();
+    expect(await within(categories).findByText("Each currency has its own scale.")).toBeVisible();
     for (const currency of ["USD", "JPY"]) {
       const trend = timeseries.querySelector(`figure.expense-chart[data-currency="${currency}"]`);
       const category = categories.querySelector(

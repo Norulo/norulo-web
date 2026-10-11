@@ -1,0 +1,150 @@
+{
+  "date": "2026-10-11",
+  "validatedAtUTC": "2026-10-11T12:32:33.103876+00:00",
+  "scope": "Projects list layout, accessibility, pagination and initial bundle loading; local verification only",
+  "baselineCommit": "17dfabdeb0b2ff9889b30f7b9045af0546c0cdbe",
+  "checks": {
+    "lint": "passed",
+    "fullSuite": {
+      "testFiles": 84,
+      "testsPassed": 1673
+    },
+    "finalProjectsRegression": {
+      "testFiles": 1,
+      "testsPassed": 48
+    },
+    "build": "passed",
+    "workerConfig": "passed (offline)",
+    "whitespace": "passed"
+  },
+  "bundles": {
+    "unit": "built bytes, not source size",
+    "configuration": "VITE_API_BASE_URL=/api VITE_APP_URL=http://127.0.0.1:4248; Node 24.19.0 / Vite 8.0.16",
+    "chineseCatalog": {
+      "baseline": {
+        "files": [
+          "zh-BsV0NMgM.js",
+          "dynamic-CqKDyOhl.js",
+          "ledger-JvwbrgA9.js",
+          "ledger-longform-COsn25se.js",
+          "ledger-ui-CgWsElKI.js",
+          "ledger-scopes-CgghSozq.js",
+          "ledger-screen-CRL-NGyf.js",
+          "ledger-summary-CKiWjblh.js"
+        ],
+        "bytes": 432071
+      },
+      "final": {
+        "files": [
+          "catalog-Cyq8jWQT.js"
+        ],
+        "bytes": 128416
+      }
+    },
+    "ledgerMainJs": {
+      "baseline": {
+        "files": [
+          "ledger-C-Cj0UJz.js"
+        ],
+        "bytes": 142586
+      },
+      "final": {
+        "files": [
+          "ledger-Cn3roVP7.js"
+        ],
+        "bytes": 111133
+      }
+    }
+  },
+  "localeParity": {
+    "languages": [
+      "zh",
+      "ja",
+      "ko",
+      "fr",
+      "es"
+    ],
+    "phrasesPerLanguage": 1128,
+    "dynamicRulesPerLanguage": 15,
+    "result": "Exact equality to the baseline catalogs and merge precedence"
+  },
+  "browserValidation": {
+    "command": "npm run test:projects-layout -- --screenshots",
+    "contexts": 27,
+    "states": 228,
+    "versions": {
+      "chromium": "143.0.7499.4",
+      "webkit": "26.0",
+      "firefox": "144.0.2"
+    },
+    "profiles": [
+      "desktop-1440",
+      "tablet-1024",
+      "phone-390",
+      "phone-320-en",
+      "phone-320-zh",
+      "phone-320-ja",
+      "phone-320-ko",
+      "phone-320-fr",
+      "phone-320-es"
+    ],
+    "screenshots": 6,
+    "scope": "Bounded loopback GET-only synthetic Projects fixtures. Coarse-pointer geometry and native touch-point counts are recorded for simulated viewports/hasTouch contexts; only Chromium requires positive touch points. No remote API, business writes, polling or physical-device acceptance.",
+    "covered": [
+      "Loading/loaded control geometry",
+      "Exact per-currency totals including a 72-digit input",
+      "Natural record heights and text selection",
+      "Hover feedback and top alignment",
+      "Named container reflow at 759/760/820px and with insets",
+      "Local search/status filters and explicit pagination",
+      "All six locales, light/dark themes, larger browser fonts and creation rails"
+    ],
+    "fixtureBusinessWrites": 0,
+    "fixtureExternalDelivered": 0,
+    "localRuntime": "Downloaded Playwright engines; temporary Debian libraries for WebKit; Firefox required permission to launch its child processes in this executor"
+  },
+  "limits": [
+    "No Lighthouse, real-device or production Core Web Vitals measurement. Font fallback metrics were not changed.",
+    "Linux Firefox/WebKit may report zero native touch points; coarse-pointer geometry is simulated and recorded.",
+    "Firefox/WebKit can retain size-query results after synthetic padding-only changes at a fixed outer width. Inset fixtures settle a real resize between independent scenarios; strict column/overflow assertions are retained.",
+    "ExpenseReviewDialog remains synchronous to preserve modal focus and operation guards. Lazy loading improvements apply to Projects initial loading; hidden tabs on detail pages can still load their chunks."
+  ],
+  "sourceSha256": {
+    "scripts/check-projects-layout.mjs": "545ae8d51f7603988331d8896eff4851cb51c90456d166234e731decbf58c489",
+    "src/App.jsx": "79db49e39eb31e74c721ce4331f92cbbcce6aaeaa777c97a6e28b7c9127dcef2",
+    "src/components/projects-list.jsx": "45e447a253c66267d2689e07e45a3100f44ce0411abd701121cbfa70cfd16df6",
+    "src/components/projects-list.test.jsx": "ff54929ca546963d301cd33d6081e773c3ba27e4cbd33ea87c32d0920bc9b3d7",
+    "src/components/recurring-expenses.jsx": "3e7a1864a60b986fd590185ae058bea68ba7dc1cb9263bcf481fb1b65d439e27",
+    "src/components/recurring-schedule-fields.jsx": "71594804fb392c91ac95e292c1299eecb93106d7c827f5b7b6cdd9f286fe1fb5",
+    "src/i18n.jsx": "ccfdefd56c6f982c5f3b29f086b3ac8e02885d7e4fceb3711eb416da0ee99e0c",
+    "src/i18n.test.jsx": "521384470e55de2a3fa30c2e3c9d4afcd9ef80b505fa35e72a8c771087c63c5a",
+    "src/locales/dynamic.js": "30c8f65abb4827842e95238e0135fdb2f8020c1714787e424f7236b487d4737e",
+    "src/locales/es/catalog.js": "9ba5c9093050661e610ce449458c1294b59dd76c37ea36d5878f7cc6739b7ccf",
+    "src/locales/es/dynamic.js": "70dc07d93593ceb000812439ef3de9319264e235a2889f4f8cdc3feaa84e47d3",
+    "src/locales/es/ledger.js": "d67ff37804079886cd06a9c81d04965cf9f83ce3062057ae5b7e1af086a695e4",
+    "src/locales/fr/catalog.js": "c253710f58d4d8e90e3374725318afa94277ad7ee9ed2a3451d0e71d5769ea22",
+    "src/locales/fr/dynamic.js": "48782dea1b01a808107b4d4babbaf3c4cc9119e93a0f8b09ae07ea2f5fb5d1be",
+    "src/locales/fr/ledger.js": "9883a564d20b7561542f5c5cbc29292caff1acb5a289de8d4f832a365b28451e",
+    "src/locales/ja/catalog.js": "2436a0d6ed2e8676f419da2de00459cc114b7e0ec98bc6b081e40f459e4690bf",
+    "src/locales/ja/dynamic.js": "b2571645446dfa01471116653fdbe59c60f67dd23b709d67eb7b66e90417cb41",
+    "src/locales/ja/ledger.js": "85a31d680c257c7cfe4672cb3e1912674c10227113bb6b0da3575dfca1fdd2ca",
+    "src/locales/ko/catalog.js": "29d4809758668b2feec895ce9c97c5198a704ccdea36dd2b02090f153644f12a",
+    "src/locales/ko/dynamic.js": "4dd6ad04aebb749872d744e32391700a6c5e7f6393b9792b643b7a6e1134818c",
+    "src/locales/ko/ledger.js": "3560fade5d1e1370c8312b8cbc22bfe47b728c5fbb8978169a3f7f2eb08e0205",
+    "src/locales/ledger-longform.js": "e97cb5ce10d98d4fa32ae4c98c82ecaa450b0f4535d7ec20feb43eea9be00eab",
+    "src/locales/ledger-scopes.js": "43238b72340eaee8bfe2f5fd68f0da5151bb823c71863b4233b811b5cc767ceb",
+    "src/locales/ledger-screen.js": "5e3d3e74537167bd10d76d66c5088fa3269a2856953b056d8233c8c0cc053770",
+    "src/locales/ledger-summary.js": "47cba049eaf7c220bf1f7c66b9a6e104c196f539391db868c85287ecc9e2c22c",
+    "src/locales/ledger-ui.js": "817cfbe97f75878ed61b5d8226c45fce111603c2cf4e6a1ee6757a84204d6ca8",
+    "src/locales/ledger.js": "a52e883920952618e23a7ffacaa7b32e79497191588fa1d657e558da332b78df",
+    "src/locales/zh/catalog.js": "214b3fcb7943080344dee08c5900e571c6ab31ea685aeddf2beaf8baf2800d74",
+    "src/locales/zh/dynamic.js": "160330eafb318ebd3b4868904f75dfc11927092c0404a70768b0a1ef86c0beac",
+    "src/locales/zh/ledger.js": "32431de4171a8362b571c1fc94d516a84ff786949ad0c8e324817e40886bd080",
+    "src/screens/ledger-projects.test.jsx": "8ed7084a8208e2539a3f79f23311a44b45f1837b13cdd20cecc4fcabd14c65e9",
+    "src/screens/ledger-recurring-links.test.jsx": "b5a1fe50e04c067e18bf9c0c94e49e9090c1853d321a96a58dfd788d5807d02b",
+    "src/screens/ledger.css": "4a38a94d06532b7705f3e76dd27f3682cf80c3473e399ca5049095211977bd53",
+    "src/screens/ledger.jsx": "cf6c7a5cd9c1e61d5a782f8ca31e282cccc1d55fe6cb6aa7483e5d32a21ad5fb",
+    "src/screens/ledger.test.jsx": "73f5f84cd7730a421ef366ef96330854acfbbdf4ef71cdad7b4821f58478dcc0",
+    "styles/base.css": "77f97964b584e732adc80c3f93acfa7af1907f78e77575667b17154ad2339da1"
+  }
+}

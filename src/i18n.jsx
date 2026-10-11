@@ -6,7 +6,7 @@ import { localStorageGet, localStorageSet } from "./lib/browser-storage.js";
 // For newer translations, pass T("English", { zh: "中文", ja: "日本語" }).
 // Components that need to re-render on lang change call useLang().
 //
-// Phrase catalogs live in ./locales/<code>.js and are fetched on demand, so an
+// Phrase catalogs live in ./locales/<code>/catalog.js and are fetched on demand, so an
 // English session downloads no translation data at all and every other locale
 // downloads only its own. T() stays synchronous: until a catalog resolves it
 // falls back to the English source string, then setLang/preloadActiveLocale
@@ -39,11 +39,11 @@ syncDocumentLanguage();
 
 // Static specifiers keep the locale chunks statically analysable for the bundler.
 const LOCALE_LOADERS = {
-  zh: () => import("./locales/zh.js"),
-  ja: () => import("./locales/ja.js"),
-  ko: () => import("./locales/ko.js"),
-  fr: () => import("./locales/fr.js"),
-  es: () => import("./locales/es.js"),
+  zh: () => import("./locales/zh/catalog.js"),
+  ja: () => import("./locales/ja/catalog.js"),
+  ko: () => import("./locales/ko/catalog.js"),
+  fr: () => import("./locales/fr/catalog.js"),
+  es: () => import("./locales/es/catalog.js"),
 };
 
 const catalogCache = new Map();
@@ -53,16 +53,10 @@ let activeDynamicRules = null;
 function loadCatalog(code) {
   let pending = catalogCache.get(code);
   if (!pending) {
-    pending = Promise.all([LOCALE_LOADERS[code](), import("./locales/dynamic.js"),
-      import("./locales/ledger.js"), import("./locales/ledger-longform.js"),
-      import("./locales/ledger-ui.js"), import("./locales/ledger-scopes.js"),
-      import("./locales/ledger-screen.js"), import("./locales/ledger-summary.js")])
-      .then(([phrases, dynamic, ledger, longform, ui, scopes, screen, summary]) => ({
-        phrases: { ...phrases.PHRASES, ...ledger.LEDGER_PHRASES[code],
-          ...longform.LEDGER_LONG_PHRASES[code], ...ui.LEDGER_UI_PHRASES[code],
-          ...scopes.LEDGER_SCOPE_PHRASES[code], ...screen.LEDGER_SCREEN_PHRASES[code],
-          ...summary.LEDGER_SUMMARY_PHRASES[code] },
-        dynamicRules: dynamic.DYNAMIC_PHRASE_TRANSLATIONS,
+    pending = LOCALE_LOADERS[code]()
+      .then((catalog) => ({
+        phrases: catalog.PHRASES,
+        dynamicRules: catalog.DYNAMIC_PHRASE_TRANSLATIONS,
       }))
       .catch(() => ({ phrases: null, dynamicRules: null }));
     catalogCache.set(code, pending);
@@ -99,7 +93,7 @@ function dynamicPhraseTranslation(en, targetLang) {
   for (const rule of activeDynamicRules) {
     const match = String(en).match(rule.match);
     if (!match) continue;
-    const template = rule.translations?.[targetLang];
+    const template = rule.translation;
     return template ? interpolateDynamicTranslation(template, match, targetLang) : "";
   }
   return "";
@@ -111,7 +105,14 @@ export function preloadActiveLocale() {
 }
 
 export function setLang(nextLang) {
-  lang = normalizeLang(nextLang);
+  const next = normalizeLang(nextLang);
+  if (next !== lang) {
+    // Inline copy can update immediately; never display the previous locale's
+    // catalog while the next locale is still loading.
+    activePhrases = null;
+    activeDynamicRules = null;
+  }
+  lang = next;
   localStorageSet("nr-lang", lang);
   syncDocumentLanguage();
   notifyLangChange();
@@ -121,18 +122,14 @@ export function setLang(nextLang) {
 export function T(en, translations) {
   if (lang === "en") return en;
 
-  const phraseTranslation = activePhrases?.[en];
-  const dynamicTranslation = dynamicPhraseTranslation(en, lang);
-
   if (translations && typeof translations === "object" && !Array.isArray(translations)) {
-    return translations[lang] || translations.en || phraseTranslation || dynamicTranslation || en;
+    const inlineTranslation = translations[lang] || translations.en;
+    if (inlineTranslation) return inlineTranslation;
+  } else if (lang === "zh" && translations && translations !== en) {
+    return translations;
   }
 
-  if (lang === "zh" && translations) {
-    return translations === en ? phraseTranslation || dynamicTranslation || translations : translations;
-  }
-
-  return phraseTranslation || dynamicTranslation || en;
+  return activePhrases?.[en] || dynamicPhraseTranslation(en, lang) || en;
 }
 
 export function useLang() {

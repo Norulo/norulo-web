@@ -93,6 +93,9 @@ describe("Projects authorization and creation", () => {
     const loading = screen.getByRole("status", { name: "Loading projects…" });
     expect(loading.querySelectorAll(".panel")).toHaveLength(1);
     expect(loading.querySelectorAll(".ledger-project-row")).toHaveLength(3);
+    expect(loading.querySelector(".ledger-project-filters > .ledger-search")).not.toBeNull();
+    expect(loading.querySelector(".ledger-project-status > .ledger-project-label-skeleton")).not.toBeNull();
+    expect(loading.querySelector(".ledger-project-status > .ledger-project-control-skeleton")).not.toBeNull();
     expect(loading.querySelector(".ledger-split")).toBeNull();
     expect(screen.queryByLabelText("Project name")).not.toBeInTheDocument();
     expect(screen.getByRole("main")).toHaveAttribute("id", "main-content");
@@ -791,6 +794,10 @@ describe("Projects authorization and creation", () => {
       .mockResolvedValueOnce({ items: [first], nextCursor: null });
     render(<LedgerScreen go={vi.fn()} mode="projects" />);
     await screen.findByRole("link", { name: first.name });
+    expect(api.projects).toHaveBeenCalledWith(
+      { limit: 25 },
+      expect.objectContaining({ signal: expect.any(AbortSignal) })
+    );
     const projectCount = () =>
       screen.getByText("Project", { selector: ".ledger-project-count > span" }).nextElementSibling;
     expect(projectCount()).toHaveTextContent("1+");
@@ -805,11 +812,15 @@ describe("Projects authorization and creation", () => {
     expect(await screen.findByRole("link", { name: next.name })).toBeVisible();
     expect(projectCount()).toHaveTextContent(/^2$/);
     expect(api.projects).toHaveBeenLastCalledWith(
-      { cursor: "projects-page-2" },
+      { cursor: "projects-page-2", limit: 25 },
       expect.objectContaining({ signal: expect.any(AbortSignal) })
     );
     fireEvent.click(screen.getByRole("button", { name: "Reload" }));
     await waitFor(() => expect(api.projects).toHaveBeenCalledTimes(3));
+    expect(api.projects).toHaveBeenLastCalledWith(
+      { limit: 25 },
+      expect.objectContaining({ signal: expect.any(AbortSignal) })
+    );
     await waitFor(() =>
       expect(screen.queryByRole("link", { name: next.name })).not.toBeInTheDocument()
     );

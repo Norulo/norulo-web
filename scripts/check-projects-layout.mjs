@@ -206,6 +206,11 @@ async function settle(page) {
 }
 
 async function measure(page, engine, profile, stage, expectedIds) {
+  await page.waitForFunction(() => {
+    const count = document.querySelector(".ledger-project-results-count");
+    const live = document.querySelector('.ledger-search-guidance [role="status"]');
+    return count && live && count.textContent === live.textContent;
+  });
   await settle(page);
   const measured = await page.evaluate(() => {
     const rect = (element) => {
@@ -225,6 +230,7 @@ async function measure(page, engine, profile, stage, expectedIds) {
     const describedBy = search.getAttribute("aria-describedby")?.split(/\s+/).filter(Boolean) || [];
     const guidance = describedBy.map((id) => document.getElementById(id));
     const form = document.querySelector("#add-repository");
+    const sectionStyle = getComputedStyle(section);
     return {
       viewport: innerWidth,
       documentWidth: document.documentElement.scrollWidth,
@@ -233,8 +239,18 @@ async function measure(page, engine, profile, stage, expectedIds) {
       rootFontSize: getComputedStyle(document.documentElement).fontSize,
       headingFontSize: getComputedStyle(document.querySelector(".page-h h1")).fontSize,
       section: rect(section),
+      containerWidth:
+        section.clientWidth -
+        parseFloat(sectionStyle.paddingLeft) -
+        parseFloat(sectionStyle.paddingRight),
+      headerColumns: getComputedStyle(section.querySelector(".ledger-project-head"))
+        .gridTemplateColumns.split(" ").length,
       sectionOverflow: section.scrollWidth > section.clientWidth + 1,
       listRole: list.getAttribute("role"),
+      visibleCount: (() => {
+        const count = section.querySelector(".ledger-project-results-count");
+        return count ? { text: count.textContent.trim(), rect: rect(count) } : null;
+      })(),
       busy: section.querySelector("[aria-busy]")?.getAttribute("aria-busy") === "true",
       live: (() => {
         const status = section.querySelector('.ledger-search-guidance [role="status"]');
@@ -257,10 +273,17 @@ async function measure(page, engine, profile, stage, expectedIds) {
         rect: rect(row),
         columns: getComputedStyle(row).gridTemplateColumns.split(" ").length,
         overflow: row.scrollWidth > row.clientWidth + 1,
+        alignItems: getComputedStyle(row).alignItems,
+        separatorWidth: parseFloat(getComputedStyle(row).borderBottomWidth),
+        archivedBadge: Boolean(row.querySelector(".ledger-project-archived")),
         values: [...row.querySelectorAll(".financial-value")].map((value) => ({
           text: value.textContent,
+          fontSize: parseFloat(getComputedStyle(value).fontSize),
           selectable: getComputedStyle(value).userSelect !== "none",
           fragments: fragments(value),
+          numberGroups: [...(value.querySelector(".financial-value-number")?.childNodes || [])]
+            .filter((node) => node.nodeType === Node.TEXT_NODE && /\d/.test(node.textContent))
+            .map((node) => ({ text: node.textContent, fragments: fragments(node) })),
         })),
         links: [...row.querySelectorAll(".ledger-project-link, .ledger-project-product-link")].map(
           (link) => ({
@@ -269,13 +292,8 @@ async function measure(page, engine, profile, stage, expectedIds) {
             href: link.getAttribute("href"),
             target: link.getAttribute("target"),
             rel: link.getAttribute("rel"),
+            text: link.textContent.trim(),
             fragments: fragments(link),
-            labelLineCount: Math.max(
-              0,
-              ...[...link.childNodes]
-                .filter((node) => node.nodeType === Node.TEXT_NODE && node.textContent.trim())
-                .map((node) => fragments(node).length)
-            ),
           })
         ),
       })),
@@ -309,7 +327,11 @@ async function measure(page, engine, profile, stage, expectedIds) {
   assert(measured.guidanceValid, `Search lacks linked loaded-results guidance: ${details}`);
   assert(
     measured.live?.text && !measured.live.hidden && measured.live.live === "polite",
-    `Result changes lack a polite visible status: ${details}`
+    `Result changes lack a polite status: ${details}`
+  );
+  assert(
+    measured.visibleCount?.text === measured.live.text && measured.visibleCount.rect.height > 1,
+    `Project result count is not visible: ${details}`
   );
   assert.deepEqual(
     measured.rows.map((row) => row.id),
@@ -320,13 +342,36 @@ async function measure(page, engine, profile, stage, expectedIds) {
   for (const row of measured.rows) {
     assert.equal(row.role, "listitem", `Missing row list semantics: ${details}`);
     assert.equal(row.overflow, false, `Project row overflow: ${details}`);
+    assert.equal(row.alignItems, "start", `Project columns are not aligned at the top: ${details}`);
+    assert.equal(row.columns, measured.headerColumns, `Header and records reflow separately: ${details}`);
+    assert.equal(
+      row.archivedBadge,
+      row.id === "prj_projects_archived",
+      `Archived state lacks a visible badge: ${details}`
+    );
+    if (row !== measured.rows.at(-1))
+      assert.equal(row.separatorWidth, 1, `Project records lack a separator: ${details}`);
     assert.deepEqual(
       row.values.map((value) => value.text),
       expectedMoney.get(row.id),
       `Money truncated or currencies merged: ${details}`
     );
-    if (measured.section.width <= 759)
-      assert.equal(row.columns, 1, `Narrow list did not stack: ${details}`);
+    assert.equal(
+      row.columns,
+      measured.containerWidth <= 759 ? 1 : 3,
+      `Project columns do not match their shared container: ${details}`
+    );
+    for (const value of row.values) {
+      assert(
+        Math.abs(value.fontSize - parseFloat(measured.rootFontSize) * 1.125) <= tolerance,
+        `Project money does not use the secondary type size: ${details}`
+      );
+      for (const group of value.numberGroups)
+        assert(
+          new Set(group.fragments.map((fragment) => Math.round(fragment.top))).size <= 1,
+          `A monetary digit group breaks in the middle: ${details}`
+        );
+    }
     for (const value of [...row.values, ...row.links]) {
       assert(value.selectable, `Record data is not selectable: ${details}`);
       for (const fragment of value.fragments)
@@ -347,7 +392,10 @@ async function measure(page, engine, profile, stage, expectedIds) {
           link.rel.includes("noopener") && link.rel.includes("noreferrer"),
           `Unsafe product shortcut: ${details}`
         );
-        assert(link.labelLineCount <= 1, `Short product label wraps within its link: ${details}`);
+        assert(
+          link.text.includes(new URL(link.href).host),
+          `Product shortcut hides its destination: ${details}`
+        );
       }
     }
   }
@@ -475,6 +523,13 @@ try {
         const skeletonWidth = await skeleton
           .locator(".panel")
           .evaluate((element) => element.getBoundingClientRect().width);
+        const skeletonControls = await skeleton.evaluate((element) =>
+          [".ledger-search", ".ledger-project-label-skeleton", ".ledger-project-control-skeleton"]
+            .map((selector) => {
+              const { width, height } = element.querySelector(selector).getBoundingClientRect();
+              return { width, height };
+            })
+        );
         fixture.releaseFirstRead();
         await page.locator(".ledger-project-link").first().waitFor();
         report.states.push(
@@ -490,6 +545,31 @@ try {
           Math.abs(report.states[0].listWidth - skeletonWidth) <= tolerance,
           "Projects skeleton/list width shifts after loading"
         );
+        const loadedControls = await page.locator(".ledger-your-projects").evaluate((element) =>
+          [".ledger-search", ".ledger-project-status label", ".ledger-project-status select"]
+            .map((selector) => {
+              const { width, height } = element.querySelector(selector).getBoundingClientRect();
+              return { width, height };
+            })
+        );
+        for (let index = 0; index < loadedControls.length; index += 1)
+          assert(
+            Math.abs(skeletonControls[index].width - loadedControls[index].width) <= tolerance &&
+              Math.abs(skeletonControls[index].height - loadedControls[index].height) <= tolerance,
+            `${engine}/${profile.name}: skeleton controls shift after loading: ${JSON.stringify({
+              skeletonControls,
+              loadedControls,
+            })}`
+          );
+        report.controls = { skeleton: skeletonControls, loaded: loadedControls };
+        if (profile.name === "desktop-1440") {
+          const firstRow = page.locator(".ledger-project-row").first();
+          const idle = await firstRow.evaluate((element) => getComputedStyle(element).backgroundColor);
+          await firstRow.hover();
+          await settle(page);
+          const hovered = await firstRow.evaluate((element) => getComputedStyle(element).backgroundColor);
+          assert.notEqual(hovered, idle, "Projects record lacks hover feedback");
+        }
         const search = page.locator(".ledger-search input");
         const status = page.locator(".ledger-project-status select");
         await search.fill("Later page project");
@@ -543,6 +623,37 @@ try {
           report.states.push(enlarged);
           await page.evaluate(() => {
             document.documentElement.style.removeProperty("font-size");
+          });
+        }
+        if (profile.name === "desktop-1440") {
+          const section = page.locator(".ledger-your-projects");
+          for (const width of [759, 760, 820]) {
+            await section.evaluate((element, value) => {
+              element.style.width = `${value}px`;
+            }, width);
+            report.states.push(await measure(page, engine, profile, `container-${width}`, allIds));
+          }
+          await section.evaluate((element) => {
+            element.style.width = "760px";
+            element.style.paddingInline = "16px";
+          });
+          report.states.push(await measure(page, engine, profile, "container-with-insets", allIds));
+          await section.evaluate((element) => {
+            element.style.removeProperty("padding-inline");
+            element.style.width = "820px";
+          });
+          // Firefox and WebKit can retain a size-query result after a synthetic
+          // padding-only change at a fixed border-box width. Settle a real resize
+          // between independent inset scenarios, as the creation rail does.
+          await settle(page);
+          await section.evaluate((element) => {
+            element.style.width = "760px";
+            element.querySelector(".ledger-project-list").style.paddingInline = "16px";
+          });
+          report.states.push(await measure(page, engine, profile, "list-with-insets", allIds));
+          await section.evaluate((element) => {
+            element.style.removeProperty("width");
+            element.querySelector(".ledger-project-list").style.removeProperty("padding-inline");
           });
         }
         await page.locator('.page-h button[aria-controls="add-repository"]').click();

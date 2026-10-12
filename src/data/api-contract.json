@@ -130,13 +130,33 @@
             "cookieSession": []
           }
         ],
-        "description": "List the signed-in actor's unrevoked key metadata. Bearer keys cannot manage credentials. An optional workspace selector filters keys to that accessible ledger; without a selector the actor's keys across ledgers are listed. Reads never return tokens or hashes.",
+        "description": "List a bounded page of the signed-in actor's unrevoked key metadata, newest first by creation time and ID. Bearer keys cannot manage credentials. An optional workspace selector filters keys to that accessible ledger before pagination; without a selector the actor's keys across ledgers are listed. Follow nextCursor with the same selector until it is null. Reads never return tokens or hashes or record usage timestamps.",
         "parameters": [
           {
             "$ref": "#/components/parameters/WorkspaceHeader"
           },
           {
             "$ref": "#/components/parameters/WorkspaceQuery"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 100
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 256,
+              "pattern": "^[A-Za-z0-9_-]+$"
+            },
+            "description": "Opaque nextCursor returned by this endpoint"
           }
         ],
         "responses": {
@@ -148,20 +168,30 @@
                   "type": "object",
                   "required": [
                     "items",
-                    "apiKeys"
+                    "apiKeys",
+                    "nextCursor"
                   ],
                   "properties": {
                     "items": {
                       "type": "array",
+                      "maxItems": 100,
                       "items": {
                         "$ref": "#/components/schemas/ApiKey"
                       }
                     },
                     "apiKeys": {
                       "type": "array",
+                      "maxItems": 100,
                       "items": {
                         "$ref": "#/components/schemas/ApiKey"
                       }
+                    },
+                    "nextCursor": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "maxLength": 256
                     }
                   }
                 }
@@ -187,7 +217,7 @@
             "cookieSession": []
           }
         ],
-        "description": "Use the signed-in actor's browser session and a trusted app Origin.\nSelect a ledger with X-Norulo-Workspace or restrictions.workspaceId;\nselectors must agree. Omission binds to the actor's personal ledger.\nScopes cannot exceed the actor's current selected-ledger role.\nExplicit members scopes require omitting projectIds, including an empty\nallowlist; conflicting scopes/restrictions return INVALID_RESTRICTION.\nA selected team ledger's current membership revision is stored by the\nServer; role or membership changes invalidate its existing keys.\nThe response displays key once. Store it in your application's secret\nstorage; the Server stores only its hash and cannot recover the token.\n",
+        "description": "Use the signed-in actor's browser session and a trusted app Origin.\nSelect a ledger with X-Norulo-Workspace or restrictions.workspaceId;\nselectors must agree. Omission binds to the actor's personal ledger.\nScopes cannot exceed the actor's current selected-ledger role.\nExplicit members scopes require omitting projectIds, including an empty\nallowlist; conflicting scopes/restrictions return INVALID_RESTRICTION.\nA selected team ledger's current membership revision is stored by the\nServer; role or membership changes invalidate its existing keys.\nThe response displays key once. Store it in your application's secret\nstorage; the Server stores only its hash and cannot recover the token.\nContent-Length is optional. The JSON body is limited to 8192 bytes;\nwhen a length is supplied it must match the received bytes.\n",
         "parameters": [
           {
             "$ref": "#/components/parameters/WorkspaceHeader"
@@ -248,6 +278,16 @@
           },
           "403": {
             "$ref": "#/components/responses/Forbidden"
+          },
+          "413": {
+            "description": "REQUEST_TOO_LARGE",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           },
           "429": {
             "$ref": "#/components/responses/RateLimited"
@@ -1433,6 +1473,7 @@
             "bearerKey": []
           }
         ],
+        "description": "Owner removes Admin/Editor/Viewer; Admin removes only Editor/Viewer. This governance endpoint does not support self-service leaving. A member asks the Owner, or an Admin for an Editor/Viewer membership, to remove them. The Owner is immutable; removal retains financial history and invalidates membership-bound keys.",
         "parameters": [
           {
             "$ref": "#/components/parameters/IfMatch"
@@ -4554,7 +4595,11 @@
         "properties": {
           "name": {
             "type": "string",
-            "description": "Optional display label; omission or blank uses API key"
+            "maxLength": 120,
+            "not": {
+              "pattern": "[\\r\\n\\x00]"
+            },
+            "description": "Optional display label of at most 120 characters before trimming; omission or blank uses API key. CR/LF and NUL are rejected."
           },
           "scopes": {
             "oneOf": [
@@ -4651,7 +4696,8 @@
               "integer",
               "null"
             ],
-            "minimum": 0
+            "minimum": 0,
+            "description": "Reserved compatibility metadata. Usage tracking is currently disabled and this field is null for newly issued keys; null does not mean the key has never been used. Reads do not write usage timestamps."
           },
           "revokedAt": {
             "type": [
@@ -7421,5 +7467,5 @@
       }
     }
   },
-  "x-norulo-source-sha256": "5b12ec8325489662968717da272a586ac1351b1c389fddebb402f22ec2bc9a92"
+  "x-norulo-source-sha256": "4be16e9e269f6ae3228268944004462c4fa099bdcb92004fc28c0018585e1799"
 }

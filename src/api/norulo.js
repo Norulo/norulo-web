@@ -25,6 +25,29 @@ function getRequest(path, options = {}) {
   return options.signal ? request(path, { signal: options.signal }) : request(path);
 }
 
+async function listApiKeys(params = {}, options = {}) {
+  const items = [];
+  const seenCursors = new Set();
+  let cursor = params.cursor;
+  for (let page = 0; page < 100; page += 1) {
+    options.signal?.throwIfAborted();
+    const result = await getRequest(withSearchParams("/api-keys", { ...params, cursor }), options);
+    const nextCursor = result?.nextCursor;
+    if (page === 0 && (nextCursor === null || nextCursor === undefined)) return result;
+    const rows = result?.items ?? result?.apiKeys;
+    if (!Array.isArray(rows)) throw new Error("API key list is unavailable.");
+    items.push(...rows);
+    if (nextCursor === null || nextCursor === undefined) {
+      return { ...result, items, apiKeys: items, nextCursor: null };
+    }
+    if (typeof nextCursor !== "string" || !/^[A-Za-z0-9_-]{1,256}$/.test(nextCursor)
+      || seenCursors.has(nextCursor)) throw new Error("API key list is unavailable.");
+    seenCursors.add(nextCursor);
+    cursor = nextCursor;
+  }
+  throw new Error("API key list is too large. Select a ledger and try again.");
+}
+
 export const noruloApi = {
   auth: {
     getSession: (options = {}) => request("/auth/session", { signal: options.signal }),
@@ -116,7 +139,7 @@ export const noruloApi = {
   },
 
   apiKeys: {
-    list: (params = {}, options = {}) => getRequest(withSearchParams("/api-keys", params), options),
+    list: listApiKeys,
     create: (payload = {}, options = {}) =>
       request("/api-keys", { method: "POST", body: payload, signal: options.signal }),
     revoke: (keyId, options = {}) =>

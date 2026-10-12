@@ -805,7 +805,8 @@ export function ApiKeysScreen({
                                 {T("Created", "已创建")} {formatDate(key.createdAt)}
                               </span>
                               <span className="tag">
-                                {T("Last used", "最近使用")} {formatDate(key.lastUsedAt)}
+                                {T("Last used", "最近使用")} {key.lastUsedAt
+                                  ? formatDate(key.lastUsedAt) : T("Unavailable", "不可用")}
                               </span>
                               {key.scopes.map((scope) => (
                                 <span className="tag" key={scope}>
@@ -851,6 +852,7 @@ export function ApiKeysScreen({
                           <I.Code size={14} />
                           <input
                             value={name}
+                            maxLength={120}
                             disabled={controlsDisabled}
                             onChange={(event) => {
                               if (!interactionBlocked()) setName(event.target.value);

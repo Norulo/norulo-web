@@ -418,7 +418,25 @@ describe("Cloudflare Worker API proxy", () => {
     expect(policy.match(/(?:^|; )script-src ([^;]+)/)[1]).not.toContain("'unsafe-inline'");
     expect(response.headers.get("X-Content-Type-Options")).toBe("nosniff");
     expect(response.headers.get("Referrer-Policy")).toBe("strict-origin-when-cross-origin");
+    expect(response.headers.get("Permissions-Policy")).toBe(
+      "camera=(), microphone=(), geolocation=(), payment=()"
+    );
+    expect(response.headers.get("Strict-Transport-Security")).toBe("max-age=15552000");
   });
+
+  it.each(["https://norulo.com", "http://127.0.0.1:5173"])(
+    "adds HSTS only for HTTPS API responses: %s",
+    async (origin) => {
+      const response = await worker.fetch(new Request(`${origin}/api/health`), {
+        NORULO_API_ORIGIN: "http://localhost:8080",
+        NORULO_SERVER: { fetch: vi.fn(async () => new Response("ok")) },
+      });
+      expect(response.headers.get("Strict-Transport-Security")).toBe(
+        origin.startsWith("https:") ? "max-age=15552000" : null
+      );
+      expect(await response.text()).toBe("ok");
+    }
+  );
 
   it("fails closed when the backend origin is missing", async () => {
     const response = await worker.fetch(new Request("https://norulo.com/api/health"), {});
@@ -473,14 +491,23 @@ describe("Cloudflare Worker API proxy", () => {
   });
 
   it("retries an explicit fallback origin for credentialless safe Cloudflare 1003 requests", async () => {
+    const abandoned = new Response("<html>error code: 1003</html>", {
+      status: 403,
+      headers: { "content-type": "text/html" },
+    });
+    // Stream cancellation can wait for a tee branch. It must not hold up the
+    // fallback response, even when that cancellation promise stays pending.
+    const clone = abandoned.clone.bind(abandoned);
+    let cancel;
+    vi.spyOn(abandoned, "clone").mockImplementation(() => {
+      const inspection = clone();
+      // clone() replaces the original body with one branch of the tee.
+      cancel = vi.spyOn(abandoned.body, "cancel").mockReturnValue(new Promise(() => {}));
+      return inspection;
+    });
     const fetchMock = vi
       .fn()
-      .mockResolvedValueOnce(
-        new Response("<html>error code: 1003</html>", {
-          status: 403,
-          headers: { "content-type": "text/html" },
-        })
-      )
+      .mockResolvedValueOnce(abandoned)
       .mockResolvedValueOnce(
         new Response(JSON.stringify({ authenticated: false }), { status: 200 })
       );
@@ -492,6 +519,7 @@ describe("Cloudflare Worker API proxy", () => {
     });
 
     expect(response.status).toBe(200);
+    expect(cancel).toHaveBeenCalledOnce();
     expect(fetchMock).toHaveBeenNthCalledWith(
       1,
       new URL("https://198.51.100.10/auth/session"),

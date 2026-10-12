@@ -2,10 +2,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { noruloApi } from "../api/norulo.js";
 import { captureGitHubRefreshScope, setGitHubRefreshIdentity } from "../api/github-refresh.js";
 import { connectGitHubRepositories, manageGitHubInstallation, startGitHubLogin } from "./auth.js";
-import {
-  clearGitHubRepositoryAccessRefreshNeeded,
-  markGitHubRepositoryAccessRefreshNeeded,
-} from "./github-repository-access-refresh.js";
 import { openGitHubInstallPopup } from "./install-popup.js";
 
 vi.mock("../api/norulo.js", () => ({
@@ -26,11 +22,6 @@ vi.mock("../api/norulo.js", () => ({
 
 vi.mock("./install-popup.js", () => ({
   openGitHubInstallPopup: vi.fn(),
-}));
-
-vi.mock("./github-repository-access-refresh.js", () => ({
-  markGitHubRepositoryAccessRefreshNeeded: vi.fn(),
-  clearGitHubRepositoryAccessRefreshNeeded: vi.fn(),
 }));
 
 function redirectScreen(call) {
@@ -382,7 +373,6 @@ describe("auth redirects", () => {
       { scope: captureGitHubRefreshScope(), signal: undefined }
     );
     expect(noruloApi.repositories.sync).toHaveBeenCalledTimes(1);
-    expect(clearGitHubRepositoryAccessRefreshNeeded).not.toHaveBeenCalled();
   });
 
   it("creates a manage session for a specific installation and syncs only that installation", async () => {
@@ -417,7 +407,7 @@ describe("auth redirects", () => {
     );
   });
 
-  it("does not arm automatic repository refresh while a manage popup can still be cancelled", async () => {
+  it("waits for the manage popup before synchronizing repository access", async () => {
     noruloApi.integrations.createGitHubInstallationManageSession.mockResolvedValueOnce({
       mode: "github-installation-manage",
       url: "https://api.norulo.com/integrations/github/manage/start?state=abc",
@@ -440,12 +430,12 @@ describe("auth redirects", () => {
     await Promise.resolve();
 
     expect(openGitHubInstallPopup).toHaveBeenCalledTimes(1);
-    expect(markGitHubRepositoryAccessRefreshNeeded).not.toHaveBeenCalled();
+    expect(noruloApi.repositories.sync).not.toHaveBeenCalled();
 
     finishPopup();
     await completion;
 
-    expect(markGitHubRepositoryAccessRefreshNeeded).not.toHaveBeenCalled();
+    expect(noruloApi.repositories.sync).toHaveBeenCalledTimes(1);
   });
 
   it.each(["connect", "manage"])("passes a neutral %s close outcome to the caller without a second sync", async (mode) => {
@@ -490,7 +480,6 @@ describe("auth redirects", () => {
       code: state === "provider-unavailable" ? "GITHUB_UNAVAILABLE" : "no_authorized_repositories",
     });
     expect(noruloApi.repositories.sync).toHaveBeenCalledTimes(1);
-    expect(clearGitHubRepositoryAccessRefreshNeeded).not.toHaveBeenCalled();
   });
 
   it("maps manage account mismatch errors to a readable message", async () => {
@@ -562,7 +551,7 @@ describe("auth redirects", () => {
     expect(openGitHubInstallPopup).not.toHaveBeenCalled();
   });
 
-  it("keeps repository refresh armed when post-popup verification fails", async () => {
+  it("reports failed post-popup verification without retrying on a visible return", async () => {
     noruloApi.integrations.getGitHubAuthorizeUrl.mockResolvedValueOnce({
       mode: "github-app-install",
       url: "https://github.com/apps/norulo/installations/new",
@@ -572,11 +561,14 @@ describe("auth redirects", () => {
 
     await expect(connectGitHubRepositories()).rejects.toThrow("sync temporarily unavailable");
 
-    expect(markGitHubRepositoryAccessRefreshNeeded).toHaveBeenCalled();
-    expect(clearGitHubRepositoryAccessRefreshNeeded).not.toHaveBeenCalled();
+    window.dispatchEvent(new Event("focus"));
+    document.dispatchEvent(new Event("visibilitychange"));
+    window.dispatchEvent(new PageTransitionEvent("pageshow", { persisted: true }));
+    await Promise.resolve();
+    expect(noruloApi.repositories.sync).toHaveBeenCalledTimes(1);
   });
 
-  it("arms repository refresh when a completed manage popup cannot sync", async () => {
+  it("reports failed manage verification without retrying on a visible return", async () => {
     noruloApi.integrations.createGitHubInstallationManageSession.mockResolvedValueOnce({
       url: "https://api.norulo.com/integrations/github/manage/start?state=abc",
     });
@@ -585,12 +577,15 @@ describe("auth redirects", () => {
 
     await expect(manageGitHubInstallation("999")).rejects.toThrow("sync temporarily unavailable");
 
-    expect(markGitHubRepositoryAccessRefreshNeeded).toHaveBeenCalledTimes(1);
-    expect(clearGitHubRepositoryAccessRefreshNeeded).not.toHaveBeenCalled();
+    window.dispatchEvent(new Event("focus"));
+    document.dispatchEvent(new Event("visibilitychange"));
+    window.dispatchEvent(new PageTransitionEvent("pageshow", { persisted: true }));
+    await Promise.resolve();
+    expect(noruloApi.repositories.sync).toHaveBeenCalledTimes(1);
   });
 
   it.each(["connect", "manage"])(
-    "does not sync or alter the new account's refresh flag after an old %s popup completes",
+    "does not sync after an old %s popup completes in another account",
     async (kind) => {
       const url = "https://api.norulo.com/integrations/github/install/start?state=abc";
       noruloApi.integrations.getGitHubAuthorizeUrl.mockResolvedValueOnce({ url });
@@ -605,8 +600,6 @@ describe("auth redirects", () => {
       const aborted = expect(completion).rejects.toMatchObject({ name: "AbortError" });
       await vi.waitFor(() => expect(openGitHubInstallPopup).toHaveBeenCalledTimes(1));
       expect(openGitHubInstallPopup.mock.calls[0][2]).toEqual({ scope, signal: controller.signal, nonce: expect.stringMatching(/^[0-9a-f]{32}$/) });
-      markGitHubRepositoryAccessRefreshNeeded.mockClear();
-      clearGitHubRepositoryAccessRefreshNeeded.mockClear();
 
       setGitHubRefreshIdentity("usr_two");
       const newScope = captureGitHubRefreshScope();
@@ -615,8 +608,6 @@ describe("auth redirects", () => {
 
       // Sync is the only entry to renewal here; abandoning it prevents either request.
       expect(noruloApi.repositories.sync).not.toHaveBeenCalled();
-      expect(markGitHubRepositoryAccessRefreshNeeded).not.toHaveBeenCalled();
-      expect(clearGitHubRepositoryAccessRefreshNeeded).not.toHaveBeenCalled();
       expect(newScope.controller.signal.aborted).toBe(false);
     }
   );
@@ -641,7 +632,6 @@ describe("auth redirects", () => {
 
       expect(noruloApi.repositories.sync).toHaveBeenCalledTimes(1);
       expect(noruloApi.repositories.sync.mock.calls[0][1]).toEqual({ scope, signal: controller.signal });
-      expect(clearGitHubRepositoryAccessRefreshNeeded).toHaveBeenCalledTimes(1);
     }
   );
 
@@ -659,7 +649,6 @@ describe("auth redirects", () => {
 
     expect(openGitHubInstallPopup).not.toHaveBeenCalled();
     expect(noruloApi.repositories.sync).not.toHaveBeenCalled();
-    expect(markGitHubRepositoryAccessRefreshNeeded).not.toHaveBeenCalled();
   });
 
   it("preserves caller cancellation while waiting for a repository popup", async () => {
@@ -678,6 +667,5 @@ describe("auth redirects", () => {
     await aborted;
 
     expect(noruloApi.repositories.sync).not.toHaveBeenCalled();
-    expect(clearGitHubRepositoryAccessRefreshNeeded).toHaveBeenCalledTimes(1);
   });
 });

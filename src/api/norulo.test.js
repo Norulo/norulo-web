@@ -48,52 +48,38 @@ describe("noruloApi current product endpoints", () => {
     });
   });
 
-  it("collects bounded key pages with the same ledger selector and lifecycle signal", async () => {
+  it("returns one key page without following its cursor automatically", async () => {
     const controller = new AbortController();
     const first = { id: "key_1" };
-    const second = { id: "key_2" };
-    request.mockResolvedValueOnce({ items: [first], apiKeys: [first], nextCursor: "cursor_1" })
-      .mockResolvedValueOnce({ items: [second], apiKeys: [second], nextCursor: null });
+    const page = { items: [first], apiKeys: [first], nextCursor: "cursor_1" };
+    request.mockResolvedValueOnce(page);
     await expect(noruloApi.apiKeys.list({ workspaceId: "owner" }, {
       signal: controller.signal,
-    })).resolves.toEqual({ items: [first, second], apiKeys: [first, second], nextCursor: null });
+    })).resolves.toBe(page);
     expect(request).toHaveBeenNthCalledWith(1, "/api-keys?workspaceId=owner", {
       signal: controller.signal,
     });
-    expect(request).toHaveBeenNthCalledWith(2, "/api-keys?workspaceId=owner&cursor=cursor_1", {
+    expect(request).toHaveBeenCalledOnce();
+  });
+
+  it("loads an explicitly requested key page with its ledger selector and signal", async () => {
+    const controller = new AbortController();
+    request.mockResolvedValue({ items: [{ id: "key_2" }], nextCursor: null });
+    await noruloApi.apiKeys.list({ workspaceId: "owner", cursor: "cursor_1" }, {
       signal: controller.signal,
     });
-  });
-
-  it("does not return a partial key list after a later page fails", async () => {
-    request.mockResolvedValueOnce({ items: [{ id: "key_1" }], nextCursor: "cursor_1" })
-      .mockRejectedValueOnce(new Error("unavailable"));
-    await expect(noruloApi.apiKeys.list()).rejects.toThrow("unavailable");
-    expect(request).toHaveBeenCalledTimes(2);
-  });
-
-  it("stops repeated key cursors without retrying", async () => {
-    request.mockResolvedValue({ items: [{ id: "key_1" }], nextCursor: "cursor_1" });
-    await expect(noruloApi.apiKeys.list()).rejects.toThrow("API key list is unavailable.");
-    expect(request).toHaveBeenCalledTimes(2);
-  });
-
-  it("bounds key list requests even when every cursor differs", async () => {
-    let next = 0;
-    request.mockImplementation(async () => ({ items: [], nextCursor: `cursor_${next++}` }));
-    await expect(noruloApi.apiKeys.list()).rejects.toThrow("API key list is too large.");
-    expect(request).toHaveBeenCalledTimes(100);
-  });
-
-  it("stops key pagination when its lifecycle is aborted between pages", async () => {
-    const controller = new AbortController();
-    request.mockImplementationOnce(async () => {
-      controller.abort();
-      return { items: [{ id: "key_1" }], nextCursor: "cursor_1" };
+    expect(request).toHaveBeenCalledWith("/api-keys?workspaceId=owner&cursor=cursor_1", {
+      signal: controller.signal,
     });
+    expect(request).toHaveBeenCalledOnce();
+  });
+
+  it("does not request a key page after its lifecycle is aborted", async () => {
+    const controller = new AbortController();
+    controller.abort();
     await expect(noruloApi.apiKeys.list({}, { signal: controller.signal }))
       .rejects.toMatchObject({ name: "AbortError" });
-    expect(request).toHaveBeenCalledTimes(1);
+    expect(request).not.toHaveBeenCalled();
   });
 
   it("passes abort signals to health and billing requests", async () => {

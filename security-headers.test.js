@@ -2,7 +2,13 @@
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { htmlContentSecurityPolicy, THEME_BOOTSTRAP_HASH } from "./security-headers.js";
+import {
+  htmlContentSecurityPolicy,
+  STATIC_SECURITY_HEADERS,
+  STRICT_TRANSPORT_SECURITY,
+  THEME_BOOTSTRAP_HASH,
+} from "./security-headers.js";
+import { renderStaticHeaders, securityHeadersPlugin } from "./scripts/generate-security-headers.mjs";
 import { PUBLIC_INDEXABLE_PATHS } from "./src/lib/seo.js";
 
 const file = (path) => readFileSync(new URL(path, import.meta.url), "utf8");
@@ -16,9 +22,22 @@ describe("browser security policy", () => {
     expect(THEME_BOOTSTRAP_HASH).toBe(
       `sha256-${createHash("sha256").update(bootstrap).digest("base64")}`
     );
-    expect(file("./public/_headers")).toContain(
+    expect(renderStaticHeaders()).toContain(
       `Content-Security-Policy: ${htmlContentSecurityPolicy()}`
     );
+  });
+
+  it("emits the shared policy for direct static assets during a build", () => {
+    const emitted = [];
+    const plugin = securityHeadersPlugin();
+    expect(plugin.apply).toBe("build");
+    plugin.generateBundle.call({ emitFile: (asset) => emitted.push(asset) });
+    expect(emitted).toEqual([{ type: "asset", fileName: "_headers", source: renderStaticHeaders() }]);
+    for (const [name, value] of Object.entries(STATIC_SECURITY_HEADERS))
+      expect(emitted[0].source).toContain(`  ${name}: ${value}\n`);
+    expect(emitted[0].source).toContain(`  Strict-Transport-Security: ${STRICT_TRANSPORT_SECURITY}\n`);
+    expect(STRICT_TRANSPORT_SECURITY).toBe("max-age=15552000");
+    expect(STATIC_SECURITY_HEADERS["Permissions-Policy"]).not.toContain("clipboard");
   });
 
   it("restricts resources while retaining inline React geometry and provider navigation", () => {

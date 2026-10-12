@@ -84,6 +84,7 @@ describe("BillingScreen", () => {
   });
 
   afterEach(async () => {
+    vi.unstubAllEnvs();
     await act(async () => {
       await setLang("en");
     });
@@ -640,6 +641,7 @@ describe("BillingScreen", () => {
   });
 
   it("accepts the exact preview checkout host and returns purchases to Billing", async () => {
+    vi.stubEnv("VITE_CREEM_MODE", "test");
     noruloApi.billing.getPlan.mockResolvedValue({ ...billingCatalog, account: { plan: "free" } });
     noruloApi.billing.createCheckoutSession.mockResolvedValue({
       url: "https://test-checkout.creem.io/ch_test",

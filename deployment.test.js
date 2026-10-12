@@ -1,9 +1,10 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
+import { renderStaticHeaders } from "./scripts/generate-security-headers.mjs";
 
 const wrangler = JSON.parse(readFileSync(join(process.cwd(), "wrangler.jsonc"), "utf-8"));
-const headersFile = readFileSync(join(process.cwd(), "public", "_headers"), "utf-8");
+const headersFile = renderStaticHeaders();
 
 function headerLinesFor(route) {
   const lines = headersFile.split(/\r?\n/);

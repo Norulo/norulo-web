@@ -14,13 +14,6 @@ import { API_KEY_SCOPES, API_KEY_SCOPE_VALUES, DEFAULT_SCOPE_VALUES } from "./le
 import { Sidebar, Topbar } from "../shell.jsx";
 import { ConsoleLayout } from "../components/console-layout.jsx";
 
-function itemsFrom(payload, ...keys) {
-  for (const key of keys) {
-    if (Array.isArray(payload?.[key])) return payload[key];
-  }
-  return [];
-}
-
 function textValue(...values) {
   for (const value of values) {
     if (value === undefined || value === null || value === "") continue;
@@ -244,6 +237,7 @@ export function ApiKeysScreen({
     [scopeValuesKey]
   );
   const [keys, setKeys] = useState([]);
+  const [nextKeyCursor, setNextKeyCursor] = useState(null);
   const [name, setName] = useState(T("Ledger automation", "账本自动化"));
   const [selectedScopes, setSelectedScopes] = useState(defaultScopes);
   const hasMemberScopes = selectedScopes.some((scope) => scope.startsWith("members:"));
@@ -274,6 +268,8 @@ export function ApiKeysScreen({
   const activeScopeRef = useRef(scopeKey);
   const readControllerRef = useRef(null);
   const readRequestRef = useRef(0);
+  const keyCursorHistoryRef = useRef(new Set());
+  const keysRef = useRef(keys);
   const projectReadControllerRef = useRef(null);
   const projectReadRequestRef = useRef(0);
   const projectCursorHistoryRef = useRef(new Set());
@@ -286,9 +282,13 @@ export function ApiKeysScreen({
   accessChangedRef.current = onAccessChanged;
   reloadAccessRef.current = onReloadAccess;
   accessRefreshingRef.current = accessRefreshing;
+  keysRef.current = keys;
   const currentScope = renderedScope === scopeKey;
   const interactionBlocked = () =>
-    Boolean(mutationInFlightRef.current || accessReloadRef.current || accessRefreshingRef.current);
+    Boolean(
+      mutationInFlightRef.current || readControllerRef.current ||
+      accessReloadRef.current || accessRefreshingRef.current
+    );
   const projectApi = useMemo(() => createLedgerApi(workspaceId), [workspaceId]);
   const matchingProjects = projectPage.items.filter((project) =>
     [project.label, project.description, project.repository]
@@ -315,6 +315,8 @@ export function ApiKeysScreen({
     )
       return;
     setKeys([]);
+    setNextKeyCursor(null);
+    keyCursorHistoryRef.current = new Set();
     setCreatedCredential(null);
     setRevokeTarget(null);
     setLoadedOnce(false);
@@ -333,11 +335,12 @@ export function ApiKeysScreen({
   }, []);
 
   const load = useCallback(
-    async (reloadTicket = null) => {
+    async (reloadTicket = null, cursor = null) => {
       if (
         !mountedRef.current ||
         activeScopeRef.current !== scopeKey ||
         mutationInFlightRef.current ||
+        (readControllerRef.current && !readControllerRef.current.signal.aborted) ||
         (accessReloadRef.current && accessReloadRef.current !== reloadTicket)
       )
         return;
@@ -352,14 +355,50 @@ export function ApiKeysScreen({
         request === readRequestRef.current;
       setLoading(true);
       setError("");
+      if (!cursor) {
+        setNextKeyCursor(null);
+        keyCursorHistoryRef.current = new Set();
+      }
       try {
-        const payload = await noruloApi.apiKeys.list(workspaceId ? { workspaceId } : {}, {
-          signal: controller.signal,
-        });
-        if (!current()) return;
-        setKeys(
-          itemsFrom(payload, "apiKeys", "keys", "items").map(normalizeApiKey).filter(Boolean)
+        const payload = await noruloApi.apiKeys.list(
+          { ...(workspaceId ? { workspaceId } : {}), ...(cursor ? { cursor } : {}) },
+          { signal: controller.signal }
         );
+        if (!current()) return;
+        const rows = [payload?.apiKeys, payload?.keys, payload?.items].find(Array.isArray);
+        const nextCursor = payload?.nextCursor ?? null;
+        if (
+          !rows ||
+          (nextCursor !== null &&
+            (typeof nextCursor !== "string" || !/^[A-Za-z0-9_-]{1,256}$/.test(nextCursor)))
+        ) {
+          setNextKeyCursor(null);
+          throw new UserFacingError(T("Unable to load API keys.", "无法加载 API key。"));
+        }
+        const nextKeys = rows.map(normalizeApiKey).filter(Boolean);
+        const loadedIds = new Set(keysRef.current.map((key) => key.id));
+        if (
+          nextCursor &&
+          (nextCursor === cursor || keyCursorHistoryRef.current.has(nextCursor) ||
+            nextKeys.length === 0 || (cursor && nextKeys.every((key) => loadedIds.has(key.id))))
+        ) {
+          setNextKeyCursor(null);
+          throw new UserFacingError(T("Pagination did not advance. Reload to retry."));
+        }
+        if (cursor) keyCursorHistoryRef.current.add(cursor);
+        setKeys((previous) => {
+          const existing = cursor ? previous : [];
+          const seen = new Set(existing.map((key) => key.id));
+          return [
+            ...existing,
+            ...nextKeys.filter((key) => {
+              if (seen.has(key.id)) return false;
+              seen.add(key.id);
+              return true;
+            }),
+          ];
+        });
+        setNextKeyCursor(nextCursor);
         setLoadedOnce(true);
       } catch (err) {
         if (!current()) return;
@@ -367,6 +406,7 @@ export function ApiKeysScreen({
         setError(requestErrorText(err, T("Unable to load API keys.", "无法加载 API key。")));
       } finally {
         if (current()) setLoading(false);
+        if (readControllerRef.current === controller) readControllerRef.current = null;
       }
     },
     [scopeKey, workspaceId, handleAccessFailure]
@@ -489,6 +529,8 @@ export function ApiKeysScreen({
     accessReloadRef.current = null;
     setRenderedScope(scopeKey);
     setKeys([]);
+    setNextKeyCursor(null);
+    keyCursorHistoryRef.current = new Set();
     setCreatedCredential(null);
     createOpenerRef.current = null;
     setRevokeTarget(null);
@@ -564,6 +606,7 @@ export function ApiKeysScreen({
       createdCredential?.token ||
       revokeTarget ||
       mutationInFlightRef.current ||
+      readControllerRef.current ||
       accessReloadRef.current ||
       accessRefreshingRef.current ||
       loading ||
@@ -657,7 +700,8 @@ export function ApiKeysScreen({
       !keyId ||
       accessReloadRef.current ||
       accessRefreshingRef.current ||
-      mutationInFlightRef.current
+      mutationInFlightRef.current ||
+      readControllerRef.current
     )
       return;
     const mutation = {};
@@ -695,7 +739,8 @@ export function ApiKeysScreen({
       !key?.id ||
       accessReloadRef.current ||
       accessRefreshingRef.current ||
-      mutationInFlightRef.current
+      mutationInFlightRef.current ||
+      readControllerRef.current
     )
       return;
     setRevokeTarget(key);
@@ -789,47 +834,64 @@ export function ApiKeysScreen({
                   <section className="panel section-split api-keys-section">
                     <div className="panel-h">
                       <h2>{T("Keys", "密钥")}</h2>
-                      <span className="count">{keys.length}</span>
+                      <span className="count" title={T("Loaded in this browser")}>
+                        {keys.length}
+                      </span>
                     </div>
-                    <div className="key-list">
-                      {keys.map((key) => (
-                        <div key={key.id || key.prefix || key.name} className="key-row">
-                          <div className="key-sev sev-bg-info">
-                            <I.Code size={12} /> {T("key", "key")}
-                          </div>
-                          <div className="key-id">{key.prefix || key.id || "-"}</div>
-                          <div className="key-main">
-                            <div className="key-t">{key.name}</div>
-                            <div className="key-meta">
-                              <span className="tag">
-                                {T("Created", "已创建")} {formatDate(key.createdAt)}
-                              </span>
-                              <span className="tag">
-                                {T("Last used", "最近使用")} {key.lastUsedAt
-                                  ? formatDate(key.lastUsedAt) : T("Unavailable", "不可用")}
-                              </span>
-                              {key.scopes.map((scope) => (
-                                <span className="tag" key={scope}>
-                                  {scope}
-                                </span>
-                              ))}
+                    <div className="panel-body">
+                      <div className="key-list">
+                        {keys.map((key) => (
+                          <div key={key.id || key.prefix || key.name} className="key-row">
+                            <div className="key-sev sev-bg-info">
+                              <I.Code size={12} /> {T("key", "key")}
                             </div>
+                            <div className="key-id">{key.prefix || key.id || "-"}</div>
+                            <div className="key-main">
+                              <div className="key-t">{key.name}</div>
+                              <div className="key-meta">
+                                <span className="tag">
+                                  {T("Created", "已创建")} {formatDate(key.createdAt)}
+                                </span>
+                                <span className="tag">
+                                  {T("Last used", "最近使用")} {key.lastUsedAt
+                                    ? formatDate(key.lastUsedAt) : T("Unavailable", "不可用")}
+                                </span>
+                                {key.scopes.map((scope) => (
+                                  <span className="tag" key={scope}>
+                                    {scope}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                            <button
+                              className="btn sm"
+                              disabled={controlsDisabled}
+                              onClick={() => requestRevokeKey(key)}
+                            >
+                              <I.X size={13} /> {T("Revoke", "吊销")}
+                            </button>
                           </div>
+                        ))}
+                        {!loading && keys.length === 0 && (
+                          <div className="empty">
+                            <I.Code size={28} />
+                            <h3>
+                              {T("No API keys have been created yet.", "尚未创建任何 API 密钥。")}
+                            </h3>
+                          </div>
+                        )}
+                      </div>
+                      {nextKeyCursor && (
+                        <div className="panel-actions">
                           <button
-                            className="btn sm"
-                            disabled={controlsDisabled}
-                            onClick={() => requestRevokeKey(key)}
+                            type="button"
+                            className="btn"
+                            aria-busy={recordsLoading}
+                            disabled={controlsDisabled || !currentScope}
+                            onClick={() => load(null, nextKeyCursor)}
                           >
-                            <I.X size={13} /> {T("Revoke", "吊销")}
+                            {T("Load more")}
                           </button>
-                        </div>
-                      ))}
-                      {!loading && keys.length === 0 && (
-                        <div className="empty">
-                          <I.Code size={28} />
-                          <h3>
-                            {T("No API keys have been created yet.", "尚未创建任何 API 密钥。")}
-                          </h3>
                         </div>
                       )}
                     </div>

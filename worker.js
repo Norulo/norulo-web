@@ -1,4 +1,8 @@
-import { htmlContentSecurityPolicy } from "./security-headers.js";
+import {
+  htmlSecurityHeaders,
+  STATIC_SECURITY_HEADERS,
+  STRICT_TRANSPORT_SECURITY,
+} from "./security-headers.js";
 
 const API_PREFIX = "/api";
 const DEFAULT_PROXY_MAX_BODY_BYTES = 1024 * 1024;
@@ -6,25 +10,18 @@ const MAX_OAUTH_ERROR_BYTES = 4096;
 const GITHUB_CALLBACK_ERRORS = new Set(["GITHUB_IDENTITY_CONFLICT", "ACCOUNT_CHANGED"]);
 const GITHUB_CALLBACK_PATHS = new Set(["/api/auth/github/callback", "/api/integrations/github/callback"]);
 const HTML_SHELL_CACHE_CONTROL = "no-cache";
-const STATIC_SECURITY_HEADERS = {
-  "X-Content-Type-Options": "nosniff",
-  "Referrer-Policy": "strict-origin-when-cross-origin",
-};
-const HTML_SHELL_SECURITY_HEADERS = {
-  "X-Frame-Options": "DENY",
-  "Content-Security-Policy": htmlContentSecurityPolicy(),
-};
+const HTML_SHELL_SECURITY_HEADERS = htmlSecurityHeaders();
 
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     if (isApiRequest(url)) {
-      return proxyApiRequest(request, env, url);
+      return withTransportSecurity(await proxyApiRequest(request, env, url), url);
     }
     if (!env.ASSETS) {
-      return json({ message: "Static assets binding is not configured." }, 500);
+      return withTransportSecurity(json({ message: "Static assets binding is not configured." }, 500), url);
     }
-    return withStaticAssetHeaders(await env.ASSETS.fetch(request));
+    return withTransportSecurity(withStaticAssetHeaders(await env.ASSETS.fetch(request)), url);
   },
 };
 
@@ -83,6 +80,9 @@ export async function proxyApiRequest(request, env, incomingUrl = new URL(reques
   let response = await fetchUpstream(targetUrl, init);
   const fallbackOrigin = fallbackApiOrigin(env);
   if (await shouldRetryCloudflare1003(response, upstreamOrigin, fallbackOrigin, request)) {
+    // The inspected clone is exhausted, and the original body will no longer
+    // reach the client. Release it without delaying the fallback fetch.
+    void response.body?.cancel().catch(() => {});
     response = await fetchUpstream(new URL(backendPathWithSearch, fallbackOrigin), init);
   }
   return proxyResponse(response, request, incomingUrl);
@@ -163,6 +163,17 @@ function withStaticAssetHeaders(response) {
       headers.set(name, value);
     }
   }
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  });
+}
+
+export function withTransportSecurity(response, url) {
+  if (url.protocol !== "https:") return response;
+  const headers = new Headers(response.headers);
+  headers.set("Strict-Transport-Security", STRICT_TRANSPORT_SECURITY);
   return new Response(response.body, {
     status: response.status,
     statusText: response.statusText,

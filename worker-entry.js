@@ -1,4 +1,4 @@
-import baseWorker from "./worker.js";
+import baseWorker, { withTransportSecurity } from "./worker.js";
 import { renderSeoHead, seoMetadataForPath } from "./src/lib/seo.js";
 import { htmlContentSecurityPolicy } from "./security-headers.js";
 
@@ -23,12 +23,12 @@ export default {
       url.protocol = "https:";
       url.port = "";
       if (hostname === WWW_HOST) url.hostname = CANONICAL_HOST;
-      return canonicalRedirect(url, env);
+      return canonicalRedirect(url, env, request);
     }
     if (hostname === WWW_HOST) {
       url.hostname = CANONICAL_HOST;
       url.protocol = "https:";
-      return canonicalRedirect(url, env);
+      return canonicalRedirect(url, env, request);
     }
 
     let response = await baseWorker.fetch(request, env);
@@ -54,10 +54,10 @@ export default {
   },
 };
 
-function canonicalRedirect(url, env) {
+function canonicalRedirect(url, env, request) {
   const headers = new Headers({ Location: url.href });
   if (env.NORULO_MODE === "preview") headers.set("X-Robots-Tag", "noindex, nofollow");
-  return new Response(null, { status: 308, headers });
+  return withTransportSecurity(new Response(null, { status: 308, headers }), new URL(request.url));
 }
 
 function isHtmlResponse(response) {

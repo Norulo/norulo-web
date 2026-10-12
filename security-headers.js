@@ -2,6 +2,25 @@
 // this hash aligned with index.html; security-headers.test.js checks its bytes.
 export const THEME_BOOTSTRAP_HASH = "sha256-1F/1Oh03zl+94G1RlYByAJCYDweLbJXS6JpGtSn68xs=";
 
+// Start with a host-only six-month policy. Subdomains and browser preload need
+// their own HTTPS readiness review before either can be enabled.
+export const STRICT_TRANSPORT_SECURITY = "max-age=15552000";
+
+export const STATIC_SECURITY_HEADERS = {
+  "X-Content-Type-Options": "nosniff",
+  "Referrer-Policy": "strict-origin-when-cross-origin",
+  // None of these browser capabilities is used by the app. Clipboard access
+  // remains available for invitation links, API keys and API documentation.
+  "Permissions-Policy": "camera=(), microphone=(), geolocation=(), payment=()",
+};
+
+export function htmlSecurityHeaders(inlineScriptHashes = []) {
+  return {
+    "X-Frame-Options": "DENY",
+    "Content-Security-Policy": htmlContentSecurityPolicy(inlineScriptHashes),
+  };
+}
+
 export function htmlContentSecurityPolicy(inlineScriptHashes = []) {
   const scriptSources = [
     "'self'",

@@ -1,9 +1,5 @@
 import { noruloApi } from "../api/norulo.js";
 import { captureGitHubRefreshScope } from "../api/github-refresh.js";
-import {
-  clearGitHubRepositoryAccessRefreshNeeded,
-  markGitHubRepositoryAccessRefreshNeeded,
-} from "./github-repository-access-refresh.js";
 import { openGitHubInstallPopup } from "./install-popup.js";
 import { pathFromScreen } from "./navigation.js";
 import { safeGitHubAuthorizeUrl, safeGitHubInstallationUrl } from "./trusted-redirects.js";
@@ -218,7 +214,6 @@ export async function connectGitHubRepositories({
   if (!result?.url) {
     if (result?.connected) {
       await verifyConnectedRepositories({ scope, signal, syncPayload: repositorySyncPayload });
-      clearGitHubRepositoryAccessRefreshNeeded();
       return;
     }
     throw new Error(
@@ -227,7 +222,6 @@ export async function connectGitHubRepositories({
   }
 
   const authorizeUrl = safeGitHubInstallationUrl(result.url, "GitHub repository authorization URL");
-  markGitHubRepositoryAccessRefreshNeeded();
   const popupSyncPayload = repositorySyncPayload
     ? { ...repositorySyncPayload, requireCloseSyncReady: true }
     : undefined;
@@ -239,20 +233,16 @@ export async function connectGitHubRepositories({
     const outcome = await completion;
     assertAuthorizationActive(scope, signal);
     if (outcome?.repositories) {
-      clearGitHubRepositoryAccessRefreshNeeded();
       return outcome;
     }
   } catch (error) {
-    if (scope === captureGitHubRefreshScope()) clearGitHubRepositoryAccessRefreshNeeded();
     throw normalizeGitHubPopupError(error);
   }
   try {
     await verifyConnectedRepositories({ scope, signal, syncPayload: repositorySyncPayload });
   } catch (error) {
-    if (scope === captureGitHubRefreshScope()) markGitHubRepositoryAccessRefreshNeeded();
     throw normalizeGitHubPopupError(error);
   }
-  clearGitHubRepositoryAccessRefreshNeeded();
 }
 
 export async function manageGitHubInstallation(
@@ -283,14 +273,12 @@ export async function manageGitHubInstallation(
   };
   const completion = openGitHubInstallPopup(manageUrl, popupSyncPayload, { scope, signal, nonce });
   if (!completion) {
-    markGitHubRepositoryAccessRefreshNeeded();
     return redirectToGitHub(manageUrl, scope, signal);
   }
   try {
     const outcome = await completion;
     assertAuthorizationActive(scope, signal);
     if (outcome?.repositories) {
-      clearGitHubRepositoryAccessRefreshNeeded();
       return outcome;
     }
   } catch (error) {
@@ -302,10 +290,8 @@ export async function manageGitHubInstallation(
     assertAuthorizationActive(scope, signal);
     assertRepositoryAuthorization(repositories, cleanInstallationId);
   } catch (error) {
-    if (scope === captureGitHubRefreshScope()) markGitHubRepositoryAccessRefreshNeeded();
     throw normalizeGitHubPopupError(error);
   }
-  clearGitHubRepositoryAccessRefreshNeeded();
 }
 
 export async function signOut() {

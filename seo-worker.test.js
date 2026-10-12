@@ -45,6 +45,7 @@ describe("SEO Worker shell", () => {
       expect(response.status).toBe(308);
       expect(response.headers.get("Location")).toBe(target);
       expect(response.headers.get("X-Robots-Tag")).toBe("noindex, nofollow");
+      expect(response.headers.get("Strict-Transport-Security")).toBeNull();
       expect(assets.fetch).not.toHaveBeenCalled();
       expect(service.fetch).not.toHaveBeenCalled();
       expect(network).not.toHaveBeenCalled();
@@ -70,6 +71,7 @@ describe("SEO Worker shell", () => {
       expect(response.status).toBe(403);
       expect(await response.json()).toEqual({ error: { code: "HTTPS_REQUIRED" } });
       expect(response.headers.get("Location")).toBeNull();
+      expect(response.headers.get("Strict-Transport-Security")).toBeNull();
       expect(response.headers.get("Cache-Control")).toBe("no-store");
       expect(assets.fetch).not.toHaveBeenCalled();
       expect(service.fetch).not.toHaveBeenCalled();
@@ -137,6 +139,7 @@ describe("SEO Worker shell", () => {
 
     expect(response.status).toBe(308);
     expect(response.headers.get("Location")).toBe("https://norulo.com/pricing?ref=launch");
+    expect(response.headers.get("Strict-Transport-Security")).toBe("max-age=15552000");
     expect(assets.fetch).not.toHaveBeenCalled();
   });
 

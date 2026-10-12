@@ -239,12 +239,26 @@ unverified.
 
 ## Local development
 
+Use Node 22.12 or newer. Wrangler is pinned in the npm lockfile; deployment
+scripts use the installed CLI without downloading another version.
+
 ```bash
 npm ci
 npm run dev
 ```
 
-The development server runs at `http://localhost:5173`. Set `VITE_API_BASE_URL=/api` when proxying to a local Server Worker configured in `vite.config.js`. Set `VITE_GITHUB_APP_SLUG` only for the public GitHub installation link. Browser environment variables must never contain GitHub, Creem, or Jev secrets.
+The development server runs at `http://127.0.0.1:5173`. Development and preview
+listen on loopback by default. For deliberate LAN access, use
+`npm run dev -- --host 0.0.0.0` or `npm run preview -- --host 0.0.0.0`.
+Set `VITE_API_BASE_URL=/api` when proxying to a local Server Worker configured
+in `vite.config.js`. Set `VITE_GITHUB_APP_SLUG` only for the public GitHub
+installation link. Browser environment variables must never contain GitHub,
+Creem, or Jev secrets.
+
+Local Creem sandbox workflows must explicitly set `VITE_CREEM_MODE=test` to
+accept `test-checkout.creem.io`. Production-mode builds reject that host even
+when this flag is set. Live checkout permits the exact `checkout.creem.io`
+host and `/checkout/` paths on `creem.io` and `www.creem.io`.
 
 The supplied Cloudflare deployment uses the same-origin `/api` proxy and a
 `connect-src 'self'` content security policy. Absolute API bases are accepted for
@@ -304,6 +318,10 @@ license, and font sizes follow browser preferences through rem units.
 `wrangler.jsonc` maps `norulo.com` and `www.norulo.com` to `norulo-web` and binds API traffic to `norulo-server-production`, with `https://api.norulo.com` as the configured API origin. The production frontend has been published with these custom domains and bindings. Coordinate OAuth callbacks, cookies and allowed origins before provider acceptance. Do not put secrets in `wrangler.jsonc`.
 
 Both configurations bind `ASSETS` and run the Worker first for HTML/API paths while serving `/assets/*` directly. This lets production apply route-specific SEO, private-page noindex and the `www` canonical redirect; production mode keeps public pages indexable. Preview mode adds a site-wide noindex header. The offline config guard checks both modes and routing shapes. This production-ready configuration does not activate or migrate the Server database.
+
+`security-headers.js` owns the browser security policy. Vite generates
+`dist/_headers` from it during every build for direct static responses; the
+Worker uses the same values and adds the exact hash for route JSON-LD.
 
 See [deployment status](docs/deployment.md) for current published versions and
 remaining production gates, and [migration notes](docs/migration.md) for current

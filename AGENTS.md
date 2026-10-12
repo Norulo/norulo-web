@@ -191,7 +191,7 @@ browser favicon use. `npm run generate:social-card` rasterizes the local SVG.
 
 ## Local verification and external operations
 
-Use Node ^20.19.0 or >=22.12.0 and the committed npm lockfile. Run `npm ci`,
+Use Node >=22.12.0 (including the pinned Wrangler CLI) and the committed npm lockfile. Run `npm ci`,
 `npm run check` (lint, all tests, build) and `npm run check:workers` (offline).
 After a completed build use applicable bounded Playwright layout scripts from
 package.json. Browser fixtures are local evidence, not actual provider/device

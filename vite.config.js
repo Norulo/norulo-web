@@ -1,11 +1,12 @@
 import { resolve } from "node:path";
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
+import { securityHeadersPlugin } from "./scripts/generate-security-headers.mjs";
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), securityHeadersPlugin()],
   server: {
-    host: "0.0.0.0",
+    host: "127.0.0.1",
     port: 5173,
     proxy: {
       "^/api(?:/|\\?|$)": {
@@ -31,7 +32,7 @@ export default defineConfig({
     },
   },
   preview: {
-    host: "0.0.0.0",
+    host: "127.0.0.1",
     port: 4173,
   },
   build: {

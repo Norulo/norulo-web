@@ -271,6 +271,117 @@ describe("API screens", () => {
     expect(screen.queryByText(/no api keys have been created/i)).not.toBeInTheDocument();
   });
 
+  it("loads another key page only on request and blocks overlapping reads and writes", async () => {
+    const second = deferredPromise();
+    noruloApi.apiKeys.list
+      .mockResolvedValueOnce({ items: [{ id: "key_1", name: "First page key" }], nextCursor: "cursor_1" })
+      .mockReturnValueOnce(second.promise);
+    render(<ApiKeysScreen go={vi.fn()} workspace={workspaceFixture("wsp_team")} />);
+    expect(await screen.findByText("First page key")).toBeVisible();
+    expect(noruloApi.apiKeys.list).toHaveBeenCalledOnce();
+    const more = screen.getByRole("button", { name: "Load more" });
+    fireEvent.click(more);
+    fireEvent.click(more);
+    fireEvent.submit(screen.getByRole("button", { name: "Create key" }).closest("form"));
+    expect(noruloApi.apiKeys.list).toHaveBeenCalledTimes(2);
+    expect(noruloApi.apiKeys.list).toHaveBeenLastCalledWith(
+      { workspaceId: "wsp_team", cursor: "cursor_1" },
+      { signal: expect.any(AbortSignal) }
+    );
+    expect(noruloApi.apiKeys.create).not.toHaveBeenCalled();
+    expect(screen.getByText("First page key")).toBeVisible();
+    expect(more).toBeDisabled();
+    await act(async () => second.resolve({
+      items: [{ id: "key_1", name: "Duplicate key" }, { id: "key_2", name: "Second page key" }],
+      nextCursor: null,
+    }));
+    expect(screen.getByText("First page key")).toBeVisible();
+    expect(screen.getByText("Second page key")).toBeVisible();
+    expect(screen.queryByText("Duplicate key")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Load more" })).not.toBeInTheDocument();
+    expect(noruloApi.apiKeys.list).toHaveBeenCalledTimes(2);
+  });
+
+  it("keeps loaded key rows after a next-page failure and only retries explicitly", async () => {
+    noruloApi.apiKeys.list
+      .mockResolvedValueOnce({ apiKeys: [{ id: "key_1", name: "Loaded key" }], nextCursor: "cursor_1" })
+      .mockRejectedValueOnce(new Error("Next page unavailable"))
+      .mockResolvedValueOnce({ apiKeys: [{ id: "key_2", name: "Recovered key" }], nextCursor: null });
+    render(<ApiKeysScreen go={vi.fn()} />);
+    fireEvent.click(await screen.findByRole("button", { name: "Load more" }));
+    await waitFor(() => expect(screen.getByRole("button", { name: "Load more" })).toBeEnabled());
+    expect(screen.getByText("Loaded key")).toBeVisible();
+    expect(noruloApi.apiKeys.list).toHaveBeenCalledTimes(2);
+    fireEvent.click(screen.getByRole("button", { name: "Load more" }));
+    expect(await screen.findByText("Recovered key")).toBeVisible();
+    expect(screen.getByText("Loaded key")).toBeVisible();
+    expect(noruloApi.apiKeys.list).toHaveBeenCalledTimes(3);
+  });
+
+  it.each([
+    { items: [{ id: "key_2", name: "Rejected page key" }], nextCursor: "cursor_1" },
+    { items: [], nextCursor: "cursor_2" },
+    { items: [{ id: "key_1", name: "Rejected page key" }], nextCursor: "cursor_2" },
+  ])("blocks key pagination that does not advance and requires a reload: %j", async (page) => {
+    noruloApi.apiKeys.list
+      .mockResolvedValueOnce({ items: [{ id: "key_1", name: "Loaded key" }], nextCursor: "cursor_1" })
+      .mockResolvedValueOnce(page);
+    render(<ApiKeysScreen go={vi.fn()} />);
+    fireEvent.click(await screen.findByRole("button", { name: "Load more" }));
+    expect(await screen.findByText("Pagination did not advance. Reload to retry.")).toBeVisible();
+    expect(screen.getByText("Loaded key")).toBeVisible();
+    expect(screen.queryByText("Rejected page key")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Load more" })).not.toBeInTheDocument();
+    expect(noruloApi.apiKeys.list).toHaveBeenCalledTimes(2);
+  });
+
+  it.each([{}, { items: [], nextCursor: "invalid?cursor" }])(
+    "does not turn malformed key pages into successful empty results: %j", async (page) => {
+      noruloApi.apiKeys.list.mockResolvedValueOnce(page);
+      render(<ApiKeysScreen go={vi.fn()} />);
+      expect(await screen.findByRole("heading", { name: "API keys are unavailable" })).toBeVisible();
+      expect(screen.queryByText("No API keys have been created yet.")).not.toBeInTheDocument();
+      expect(noruloApi.apiKeys.list).toHaveBeenCalledOnce();
+    }
+  );
+
+  it.each([
+    workspaceFixture("wsp_other"),
+    workspaceFixture("wsp_team", { memberRevision: 4 }),
+  ])("aborts and discards a next key page after its access scope changes: %j", async (workspace) => {
+    const oldPage = deferredPromise();
+    noruloApi.apiKeys.list
+      .mockResolvedValueOnce({ items: [{ id: "key_1", name: "Old ledger key" }], nextCursor: "cursor_1" })
+      .mockReturnValueOnce(oldPage.promise)
+      .mockResolvedValueOnce({ items: [{ id: "key_current", name: "Current ledger key" }], nextCursor: null });
+    const view = render(<ApiKeysScreen go={vi.fn()} workspace={workspaceFixture("wsp_team")} />);
+    fireEvent.click(await screen.findByRole("button", { name: "Load more" }));
+    const signal = noruloApi.apiKeys.list.mock.calls[1][1].signal;
+    view.rerender(<NotificationProvider><ApiKeysScreen go={vi.fn()} workspace={workspace} /></NotificationProvider>);
+    expect(signal.aborted).toBe(true);
+    expect(await screen.findByText("Current ledger key")).toBeVisible();
+    await act(async () => oldPage.resolve({ items: [{ id: "key_private", name: "Old scope secret" }], nextCursor: "cursor_2" }));
+    expect(screen.queryByText("Old scope secret")).not.toBeInTheDocument();
+    expect(screen.queryByText("Old ledger key")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Load more" })).not.toBeInTheDocument();
+    expect(noruloApi.apiKeys.list).toHaveBeenCalledTimes(3);
+  });
+
+  it("aborts an unfinished next key page on unmount", async () => {
+    const pending = deferredPromise();
+    noruloApi.apiKeys.list
+      .mockResolvedValueOnce({ items: [{ id: "key_1", name: "Loaded key" }], nextCursor: "cursor_1" })
+      .mockReturnValueOnce(pending.promise);
+    const view = render(<ApiKeysScreen go={vi.fn()} />);
+    fireEvent.click(await screen.findByRole("button", { name: "Load more" }));
+    const signal = noruloApi.apiKeys.list.mock.calls[1][1].signal;
+    expect(signal.aborted).toBe(false);
+    view.unmount();
+    expect(signal.aborted).toBe(true);
+    await act(async () => pending.resolve({ items: [], nextCursor: null }));
+    expect(noruloApi.apiKeys.list).toHaveBeenCalledTimes(2);
+  });
+
   it("creates and revokes account-scoped API keys", async () => {
     noruloApi.apiKeys.list.mockResolvedValue({
       apiKeys: [{ id: "key_1", name: "Old key", prefix: "nrk_old" }],
@@ -1378,16 +1489,14 @@ describe("API screens", () => {
     expect(screen.queryByText("Old workspace removed")).not.toBeInTheDocument();
   });
 
-  it("aborts account key reads on unmount and ignores a late failed creation", async () => {
+  it("ignores a late failed account key creation after unmount", async () => {
     const pending = deferredPromise();
     const onAccessChanged = vi.fn();
     noruloApi.apiKeys.list.mockResolvedValue({ apiKeys: [] });
     noruloApi.apiKeys.create.mockReturnValue(pending.promise);
     const view = render(<ApiKeysScreen go={vi.fn()} onAccessChanged={onAccessChanged} />);
     fireEvent.submit((await screen.findByRole("button", { name: "Create key" })).closest("form"));
-    const readSignal = noruloApi.apiKeys.list.mock.calls[0][1]?.signal;
     view.unmount();
-    expect(readSignal?.aborted).toBe(true);
     await act(async () => pending.reject({ status: 403, message: "Late denial" }));
     expect(onAccessChanged).not.toHaveBeenCalled();
   });

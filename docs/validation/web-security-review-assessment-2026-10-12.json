@@ -1,0 +1,94 @@
+{
+  "date": "2026-10-12",
+  "reviewed_base_commit": "506a0d2aad67c9c1e49b1846ccd8089be5cbd007",
+  "method": "Independent current Web source review, local Server authorization/checkout contract inspection, finite public HTTPS headers and Cloudflare management readback; no remote business fixtures or writes.",
+  "findings": [
+    {
+      "id": 1,
+      "assessment": "Confirmed deploy scripts downloaded an unpinned CLI; schema path was unavailable after npm ci. Supply-chain exposure rather than an observed compromise.",
+      "resolution": "Exact Wrangler 4.149.0 and dependency closure in lockfile; npm scripts call installed CLI. Node >=22.12 requirement matches Wrangler and CI. Full audit has zero advisories."
+    },
+    {
+      "id": 2,
+      "assessment": "Confirmed production accepted sandbox checkout host. Deleting creem.io/www.creem.io indiscriminately would break the current Server checkout contract.",
+      "resolution": "Sandbox host requires explicit VITE_CREEM_MODE=test and non-production mode. Retain actual exact live hosts; main domains require /checkout/ paths."
+    },
+    {
+      "id": 3,
+      "assessment": "Confirmed API key helper automatically enumerated up to 100 remote pages.",
+      "resolution": "One page per request; explicit Load more, scope/abort fences, deduplication, cursor progress checks and failed-page recovery retaining loaded records."
+    },
+    {
+      "id": 4,
+      "assessment": "Reported focus retry loop is not active in production: hook and stored-flag reader had no production callers. Unscoped dormant storage code was real design debt.",
+      "resolution": "Delete unused hook and stored flag writes; keep account-scoped bounded GitHub renewal, popup verification and explicit user failure recovery."
+    },
+    {
+      "id": 5,
+      "assessment": "Confirmed public HTTPS response lacked HSTS and Permissions-Policy. This is defense-in-depth; no exploit demonstrated.",
+      "resolution": "Host-only HSTS max-age=15552000 on HTTPS; disable unused camera/microphone/geolocation/payment capabilities and preserve clipboard."
+    },
+    {
+      "id": 6,
+      "assessment": "Confirmed duplicate hand-maintained CSP; existing drift test reduced immediate risk.",
+      "resolution": "Generate dist/_headers during Vite build from the module shared with Worker, retaining per-route cache controls and exact JSON-LD hashes."
+    }
+  ],
+  "additional_changes": [
+    "Default Vite dev/preview to loopback with explicit CLI LAN opt-in.",
+    "Cancel discarded upstream response body without blocking fallback fetch.",
+    "Return validated parsed URL.href and reject raw controls/embedded credentials across trusted redirects. Original praise of GitHub guards was incomplete.",
+    "Pin official CI actions to verified immutable commit SHAs."
+  ],
+  "retained_items": [
+    "CSV workspaceId query is explicitly supported in OpenAPI; Server rejects duplicate/empty/conflicting selectors and maps query to the same header-based authorization path, including streamed-page authorization.",
+    "Five-minute transport timeout is UX/design debt with per-request overrides; no latency evidence justifies broad timeout changes in this security release.",
+    "Large ledger screen is refactoring debt; avoid mixing concurrency-sensitive structural changes into security remediation."
+  ],
+  "limitations": [
+    "No absolute absence-of-vulnerability claim; review and local assertions cover the stated scope.",
+    "No production sign-in, provider authorization, checkout, payment or data mutation was performed.",
+    "Only installed Chromium ran locally; Firefox/WebKit were unavailable. Existing CI retains all three browser engines."
+  ],
+  "local_verification": {
+    "npm_ci": "passed",
+    "lint": "passed",
+    "tests": {
+      "files": 86,
+      "passed": 1831,
+      "failed": 0
+    },
+    "build": "passed",
+    "workers_offline": "passed",
+    "full_dependency_audit": {
+      "advisories": 0
+    },
+    "registry_signatures_verified": 365,
+    "registry_attestations_verified": 67,
+    "generated_headers_match_shared_module": true,
+    "independent_final_source_review": "passed",
+    "browser_layout": {
+      "engine": "Chromium 154.0.8037.57",
+      "states": 258,
+      "profiles": 4,
+      "passed": true,
+      "physical_device_acceptance": false
+    },
+    "api_key_browser": {
+      "engine": "chromium 154.0.8037.57",
+      "scenarios": [
+        "desktop-explicit-page",
+        "phone-320-failure-manual-retry",
+        "identity-change-stale-page"
+      ],
+      "passed": true,
+      "remote_requests": 0,
+      "writes": 0,
+      "phone_button_height_px": 44,
+      "stale_account_page_aborted": true,
+      "product_source_sha256": "45c478529cc0b97796b514cd0a80c86599ef42dd5da97835c73506af7bb9f144"
+    },
+    "production_build": "passed with explicit Norulo production origin and same-origin API",
+    "wrangler_dry_run": "passed with pinned Wrangler 4.149.0"
+  }
+}

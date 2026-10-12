@@ -7,12 +7,9 @@ const GITHUB_AUTH_PATHS = new Set(["/auth/github/authorize", "/api/auth/github/a
 const LOCAL_GITHUB_CALLBACK_PATHS = new Set(["/auth/github/callback", "/api/auth/github/callback"]);
 const GITHUB_INTEGRATION_PATH_PREFIXES = ["/integrations/github/", "/api/integrations/github/"];
 
-const TRUSTED_BILLING_PROVIDER_HOSTS = new Set([
-  "checkout.creem.io",
-  "test-checkout.creem.io",
-  "creem.io",
-  "www.creem.io",
-]);
+const TRUSTED_BILLING_PROVIDER_HOSTS = new Set(["checkout.creem.io"]);
+const TRUSTED_BILLING_CHECKOUT_PATH_HOSTS = new Set(["creem.io", "www.creem.io"]);
+const TEST_BILLING_PROVIDER_HOST = "test-checkout.creem.io";
 const TRUSTED_BILLING_FIRST_PARTY_HOSTS = new Set(["norulo.com"]);
 
 function currentOrigin() {
@@ -74,16 +71,34 @@ function hasControlCharacter(value) {
   return [...value].some((char) => char.charCodeAt(0) < 32 || char.charCodeAt(0) === 127);
 }
 
+function isTrustedBillingProvider(parsed) {
+  if (TRUSTED_BILLING_PROVIDER_HOSTS.has(parsed.hostname)) return true;
+  if (TRUSTED_BILLING_CHECKOUT_PATH_HOSTS.has(parsed.hostname)) {
+    return parsed.pathname.startsWith("/checkout/");
+  }
+  return (
+    parsed.hostname === TEST_BILLING_PROVIDER_HOST &&
+    import.meta.env.MODE !== "production" &&
+    import.meta.env.VITE_CREEM_MODE === "test"
+  );
+}
+
 export function safeHttpUrl(value, label) {
   if (typeof value !== "string") throw new Error(`A safe ${label} is required.`);
-  const url = value.trim();
-  if (hasControlCharacter(url)) {
+  if (hasControlCharacter(value)) {
     throw new Error(`A safe ${label} is required.`);
   }
+  const url = value.trim();
 
   try {
     const parsed = new URL(url);
-    if (["http:", "https:"].includes(parsed.protocol) && parsed.hostname) return url;
+    if (
+      ["http:", "https:"].includes(parsed.protocol) &&
+      parsed.hostname &&
+      !parsed.username &&
+      !parsed.password
+    )
+      return parsed.href;
   } catch {
     // handled by the common error below
   }
@@ -120,15 +135,11 @@ export function safeGitHubInstallationUrl(value, label) {
 }
 
 export function safeBillingRedirectUrl(value, label) {
-  if (typeof value === "string" && hasControlCharacter(value)) {
-    throw new Error(`A safe ${label} is required.`);
-  }
   const url = safeHttpUrl(value, label);
   const parsed = new URL(url);
   const hostname = parsed.hostname.toLowerCase();
 
-  if (parsed.username || parsed.password) throw new Error(`A safe ${label} is required.`);
-  if (parsed.protocol === "https:" && !parsed.port && TRUSTED_BILLING_PROVIDER_HOSTS.has(hostname))
+  if (parsed.protocol === "https:" && !parsed.port && isTrustedBillingProvider(parsed))
     return url;
   if (isSameOrigin(parsed)) return url;
   if (

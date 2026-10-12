@@ -452,27 +452,33 @@
 .ledger-your-projects .ledger-search:focus-within {
   border-color: var(--accent);
 }
-/* Search and status share one control row and one top edge; the status
-   label reads inline as the select's prefix. */
+/* Search and status share one control row and one top edge. The status
+   label reads inline as the select's prefix while both fit at their natural
+   widths; otherwise the select wraps below it and takes the full width. A
+   native select is never squeezed below its own content, which some engines
+   refuse to do anyway. */
 .ledger-screen .main .ledger-your-projects .ledger-project-status {
   display: flex;
   flex: 0 1 auto;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 10px;
+  gap: 8px 10px;
 }
 .ledger-your-projects .ledger-project-filters {
   align-items: center;
 }
 .ledger-your-projects .ledger-project-status > :is(label, .ledger-project-label-skeleton) {
-  flex: 0 0 auto;
+  flex: 0 1 auto;
+  min-width: 0;
   color: var(--text-3);
   font-size: var(--fs-md);
   font-weight: 500;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
 }
 .ledger-screen .main .ledger-your-projects .ledger-project-status > select {
+  flex: 1 1 auto;
   width: auto;
-  min-width: 10rem;
+  min-width: min(10rem, 100%);
   min-height: 44px;
 }
 .ledger-your-projects .ledger-search-guidance {
@@ -629,10 +635,6 @@
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     gap: 12px;
-  }
-  .ledger-screen .main .ledger-your-projects .ledger-project-status > select {
-    flex: 1 1 auto;
-    min-width: 0;
   }
   .ledger-your-projects .ledger-project-toolbar {
     align-items: stretch;

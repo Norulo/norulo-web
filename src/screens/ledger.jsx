@@ -3250,7 +3250,7 @@ function ScopedLedgerScreen({
                 reviewDisabled={blocked || showExpenseForm || expenses.length === 0}
               />
               {data.project?.status === "archived" && (
-                <div className="notice" role="status">
+                <div className="notice notice-borderless" role="status">
                   {canManageProjects
                     ? T(
                         "This project is archived. Its expenses, reports and exports remain available. Reactivate it in Project settings to add expenses.",

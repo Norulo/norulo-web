@@ -1162,8 +1162,8 @@ a.crumb-button:where(:not([aria-disabled="true"])):hover {
   white-space: normal;
 }
 
-/* Shared inline notice: accent-railed soft box for messages, guides and
-   suggestion panels. Variants adjust layout and padding only. */
+/* Shared inline notice: soft box for messages, guides and suggestion panels.
+   Variants adjust the accent rail, layout and padding. */
 .notice {
   border-left: 3px solid var(--accent);
   background: var(--bg-soft);
@@ -1171,6 +1171,9 @@ a.crumb-button:where(:not([aria-disabled="true"])):hover {
   margin-bottom: var(--space-5);
   line-height: 1.7;
   overflow-wrap: anywhere;
+}
+.notice-borderless {
+  border-left: 0;
 }
 .notice-guide {
   display: flex;

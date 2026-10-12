@@ -1,5 +1,18 @@
 # Norulo production deployment
 
+The archived-project notice style release was verified on 2026-10-12. Web source
+`6b95e2588be5b0e73469f07c16040c47aa1d7248` is deployed as version
+`06408ecb-6430-4b22-8ac3-9eabe5bf5b1b` with 100% production traffic.
+The archive notice no longer has a left accent border; its background and the
+selected Tab underline are preserved. All 1,805 tests, lint, production build,
+offline Worker checks and Wrangler dry-run passed. Local Chromium verified
+eight archive-notice states across light/dark desktop/phone views and 74 existing
+Projects layout states. Firefox and WebKit executables were unavailable locally.
+Production readback matched 14 static assets byte-for-byte and confirmed that
+the homepage references the current build. Production configuration was retained;
+Server remains at version `2a1a1086-a0ce-40c1-8e83-5b5e7d6b3a9d`.
+See the [archive-notice production release record](validation/archived-notice-border-production-release-2026-10-12.json).
+
 The console record alignment release was verified on 2026-10-12. Web source
 `ead7e33cea6d2fe0e2eaa8eafbeee4ba9638b885` is deployed as version
 `7b89fa52-6e8c-4014-92bc-3322bc9df341` with 100% production traffic.
@@ -85,12 +98,12 @@ Release A's hourly publication is retained below as historical evidence.
 ## Published frontend
 
 Cloudflare publication of the frontend application completed successfully using
-Web main commit `9cb56ff0e922740d0c6eee648244723d55279a3e`:
+Web main source commit `6b95e2588be5b0e73469f07c16040c47aa1d7248`:
 
 | Setting | Published value |
 | --- | --- |
 | Worker | `norulo-web` |
-| Version | `96423614-f893-4710-b8c9-ad76c03173ef` |
+| Version | `06408ecb-6430-4b22-8ac3-9eabe5bf5b1b` |
 | Custom domains | `norulo.com`, `www.norulo.com` |
 | Mode | `production` |
 | API origin | `https://api.norulo.com` |

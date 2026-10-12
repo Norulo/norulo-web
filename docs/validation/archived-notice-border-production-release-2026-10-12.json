@@ -1,0 +1,307 @@
+{
+  "verified_at_beijing": "2026-10-12T18:25:14.480627+08:00",
+  "source_commit": "6b95e2588be5b0e73469f07c16040c47aa1d7248",
+  "github_main_published_before_deployment": true,
+  "worker_name": "norulo-web",
+  "account_id": "84e421f26c708c0cf437e287eed11fa1",
+  "web_version": "06408ecb-6430-4b22-8ac3-9eabe5bf5b1b",
+  "traffic_percentage": 100,
+  "retained_server_version": "2a1a1086-a0ce-40c1-8e83-5b5e7d6b3a9d",
+  "passed": true,
+  "change": "Remove only the archived-project notice left accent border; retain its background and selected Tab underline.",
+  "local_checks": {
+    "npm_ci": "passed with committed lockfile and workspace cache",
+    "npm_run_check": {
+      "lint": "passed",
+      "test_files": 87,
+      "tests_passed": 1805,
+      "tests_failed": 0,
+      "build": "passed"
+    },
+    "worker_config": "passed",
+    "production_build": "passed with VITE_APP_URL=https://norulo.com, VITE_API_BASE_URL=/api, VITE_GITHUB_APP_SLUG=norulo",
+    "wrangler_dry_run": "passed, Wrangler 4.136.3",
+    "independent_source_review": "no blocking findings",
+    "git_diff_check": "passed",
+    "optional_prettier_check": {
+      "css_and_release_json": "passed",
+      "ledger_jsx_and_deployment_markdown": "pre-existing formatting warnings also reproduced from baseline main 203e0a3; no unrelated reformatting"
+    }
+  },
+  "local_browser_validation": {
+    "engine": "chromium",
+    "version": "154.0.8037.57",
+    "contexts": 4,
+    "states": 8,
+    "passed": true,
+    "profiles": [
+      {
+        "name": "desktop-dark",
+        "theme": "dark",
+        "width": 1440,
+        "height": 900,
+        "touch": false
+      },
+      {
+        "name": "desktop-light",
+        "theme": "light",
+        "width": 1440,
+        "height": 900,
+        "touch": false
+      },
+      {
+        "name": "phone-dark",
+        "theme": "dark",
+        "width": 390,
+        "height": 844,
+        "touch": true
+      },
+      {
+        "name": "phone-light",
+        "theme": "light",
+        "width": 390,
+        "height": 844,
+        "touch": true
+      }
+    ],
+    "left_border_width": "0px",
+    "backgrounds": {
+      "dark": "rgb(20, 20, 20)",
+      "light": "rgb(241, 240, 239)"
+    },
+    "background_matches_original": true,
+    "tab_underline": "2px solid var(--accent)",
+    "expenses_and_reports_verified": true,
+    "existing_projects_layout": {
+      "contexts": 9,
+      "states": 74,
+      "passed": true
+    },
+    "limitations": [
+      "Simulated local viewports with GET-only API fixtures; not authenticated customer acceptance.",
+      "Firefox and WebKit executables were unavailable in the workspace browser cache."
+    ],
+    "business_writes": 0,
+    "external_responses": 0
+  },
+  "management_readback": {
+    "web_deployment": {
+      "id": "f544d3cf-5443-47f5-a4a7-1e884b165a8e",
+      "created_on": "2026-10-12T10:24:57.245495Z",
+      "versions": [
+        {
+          "version_id": "06408ecb-6430-4b22-8ac3-9eabe5bf5b1b",
+          "percentage": 100
+        }
+      ],
+      "annotations": {
+        "workers/message": "Remove archived project notice accent border (6b95e2588be5b0e73469f07c16040c47aa1d7248)",
+        "workers/triggered_by": "deployment"
+      }
+    },
+    "server_deployment": {
+      "id": "573ab1c2-5568-4580-b904-e0f9ac50d53c",
+      "versions": [
+        {
+          "version_id": "2a1a1086-a0ce-40c1-8e83-5b5e7d6b3a9d",
+          "percentage": 100
+        }
+      ]
+    },
+    "settings": {
+      "bindings": [
+        {
+          "name": "ASSETS",
+          "type": "assets"
+        },
+        {
+          "name": "NORULO_API_ORIGIN",
+          "text": "https://api.norulo.com",
+          "type": "plain_text"
+        },
+        {
+          "name": "NORULO_MODE",
+          "text": "production",
+          "type": "plain_text"
+        },
+        {
+          "environment": "production",
+          "name": "NORULO_SERVER",
+          "service": "norulo-server-production",
+          "type": "service"
+        }
+      ],
+      "compatibility_date": "2026-05-25",
+      "observability": {
+        "enabled": true,
+        "head_sampling_rate": 1,
+        "redact_query_string": true,
+        "logs": {
+          "enabled": true,
+          "head_sampling_rate": 0.01,
+          "persist": true,
+          "invocation_logs": false
+        },
+        "traces": {
+          "enabled": false,
+          "persist": true,
+          "head_sampling_rate": 1
+        },
+        "issues": {
+          "enabled": true
+        }
+      }
+    },
+    "subdomain": {
+      "enabled": false,
+      "previews_enabled": false
+    },
+    "domains": [
+      {
+        "hostname": "norulo.com",
+        "service": "norulo-web",
+        "environment": "production",
+        "enabled": true,
+        "previews_enabled": false
+      },
+      {
+        "hostname": "www.norulo.com",
+        "service": "norulo-web",
+        "environment": "production",
+        "enabled": true,
+        "previews_enabled": false
+      }
+    ],
+    "configuration_preserved": true,
+    "server_version_preserved": true
+  },
+  "public_readback": {
+    "responses": 15,
+    "byte_identical_assets": 14,
+    "homepage_references_current_build": true,
+    "results": [
+      {
+        "path": "assets/i18n-B2aVivJ7.js",
+        "status": 200,
+        "content_type": "text/javascript",
+        "bytes": 8348,
+        "sha256": "9020ada2dbd20cb1e0527885afc22340e48c505109d618eccc68fd0172c75f9d",
+        "matches_local_dist": true
+      },
+      {
+        "path": "assets/index-Bbmx0zgL.js",
+        "status": 200,
+        "content_type": "text/javascript",
+        "bytes": 119936,
+        "sha256": "77802dbedbe9f1b4832702533e028d2f6225c4613f3b17eafc53c288a2f5f0cb",
+        "matches_local_dist": true
+      },
+      {
+        "path": "assets/index-BdnT1kGy.css",
+        "status": 200,
+        "content_type": "text/css",
+        "bytes": 68720,
+        "sha256": "298b18663f6632726ff7d6946af16712903e5e6dc43221bbc62f0be817db9a46",
+        "matches_local_dist": true
+      },
+      {
+        "path": "assets/ledger-B2K5OMzc.js",
+        "status": 200,
+        "content_type": "text/javascript",
+        "bytes": 114863,
+        "sha256": "37c0d4475c7a78ba0318101cfe161b0a185ea0da9264b87633b85225517910ca",
+        "matches_local_dist": true
+      },
+      {
+        "path": "assets/ledger-Bx8BdLCh.css",
+        "status": 200,
+        "content_type": "text/css",
+        "bytes": 3457,
+        "sha256": "7d56ba535172bb9983a6c4be6a0c1277e40f62f9a935763ab577d255eb6871ef",
+        "matches_local_dist": true
+      },
+      {
+        "path": "assets/ledger-ChZ_GJN_.css",
+        "status": 200,
+        "content_type": "text/css",
+        "bytes": 32414,
+        "sha256": "95c7c2c1db2cc43e0b2777b7d007293cad0e2741a8c6346b2ea1ebddc8521870",
+        "matches_local_dist": true
+      },
+      {
+        "path": "assets/ledger-overview-CdXBm3pM.js",
+        "status": 200,
+        "content_type": "text/javascript",
+        "bytes": 4788,
+        "sha256": "faa02d7c7878d61cda66300ef63032f6753809e56ad193e23b5537054f1e8bab",
+        "matches_local_dist": true
+      },
+      {
+        "path": "assets/ledger-split-JeqKS3if.js",
+        "status": 200,
+        "content_type": "text/javascript",
+        "bytes": 1530,
+        "sha256": "9ecc5eabc45e7e5f698d39772de3f27d0e1cc24b576353cbf606672333821204",
+        "matches_local_dist": true
+      },
+      {
+        "path": "assets/ledger-summary-lm5Xq1Bl.js",
+        "status": 200,
+        "content_type": "text/javascript",
+        "bytes": 5189,
+        "sha256": "18948a9d43c992c382452e72d9fd08803912024c4b0befa81a5b995421d61fe9",
+        "matches_local_dist": true
+      },
+      {
+        "path": "assets/navigation-DHQunuIk.js",
+        "status": 200,
+        "content_type": "text/javascript",
+        "bytes": 8422,
+        "sha256": "3263b96060ca8322c4c1cf88bb6d4476f95045a1510c15f30698085e21c8f528",
+        "matches_local_dist": true
+      },
+      {
+        "path": "assets/norulo-D748eonE.js",
+        "status": 200,
+        "content_type": "text/javascript",
+        "bytes": 3009,
+        "sha256": "86838a6558dcef036f6bac01babc8a25bc119f16689ed1cdb213491f1baa68c4",
+        "matches_local_dist": true
+      },
+      {
+        "path": "assets/rolldown-runtime-Bh1tDfsg.js",
+        "status": 200,
+        "content_type": "text/javascript",
+        "bytes": 567,
+        "sha256": "1b13387cb23dc39bf70e31677c21f6db5cad3377b96f286b6ee444496e5bfea7",
+        "matches_local_dist": true
+      },
+      {
+        "path": "assets/vendor-CHwUWPSh.js",
+        "status": 200,
+        "content_type": "text/javascript",
+        "bytes": 56389,
+        "sha256": "bb88671736f2acdd1ab57aa4ca82fd7fa055a58dc8bf06a9a3f41f49dcb355e1",
+        "matches_local_dist": true
+      },
+      {
+        "path": "assets/vendor-react-9XhioiGP.js",
+        "status": 200,
+        "content_type": "text/javascript",
+        "bytes": 139888,
+        "sha256": "109ae04dfb036b92515ae052411c426365e48876c4b00de7f1d7a289e0e6ef75",
+        "matches_local_dist": true
+      },
+      {
+        "path": "index.html",
+        "status": 200,
+        "content_type": "text/html",
+        "bytes": 5252,
+        "references_current_build": true,
+        "production_canonical_origin": true
+      }
+    ]
+  },
+  "remote_sql_requests": 0,
+  "remote_business_writes": 0
+}

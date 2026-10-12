@@ -30,6 +30,10 @@
 }
 /* The return path sits above the title as a quiet eyebrow, leaving the action
    group to the page's real work. */
+.page-action-placeholder {
+  opacity: 0.4;
+  pointer-events: none;
+}
 .ledger-back-link {
   display: inline-flex;
   align-items: center;
@@ -459,8 +463,7 @@
    refuse to do anyway. */
 .ledger-screen .main .ledger-your-projects .ledger-project-status {
   display: flex;
-  flex: 0 1 auto;
-  flex-wrap: wrap;
+  flex: 0 0 auto;
   align-items: center;
   gap: 8px 10px;
 }
@@ -468,17 +471,16 @@
   align-items: center;
 }
 .ledger-your-projects .ledger-project-status > :is(label, .ledger-project-label-skeleton) {
-  flex: 0 1 auto;
-  min-width: 0;
+  flex: 0 0 auto;
   color: var(--text-3);
   font-size: var(--fs-md);
   font-weight: 500;
-  overflow-wrap: anywhere;
+  white-space: nowrap;
 }
 .ledger-screen .main .ledger-your-projects .ledger-project-status > select {
   flex: 1 1 auto;
   width: auto;
-  min-width: min(10rem, 100%);
+  min-width: 10rem;
   min-height: 44px;
 }
 .ledger-your-projects .ledger-search-guidance {
@@ -635,6 +637,23 @@
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     gap: 12px;
+  }
+  /* The full-width field wraps its select below the label when both cannot
+     fit at their natural widths. */
+  .ledger-screen .main .ledger-your-projects .ledger-project-status {
+    flex-wrap: wrap;
+  }
+  .ledger-screen .main .ledger-your-projects .ledger-project-status {
+    flex: 1 1 auto;
+  }
+  .ledger-screen .main .ledger-your-projects .ledger-project-status > select {
+    min-width: min(10rem, 100%);
+  }
+  .ledger-your-projects .ledger-project-status > :is(label, .ledger-project-label-skeleton) {
+    flex: 0 1 auto;
+    min-width: 0;
+    white-space: normal;
+    overflow-wrap: anywhere;
   }
   .ledger-your-projects .ledger-project-toolbar {
     align-items: stretch;

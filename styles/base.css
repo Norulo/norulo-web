@@ -749,11 +749,11 @@ a.crumb-button:where(:not([aria-disabled="true"])):hover {
   background: var(--bg);
 }
 
-/* Console content keeps a comfortable measure on very wide screens. */
+/* Console content uses the full width beside the sidebar. */
 .main {
   padding: var(--space-8) 40px calc(88px + env(safe-area-inset-bottom));
   min-width: 0;
-  max-width: 1360px;
+  max-width: none;
   width: 100%;
 }
 

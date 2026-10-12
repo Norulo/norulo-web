@@ -425,7 +425,8 @@ function LedgerSkeleton({ mode }) {
           <div className="ledger-project-toolbar">
             <div className="ledger-project-filters">
               <div className="ledger-search">
-                <SkeletonLine className="sk-line sk-w-70" />
+                <I.Search size={16} aria-hidden="true" />
+                <SkeletonLine className="sk-line sk-w-42" />
               </div>
               <div className="ledger-field ledger-project-status">
                 <span className="ledger-project-label-skeleton">
@@ -438,7 +439,6 @@ function LedgerSkeleton({ mode }) {
             </div>
           </div>
           <div className="ledger-search-guidance">
-            <SkeletonLine className="sk-line sk-w-65" />
             <SkeletonLine className="sk-line sk-w-34" />
           </div>
           <div className="ledger-project-head">
@@ -2369,6 +2369,13 @@ function ScopedLedgerScreen({
                 )}
             </div>
             <div className="actions">
+              {canManageProjects && mode === "projects" && !data && loading && (
+                // Holds the primary action's place while projects load so the
+                // header and list do not shift when it appears.
+                <span className="btn primary page-action-placeholder" aria-hidden="true">
+                  <I.Plus size={14} /> {T("Add project", "添加项目")}
+                </span>
+              )}
               {canManageProjects && mode === "projects" && data?.projects.items.length > 0 && (
                 <button
                   className="btn primary"

@@ -132,9 +132,8 @@ function projectChoices(payload) {
 function ApiKeysSkeleton() {
   return (
     <div className="set-body api-keys-skeleton" aria-busy="true">
-      <section className="panel">
+      <section className="panel section-split api-keys-section">
         <div className="panel-h">
-          <SkeletonLine className="sk-square sk-size-16" />
           <SkeletonLine className="sk-line sk-w-30 sk-h-16" />
         </div>
         <div className="key-list">
@@ -155,13 +154,12 @@ function ApiKeysSkeleton() {
           ))}
         </div>
       </section>
-      <div className="panel api-key-create">
-        <div className="panel-h">
-          <SkeletonLine className="sk-square sk-size-16" />
-          <SkeletonLine className="sk-line sk-w-30 sk-h-16" />
+      <div className="panel api-key-create section-split">
+        <div className="section-head">
+          <SkeletonLine className="sk-line sk-w-56 sk-h-16" />
+          <SkeletonLine className="sk-line" />
         </div>
         <div className="api-key-create-main">
-          <SkeletonLine className="sk-line sk-w-65" />
           <SkeletonLine className="sk-line sk-w-60 sk-h-40" />
           <div className="api-scope-panel">
             <div className="api-scope-head">
@@ -787,9 +785,8 @@ export function ApiKeysScreen({
                       </button>
                     </div>
                   )}
-                  <section className="panel">
+                  <section className="panel section-split api-keys-section">
                     <div className="panel-h">
-                      <I.Code size={16} />
                       <h2>{T("Keys", "密钥")}</h2>
                       <span className="count">{keys.length}</span>
                     </div>
@@ -836,18 +833,17 @@ export function ApiKeysScreen({
                     </div>
                   </section>
 
-                  <form className="api-key-create panel" onSubmit={createKey}>
-                    <div className="panel-h">
-                      <I.Shield size={16} />
+                  <form className="api-key-create panel section-split" onSubmit={createKey}>
+                    <div className="section-head">
                       <h2>{T("Create API key", "创建 API 密钥")}</h2>
-                    </div>
-                    <div className="api-key-create-main">
-                      <p className="muted">
+                      <p>
                         {T(
                           "Name the key, choose scopes, then create the token.",
                           "为密钥命名，选择权限范围，然后创建令牌。"
                         )}
                       </p>
+                    </div>
+                    <div className="api-key-create-main">
                       <label className="auth-field">
                         <span>{T("Key name", "密钥名称")}</span>
                         <div className="auth-input">

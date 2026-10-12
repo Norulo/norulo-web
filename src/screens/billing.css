@@ -133,8 +133,31 @@
   border-bottom: 0;
 }
 
-.billing-ledger-section {
+/* Usage sections follow the shared .section-split layout: the meters live in
+   the body column, so that column decides whether the two rows sit side by
+   side. */
+.billing-usage-body {
+  gap: var(--space-6);
+}
+.billing-ledger-section > .billing-usage-body {
   container: billing-ledger / inline-size;
+}
+.billing-usage-body > .billing-usage-grid {
+  align-self: stretch;
+  margin-block: 0;
+}
+.billing-body > .section-split .billing-summary,
+.billing-body > .section-split .sub-record-list {
+  align-self: stretch;
+}
+@media (min-width: 1100px) {
+  .section-split .billing-usage-heading {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .section-split .billing-usage-heading .btn {
+    margin-left: 0;
+  }
 }
 
 .billing-usage-heading {
@@ -305,26 +328,6 @@
     padding-left: var(--space-8);
     border-top: 0;
     border-left: 1px solid var(--border);
-  }
-}
-
-@container billing-body (min-width: 1020px) {
-  .billing-usage-layout:has(.billing-jev-section) {
-    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
-    gap: var(--space-8);
-  }
-  .billing-usage-layout:has(.billing-jev-section) > .panel {
-    border-bottom: 0;
-  }
-  .billing-usage-layout .billing-jev-section {
-    border-left: 1px solid var(--border);
-    padding-left: var(--space-8);
-  }
-  .billing-usage-layout .billing-usage-meta {
-    min-block-size: 3.4em;
-  }
-  .billing-usage-layout .billing-usage-label {
-    min-block-size: 2.8em;
   }
 }
 

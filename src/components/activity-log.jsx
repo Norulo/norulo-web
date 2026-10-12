@@ -286,7 +286,6 @@ function ScopedActivityLog({ api, target, active, disabled = false, reloadSignal
   return (
     <section className="panel activity-log" aria-busy={loading}>
       <div className="panel-h">
-        <I.Clock size={20} aria-hidden="true" />
         <h2>{T("Operation log")}</h2>
         <button className="btn ghost" type="button" disabled={disabled || loading} onClick={() => load()}>
           <I.Refresh size={14} aria-hidden="true" /> {T("Reload operation log")}

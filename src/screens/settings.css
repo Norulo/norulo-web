@@ -1,36 +1,11 @@
-/* Settings sections: the heading names the topic, the body holds its state
-   and controls with one consistent rhythm. Wide screens set the heading in a
-   left column so every section's controls start on the same edge. */
-.settings-section-body {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: var(--space-3);
-  min-width: 0;
-}
+/* Settings sections use the shared .section-split layout from base.css;
+   these groups also span the body's width. */
 .settings-section-body
-  > :is(.settings-sign-in-methods, .github-installations-fieldset, .notice, .set-row) {
+  > :is(.settings-sign-in-methods, .github-installations-fieldset) {
   align-self: stretch;
 }
 .settings-section-body > .set-row {
   margin: 0;
-}
-.settings-section > h2 {
-  margin-bottom: var(--space-4);
-}
-@media (min-width: 1100px) {
-  .settings-screen .main > .settings-section {
-    display: grid;
-    grid-template-columns: minmax(0, 15rem) minmax(0, 1fr);
-    column-gap: var(--space-12);
-    padding-block: var(--space-8);
-  }
-  .settings-screen .main > .page-h + .settings-section {
-    padding-top: 0;
-  }
-  .settings-section > h2 {
-    margin-bottom: 0;
-  }
 }
 
 .settings-profile-panel .set-row,

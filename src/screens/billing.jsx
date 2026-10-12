@@ -453,15 +453,21 @@ function BillingUsageMeter({ used, limit, titleId, usedLabel, totalLabel }) {
 function BillingJevUsage({ usage, lang }) {
   const metric = jevUsageMetric(usage);
   return (
-    <section className="panel billing-jev-section" aria-labelledby="billing-jev-usage-title">
-      <div className="panel-h billing-usage-heading">
-        <h2 id="billing-jev-usage-title">{usageText("jevTitle")}</h2>
+    <section
+      className="panel section-split billing-jev-section"
+      aria-labelledby="billing-jev-usage-title"
+    >
+      <div className="section-head">
+        <div className="panel-h billing-usage-heading">
+          <h2 id="billing-jev-usage-title">{usageText("jevTitle")}</h2>
+        </div>
+        {metric && (
+          <p className="muted billing-usage-meta">
+            {usageText("jevMonth")}: <time>{metric.month}</time>
+          </p>
+        )}
       </div>
-      {metric && (
-        <p className="muted billing-usage-meta">
-          {usageText("jevMonth")}: <time>{metric.month}</time>
-        </p>
-      )}
+      <div className="section-body billing-usage-body">
       <div className="billing-usage-grid">
         <article className="billing-usage-row" aria-labelledby="billing-jev-allowance-title">
           <div className="billing-usage-label">
@@ -504,6 +510,7 @@ function BillingJevUsage({ usage, lang }) {
         </article>
       </div>
       <p className="muted billing-usage-policy">{usageText("jevPolicy")}</p>
+      </div>
     </section>
   );
 }
@@ -511,14 +518,20 @@ function BillingJevUsage({ usage, lang }) {
 function BillingUsage({ usage, lang, busy, onRefresh }) {
   const number = (value) => new Intl.NumberFormat(lang).format(value);
   return (
-    <section className="panel billing-ledger-section" aria-labelledby="billing-usage-title">
-      <div className="panel-h billing-usage-heading">
-        <h2 id="billing-usage-title">{usageText("title")}</h2>
-        <button className="btn sm" type="button" disabled={busy} onClick={onRefresh}>
-          <I.Refresh size={14} /> {usageText("refresh")}
-        </button>
+    <section
+      className="panel section-split billing-ledger-section"
+      aria-labelledby="billing-usage-title"
+    >
+      <div className="section-head">
+        <div className="panel-h billing-usage-heading">
+          <h2 id="billing-usage-title">{usageText("title")}</h2>
+          <button className="btn sm" type="button" disabled={busy} onClick={onRefresh}>
+            <I.Refresh size={14} /> {usageText("refresh")}
+          </button>
+        </div>
+        <p className="muted billing-usage-meta">{usageText("scope")}</p>
       </div>
-      <p className="muted billing-usage-meta">{usageText("scope")}</p>
+      <div className="section-body billing-usage-body">
       <div className="billing-usage-grid">
         {["projects", "expenseRecords"].map((key) => {
           const metric = usageMetric(usage, key);
@@ -566,6 +579,7 @@ function BillingUsage({ usage, lang, busy, onRefresh }) {
         })}
       </div>
       <p className="muted billing-usage-policy">{usageText("retention")}</p>
+      </div>
     </section>
   );
 }
@@ -573,23 +587,25 @@ function BillingUsage({ usage, lang, busy, onRefresh }) {
 function BillingSkeleton() {
   return (
     <div className="set-body billing-body billing-skeleton" aria-busy="true">
-      <div className="panel">
-        <div className="billing-summary-main">
-          <SkeletonLine className="sk-square sk-size-32" />
+      <div className="panel section-split">
+        <div className="section-head">
+          <SkeletonLine className="sk-line sk-w-34 sk-h-16" />
+        </div>
+        <div className="section-body">
           <div className="skeleton-stack">
-            <SkeletonLine className="sk-line sk-w-34 sk-h-16" />
+            <SkeletonLine className="sk-line sk-w-34 sk-h-28" />
             <SkeletonLine className="sk-line sk-w-52" />
           </div>
         </div>
-        <div className="billing-actions">
-          <SkeletonLine className="sk-line sk-w-26 sk-h-34" />
-          <SkeletonLine className="sk-line sk-w-24 sk-h-34" />
-          <SkeletonLine className="sk-line sk-w-22 sk-h-34" />
-        </div>
       </div>
 
-      <div className="panel billing-ledger-section">
-        <SkeletonLine className="sk-line sk-w-32 sk-h-16" />
+      <div className="panel section-split billing-ledger-section">
+        <div className="section-head">
+          <SkeletonLine className="sk-line sk-w-52 sk-h-16" />
+          <SkeletonLine className="sk-line" />
+          <SkeletonLine className="sk-line sk-w-70" />
+        </div>
+        <div className="section-body billing-usage-body">
         <div className="billing-usage-grid">
           {["projects", "expenses"].map((key) => (
             <div className="billing-usage-row" key={key}>
@@ -611,13 +627,14 @@ function BillingSkeleton() {
             </div>
           ))}
         </div>
+        </div>
       </div>
 
-      <div className="panel">
-        <div className="billing-summary-main">
-          <SkeletonLine className="sk-square sk-size-32" />
-          <SkeletonLine className="sk-line sk-w-32 sk-h-16" />
+      <div className="panel section-split">
+        <div className="section-head">
+          <SkeletonLine className="sk-line sk-w-52 sk-h-16" />
         </div>
+        <div className="section-body">
         <div className="sub-record-list">
           {Array.from({ length: 3 }, (_, index) => (
             <div className="sub-record-row skeleton-row" key={`billing-record-skeleton-${index}`}>
@@ -628,6 +645,7 @@ function BillingSkeleton() {
               <SkeletonLine className="sk-line sk-w-16 sk-h-20" />
             </div>
           ))}
+        </div>
         </div>
       </div>
     </div>
@@ -1008,11 +1026,9 @@ export function BillingScreen({ go, navigate = (url) => window.location.assign(u
                 <BillingLoadError error={error} onRetry={loadBillingPlan} />
               ) : (
                 <div className="set-body billing-body">
-                  <section className="panel">
-                    <div className="panel-h">
-                      <I.Package size={20} />
-                      <h2>{T("Plan", "Plan")}</h2>
-                    </div>
+                  <section className="panel section-split billing-plan-section">
+                    <h2>{T("Plan", "Plan")}</h2>
+                    <div className="section-body">
                     <div className="billing-summary">
                       <div className="billing-summary-main">
                         <div>
@@ -1106,6 +1122,7 @@ export function BillingScreen({ go, navigate = (url) => window.location.assign(u
                         </div>
                       )}
                     </div>
+                    </div>
                   </section>
 
                   <div className="billing-usage-layout">
@@ -1147,11 +1164,9 @@ export function BillingScreen({ go, navigate = (url) => window.location.assign(u
                   )}
 
                   {subscriptions.length > 0 && (
-                    <section className="panel">
-                      <div className="panel-h">
-                        <I.FileCode size={20} />
-                        <h2>{T("Subscription activity", "订阅动态")}</h2>
-                      </div>
+                    <section className="panel section-split">
+                      <h2>{T("Subscription activity", "订阅动态")}</h2>
+                      <div className="section-body">
                       <div className="sub-record-list">
                         {subscriptions.map((record, index) => (
                           <div
@@ -1166,6 +1181,7 @@ export function BillingScreen({ go, navigate = (url) => window.location.assign(u
                             <span className="tag">{record?.plan || account.plan || "free"}</span>
                           </div>
                         ))}
+                      </div>
                       </div>
                     </section>
                   )}

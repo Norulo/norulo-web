@@ -1232,7 +1232,8 @@ a.crumb-button:where(:not([aria-disabled="true"])):hover {
 .main > .page-h + .panel {
   padding-top: 0;
 }
-.panel > h2 {
+.panel > h2,
+.section-head > h2 {
   font-size: var(--fs-section-title);
   font-weight: 600;
   letter-spacing: -0.01em;
@@ -1285,6 +1286,57 @@ a.crumb-button:where(:not([aria-disabled="true"])):hover {
   display: grid;
   gap: var(--space-4);
   min-width: 0;
+}
+/* Configuration section (Settings, account tools, project settings): the
+   heading, with an optional short lead, names the topic; the body holds its
+   state and controls with one rhythm. Wide screens set the heading in a left
+   column so every section's controls start on the same edge. */
+.section-split > :is(h2, .panel-h, .section-head) {
+  margin-bottom: var(--space-4);
+}
+.section-head {
+  display: grid;
+  align-content: start;
+  gap: var(--space-2);
+  min-width: 0;
+}
+.section-head > :is(h2, .panel-h) {
+  margin: 0;
+}
+.section-head > p {
+  max-width: 60ch;
+  margin: 0;
+  color: var(--text-3);
+  font-size: var(--fs-md);
+  line-height: 1.55;
+}
+.section-body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-3);
+  min-width: 0;
+}
+.section-body > :is(.notice, .set-row, form, ul, ol, .ledger-list) {
+  align-self: stretch;
+}
+.section-body p {
+  max-width: 72ch;
+}
+@media (min-width: 1100px) {
+  .section-split {
+    display: grid;
+    grid-template-columns: minmax(0, 15rem) minmax(0, 1fr);
+    column-gap: var(--space-12);
+    padding-block: var(--space-8);
+  }
+  .main > .page-h + .section-split {
+    padding-top: 0;
+  }
+  .section-split > :is(h2, .panel-h, .section-head) {
+    align-self: start;
+    margin-bottom: 0;
+  }
 }
 details.panel > summary.panel-h {
   cursor: pointer;

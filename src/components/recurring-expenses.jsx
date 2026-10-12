@@ -437,7 +437,6 @@ export function RecurringExpenses({
     >
       <section className="panel" id="recurring-plans" tabIndex={-1} aria-busy={loading || busy}>
         <div className="panel-h">
-          <I.Refresh size={20} aria-hidden="true" />
           <h2>{T("Recurring plans")}</h2>
           <span className="count">{items.length}{nextCursor ? "+" : ""}</span>
           <button

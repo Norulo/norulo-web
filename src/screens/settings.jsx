@@ -565,9 +565,9 @@ export function SettingsScreen({ go, onSessionUpdated, onOperationBusy }) {
               {error}
             </div>
           )}
-          <section className="panel settings-section settings-profile-panel" aria-label={T("Profile", "个人资料")}>
+          <section className="panel section-split settings-section settings-profile-panel" aria-label={T("Profile", "个人资料")}>
             <h2>{T("Profile", "个人资料")}</h2>
-            <div className="settings-section-body">
+            <div className="section-body settings-section-body">
               {session ? (
                 <>
                   <div className="set-row">
@@ -591,9 +591,9 @@ export function SettingsScreen({ go, onSessionUpdated, onOperationBusy }) {
               )}
             </div>
           </section>
-          <section className="panel settings-section settings-sign-in-panel" aria-label={T("Sign-in methods", "登录方式")}>
+          <section className="panel section-split settings-section settings-sign-in-panel" aria-label={T("Sign-in methods", "登录方式")}>
             <h2>{T("Sign-in methods", "登录方式")}</h2>
-            <div className="settings-section-body">
+            <div className="section-body settings-section-body">
               <div className="settings-sign-in-methods">
                 {loading && (
                   <p className="muted settings-sign-in-description">{T("Loading...", "正在加载...")}</p>
@@ -663,9 +663,9 @@ export function SettingsScreen({ go, onSessionUpdated, onOperationBusy }) {
               </div>
             </div>
           </section>
-          <section className="panel settings-section settings-retention-panel" aria-label={retentionText("title")}>
+          <section className="panel section-split settings-section settings-retention-panel" aria-label={retentionText("title")}>
             <h2>{retentionText("title")}</h2>
-            <div className="settings-section-body">
+            <div className="section-body settings-section-body">
               <p className="muted">{retentionText("scope")}</p>
               <p
                 className="muted"
@@ -703,9 +703,9 @@ export function SettingsScreen({ go, onSessionUpdated, onOperationBusy }) {
               )}
             </div>
           </section>
-          <section className="panel settings-section settings-jev-panel" aria-label={T("Jev settings", "Jev 设置")}>
+          <section className="panel section-split settings-section settings-jev-panel" aria-label={T("Jev settings", "Jev 设置")}>
             <h2>{T("Jev settings", "Jev 设置")}</h2>
-            <div className="settings-section-body">
+            <div className="section-body settings-section-body">
               <p className="muted" id={jevDescriptionId} ref={jevDescriptionRef} tabIndex={0}>
                 {T(
                   "Controls Jev for your own ledger and its shared members. Other owners control their own ledgers.",
@@ -784,9 +784,9 @@ export function SettingsScreen({ go, onSessionUpdated, onOperationBusy }) {
               </p>
             </div>
           </section>
-          <section className="panel settings-section settings-github-panel" aria-label={T("GitHub access", "GitHub 授权")}>
+          <section className="panel section-split settings-section settings-github-panel" aria-label={T("GitHub access", "GitHub 授权")}>
             <h2>{T("GitHub access", "GitHub 授权")}</h2>
-            <div className="settings-section-body">
+            <div className="section-body settings-section-body">
               {canConnectGitHub && githubReconnectRequired ? (
                 <p className="muted">
                   {T("Reconnect GitHub in Sign-in methods, then check repository access again.", {

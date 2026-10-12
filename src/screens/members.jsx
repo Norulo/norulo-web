@@ -870,7 +870,6 @@ function MembersContent({
                 aria-busy={loading}
               >
                 <div className="panel-h">
-                  <I.User size={20} aria-hidden="true" />
                   <h2 ref={memberHeading} tabIndex={-1}>
                     {T("Ledger members", "账本成员")}
                   </h2>
@@ -1067,7 +1066,6 @@ function MembersContent({
                 >
                   <section className="panel" aria-label={T("Invite member", "邀请成员")}>
                     <div className="panel-h">
-                      <I.Plus size={20} aria-hidden="true" />
                       <h2>{T("Invite member", "邀请成员")}</h2>
                     </div>
                     <div className="panel-body">
@@ -1162,7 +1160,6 @@ function MembersContent({
                     aria-busy={loading}
                   >
                     <div className="panel-h">
-                      <I.User size={20} aria-hidden="true" />
                       <h2 ref={requestHeading} tabIndex={-1}>
                         {T("Join requests", "加入申请")}
                       </h2>
@@ -1265,7 +1262,6 @@ function MembersContent({
                     aria-busy={loading}
                   >
                     <div className="panel-h">
-                      <I.Mail size={20} aria-hidden="true" />
                       <h2>{T("Pending invitations", "待接受邀请")}</h2>
                       {invites && <span className="count">{invites.length}</span>}
                     </div>

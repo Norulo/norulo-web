@@ -289,7 +289,10 @@ async function measure(page, profile, lang, theme, usage, name, kind = "ledger")
       // Content-box width of the container that switches usage rows between
       // stacked and side-by-side layouts.
       usageContainerWidth: (() => {
-        const section = region.closest(".billing-ledger-section") || region;
+        const section =
+          region.querySelector(".billing-usage-body") ||
+          region.closest(".billing-ledger-section") ||
+          region;
         const style = getComputedStyle(section);
         return (
           section.clientWidth -

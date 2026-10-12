@@ -467,7 +467,6 @@ function LedgerSkeleton({ mode }) {
     );
   const headingSkeleton = (
     <div className="panel-h skeleton-row">
-      <SkeletonLine className="sk-square sk-size-16" />
       <SkeletonLine className="sk-line sk-w-26 sk-h-16" />
     </div>
   );
@@ -2619,7 +2618,6 @@ function ScopedLedgerScreen({
                 {showProjectForm && (
                   <section className="panel" id="add-repository" ref={addProjectPanelRef}>
                     <div className="panel-h">
-                      <I.Folder size={20} />
                       <h2>
                         {data.projects.items.length === 0
                           ? T("Your first project starts here", "从第一个项目开始")
@@ -2874,7 +2872,6 @@ function ScopedLedgerScreen({
             <LedgerSplit enabled={canManageCategories} scope={`${workspaceScope}:categories`}>
               <section className="panel">
                 <div className="panel-h">
-                  <I.Layers size={20} />
                   <h2 ref={categoryHeadingRef} tabIndex={-1}>
                     {T("Your categories")}
                   </h2>
@@ -3139,7 +3136,6 @@ function ScopedLedgerScreen({
               {canManageCategories && (
                 <section className="panel">
                   <div className="panel-h">
-                    <I.Plus size={20} />
                     <h2>{T("Add category")}</h2>
                   </div>
                   <p className="ledger-help">
@@ -3247,7 +3243,6 @@ function ScopedLedgerScreen({
                 >
                   <section className="panel">
                     <div className="panel-h">
-                      <I.Database size={20} />
                       <h2>{T("Recorded expenses")}</h2>
                       <span className="count">
                         {expenses.length}
@@ -3444,7 +3439,6 @@ function ScopedLedgerScreen({
                   {showExpenseForm && (
                     <section className="panel" id="expense-form" ref={expenseFormPanelRef}>
                       <div className="panel-h">
-                        <I.Plus size={20} />
                         <h2>{editing ? T("Edit expense") : T("Add expense")}</h2>
                       </div>
                       {activeCategories.length === 0 && editing && (
@@ -3473,7 +3467,6 @@ function ScopedLedgerScreen({
                 <Suspense fallback={
                   <section className="panel" aria-busy="true">
                     <div className="panel-h">
-                      <I.Refresh size={20} aria-hidden="true" />
                       <h2>{T("Recurring plans")}</h2>
                     </div>
                     <p role="status">{T("Loading recurring schedules…")}</p>
@@ -3541,24 +3534,24 @@ function ScopedLedgerScreen({
                 </div>
               </div>
               {mode === "project" && (
-                <section
-                  className="panel"
+                <div
+                  className="ledger-settings-view"
                   role="tabpanel"
                   id={`${viewId}-panel-settings`}
                   aria-labelledby={`${viewId}-tab-settings`}
                   tabIndex={0}
                   hidden={view !== "settings"}
                 >
-                  <div className="panel-h">
-                    <I.FileCode size={20} />
+                  <section className="panel section-split">
+                  <div className="section-head">
                     <h2>{T("Project settings", "项目设置")}</h2>
+                    <p>
+                      {T(
+                        "Keep a financial name for this project independently of GitHub access. Repository changes use your own GitHub authorization.",
+                        "财务项目名称独立于 GitHub 授权保留。更换仓库使用你自己的 GitHub 授权。"
+                      )}
+                    </p>
                   </div>
-                  <p className="ledger-help">
-                    {T(
-                      "Keep a financial name for this project independently of GitHub access. Repository changes use your own GitHub authorization.",
-                      "财务项目名称独立于 GitHub 授权保留。更换仓库使用你自己的 GitHub 授权。"
-                    )}
-                  </p>
                   {canManageProjects ? (
                     <form
                       className="ledger-form"
@@ -3907,26 +3900,31 @@ function ScopedLedgerScreen({
                       </div>
                     </div>
                   )}
+                  </section>
                   {canRemoveCurrentProject && (
-                    <section className="ledger-project-removal">
-                      <h3>{T("Remove project", "移除项目")}</h3>
-                      <p>
-                        {T(
-                          "Permanently delete this project, its current expenses, all its recurring schedules and related business history.",
-                          "永久删除此项目、当前归属于它的支出、全部周期计划及相关业务历史。",
-                        )}
-                      </p>
-                      <button
-                        type="button"
-                        className="btn danger"
-                        disabled={blocked}
-                        onClick={openProjectRemoval}
-                      >
-                        <I.X size={14} aria-hidden="true" /> {T("Remove project", "移除项目")}
-                      </button>
+                    <section className="panel section-split ledger-project-removal">
+                      <div className="section-head">
+                        <h2>{T("Remove project", "移除项目")}</h2>
+                        <p>
+                          {T(
+                            "Permanently delete this project, its current expenses, all its recurring schedules and related business history.",
+                            "永久删除此项目、当前归属于它的支出、全部周期计划及相关业务历史。",
+                          )}
+                        </p>
+                      </div>
+                      <div className="section-body">
+                        <button
+                          type="button"
+                          className="btn danger"
+                          disabled={blocked}
+                          onClick={openProjectRemoval}
+                        >
+                          <I.X size={14} aria-hidden="true" /> {T("Remove project", "移除项目")}
+                        </button>
+                      </div>
                     </section>
                   )}
-                </section>
+                </div>
               )}
               <div
                 role="tabpanel"
@@ -3938,7 +3936,6 @@ function ScopedLedgerScreen({
                 <Suspense fallback={
                   <section className="panel" aria-busy="true">
                     <div className="panel-h">
-                      <I.Clock size={20} aria-hidden="true" />
                       <h2>{T("Operation log")}</h2>
                     </div>
                     <p role="status">{T("Loading operation log…")}</p>

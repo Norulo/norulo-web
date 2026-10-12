@@ -21,7 +21,7 @@
 .members-screen .member-list .member-row {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(150px, 180px) 96px;
-  align-items: center;
+  align-items: start;
   gap: var(--space-4) var(--space-6);
   padding-block: var(--space-4);
 }
@@ -37,7 +37,7 @@
 .member-identity {
   display: grid;
   grid-template-columns: 36px minmax(0, 1fr);
-  align-items: center;
+  align-items: start;
   gap: var(--space-3);
   min-width: 0;
 }

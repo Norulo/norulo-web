@@ -1,0 +1,188 @@
+{
+  "verified_at_beijing": "2026-10-12T17:45:34.552627+08:00",
+  "final_source_base": "0d773bea432864d616cd103d63cedb107e93d1ad",
+  "change": "Keep equal natural row heights; anchor record content at fixed top insets and leave spare height below. Projects retain natural per-record heights.",
+  "passed": true,
+  "full_check": {
+    "lint": "passed",
+    "test_files": 87,
+    "tests": 1805,
+    "build": "passed",
+    "duration_seconds": 90.28
+  },
+  "worker_configuration": "passed",
+  "worker_dry_run": "passed",
+  "alignment": {
+    "state_count": 48,
+    "tolerance_px": 1,
+    "assertions": [
+      "Equal natural row heights retained.",
+      "Matching top and left insets across short and long record content.",
+      "Record headers start at their row padding, with unused height below.",
+      "No horizontal overflow or browser errors."
+    ],
+    "states_per_profile": [
+      "ordinary-expenses",
+      "recurring",
+      "entry-type-options",
+      "operation-log-header",
+      "operation-log-title",
+      "operation-log-changes",
+      "members",
+      "api-keys",
+      "api-scopes",
+      "subscription-history",
+      "github-installations",
+      "categories"
+    ],
+    "profiles": [
+      {
+        "profile": {
+          "name": "desktop-1440-en",
+          "width": 1440,
+          "height": 1000,
+          "lang": "en",
+          "touch": false
+        },
+        "browser_version": "154.0.8037.57",
+        "alignment_states_passed": 12,
+        "operation_log_rows": [
+          {
+            "height_px": 299.09375,
+            "header_top_inset_px": 16,
+            "header_left_inset_px": 16
+          },
+          {
+            "height_px": 299.09375,
+            "header_top_inset_px": 16,
+            "header_left_inset_px": 16
+          }
+        ],
+        "requests": {
+          "total": 68,
+          "api": 27,
+          "blockedFonts": 0,
+          "writes": 0,
+          "externalDelivered": 0
+        }
+      },
+      {
+        "profile": {
+          "name": "phone-390-en",
+          "width": 390,
+          "height": 844,
+          "lang": "en",
+          "touch": true
+        },
+        "browser_version": "154.0.8037.57",
+        "alignment_states_passed": 12,
+        "operation_log_rows": [
+          {
+            "height_px": 526.375,
+            "header_top_inset_px": 18,
+            "header_left_inset_px": 16
+          },
+          {
+            "height_px": 526.375,
+            "header_top_inset_px": 18,
+            "header_left_inset_px": 16
+          }
+        ],
+        "requests": {
+          "total": 68,
+          "api": 27,
+          "blockedFonts": 0,
+          "writes": 0,
+          "externalDelivered": 0
+        }
+      },
+      {
+        "profile": {
+          "name": "phone-320-en",
+          "width": 320,
+          "height": 844,
+          "lang": "en",
+          "touch": true
+        },
+        "browser_version": "154.0.8037.57",
+        "alignment_states_passed": 12,
+        "operation_log_rows": [
+          {
+            "height_px": 551.375,
+            "header_top_inset_px": 18,
+            "header_left_inset_px": 16
+          },
+          {
+            "height_px": 551.375,
+            "header_top_inset_px": 18,
+            "header_left_inset_px": 16
+          }
+        ],
+        "requests": {
+          "total": 68,
+          "api": 27,
+          "blockedFonts": 0,
+          "writes": 0,
+          "externalDelivered": 0
+        }
+      },
+      {
+        "profile": {
+          "name": "phone-390-zh",
+          "width": 390,
+          "height": 844,
+          "lang": "zh",
+          "touch": true
+        },
+        "browser_version": "154.0.8037.57",
+        "alignment_states_passed": 12,
+        "operation_log_rows": [
+          {
+            "height_px": 526.375,
+            "header_top_inset_px": 18,
+            "header_left_inset_px": 16
+          },
+          {
+            "height_px": 526.375,
+            "header_top_inset_px": 18,
+            "header_left_inset_px": 16
+          }
+        ],
+        "requests": {
+          "total": 69,
+          "api": 27,
+          "blockedFonts": 0,
+          "writes": 0,
+          "externalDelivered": 0
+        }
+      }
+    ],
+    "old_center_negative_control": {
+      "oldCenterHeaderInsets": [
+        70.5,
+        16
+      ],
+      "detected": true
+    },
+    "integrated_api_key_metadata": {
+      "null_last_used": "Unavailable / 不可用",
+      "name_max_length": 120
+    }
+  },
+  "existing_date_layout": {
+    "command": "npm run test:layout -- --browser=chromium",
+    "passed": true,
+    "states_per_profile": {
+      "desktop-1440": 81,
+      "tablet-1280-zh": 81,
+      "phone-390-to-320": 48,
+      "android-size-412-to-360": 48
+    },
+    "source_base": "b638f5e",
+    "scope": "Date controls, recurring rows, rename and confirmation geometry; final rebase added API-key code without changing this CSS or these paths."
+  },
+  "limitations": [
+    "Local Chromium geometry with synthetic loopback GET fixtures and simulated touch; Firefox/WebKit were unavailable.",
+    "No remote API fixtures, remote SQL, or business writes; no physical device acceptance claim."
+  ]
+}

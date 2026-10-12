@@ -1004,13 +1004,14 @@ a.crumb-button:where(:not([aria-disabled="true"])):hover {
 .api-scope-list {
   grid-auto-rows: 1fr;
 }
-/* Extra row height surrounds the content instead of stretching its gaps. */
+/* Equal rows keep a fixed top inset; spare height follows the content without
+   stretching its gaps or moving shorter records away from the top edge. */
 .ledger-list > article:not(.ledger-project-row),
 .key-list > .key-row,
 .sub-record-list > .sub-record-row,
 .gh-install-list > .gh-install-row,
 .api-scope-list > .api-scope-row {
-  align-content: center;
+  align-content: start;
 }
 /* Flat console records share insets in both idle and highlighted states. */
 .ledger-list > article,
@@ -1937,7 +1938,7 @@ details.panel[open] > summary.panel-h::after,
   display: grid;
   grid-template-columns: 18px minmax(0, 1fr) auto;
   gap: 10px;
-  align-items: center;
+  align-items: start;
   min-height: 44px;
   min-width: 0;
   padding: var(--space-3) 14px;

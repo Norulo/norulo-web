@@ -34,7 +34,7 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   gap: var(--space-3);
-  align-items: center;
+  align-items: start;
   padding-block: var(--space-5);
   border-bottom: 1px solid var(--border);
   min-width: 0;

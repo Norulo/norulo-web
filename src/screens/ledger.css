@@ -761,7 +761,7 @@
   grid-template-columns: minmax(0, 1fr);
 }
 .ledger-screen .ledger-category-row > .ledger-actions {
-  align-self: center;
+  align-self: start;
 }
 /* The title line and the inline rename editor share one line height, so
    renaming swaps controls in place without resizing the row. */
@@ -770,7 +770,7 @@
 }
 .ledger-category-title {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 6px;
   min-width: 0;
   min-height: var(--category-line, 28px);
@@ -823,7 +823,7 @@
   grid-column: 1 / -1;
   grid-template-columns: minmax(0, 1fr) auto auto;
   grid-template-columns: subgrid;
-  align-items: center;
+  align-items: start;
   column-gap: 32px;
 }
 .ledger-screen .ledger-expense-row > .ledger-row-side {
@@ -831,7 +831,7 @@
   display: grid;
   grid-template-columns: auto auto;
   grid-template-columns: subgrid;
-  align-items: center;
+  align-items: start;
   column-gap: 24px;
   min-width: 0;
 }
@@ -916,7 +916,7 @@
     grid-column: 1;
     display: flex;
     flex-wrap: wrap;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
     gap: 8px 16px;
   }
@@ -951,7 +951,7 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  justify-content: center;
+  justify-content: flex-start;
   text-align: start;
   white-space: normal;
   height: auto;

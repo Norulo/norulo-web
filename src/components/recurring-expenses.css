@@ -1,8 +1,7 @@
 .ledger-screen .recurring-expenses-row {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  align-content: center;
-  align-items: center;
+  align-items: start;
   gap: 16px 24px;
 }
 .recurring-expenses-row > * {
@@ -14,7 +13,7 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-end;
-  align-items: center;
+  align-items: flex-start;
   gap: 8px 12px;
   min-width: 0;
 }

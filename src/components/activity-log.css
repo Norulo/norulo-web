@@ -8,7 +8,6 @@
 }
 .activity-log-row {
   display: grid;
-  align-content: center;
 }
 .activity-log-row-header {
   display: flex;

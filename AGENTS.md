@@ -165,7 +165,8 @@ again downstream. Screen styles load with routes; cross-route styles stay shared
 Console views share `ConsoleLayout`; creation/edit rails share `LedgerSplit`
 and `useResizablePane`. Preserve bounds, pointer/keyboard access, cleanup,
 container-based reflow and scoped drafts. Projects use natural per-record height;
-other console lists retain equal natural rows. Keep whole names, descriptions,
+other console lists retain equal natural rows, with record content anchored to
+the top inset and spare height below it. Keep whole names, descriptions,
 exact amounts and separate internal/external links visible and selectable.
 Loaded-page searches and filters must disclose their local scope and retain
 pagination for no matches. Preserve authorized repository selections while

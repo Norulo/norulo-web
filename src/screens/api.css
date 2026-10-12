@@ -9,7 +9,7 @@
   grid-template-columns: minmax(0, 1fr) minmax(120px, 11rem) auto;
   grid-template-areas: "main id action";
   gap: 14px 24px;
-  align-items: center;
+  align-items: start;
   padding-block: var(--space-4);
   border: 0;
   border-bottom: 1px solid var(--border);

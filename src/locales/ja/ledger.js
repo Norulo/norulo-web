@@ -828,7 +828,6 @@ export const LEDGER_SCREEN_PHRASES = {
   "List projects in this ledger and repositories authorized to you.": "この台帳のプロジェクトと、自分にアクセス権のあるリポジトリを一覧表示します。",
   "Create and manage projects, including names, descriptions, status and optional GitHub links.": "名前、説明、状態、任意の GitHub 関連付けを含むプロジェクトの作成と管理。",
   "List categories in this ledger.": "この台帳のカテゴリを一覧表示します。",
-  "Project and expense limits apply to the Owner's ledger and are shared by members and API keys. Archived projects and removed expenses still count toward capacity.": "プロジェクトと支出の上限は所有者の台帳に適用され、メンバーと API キーで共有します。アーカイブ済みプロジェクトと削除済み支出も容量に数えられます。",
   "The monthly Jev allowance covers model assistance, has no cash value, and cannot pay expenses or subscription charges.": "Jev の月間枠はモデルによる支援に使うもので、現金価値はなく、支出やサブスクリプション料金の支払いには使えません。",
   "Jev assistance allowance": "Jev アシスト利用枠",
   "Paid subscription fees are non-refundable except where required by applicable law. Cancelling renewal does not refund the current paid period; paid access continues until that period ends.": "適用法令で義務付けられる場合を除き、お支払い済みのサブスクリプション料金は返金されません。自動更新を停止しても現在の支払い済み期間の料金は返金されず、その期間の終了まで有料機能を利用できます。",

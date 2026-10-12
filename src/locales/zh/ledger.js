@@ -828,7 +828,6 @@ export const LEDGER_SCREEN_PHRASES = {
   "List projects in this ledger and repositories authorized to you.": "列出当前账本的项目及你已授权的仓库。",
   "Create and manage projects, including names, descriptions, status and optional GitHub links.": "创建和管理项目，包括名称、说明、状态及可选 GitHub 关联。",
   "List categories in this ledger.": "列出当前账本的类别。",
-  "Project and expense limits apply to the Owner's ledger and are shared by members and API keys. Archived projects and removed expenses still count toward capacity.": "项目与支出限额按所有者的账本计算，由成员及 API 密钥共同使用。已归档项目和已移除支出仍占用容量。",
   "The monthly Jev allowance covers model assistance, has no cash value, and cannot pay expenses or subscription charges.": "Jev 月度额度用于模型辅助，没有现金价值，不能用于支付支出或订阅费用。",
   "Jev assistance allowance": "Jev 辅助额度",
   "Paid subscription fees are non-refundable except where required by applicable law. Cancelling renewal does not refund the current paid period; paid access continues until that period ends.": "除适用法律另有强制规定外，已支付的订阅费用不予退还。取消续订不会退还当前周期费用，付费权益保留至该周期结束。",

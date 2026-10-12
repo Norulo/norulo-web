@@ -355,8 +355,9 @@ describe("BillingScreen", () => {
       expect(region).not.toHaveTextContent(/Remaining|Over limit by|Limit reached/);
       expect(region).toHaveTextContent("ledger you own, even when another ledger is selected");
       expect(region).toHaveTextContent(
-        "Archived or removed projects still count toward the project limit"
+        "Archived projects still count toward the project limit"
       );
+      expect(region).toHaveTextContent("Removing a project frees its project slot");
       expect(region).toHaveTextContent(
         "Removing an expense manually or automatically frees its place"
       );
@@ -366,6 +367,36 @@ describe("BillingScreen", () => {
       expect(noruloApi.billing.getPlan).toHaveBeenCalledWith();
     }
   );
+
+  it("reads current project capacity when Billing is reopened after a project removal", async () => {
+    const currentUsage = deferred();
+    noruloApi.billing.getPlan
+      .mockResolvedValueOnce(
+        withUsage("free", { used: 3, limit: 3 }, { used: 8, limit: 100 })
+      )
+      .mockReturnValueOnce(currentUsage.promise);
+    const firstVisit = render(<BillingScreen go={vi.fn()} navigate={vi.fn()} />);
+    expectUsageValues(
+      await screen.findByRole("region", { name: "Ledger usage" }),
+      "Projects",
+      3,
+      3
+    );
+    firstVisit.unmount();
+
+    render(<BillingScreen go={vi.fn()} navigate={vi.fn()} />);
+    expect(noruloApi.billing.getPlan).toHaveBeenCalledTimes(2);
+    expect(screen.queryByRole("region", { name: "Ledger usage" })).not.toBeInTheDocument();
+    await act(async () => {
+      currentUsage.resolve(
+        withUsage("free", { used: 2, limit: 3 }, { used: 6, limit: 100 })
+      );
+    });
+    const region = await screen.findByRole("region", { name: "Ledger usage" });
+    expectUsageValues(region, "Projects", 2, 3);
+    expectUsageValues(region, "Expense records", 6, 100);
+    expect(noruloApi.billing.getPlan).toHaveBeenCalledTimes(2);
+  });
 
   it("shows valid usage even when Server remaining values are inconsistent", async () => {
     noruloApi.billing.getPlan.mockResolvedValue(
@@ -497,8 +528,9 @@ describe("BillingScreen", () => {
       "Total allowance",
       "Refresh usage",
       "does not reset each month",
+      "Removing a project frees its project slot",
     ],
-    ["zh", "账本用量", "项目", "支出记录", "已使用", "总额度", "刷新用量", "容量不会每月重置"],
+    ["zh", "账本用量", "项目", "支出记录", "已使用", "总额度", "刷新用量", "容量不会每月重置", "移除项目会释放其项目名额"],
     [
       "ja",
       "帳簿の使用量",
@@ -508,6 +540,7 @@ describe("BillingScreen", () => {
       "合計枠",
       "使用量を更新",
       "毎月リセットされません",
+      "プロジェクトを削除するとそのプロジェクト枠が空きます",
     ],
     [
       "ko",
@@ -518,6 +551,7 @@ describe("BillingScreen", () => {
       "총 한도",
       "사용량 새로고침",
       "매월 초기화되지 않습니다",
+      "프로젝트를 제거하면 해당 프로젝트 자리가 비워집니다",
     ],
     [
       "fr",
@@ -528,6 +562,7 @@ describe("BillingScreen", () => {
       "Quota total",
       "Actualiser l’utilisation",
       "n’est pas réinitialisée chaque mois",
+      "Supprimer un projet libère sa place de projet",
     ],
     [
       "es",
@@ -538,10 +573,11 @@ describe("BillingScreen", () => {
       "Cupo total",
       "Actualizar uso",
       "no se restablece cada mes",
+      "Eliminar un proyecto libera su espacio de proyecto",
     ],
   ])(
     "localizes usage, totals and policy in %s",
-    async (locale, title, projects, records, used, total, refresh, retention) => {
+    async (locale, title, projects, records, used, total, refresh, retention, projectRemoval) => {
       await setLang(locale);
       noruloApi.billing.getPlan.mockResolvedValue(
         withUsage(
@@ -556,6 +592,7 @@ describe("BillingScreen", () => {
       expectUsageValues(region, records, 64567, 100000, locale, [used, total]);
       expect(within(region).getByRole("button", { name: refresh })).toBeInTheDocument();
       expect(region).toHaveTextContent(retention);
+      expect(region).toHaveTextContent(projectRemoval);
       if (locale !== "en") expect(region).not.toHaveTextContent("Ledger usage");
     }
   );

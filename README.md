@@ -97,8 +97,9 @@ meters for every plan.
 Project/shared-pool expenses and generated recurring occurrences use the owner's
 record allowance. Expense capacity counts current undeleted entries in shared
 pool and projects that have not been removed, including archived projects.
-Removing an expense or its project frees expense slots. Project capacity still
-counts archived and removed projects.
+Removing an expense or its project frees expense slots. Project capacity counts
+current undeleted projects, including archived projects. Removing a project also
+frees its project slot.
 Billing does not switch to a joined team's allowance with the ledger picker.
 
 Spending overview displays each currency's total beside its project / Shared

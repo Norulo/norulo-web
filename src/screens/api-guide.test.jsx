@@ -36,4 +36,21 @@ describe("REST integration journey", () => {
       expect(value).toContain(expected);
     expect(value).not.toContain("explicit active category is always required");
   });
+
+  it.each([
+    ["en", "projects count current undeleted projects, including archived projects", "Removing a project frees its project slot", "removing a project frees its project slot", "archived and removed projects"],
+    ["zh", "projects 统计未移除项目，包括归档项目", "移除项目会释放其项目名额", "移除项目则会释放其项目名额", "归档和移除的项目仍占用"],
+    ["ja", "projects はアーカイブ済みを含む未削除プロジェクト", "プロジェクトを削除するとそのプロジェクト枠が空きます", "削除するとプロジェクト枠も空きます", "アーカイブ・削除済み"],
+    ["ko", "projects는 보관된 프로젝트를 포함한 제거되지 않은 프로젝트", "프로젝트를 제거하면 해당 프로젝트 자리가 비워집니다", "프로젝트를 제거하면 프로젝트 자리도 비워집니다", "보관·제거된 프로젝트"],
+    ["fr", "projects compte les projets non supprimés, y compris les projets archivés", "Supprimer un projet libère sa place de projet", "supprimer un projet libère sa place de projet", "les projets archivés ou supprimés occupent"],
+    ["es", "projects cuenta los proyectos no eliminados, incluidos los archivados", "Eliminar un proyecto libera su espacio de proyecto", "eliminar un proyecto libera su plaza de proyecto", "los proyectos archivados o eliminados siguen ocupando"],
+  ])("explains current project capacity and deletion release in %s", async (locale, count, release, retentionRelease, oldPolicy) => {
+    await setLang(locale);
+    const limits = integrationMarkdown("https://api.norulo.com", ["troubleshooting"]);
+    const retention = integrationMarkdown("https://api.norulo.com", ["expense-retention"]);
+    expect(limits).toContain(count);
+    expect(limits).toContain(release);
+    expect(retention).toContain(retentionRelease);
+    expect(`${limits}\n${retention}`).not.toContain(oldPolicy);
+  });
 });

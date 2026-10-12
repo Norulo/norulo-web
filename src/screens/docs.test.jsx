@@ -73,7 +73,7 @@ describe("product Docs", () => {
     expect(heading).toHaveAttribute("id", "expense-retention");
     const section = heading.closest("section");
     for (const phrase of ["Off by default on every plan", "adds no charges", "frees expense slots",
-      "archived and removed projects still count", "expense date, then creation time, then ID",
+      "archived projects still count", "removing a project frees its project slot", "expense date, then creation time, then ID",
       "permission to remove that exact expense", "cannot be restored", "does not perform bulk cleanup",
       "failed save does not remove", "Recurring generation follows the same setting"]) {
       expect(section).toHaveTextContent(phrase);
@@ -135,7 +135,7 @@ describe("product Docs", () => {
         ["project-settings", "管理项目设置", ["开发和产品链接", "此操作无法撤销"]],
         ["recurring", "管理周期支出", ["每周、每月、每季度或每年", "不补记暂停期间的支出", "已经记入的支出仍保留", "10 条未处理", "全英文邮件", "站内信"]],
         ["activity", "查看操作日志", ["最近 24 小时", "重新加载", "不会轮询"]],
-        ["expense-retention", "支出容量与自动移除", ["默认关闭", "无法恢复", "设置不会批量移除"]],
+        ["expense-retention", "支出容量与自动移除", ["默认关闭", "无法恢复", "设置不会批量移除", "移除项目则会释放其项目名额"]],
       ],
       categories: "即使已被保存记录引用，也可以移除类别",
       quickstart: "API 接入教程",
@@ -146,7 +146,7 @@ describe("product Docs", () => {
         ["project-settings", "プロジェクト設定を管理", ["開発・製品リンク", "完全に削除され、復元できません"]],
         ["recurring", "定期支出を管理", ["毎週、毎月、四半期ごと、毎年", "停止期間分は遡って記録されません", "記録済み支出は保持します", "未処理の最初の10件", "英語のメール", "受信箱"]],
         ["activity", "操作ログを確認", ["直近 24 時間", "再読み込み", "定期取得は行いません"]],
-        ["expense-retention", "支出の容量と自動削除", ["追加料金はかかりません", "一括削除は行いません"]],
+        ["expense-retention", "支出の容量と自動削除", ["追加料金はかかりません", "一括削除は行いません", "削除するとプロジェクト枠も空きます"]],
       ],
       categories: "使用済みのカテゴリーも削除できます",
       quickstart: "API 導入ガイド",
@@ -157,7 +157,7 @@ describe("product Docs", () => {
         ["project-settings", "프로젝트 설정 관리", ["개발 및 제품 링크", "영구 삭제되며 복원할 수 없습니다"]],
         ["recurring", "반복 지출 관리", ["매주, 매월, 분기별 또는 매년", "중지 기간은 소급 기록되지 않습니다", "이미 기록된 지출은 유지됩니다", "10개의 미처리", "영어 이메일", "수신함"]],
         ["activity", "작업 로그 보기", ["최근 24시간", "새로고침", "주기적으로 조회하지 않고"]],
-        ["expense-retention", "지출 용량 및 자동 제거", ["추가 요금이 없습니다", "일괄 제거하지 않습니다"]],
+        ["expense-retention", "지출 용량 및 자동 제거", ["추가 요금이 없습니다", "일괄 제거하지 않습니다", "프로젝트를 제거하면 프로젝트 자리도 비워집니다"]],
       ],
       categories: "이미 사용된 카테고리도 제거할 수 있습니다",
       quickstart: "API 시작 안내",
@@ -168,7 +168,7 @@ describe("product Docs", () => {
         ["project-settings", "Gérer les paramètres du projet", ["liens de développement et de produit", "Cette action est irréversible"]],
         ["recurring", "Gérer les dépenses récurrentes", ["hebdomadaire, mensuelle, trimestrielle ou annuelle", "sans rattraper les périodes en pause", "conserve les dépenses déjà enregistrées", "10 premiers échecs", "e-mail en anglais", "boîte Norulo"]],
         ["activity", "Consulter le journal des opérations", ["dernières 24 heures", "Recharger", "sans interrogation périodique"]],
-        ["expense-retention", "Capacité des dépenses et suppression automatique", ["sans frais supplémentaires", "aucun nettoyage en masse"]],
+        ["expense-retention", "Capacité des dépenses et suppression automatique", ["sans frais supplémentaires", "aucun nettoyage en masse", "supprimer un projet libère sa place de projet"]],
       ],
       categories: "supprimer une catégorie déjà utilisée",
       quickstart: "Démarrage rapide de l’API",
@@ -179,7 +179,7 @@ describe("product Docs", () => {
         ["project-settings", "Gestionar la configuración del proyecto", ["enlaces de desarrollo y producto", "Esta acción es irreversible"]],
         ["recurring", "Gestionar gastos recurrentes", ["semanal, mensual, trimestral o anual", "sin recuperar períodos pausados", "conserva los gastos ya registrados", "10 fallos pendientes", "correo en inglés", "bandeja Norulo"]],
         ["activity", "Consultar el registro de operaciones", ["últimas 24 horas", "Recargar", "sin consultas periódicas"]],
-        ["expense-retention", "Capacidad de gastos y eliminación automática", ["sin cargos adicionales", "no hay limpieza masiva"]],
+        ["expense-retention", "Capacidad de gastos y eliminación automática", ["sin cargos adicionales", "no hay limpieza masiva", "eliminar un proyecto libera su plaza de proyecto"]],
       ],
       categories: "eliminar una categoría que ya esté en uso",
       quickstart: "Inicio rápido de la API",

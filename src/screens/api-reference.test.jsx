@@ -251,8 +251,8 @@ describe("complete OpenAPI reference", () => {
     expect(deletion).toHaveTextContent(
       "Moved-out current expenses and unrelated schedules survive"
     );
-    expect(deletion).toHaveTextContent("cumulative project capacity");
-    expect(deletion).toHaveTextContent("Active expense capacity is released");
+    expect(deletion).toHaveTextContent("Project capacity and active expense capacity are released");
+    expect(deletion).toHaveTextContent("prior write/model-fee counters remain");
     expect(deletion).toHaveTextContent("Cookie session (nr_session) OR Bearer API key");
     const categories = await openEndpoint("/api/v1/categories");
     expect(categories).toHaveTextContent("query: includeRemoved");

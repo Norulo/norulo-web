@@ -828,7 +828,6 @@ export const LEDGER_SCREEN_PHRASES = {
   "List projects in this ledger and repositories authorized to you.": "이 장부의 프로젝트와 접근 권한이 있는 저장소를 나열합니다.",
   "Create and manage projects, including names, descriptions, status and optional GitHub links.": "이름, 설명, 상태 및 선택적 GitHub 연결을 포함해 프로젝트를 생성하고 관리합니다.",
   "List categories in this ledger.": "이 장부의 카테고리를 나열합니다.",
-  "Project and expense limits apply to the Owner's ledger and are shared by members and API keys. Archived projects and removed expenses still count toward capacity.": "프로젝트 및 지출 한도는 소유자의 장부에 적용되며 멤버와 API 키가 공유합니다. 보관된 프로젝트와 삭제된 지출도 용량에 포함됩니다.",
   "The monthly Jev allowance covers model assistance, has no cash value, and cannot pay expenses or subscription charges.": "Jev 월 한도는 모델 지원에 사용되며 현금 가치가 없고 지출이나 구독 요금을 결제할 수 없습니다.",
   "Jev assistance allowance": "Jev 지원 한도",
   "Paid subscription fees are non-refundable except where required by applicable law. Cancelling renewal does not refund the current paid period; paid access continues until that period ends.": "관련 법률에서 요구하는 경우를 제외하고 이미 결제한 구독 요금은 환불되지 않습니다. 갱신을 취소해도 현재 결제 기간의 요금은 환불되지 않으며, 해당 기간이 끝날 때까지 유료 이용 권한이 유지됩니다.",

@@ -1020,17 +1020,15 @@ a.crumb-button:where(:not([aria-disabled="true"])):hover {
 .ledger-list > a {
   user-select: text;
 }
-/* Every console list shares one hover language: a faint tint plus a hard 2px
-   accent edge drawn inside the row, so rows read the same on every page. */
+/* Every console list shares one hover language: a faint background tint only,
+   so rows read the same on every page. Accent edges stay reserved for active
+   and selected states. */
 :is(.ledger-list > article, .key-list > .key-row):not(.skeleton-row) {
-  transition:
-    background 160ms ease,
-    box-shadow 160ms ease;
+  transition: background 160ms ease;
 }
 :is(.ledger-list > article, .key-list > .key-row):not(.skeleton-row):hover,
 :is(.ledger-list > article, .key-list > .key-row):not(.skeleton-row):focus-within {
   background: var(--bg-tint);
-  box-shadow: inset 2px 0 0 var(--accent);
 }
 
 /* Financial values share one hierarchy across records, reports and plans. */

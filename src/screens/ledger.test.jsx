@@ -72,6 +72,13 @@ async function openGitHubLinks() {
   await waitFor(() => expect(screen.queryByText("Loading repositories…")).not.toBeInTheDocument());
 }
 
+async function clickManageGitHubAccess() {
+  // The button exists while repository or ledger loads still disable it.
+  const button = await screen.findByRole("button", { name: /Manage GitHub access/i });
+  await waitFor(() => expect(button).toBeEnabled());
+  fireEvent.click(button);
+}
+
 async function openFilters() {
   const button = await screen.findByRole("button", { name: "Filters" });
   await waitFor(() => expect(button).toBeEnabled());
@@ -1433,7 +1440,7 @@ describe("ledger screens", () => {
     github.connect.mockRejectedValue(new Error("GitHub authorization was cancelled"));
     render(<LedgerScreen go={vi.fn()} mode="projects" />);
     await openGitHubLinks();
-    fireEvent.click(await screen.findByRole("button", { name: /Manage GitHub access/i }));
+    await clickManageGitHubAccess();
     expect(await screen.findByRole("alert")).toHaveTextContent(
       "GitHub authorization was cancelled"
     );
@@ -1465,7 +1472,7 @@ describe("ledger screens", () => {
     github.connect.mockResolvedValue(undefined);
     render(<LedgerScreen go={vi.fn()} mode="projects" />);
     await openGitHubLinks();
-    fireEvent.click(await screen.findByRole("button", { name: /Manage GitHub access/i }));
+    await clickManageGitHubAccess();
     expect(await screen.findByRole("option", { name: "alice/project" })).toBeInTheDocument();
     expect(github.connect).toHaveBeenCalledTimes(1);
   });

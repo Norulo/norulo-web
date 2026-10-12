@@ -53,6 +53,13 @@ async function openGitHubLinks() {
   await waitFor(() => expect(summary.closest("details")).toHaveAttribute("open"));
 }
 
+async function clickManageGitHubAccess() {
+  // The button exists while repository or ledger loads still disable it.
+  const button = await screen.findByRole("button", { name: /Manage GitHub access/i });
+  await waitFor(() => expect(button).toBeEnabled());
+  fireEvent.click(button);
+}
+
 async function closeGitHubLinks() {
   const summary = screen.getByText("Link GitHub repositories (optional)", { selector: "summary" });
   if (summary.closest("details").open) fireEvent.click(summary);
@@ -665,7 +672,7 @@ describe("Projects authorization and creation", () => {
     api.repositories.mockResolvedValueOnce({ items: [], nextCursor: null });
     render(<LedgerScreen go={vi.fn()} mode="projects" />);
     await openGitHubLinks();
-    fireEvent.click(await screen.findByRole("button", { name: /Manage GitHub access/i }));
+    await clickManageGitHubAccess();
     expect(await screen.findByRole("option", { name: "alice/project" })).toBeInTheDocument();
     expect(github.connect).toHaveBeenCalledTimes(1);
     expect(api.repositories).toHaveBeenCalledTimes(2);
@@ -732,7 +739,7 @@ describe("Projects authorization and creation", () => {
     render(<LedgerScreen go={vi.fn()} mode="projects" />);
     await openGitHubLinks();
     expect(screen.getByText(/On GitHub, finish saving, then close the window/)).toBeVisible();
-    fireEvent.click(await screen.findByRole("button", { name: /Manage GitHub access/i }));
+    await clickManageGitHubAccess();
     await waitFor(() => expect(api.projects).toHaveBeenCalledTimes(2));
     expect(screen.queryByText(message)).not.toBeInTheDocument();
 
@@ -754,7 +761,7 @@ describe("Projects authorization and creation", () => {
     });
     render(<LedgerScreen go={vi.fn()} mode="projects" />);
     await openGitHubLinks();
-    fireEvent.click(await screen.findByRole("button", { name: /Manage GitHub access/i }));
+    await clickManageGitHubAccess();
     expect(await screen.findByRole("alert")).toHaveTextContent("Projects could not be read");
     expect(screen.queryByRole("status")).not.toBeInTheDocument();
   });
@@ -774,7 +781,7 @@ describe("Projects authorization and creation", () => {
     };
     const view = render(<LedgerScreen go={vi.fn()} mode="projects" workspace={workspace} />);
     await openGitHubLinks();
-    fireEvent.click(await screen.findByRole("button", { name: /Manage GitHub access/i }));
+    await clickManageGitHubAccess();
     view.rerender(
       <LedgerScreen go={vi.fn()} mode="projects" workspace={{ ...workspace, id: "usr_second" }} />
     );
@@ -793,7 +800,7 @@ describe("Projects authorization and creation", () => {
     github.connect.mockRejectedValueOnce(new Error("GitHub denied authorization"));
     render(<LedgerScreen go={vi.fn()} mode="projects" />);
     await openGitHubLinks();
-    fireEvent.click(await screen.findByRole("button", { name: /Manage GitHub access/i }));
+    await clickManageGitHubAccess();
     expect(await screen.findByRole("alert")).toHaveTextContent("GitHub denied authorization");
     expect(screen.getByRole("button", { name: /Manage GitHub access/i })).toBeEnabled();
     expect(api.repositories).toHaveBeenCalledTimes(1);
@@ -921,7 +928,7 @@ describe("Projects authorization and creation", () => {
     );
     const view = render(<LedgerScreen go={vi.fn()} mode="projects" />);
     await openGitHubLinks();
-    fireEvent.click(await screen.findByRole("button", { name: /Manage GitHub access/i }));
+    await clickManageGitHubAccess();
     view.unmount();
     finish();
     await Promise.resolve();

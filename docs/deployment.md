@@ -1,17 +1,40 @@
 # Norulo production deployment
 
-The latest frontend GitHub navigation and Settings/repository layout release
+The Project capacity deletion fix was published and verified on 2026-10-12.
+Web main source `ce91b4468df1bf322deb5ed4fb9f5a8a46927f02` runs as version
+`55cf559b-c1ae-46b8-99f3-1f64a6add3c1`; Server main source
+`81cea4337e80b7d19c6f79ba94447bb9d95505cf` runs as version
+`075fb193-6440-4182-8470-5f40c43f7c70`. Both have 100% production traffic.
+Billing and creation admission count current undeleted projects, including
+archives, so deletion releases a project place even with a legacy cumulative
+counter. Six-language capacity copy and the shared OpenAPI artifacts match.
+The two newer frontend main changes were retained before publication.
+See the [Project capacity production record](../../norulo-server/docs/validation/project-capacity-production-release-2026-10-12.json).
+
+The final integrated Web passed 1,706 tests in 84 files, lint, an explicit
+production build, offline Worker checks and Wrangler dry-run. Actual upload
+bundles matched the reviewed dry-run artifacts. Twelve final TLS-verified
+anonymous GETs checked page shells, direct/proxied health and authorization,
+five byte-identical public assets and the path/query-preserving 308 WWW redirect.
+The record also retains three earlier successful GETs from a corrected smoke
+harness. All public variables, six Server Secret names, resource bindings,
+monitoring, limits and the daily cron were preserved. The schema check read
+334 rows and wrote zero; no migration or production test fixture was needed.
+Authenticated customer deletion/recreation remains user-operated acceptance;
+the fix's complete deletion/recreation regression was local.
+
+The earlier frontend GitHub navigation and Settings/repository layout release
 was verified on 2026-10-11. Web source
-`678b49fbd4f7e2cb5ff93f259866b7166c6850c0` is deployed as version
-`d2e48265-698c-4b4f-9824-170614a53a0c` with 100% production traffic. See the
+`678b49fbd4f7e2cb5ff93f259866b7166c6850c0` was deployed as version
+`d2e48265-698c-4b4f-9824-170614a53a0c` with 100% production traffic at that time. See the
 [GitHub/Settings production release record](validation/github-settings-production-release-2026-10-11.json).
 The user explicitly authorized GitHub main publication and Cloudflare deployment.
 The prior local record's pending-publication state is historical. This Web-only
 release preserved production bindings, domains, logging and disabled preview
-URLs; Server remains at version `15ebb291-af35-4600-87e9-0064d8fe33d0`.
+URLs; Server remained at version `15ebb291-af35-4600-87e9-0064d8fe33d0`.
 
 The previous frontend Projects release was verified on 2026-10-11. Web source
-`4f0da82e957d1a8aec490a01aeda19b37bf41aff` is deployed as version
+`4f0da82e957d1a8aec490a01aeda19b37bf41aff` was deployed as version
 `bce7995f-6c1c-4481-ab44-7b1718ba059e` with 100% production traffic. See the
 [Projects production release record](validation/projects-production-release-2026-10-11.json).
 This Web-only release retained the production Server binding and its active
@@ -28,12 +51,12 @@ Release A's hourly publication is retained below as historical evidence.
 ## Published frontend
 
 Cloudflare publication of the frontend application completed successfully using
-Web main commit `678b49fbd4f7e2cb5ff93f259866b7166c6850c0`:
+Web main commit `ce91b4468df1bf322deb5ed4fb9f5a8a46927f02`:
 
 | Setting | Published value |
 | --- | --- |
 | Worker | `norulo-web` |
-| Version | `d2e48265-698c-4b4f-9824-170614a53a0c` |
+| Version | `55cf559b-c1ae-46b8-99f3-1f64a6add3c1` |
 | Custom domains | `norulo.com`, `www.norulo.com` |
 | Mode | `production` |
 | API origin | `https://api.norulo.com` |
@@ -46,7 +69,7 @@ The production build uses `VITE_APP_URL=https://norulo.com`,
 [Norulo](https://github.com/apps/norulo). The exact user-supplied logo and its
 derivatives are included; see [brand provenance](branding.md).
 
-The GitHub/Settings release passed all 1,694 tests in 84 files, lint, an explicit
+The earlier GitHub/Settings release passed all 1,694 tests in 84 files, lint, an explicit
 production build, offline Worker checks and Wrangler dry-run. Eight finite local
 Chromium/WebKit contexts checked 1280/1024/390/320px layouts. Repository selection
 rows align their checkbox and full name and have at least 44px height. View plans
@@ -101,7 +124,7 @@ byte-for-byte; the original logo hash was unchanged.
 
 ## Published backend and remaining acceptance
 
-The full Python `norulo-server-production` Worker has been published at
+The daily release B of the full Python `norulo-server-production` Worker was published at
 `api.norulo.com` from Server main commit
 `ded49a46b06f5f79e2996f58d773d66acaddc0a0`, version
 `e2e4e02d-ac9a-4c20-852f-f6cbfe5b5ae4`. Release B readback verified all 19 public

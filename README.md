@@ -1,5 +1,11 @@
 # Norulo Web
 
+The Project capacity fix is published in production as of 2026-10-12. Deleting
+a project releases its project place; Billing, creation limits and all six
+languages share the current undeleted-project definition. Final integrated main
+passed 1,706 tests. See [deployment verification](docs/deployment.md) for the
+exact source commits, Worker versions and read-only production checks.
+
 The user has now confirmed ordinary expense recording works. The current release
 also fixes mobile profile spacing and narrow-screen project setup steps. Empty
 payment configuration supports Free use; paid checkout remains unavailable until

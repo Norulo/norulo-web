@@ -1,5 +1,18 @@
 # Norulo production deployment
 
+The console record alignment release was verified on 2026-10-12. Web source
+`ead7e33cea6d2fe0e2eaa8eafbeee4ba9638b885` is deployed as version
+`7b89fa52-6e8c-4014-92bc-3322bc9df341` with 100% production traffic.
+Operation log and other equal-height records now start at a fixed top inset.
+The final source includes the latest API-key pagination and metadata changes.
+All 1,805 tests, 48 focused alignment states and 258 existing date/inline-control
+layout states passed; browser evidence is local Chromium only. Production
+readback matched all 20 selected assets and verified homepage, health and
+unauthenticated access protection. Bindings, domains, observability and disabled
+preview URLs were preserved; Server remains at version
+`2a1a1086-a0ce-40c1-8e83-5b5e7d6b3a9d`. See the
+[alignment production release record](validation/console-record-top-alignment-production-release-2026-10-12.json).
+
 The Web review fixes were published and independently verified on 2026-10-12.
 Web main source `9cb56ff0e922740d0c6eee648244723d55279a3e` is deployed as
 version `96423614-f893-4710-b8c9-ad76c03173ef` with 100% production traffic.

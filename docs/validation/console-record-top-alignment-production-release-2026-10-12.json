@@ -1,0 +1,372 @@
+{
+  "verified_at_beijing": "2026-10-12T17:49:32.415508+08:00",
+  "source_commit": "ead7e33cea6d2fe0e2eaa8eafbeee4ba9638b885",
+  "github_main_published_before_deployment": true,
+  "worker_name": "norulo-web",
+  "account_id": "84e421f26c708c0cf437e287eed11fa1",
+  "web_version": "7b89fa52-6e8c-4014-92bc-3322bc9df341",
+  "traffic_percentage": 100,
+  "retained_server_version": "2a1a1086-a0ce-40c1-8e83-5b5e7d6b3a9d",
+  "passed": true,
+  "management_readback": {
+    "deployments": {
+      "web": {
+        "id": "6840ebcb-97ee-4e46-9b5a-ff7ac7b975f3",
+        "created_on": "2026-10-12T09:46:40.334957Z",
+        "versions": [
+          {
+            "version_id": "7b89fa52-6e8c-4014-92bc-3322bc9df341",
+            "percentage": 100
+          }
+        ],
+        "annotations": {
+          "workers/message": "Anchor equal-height console records at the top (ead7e33cea6d2fe0e2eaa8eafbeee4ba9638b885)",
+          "workers/triggered_by": "deployment"
+        }
+      },
+      "server": {
+        "id": "573ab1c2-5568-4580-b904-e0f9ac50d53c",
+        "versions": [
+          {
+            "version_id": "2a1a1086-a0ce-40c1-8e83-5b5e7d6b3a9d",
+            "percentage": 100
+          }
+        ]
+      }
+    },
+    "settings": {
+      "bindings": [
+        {
+          "name": "ASSETS",
+          "type": "assets"
+        },
+        {
+          "name": "NORULO_API_ORIGIN",
+          "text": "https://api.norulo.com",
+          "type": "plain_text"
+        },
+        {
+          "name": "NORULO_MODE",
+          "text": "production",
+          "type": "plain_text"
+        },
+        {
+          "environment": "production",
+          "name": "NORULO_SERVER",
+          "service": "norulo-server-production",
+          "type": "service"
+        }
+      ],
+      "compatibility_date": "2026-05-25",
+      "observability": {
+        "enabled": true,
+        "head_sampling_rate": 1,
+        "redact_query_string": true,
+        "logs": {
+          "enabled": true,
+          "head_sampling_rate": 0.01,
+          "persist": true,
+          "invocation_logs": false
+        },
+        "traces": {
+          "enabled": false,
+          "persist": true,
+          "head_sampling_rate": 1
+        },
+        "issues": {
+          "enabled": true
+        }
+      }
+    },
+    "subdomain": {
+      "enabled": false,
+      "previews_enabled": false
+    },
+    "domains": [
+      {
+        "hostname": "norulo.com",
+        "service": "norulo-web",
+        "environment": "production",
+        "enabled": true,
+        "previews_enabled": false
+      },
+      {
+        "hostname": "www.norulo.com",
+        "service": "norulo-web",
+        "environment": "production",
+        "enabled": true,
+        "previews_enabled": false
+      }
+    ],
+    "preserved_settings_domains_and_disabled_preview_urls": true
+  },
+  "public_readback": {
+    "checkedAtUTC": "2026-10-12T09:47:16.021679+00:00",
+    "checkedAtBeijing": "2026-10-12T17:47:16.021679+08:00",
+    "sourceCommit": "ead7e33cea6d2fe0e2eaa8eafbeee4ba9638b885",
+    "expectedCloudflareVersion": "7b89fa52-6e8c-4014-92bc-3322bc9df341",
+    "versionObservation": "Cloudflare management version/configuration is checked separately by the release operator",
+    "scope": "Finite anonymous TLS-verified GETs through inherited proxy; no JavaScript execution, remote SQL, credentials, application writes, or retries",
+    "requests": [
+      {
+        "path": "/",
+        "expectedStatus": 200,
+        "status": 200,
+        "setCookie": false,
+        "bytes": 5252
+      },
+      {
+        "path": "/api/health",
+        "expectedStatus": 200,
+        "status": 200,
+        "setCookie": false,
+        "bytes": 88,
+        "body": {
+          "ok": true,
+          "service": "norulo-server",
+          "database": {
+            "type": "d1",
+            "configured": true
+          }
+        }
+      },
+      {
+        "path": "/api/api/v1/me",
+        "expectedStatus": 401,
+        "status": 401,
+        "setCookie": false,
+        "bytes": 38
+      },
+      {
+        "path": "/assets/activity-log-BExximTb.js",
+        "expectedStatus": 200,
+        "status": 200,
+        "setCookie": false,
+        "bytes": 8180,
+        "localBytes": 8180,
+        "localSha256": "bfb5d36486ccfee43b4470c6f19bbb44c367b39814daf8840f05cf3caa0c0460",
+        "remoteSha256": "bfb5d36486ccfee43b4470c6f19bbb44c367b39814daf8840f05cf3caa0c0460",
+        "matchesFinalDist": true
+      },
+      {
+        "path": "/assets/activity-log-Bg6S74-X.css",
+        "expectedStatus": 200,
+        "status": 200,
+        "setCookie": false,
+        "bytes": 1739,
+        "localBytes": 1739,
+        "localSha256": "9984f4c870c6cd4ad6e1aac209124c44399de7c82c6e1e4a060aff85e468cc07",
+        "remoteSha256": "9984f4c870c6cd4ad6e1aac209124c44399de7c82c6e1e4a060aff85e468cc07",
+        "matchesFinalDist": true
+      },
+      {
+        "path": "/assets/api-DIvIJuM7.css",
+        "expectedStatus": 200,
+        "status": 200,
+        "setCookie": false,
+        "bytes": 3203,
+        "localBytes": 3203,
+        "localSha256": "c4e744df5968740f6917d7deaaa5a02514b93675e06dfb835d995faafe7fb162",
+        "remoteSha256": "c4e744df5968740f6917d7deaaa5a02514b93675e06dfb835d995faafe7fb162",
+        "matchesFinalDist": true
+      },
+      {
+        "path": "/assets/api-Dbz4lInG.js",
+        "expectedStatus": 200,
+        "status": 200,
+        "setCookie": false,
+        "bytes": 29434,
+        "localBytes": 29434,
+        "localSha256": "19e98be3f80724913802f2cb186db45416cd73aeeddc215a52403fafad4a7228",
+        "remoteSha256": "19e98be3f80724913802f2cb186db45416cd73aeeddc215a52403fafad4a7228",
+        "matchesFinalDist": true
+      },
+      {
+        "path": "/assets/api-docs-DX9bCjXM.js",
+        "expectedStatus": 200,
+        "status": 200,
+        "setCookie": false,
+        "bytes": 314621,
+        "localBytes": 314621,
+        "localSha256": "50681ea3d05ec3338b68059bc2aae242c9b74f8143aaa2ef116576bb66de2734",
+        "remoteSha256": "50681ea3d05ec3338b68059bc2aae242c9b74f8143aaa2ef116576bb66de2734",
+        "matchesFinalDist": true
+      },
+      {
+        "path": "/assets/billing-Bn3OHo2x.css",
+        "expectedStatus": 200,
+        "status": 200,
+        "setCookie": false,
+        "bytes": 17089,
+        "localBytes": 17089,
+        "localSha256": "e8b45eccfabd0c714c9c0b9cafe74b2f2692fcd8fc1a8cfcb070ae2bd5ae9124",
+        "remoteSha256": "e8b45eccfabd0c714c9c0b9cafe74b2f2692fcd8fc1a8cfcb070ae2bd5ae9124",
+        "matchesFinalDist": true
+      },
+      {
+        "path": "/assets/billing-Cu9TSvqJ.js",
+        "expectedStatus": 200,
+        "status": 200,
+        "setCookie": false,
+        "bytes": 47215,
+        "localBytes": 47215,
+        "localSha256": "cf78a81cfe46c609d7fd6e870037692840874d8e7363468dc2244f572ac7a0e2",
+        "remoteSha256": "cf78a81cfe46c609d7fd6e870037692840874d8e7363468dc2244f572ac7a0e2",
+        "matchesFinalDist": true
+      },
+      {
+        "path": "/assets/index-9qKzcTuW.css",
+        "expectedStatus": 200,
+        "status": 200,
+        "setCookie": false,
+        "bytes": 68687,
+        "localBytes": 68687,
+        "localSha256": "2fe743f09546cd4b6efabc65daa2af625228d579bef09543cf1db2d5cd745a2c",
+        "remoteSha256": "2fe743f09546cd4b6efabc65daa2af625228d579bef09543cf1db2d5cd745a2c",
+        "matchesFinalDist": true
+      },
+      {
+        "path": "/assets/index-ZIVWIJeG.js",
+        "expectedStatus": 200,
+        "status": 200,
+        "setCookie": false,
+        "bytes": 119936,
+        "localBytes": 119936,
+        "localSha256": "5c067a4b943b18c46abe59e7a8a19020fc41a3c192449843d624c49aa853fa7a",
+        "remoteSha256": "5c067a4b943b18c46abe59e7a8a19020fc41a3c192449843d624c49aa853fa7a",
+        "matchesFinalDist": true
+      },
+      {
+        "path": "/assets/ledger-Bx8BdLCh.css",
+        "expectedStatus": 200,
+        "status": 200,
+        "setCookie": false,
+        "bytes": 3457,
+        "localBytes": 3457,
+        "localSha256": "7d56ba535172bb9983a6c4be6a0c1277e40f62f9a935763ab577d255eb6871ef",
+        "remoteSha256": "7d56ba535172bb9983a6c4be6a0c1277e40f62f9a935763ab577d255eb6871ef",
+        "matchesFinalDist": true
+      },
+      {
+        "path": "/assets/ledger-ChZ_GJN_.css",
+        "expectedStatus": 200,
+        "status": 200,
+        "setCookie": false,
+        "bytes": 32414,
+        "localBytes": 32414,
+        "localSha256": "95c7c2c1db2cc43e0b2777b7d007293cad0e2741a8c6346b2ea1ebddc8521870",
+        "remoteSha256": "95c7c2c1db2cc43e0b2777b7d007293cad0e2741a8c6346b2ea1ebddc8521870",
+        "matchesFinalDist": true
+      },
+      {
+        "path": "/assets/ledger-DeBP0k7h.js",
+        "expectedStatus": 200,
+        "status": 200,
+        "setCookie": false,
+        "bytes": 114845,
+        "localBytes": 114845,
+        "localSha256": "e6acd9c3cbf4e5ec304570bab05c602578b58af463bca03f7e28b75b514b0209",
+        "remoteSha256": "e6acd9c3cbf4e5ec304570bab05c602578b58af463bca03f7e28b75b514b0209",
+        "matchesFinalDist": true
+      },
+      {
+        "path": "/assets/ledger-overview-7TGriCUz.js",
+        "expectedStatus": 200,
+        "status": 200,
+        "setCookie": false,
+        "bytes": 4788,
+        "localBytes": 4788,
+        "localSha256": "f4210b64570b1da61edeb0c372653a75cd8feb5fd0153ef502f79995b553c70b",
+        "remoteSha256": "f4210b64570b1da61edeb0c372653a75cd8feb5fd0153ef502f79995b553c70b",
+        "matchesFinalDist": true
+      },
+      {
+        "path": "/assets/ledger-split-DC8jiKpE.js",
+        "expectedStatus": 200,
+        "status": 200,
+        "setCookie": false,
+        "bytes": 1530,
+        "localBytes": 1530,
+        "localSha256": "f8bd4de3f5478afbf6ee4d83250ca554e6d31346a592035f588aade46c304688",
+        "remoteSha256": "f8bd4de3f5478afbf6ee4d83250ca554e6d31346a592035f588aade46c304688",
+        "matchesFinalDist": true
+      },
+      {
+        "path": "/assets/ledger-summary-J4cx7ACh.js",
+        "expectedStatus": 200,
+        "status": 200,
+        "setCookie": false,
+        "bytes": 5189,
+        "localBytes": 5189,
+        "localSha256": "a187dc950b302e03ddb4279a7f9cc8759ea81b4c19f602fff0b72f3e0104f14f",
+        "remoteSha256": "a187dc950b302e03ddb4279a7f9cc8759ea81b4c19f602fff0b72f3e0104f14f",
+        "matchesFinalDist": true
+      },
+      {
+        "path": "/assets/members-BMHWZxaT.js",
+        "expectedStatus": 200,
+        "status": 200,
+        "setCookie": false,
+        "bytes": 26721,
+        "localBytes": 26721,
+        "localSha256": "2b7c6ad37849c2c0457617b1d87819ca6e18cec9d4b40de760c1ef6c04111417",
+        "remoteSha256": "2b7c6ad37849c2c0457617b1d87819ca6e18cec9d4b40de760c1ef6c04111417",
+        "matchesFinalDist": true
+      },
+      {
+        "path": "/assets/members-yfiuCHLq.css",
+        "expectedStatus": 200,
+        "status": 200,
+        "setCookie": false,
+        "bytes": 4039,
+        "localBytes": 4039,
+        "localSha256": "fa49f00268460b66da1575270e34f25659a57326922cbd6467062c270286d25b",
+        "remoteSha256": "fa49f00268460b66da1575270e34f25659a57326922cbd6467062c270286d25b",
+        "matchesFinalDist": true
+      },
+      {
+        "path": "/assets/recurring-expenses-BQO-OuNb.js",
+        "expectedStatus": 200,
+        "status": 200,
+        "setCookie": false,
+        "bytes": 14633,
+        "localBytes": 14633,
+        "localSha256": "d0221e1c8e7b59e528c149f6c36901982448318e48ad14b8f98909c23d43593d",
+        "remoteSha256": "d0221e1c8e7b59e528c149f6c36901982448318e48ad14b8f98909c23d43593d",
+        "matchesFinalDist": true
+      },
+      {
+        "path": "/assets/recurring-expenses-NIoBLfla.css",
+        "expectedStatus": 200,
+        "status": 200,
+        "setCookie": false,
+        "bytes": 2966,
+        "localBytes": 2966,
+        "localSha256": "b52adf792b26b51dc8d46c84bbb3d61f6fccd11c1d9170af027ca50c6000daba",
+        "remoteSha256": "b52adf792b26b51dc8d46c84bbb3d61f6fccd11c1d9170af027ca50c6000daba",
+        "matchesFinalDist": true
+      },
+      {
+        "path": "/assets/recurring-schedule-fields-D-vlZpPi.js",
+        "expectedStatus": 200,
+        "status": 200,
+        "setCookie": false,
+        "bytes": 5794,
+        "localBytes": 5794,
+        "localSha256": "70a15a5cc1d6facee6d9fb122717680338e2b023854a7489bdeae4fd49a10445",
+        "remoteSha256": "70a15a5cc1d6facee6d9fb122717680338e2b023854a7489bdeae4fd49a10445",
+        "matchesFinalDist": true
+      }
+    ],
+    "failures": [],
+    "passed": true,
+    "assetCount": 20,
+    "requestCount": 23
+  },
+  "local_validation_record": "console-record-top-alignment-local-2026-10-12.json",
+  "remote_business_writes": 0,
+  "remote_SQL_operations": 0,
+  "limitations": [
+    "Anonymous static byte verification and local Chromium fixture geometry do not establish authenticated business or physical-device acceptance."
+  ]
+}

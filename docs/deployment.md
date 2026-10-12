@@ -1,5 +1,30 @@
 # Norulo production deployment
 
+The Web security review release was verified on 2026-10-12 at 15:25:47 UTC.
+Web main source `e2c72018aa467e4db3f3c14461a162be1a38f2b8` is deployed as
+version `263da268-8498-4874-be61-64ebc03eeb2a` with 100% production traffic.
+The release pins Wrangler and CI actions, makes API-key pagination explicit,
+restricts sandbox checkout redirects, removes unused GitHub refresh storage,
+normalizes trusted URLs, generates static headers from the shared policy, and
+adds host-only HSTS and Permissions-Policy. Local development defaults to
+loopback, and discarded proxy fallback bodies are cancelled.
+
+All 1,831 tests in 86 files, lint, production build, offline Worker checks and
+Wrangler dry-run passed. Full dependency audit found zero advisories; 365
+registry signatures and 67 attestations verified. Local Chromium passed 258
+existing layout states and three API-key pagination/recovery/account-isolation
+scenarios, including a 44px clickable Load more control at 320px. Firefox and
+WebKit were unavailable locally; these fixtures are not physical-device or
+authenticated customer acceptance.
+
+Final production readback verified the matching source annotation, expected
+security headers, current page builds, six byte-identical assets, the WWW
+redirect and proxy health. Bindings, domains, observability and disabled preview
+URLs were preserved; Server remains at version
+`2a1a1086-a0ce-40c1-8e83-5b5e7d6b3a9d`. No production business write or SQL API
+call was made. See the [review assessment](validation/web-security-review-assessment-2026-10-12.json)
+and [security production release record](validation/web-security-production-release-2026-10-12.json).
+
 The archived-project notice style release was verified on 2026-10-12. Web source
 `6b95e2588be5b0e73469f07c16040c47aa1d7248` is deployed as version
 `06408ecb-6430-4b22-8ac3-9eabe5bf5b1b` with 100% production traffic.
@@ -98,12 +123,12 @@ Release A's hourly publication is retained below as historical evidence.
 ## Published frontend
 
 Cloudflare publication of the frontend application completed successfully using
-Web main source commit `6b95e2588be5b0e73469f07c16040c47aa1d7248`:
+Web main source commit `e2c72018aa467e4db3f3c14461a162be1a38f2b8`:
 
 | Setting | Published value |
 | --- | --- |
 | Worker | `norulo-web` |
-| Version | `06408ecb-6430-4b22-8ac3-9eabe5bf5b1b` |
+| Version | `263da268-8498-4874-be61-64ebc03eeb2a` |
 | Custom domains | `norulo.com`, `www.norulo.com` |
 | Mode | `production` |
 | API origin | `https://api.norulo.com` |

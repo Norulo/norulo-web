@@ -1,0 +1,369 @@
+{
+  "verified_at_utc": "2026-10-12T15:25:47.564851+00:00",
+  "source_commit": "e2c72018aa467e4db3f3c14461a162be1a38f2b8",
+  "github_main_published_before_deployment": true,
+  "worker_name": "norulo-web",
+  "account_id": "84e421f26c708c0cf437e287eed11fa1",
+  "web_version": "263da268-8498-4874-be61-64ebc03eeb2a",
+  "traffic_percentage": 100,
+  "retained_server_version": "2a1a1086-a0ce-40c1-8e83-5b5e7d6b3a9d",
+  "passed": true,
+  "assessment": "web-security-review-assessment-2026-10-12.json",
+  "local_checks": {
+    "npm_ci": "passed",
+    "lint": "passed",
+    "tests": {
+      "files": 86,
+      "passed": 1831,
+      "failed": 0
+    },
+    "build": "passed",
+    "workers_offline": "passed",
+    "full_dependency_audit": {
+      "advisories": 0
+    },
+    "registry_signatures_verified": 365,
+    "registry_attestations_verified": 67,
+    "generated_headers_match_shared_module": true,
+    "independent_final_source_review": "passed",
+    "browser_layout": {
+      "engine": "Chromium 154.0.8037.57",
+      "states": 258,
+      "profiles": 4,
+      "passed": true,
+      "physical_device_acceptance": false
+    },
+    "api_key_browser": {
+      "engine": "chromium 154.0.8037.57",
+      "scenarios": [
+        "desktop-explicit-page",
+        "phone-320-failure-manual-retry",
+        "identity-change-stale-page"
+      ],
+      "passed": true,
+      "remote_requests": 0,
+      "writes": 0,
+      "phone_button_height_px": 44,
+      "stale_account_page_aborted": true,
+      "product_source_sha256": "45c478529cc0b97796b514cd0a80c86599ef42dd5da97835c73506af7bb9f144"
+    },
+    "production_build": "passed with explicit Norulo production origin and same-origin API",
+    "wrangler_dry_run": "passed with pinned Wrangler 4.149.0"
+  },
+  "local_api_key_browser_validation": {
+    "timestamp": "2026-10-12T15:20:48.515Z",
+    "scope": "Local native Chromium fixtures; no remote requests or Server writes",
+    "sourceSha256": "45c478529cc0b97796b514cd0a80c86599ef42dd5da97835c73506af7bb9f144",
+    "profiles": [
+      {
+        "name": "desktop-explicit-page",
+        "width": 1440,
+        "checks": [
+          "one initial page",
+          "explicit second page",
+          "first page retained",
+          "end cursor removes Load more"
+        ],
+        "totalRequests": 23,
+        "apiKeyCalls": [
+          {
+            "actor": "a",
+            "cursor": null,
+            "workspaceId": "usr_browser_a"
+          },
+          {
+            "actor": "a",
+            "cursor": "cursor_a_1",
+            "workspaceId": "usr_browser_a"
+          }
+        ],
+        "writes": 0,
+        "externalDelivered": 0,
+        "violations": [],
+        "failures": []
+      },
+      {
+        "name": "phone-320-failure-manual-retry",
+        "width": 320,
+        "geometry": {
+          "width": 320,
+          "documentWidth": 320,
+          "rect": {
+            "left": 20,
+            "right": 125.0625,
+            "top": 588.5625,
+            "bottom": 632.5625,
+            "height": 44
+          },
+          "navTop": 648.21875,
+          "hitTarget": true
+        },
+        "checks": [
+          "one initial page",
+          "failed next page retains first page",
+          "manual retry only",
+          "44px button hit-test above mobile nav",
+          "no horizontal overflow"
+        ],
+        "totalRequests": 24,
+        "apiKeyCalls": [
+          {
+            "actor": "a",
+            "cursor": null,
+            "workspaceId": "usr_browser_a"
+          },
+          {
+            "actor": "a",
+            "cursor": "cursor_a_1",
+            "workspaceId": "usr_browser_a"
+          },
+          {
+            "actor": "a",
+            "cursor": "cursor_a_1",
+            "workspaceId": "usr_browser_a"
+          }
+        ],
+        "writes": 0,
+        "externalDelivered": 0,
+        "violations": [],
+        "failures": []
+      },
+      {
+        "name": "identity-change-stale-page",
+        "width": 1440,
+        "checks": [
+          "old page aborted",
+          "new actor first page",
+          "old account rows and cursor discarded"
+        ],
+        "totalRequests": 28,
+        "apiKeyCalls": [
+          {
+            "actor": "a",
+            "cursor": null,
+            "workspaceId": "usr_browser_a"
+          },
+          {
+            "actor": "a",
+            "cursor": "cursor_a_1",
+            "workspaceId": "usr_browser_a"
+          },
+          {
+            "actor": "b",
+            "cursor": null,
+            "workspaceId": "usr_browser_b"
+          }
+        ],
+        "writes": 0,
+        "externalDelivered": 0,
+        "violations": [],
+        "failures": [
+          {
+            "url": "http://127.0.0.1:4262/api/api-keys?workspaceId=usr_browser_a&cursor=cursor_a_1",
+            "reason": "net::ERR_ABORTED"
+          }
+        ]
+      }
+    ],
+    "engine": {
+      "name": "chromium",
+      "version": "154.0.8037.57",
+      "executablePath": "/usr/bin/chromium"
+    },
+    "ok": true
+  },
+  "management_readback": {
+    "web_deployment": {
+      "id": "ad75897b-75af-4d70-b626-0e5a83f17cfc",
+      "source": "wrangler",
+      "strategy": "percentage",
+      "author_email": "danuberiverferryman@gmail.com",
+      "annotations": {
+        "workers/message": "Harden Web security boundaries (e2c72018aa467e4db3f3c14461a162be1a38f2b8)",
+        "workers/triggered_by": "deployment"
+      },
+      "versions": [
+        {
+          "version_id": "263da268-8498-4874-be61-64ebc03eeb2a",
+          "percentage": 100
+        }
+      ],
+      "created_on": "2026-10-12T15:23:57.983371Z"
+    },
+    "server_deployment": {
+      "id": "573ab1c2-5568-4580-b904-e0f9ac50d53c",
+      "source": "wrangler",
+      "strategy": "percentage",
+      "author_email": "danuberiverferryman@gmail.com",
+      "annotations": {
+        "workers/message": "Fix reviewed server authentication, quota and export issues (04f13061cbdd2c5e8cc0bc66c175d14fd588a4ad)",
+        "workers/triggered_by": "deployment"
+      },
+      "versions": [
+        {
+          "version_id": "2a1a1086-a0ce-40c1-8e83-5b5e7d6b3a9d",
+          "percentage": 100
+        }
+      ],
+      "created_on": "2026-10-12T09:38:52.429812Z"
+    },
+    "settings": {
+      "compatibility_date": "2026-05-25",
+      "compatibility_flags": [],
+      "observability": {
+        "enabled": true,
+        "head_sampling_rate": 1,
+        "redact_query_string": true,
+        "logs": {
+          "enabled": true,
+          "head_sampling_rate": 0.01,
+          "persist": true,
+          "invocation_logs": false
+        },
+        "traces": {
+          "enabled": false,
+          "persist": true,
+          "head_sampling_rate": 1
+        },
+        "issues": {
+          "enabled": true
+        }
+      },
+      "bindings": [
+        {
+          "name": "ASSETS",
+          "type": "assets"
+        },
+        {
+          "name": "NORULO_API_ORIGIN",
+          "type": "plain_text",
+          "text": "https://api.norulo.com"
+        },
+        {
+          "name": "NORULO_MODE",
+          "type": "plain_text",
+          "text": "production"
+        },
+        {
+          "name": "NORULO_SERVER",
+          "type": "service",
+          "service": "norulo-server-production",
+          "environment": "production"
+        }
+      ]
+    },
+    "subdomain": {
+      "enabled": false,
+      "previews_enabled": false
+    },
+    "domains": [
+      {
+        "hostname": "norulo.com",
+        "service": "norulo-web",
+        "environment": "production",
+        "enabled": true,
+        "previews_enabled": false
+      },
+      {
+        "hostname": "www.norulo.com",
+        "service": "norulo-web",
+        "environment": "production",
+        "enabled": true,
+        "previews_enabled": false
+      }
+    ],
+    "configuration_preserved": true,
+    "server_version_preserved": true
+  },
+  "public_readback": {
+    "verified_at_utc": "2026-10-12T15:25:47.564851+00:00",
+    "responses": 10,
+    "byte_identical_assets": 6,
+    "passed": true,
+    "results": [
+      {
+        "path": "/",
+        "status": 200,
+        "current_build_references": true,
+        "security_headers": "passed"
+      },
+      {
+        "path": "/api-keys",
+        "status": 200,
+        "current_build_references": true,
+        "security_headers": "passed"
+      },
+      {
+        "path": "/assets/index-vp7aoA2S.js",
+        "status": 200,
+        "matches_dist": true,
+        "sha256": "b8bbac1dcbfff0db11efa7b175939b29a471700ee00bcbd50782c4c2c418ffad",
+        "security_headers": "passed"
+      },
+      {
+        "path": "/assets/index-BdnT1kGy.css",
+        "status": 200,
+        "matches_dist": true,
+        "sha256": "298b18663f6632726ff7d6946af16712903e5e6dc43221bbc62f0be817db9a46",
+        "security_headers": "passed"
+      },
+      {
+        "path": "/assets/api-CVLW0zqA.js",
+        "status": 200,
+        "matches_dist": true,
+        "sha256": "b57a645a90035ad2c77874b6b3239a0dbd27d0bc869e2871cb3f49228e43230d",
+        "security_headers": "passed"
+      },
+      {
+        "path": "/assets/norulo-DBdsjYwQ.js",
+        "status": 200,
+        "matches_dist": true,
+        "sha256": "40b4d485546aa539515b675720676f485d87cfd812ce041aebc8ae9064783b1c",
+        "security_headers": "passed"
+      },
+      {
+        "path": "/assets/vendor-react-9XhioiGP.js",
+        "status": 200,
+        "matches_dist": true,
+        "sha256": "109ae04dfb036b92515ae052411c426365e48876c4b00de7f1d7a289e0e6ef75",
+        "security_headers": "passed"
+      },
+      {
+        "path": "/norulo-logo.png",
+        "status": 200,
+        "matches_dist": true,
+        "sha256": "a9632acbd7a5ad48ad5ff25d6269f617c7655446365344c9db42d504213c710f",
+        "security_headers": "passed"
+      },
+      {
+        "path": "https://www.norulo.com/pricing?lang=zh",
+        "status": 308,
+        "location": "https://norulo.com/pricing?lang=zh",
+        "hsts": "passed"
+      },
+      {
+        "path": "/api/health",
+        "status": 200,
+        "service": "norulo-server",
+        "hsts": "passed"
+      }
+    ],
+    "remote_business_writes": 0,
+    "remote_sql_api_calls": 0
+  },
+  "production_security_policy": {
+    "hsts": "max-age=15552000",
+    "include_subdomains": false,
+    "preload": false,
+    "permissions_policy": "camera=(), microphone=(), geolocation=(), payment=()"
+  },
+  "verification_notes": [
+    "One immediate post-deployment homepage response lacked expected HSTS; a subsequent bounded diagnostic read and final checks returned the current build and expected headers. No redeployment or write retry occurred.",
+    "The initial private-page harness incorrectly required X-Robots-Tag. Production uses robots meta tags; the check was corrected against source and existing SEO tests before final verification.",
+    "Final public verification comprises ten successful anonymous GET responses, after four earlier page/diagnostic reads. No authenticated provider, checkout or customer-data action was tested.",
+    "Documentation publication after the deployed source commit does not change Worker code or assets."
+  ],
+  "remote_business_writes": 0,
+  "remote_sql_api_calls": 0,
+  "preview_publication": false
+}

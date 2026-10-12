@@ -1,10 +1,31 @@
 # Norulo production deployment
 
-The Project capacity deletion fix was published and verified on 2026-10-12.
-Web main source `ce91b4468df1bf322deb5ed4fb9f5a8a46927f02` runs as version
+The Web review fixes were published and independently verified on 2026-10-12.
+Web main source `9cb56ff0e922740d0c6eee648244723d55279a3e` is deployed as
+version `96423614-f893-4710-b8c9-ad76c03173ef` with 100% production traffic.
+The integrated source retains the concurrent project-capacity correction.
+The final 87-file suite passed all 1,800 tests, lint, an explicit production
+build, the latest Server contract check, offline Worker checks and Wrangler
+dry-run. Full dependency audit reports zero advisories. Chromium and WebKit
+each passed 258 date-layout states; six final-build error-recovery cases and
+the applicable mobile, Projects, billing, overview and currency checks passed.
+Firefox could not run on this cloud host; local fixtures do not establish
+physical-device or authenticated customer acceptance.
+
+Independent production readback confirmed the matching source annotation,
+100% traffic, byte-identical assets, page security headers, direct/proxied health,
+anonymous 401 protection and the path/query-preserving WWW redirect. Production
+bindings, domains, Issues, 1% logs, query redaction and disabled invocation logs,
+traces, workers.dev and preview URLs were preserved. Server remained at
+`075fb193-6440-4182-8470-5f40c43f7c70`; no remote SQL or business test write was
+performed. See the [review assessment](validation/web-review-remediation-2026-10-12.json)
+and [production release readback](validation/web-review-production-release-2026-10-12.json).
+
+The preceding Project capacity deletion fix was verified on 2026-10-12.
+Web main source `ce91b4468df1bf322deb5ed4fb9f5a8a46927f02` was deployed as version
 `55cf559b-c1ae-46b8-99f3-1f64a6add3c1`; Server main source
-`81cea4337e80b7d19c6f79ba94447bb9d95505cf` runs as version
-`075fb193-6440-4182-8470-5f40c43f7c70`. Both have 100% production traffic.
+`81cea4337e80b7d19c6f79ba94447bb9d95505cf` was deployed as version
+`075fb193-6440-4182-8470-5f40c43f7c70`. Both had 100% traffic at that verification.
 Billing and creation admission count current undeleted projects, including
 archives, so deletion releases a project place even with a legacy cumulative
 counter. Six-language capacity copy and the shared OpenAPI artifacts match.
@@ -51,12 +72,12 @@ Release A's hourly publication is retained below as historical evidence.
 ## Published frontend
 
 Cloudflare publication of the frontend application completed successfully using
-Web main commit `ce91b4468df1bf322deb5ed4fb9f5a8a46927f02`:
+Web main commit `9cb56ff0e922740d0c6eee648244723d55279a3e`:
 
 | Setting | Published value |
 | --- | --- |
 | Worker | `norulo-web` |
-| Version | `55cf559b-c1ae-46b8-99f3-1f64a6add3c1` |
+| Version | `96423614-f893-4710-b8c9-ad76c03173ef` |
 | Custom domains | `norulo.com`, `www.norulo.com` |
 | Mode | `production` |
 | API origin | `https://api.norulo.com` |

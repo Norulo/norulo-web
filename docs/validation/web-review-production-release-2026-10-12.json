@@ -1,0 +1,397 @@
+{
+  "source_commit": "9cb56ff0e922740d0c6eee648244723d55279a3e",
+  "web_version": "96423614-f893-4710-b8c9-ad76c03173ef",
+  "retained_server_version": "075fb193-6440-4182-8470-5f40c43f7c70",
+  "passed": true,
+  "assertions_passed": 34,
+  "script_verified_at_utc": "2026-10-12T09:09:33.441827+00:00",
+  "official_config_verified_at_utc": "2026-10-12T09:09:29.727Z",
+  "requests": {
+    "anonymous_GET": 19,
+    "Wrangler_read_only_GET": 4,
+    "Cloudflare_connector_configuration_GET": 4,
+    "total": 27
+  },
+  "no_retries": true,
+  "remote_business_writes": 0,
+  "remote_SQL_operations": 0,
+  "limitations": [
+    "Anonymous shell and byte verification do not prove authenticated business or physical-device acceptance."
+  ],
+  "checks": [
+    {
+      "name": "source commit",
+      "passed": true,
+      "details": {
+        "expected": "9cb56ff0e922740d0c6eee648244723d55279a3e",
+        "local_head": "9cb56ff0e922740d0c6eee648244723d55279a3e"
+      }
+    },
+    {
+      "name": "norulo-web active version",
+      "passed": true,
+      "details": {
+        "versions": [
+          {
+            "version_id": "96423614-f893-4710-b8c9-ad76c03173ef",
+            "percentage": 100
+          }
+        ]
+      }
+    },
+    {
+      "name": "web binding names",
+      "passed": true,
+      "details": {
+        "names": [
+          "ASSETS",
+          "NORULO_API_ORIGIN",
+          "NORULO_MODE",
+          "NORULO_SERVER"
+        ]
+      }
+    },
+    {
+      "name": "web production service binding",
+      "passed": true,
+      "details": {
+        "binding": [
+          {
+            "environment": "production",
+            "name": "NORULO_SERVER",
+            "service": "norulo-server-production",
+            "type": "service"
+          }
+        ]
+      }
+    },
+    {
+      "name": "web runtime mode and API origin",
+      "passed": true,
+      "details": {
+        "NORULO_API_ORIGIN": "https://api.norulo.com",
+        "NORULO_MODE": "production"
+      }
+    },
+    {
+      "name": "web source annotation",
+      "passed": true,
+      "details": {
+        "message": "Deploy norulo-web main 9cb56ff0e922740d0c6eee648244723d55279a3e; reviewed Web recovery and ledger fixes; preserve production bindings and monitoring"
+      }
+    },
+    {
+      "name": "norulo-server-production active version",
+      "passed": true,
+      "details": {
+        "versions": [
+          {
+            "version_id": "075fb193-6440-4182-8470-5f40c43f7c70",
+            "percentage": 100
+          }
+        ]
+      }
+    },
+    {
+      "name": "asset /assets/index-DG7FtA3C.js",
+      "passed": true,
+      "details": {
+        "path": "/assets/index-DG7FtA3C.js",
+        "status": 200,
+        "local_sha256": "d6dfb2a22ebb64bab0d67030bf0577b6f70d281385ae16056221c0d65e30d1cc",
+        "remote_sha256": "d6dfb2a22ebb64bab0d67030bf0577b6f70d281385ae16056221c0d65e30d1cc",
+        "cache_control": "public, max-age=31536000, immutable"
+      }
+    },
+    {
+      "name": "asset /assets/rolldown-runtime-Bh1tDfsg.js",
+      "passed": true,
+      "details": {
+        "path": "/assets/rolldown-runtime-Bh1tDfsg.js",
+        "status": 200,
+        "local_sha256": "1b13387cb23dc39bf70e31677c21f6db5cad3377b96f286b6ee444496e5bfea7",
+        "remote_sha256": "1b13387cb23dc39bf70e31677c21f6db5cad3377b96f286b6ee444496e5bfea7",
+        "cache_control": "public, max-age=31536000, immutable"
+      }
+    },
+    {
+      "name": "asset /assets/vendor-react-9XhioiGP.js",
+      "passed": true,
+      "details": {
+        "path": "/assets/vendor-react-9XhioiGP.js",
+        "status": 200,
+        "local_sha256": "109ae04dfb036b92515ae052411c426365e48876c4b00de7f1d7a289e0e6ef75",
+        "remote_sha256": "109ae04dfb036b92515ae052411c426365e48876c4b00de7f1d7a289e0e6ef75",
+        "cache_control": "public, max-age=31536000, immutable"
+      }
+    },
+    {
+      "name": "asset /assets/i18n-B2aVivJ7.js",
+      "passed": true,
+      "details": {
+        "path": "/assets/i18n-B2aVivJ7.js",
+        "status": 200,
+        "local_sha256": "9020ada2dbd20cb1e0527885afc22340e48c505109d618eccc68fd0172c75f9d",
+        "remote_sha256": "9020ada2dbd20cb1e0527885afc22340e48c505109d618eccc68fd0172c75f9d",
+        "cache_control": "public, max-age=31536000, immutable"
+      }
+    },
+    {
+      "name": "asset /assets/vendor-CHwUWPSh.js",
+      "passed": true,
+      "details": {
+        "path": "/assets/vendor-CHwUWPSh.js",
+        "status": 200,
+        "local_sha256": "bb88671736f2acdd1ab57aa4ca82fd7fa055a58dc8bf06a9a3f41f49dcb355e1",
+        "remote_sha256": "bb88671736f2acdd1ab57aa4ca82fd7fa055a58dc8bf06a9a3f41f49dcb355e1",
+        "cache_control": "public, max-age=31536000, immutable"
+      }
+    },
+    {
+      "name": "asset /assets/navigation-DHQunuIk.js",
+      "passed": true,
+      "details": {
+        "path": "/assets/navigation-DHQunuIk.js",
+        "status": 200,
+        "local_sha256": "3263b96060ca8322c4c1cf88bb6d4476f95045a1510c15f30698085e21c8f528",
+        "remote_sha256": "3263b96060ca8322c4c1cf88bb6d4476f95045a1510c15f30698085e21c8f528",
+        "cache_control": "public, max-age=31536000, immutable"
+      }
+    },
+    {
+      "name": "asset /assets/norulo-D5rQTiZQ.js",
+      "passed": true,
+      "details": {
+        "path": "/assets/norulo-D5rQTiZQ.js",
+        "status": 200,
+        "local_sha256": "25abc45d7f090e89b5b88465d2772ddd2b2761e37163d6027a7dda71536667f0",
+        "remote_sha256": "25abc45d7f090e89b5b88465d2772ddd2b2761e37163d6027a7dda71536667f0",
+        "cache_control": "public, max-age=31536000, immutable"
+      }
+    },
+    {
+      "name": "asset /assets/index-DJZ8ywDK.css",
+      "passed": true,
+      "details": {
+        "path": "/assets/index-DJZ8ywDK.css",
+        "status": 200,
+        "local_sha256": "6b6563b5c0c7c0545b53ecbfda92523c650542000cb9d681d7175e50d8a8e814",
+        "remote_sha256": "6b6563b5c0c7c0545b53ecbfda92523c650542000cb9d681d7175e50d8a8e814",
+        "cache_control": "public, max-age=31536000, immutable"
+      }
+    },
+    {
+      "name": "page shell /",
+      "passed": true,
+      "details": {
+        "path": "/",
+        "status": 200,
+        "csp": "default-src 'self'; script-src 'self' 'sha256-1F/1Oh03zl+94G1RlYByAJCYDweLbJXS6JpGtSn68xs=' 'sha256-T4l2UyST1aY0V0nPstgMjXkAFxt6ZC02nKnWvnIytWE='; script-src-attr 'none'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-src 'none'; frame-ancestors 'none'; form-action 'self'",
+        "set_cookie": false
+      }
+    },
+    {
+      "name": "page shell /login",
+      "passed": true,
+      "details": {
+        "path": "/login",
+        "status": 200,
+        "csp": "default-src 'self'; script-src 'self' 'sha256-1F/1Oh03zl+94G1RlYByAJCYDweLbJXS6JpGtSn68xs='; script-src-attr 'none'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-src 'none'; frame-ancestors 'none'; form-action 'self'",
+        "set_cookie": false
+      }
+    },
+    {
+      "name": "page shell /projects",
+      "passed": true,
+      "details": {
+        "path": "/projects",
+        "status": 200,
+        "csp": "default-src 'self'; script-src 'self' 'sha256-1F/1Oh03zl+94G1RlYByAJCYDweLbJXS6JpGtSn68xs='; script-src-attr 'none'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-src 'none'; frame-ancestors 'none'; form-action 'self'",
+        "set_cookie": false
+      }
+    },
+    {
+      "name": "proxy-health",
+      "passed": true,
+      "details": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "service": "norulo-server",
+          "database": {
+            "type": "d1",
+            "configured": true
+          }
+        }
+      }
+    },
+    {
+      "name": "direct-health",
+      "passed": true,
+      "details": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "service": "norulo-server",
+          "database": {
+            "type": "d1",
+            "configured": true
+          }
+        }
+      }
+    },
+    {
+      "name": "unauthenticated account boundary",
+      "passed": true,
+      "details": {
+        "status": 401,
+        "set_cookie": false
+      }
+    },
+    {
+      "name": "WWW canonical redirect",
+      "passed": true,
+      "details": {
+        "status": 308,
+        "location": "https://norulo.com/projects?review=web"
+      }
+    },
+    {
+      "name": "four official configuration GETs",
+      "passed": true
+    },
+    {
+      "name": "Issues preserved",
+      "passed": true
+    },
+    {
+      "name": "1% logs retained",
+      "passed": true
+    },
+    {
+      "name": "privacy and traces retained",
+      "passed": true
+    },
+    {
+      "name": "disabled workers.dev and preview URLs",
+      "passed": true
+    },
+    {
+      "name": "two exact Web domains enabled without preview",
+      "passed": true
+    },
+    {
+      "name": "backend domain retained",
+      "passed": true
+    },
+    {
+      "name": "Web runtime retained",
+      "passed": true
+    },
+    {
+      "name": "changed lazy asset /assets/ledger-B_0xULfm.js",
+      "path": "/assets/ledger-B_0xULfm.js",
+      "passed": true,
+      "local_sha256": "a29547da2337d282b02fc6b8a7944e5cf2b5a1b63718f276b2e0485e74eba557",
+      "remote_sha256": "a29547da2337d282b02fc6b8a7944e5cf2b5a1b63718f276b2e0485e74eba557"
+    },
+    {
+      "name": "changed lazy asset /assets/billing-DFmxG5h7.js",
+      "path": "/assets/billing-DFmxG5h7.js",
+      "passed": true,
+      "local_sha256": "33fa2971ef7b97151a7fdbc70b0676db5abf97a6514403d6079327a8f7b8d9bd",
+      "remote_sha256": "33fa2971ef7b97151a7fdbc70b0676db5abf97a6514403d6079327a8f7b8d9bd"
+    },
+    {
+      "name": "changed lazy asset /assets/settings-DRJCbSsT.js",
+      "path": "/assets/settings-DRJCbSsT.js",
+      "passed": true,
+      "local_sha256": "31779372618864924ecc9ebfe0459bbda18753acceb13cfc762ca32db1bd4b51",
+      "remote_sha256": "31779372618864924ecc9ebfe0459bbda18753acceb13cfc762ca32db1bd4b51"
+    },
+    {
+      "name": "changed lazy asset /assets/api-nl3W1k3m.js",
+      "path": "/assets/api-nl3W1k3m.js",
+      "passed": true,
+      "local_sha256": "a98c57a8373811388bb1e9dc97c847c68078bf7330763160f48ad372e6be1cea",
+      "remote_sha256": "a98c57a8373811388bb1e9dc97c847c68078bf7330763160f48ad372e6be1cea"
+    }
+  ],
+  "evidence_files": [
+    "verification.json",
+    "cloudflare-settings-verification.json",
+    "cloudflare-settings-readback.json",
+    "norulo-web-deployment.json",
+    "norulo-web-version.json",
+    "norulo-server-production-deployment.json",
+    "norulo-server-production-version.json"
+  ],
+  "review_record": "web-review-remediation-2026-10-12.json",
+  "local_validation": {
+    "node": "24.19.0",
+    "npm_ci": true,
+    "lint": "passed",
+    "tests": {
+      "files": 87,
+      "passed": 1800
+    },
+    "production_build": "passed without ineffective dynamic-import warning",
+    "workers_offline": "passed",
+    "api_contract_checksum": "5b12ec832548",
+    "wrangler_version": "4.136.3",
+    "wrangler_dry_run": "passed",
+    "npm_audit": {
+      "before_development_advisories": 17,
+      "after_total_advisories": 0
+    },
+    "native_email_input": {
+      "chromium": "clipboard paste before/after passed",
+      "webkit": "native text insertion before/after passed"
+    },
+    "native_error_boundary": {
+      "cases_passed": 6,
+      "engines": [
+        "Chromium 143.0.7499.4",
+        "WebKit 26.0"
+      ],
+      "business_writes": 0,
+      "external_requests": 0,
+      "dist_sha256": "6455e402c49fe95564b93c5ed6925956874fc21068e1cdabf33691330ec6d782",
+      "verified_at_utc": "2026-10-12T09:05:06.201Z"
+    },
+    "layouts": {
+      "date_chromium_states": 258,
+      "billing_chromium_contexts": 24,
+      "overview_chromium_contexts": 15,
+      "currency_chromium_contexts": 9,
+      "mobile_chromium_webkit_contexts": 20,
+      "projects_chromium_webkit_contexts": 18,
+      "date_webkit_states": 258,
+      "date_script_adjustment": "Wait for enabled controls and post-close focus/split reflow before the next native click; app behavior unchanged."
+    }
+  },
+  "source_ci": {
+    "run_id": 38227797780,
+    "url": "https://github.com/Norulo/norulo-web/actions/runs/38227797780",
+    "last_observed_status": "in_progress",
+    "observed_completed_steps": [
+      "Set up job",
+      "Run actions/checkout@v4",
+      "Run actions/setup-node@v4",
+      "Install dependencies",
+      "Run checks",
+      "Build browser-check assets",
+      "Install browser engines",
+      "Check date-field layouts across browser engines"
+    ],
+    "local_final_tests_passed": 1800,
+    "conclusion": null,
+    "date_layout_engines": [
+      "Chromium",
+      "Firefox",
+      "WebKit"
+    ],
+    "observed_at_utc": "2026-10-12T09:15:09Z"
+  },
+  "publication_base_commit": "c8d37a5faaf1d5dba938c2c44d6b3c34ebeaafe0"
+}

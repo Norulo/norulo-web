@@ -466,6 +466,8 @@
   flex: 0 0 auto;
   align-items: center;
   gap: 8px 10px;
+  /* The status group sits at the right edge of the control row. */
+  margin-left: auto;
 }
 .ledger-your-projects .ledger-project-filters {
   align-items: center;
@@ -645,6 +647,7 @@
   }
   .ledger-screen .main .ledger-your-projects .ledger-project-status {
     flex: 1 1 auto;
+    margin-left: 0;
   }
   .ledger-screen .main .ledger-your-projects .ledger-project-status > select {
     min-width: min(10rem, 100%);

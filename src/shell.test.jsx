@@ -386,7 +386,7 @@ describe("Sidebar navigation", () => {
     render(<Sidebar section="ledgerProjects" go={go} />);
 
     const projects = screen.getByRole("link", { name: /^projects$/i });
-    const overview = screen.getByRole("link", { name: /^spending overview$/i });
+    const overview = screen.getByRole("link", { name: /^overview$/i });
     const shared = screen.getByRole("link", { name: /^shared pool$/i });
     const apiKeys = screen.getByRole("link", { name: /^api keys$/i });
     const billing = screen.getByRole("link", { name: /^billing$/i });

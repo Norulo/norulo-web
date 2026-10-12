@@ -48,7 +48,7 @@ describe("Spending overview", () => {
     ]);
     expect(api.projects).not.toHaveBeenCalled();
     expect(api.expenses).not.toHaveBeenCalled();
-    expect(screen.getByRole("link", { name: "Spending overview" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "Overview" })).toHaveAttribute(
       "aria-current",
       "page"
     );

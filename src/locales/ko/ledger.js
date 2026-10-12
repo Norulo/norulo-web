@@ -882,6 +882,7 @@ export const LEDGER_SUMMARY_PHRASES = {
   "Expense composition": "지출 구성",
   "Share of this currency's total": "해당 통화의 총지출 대비 비율",
   "Spending overview": "지출 개요",
+  "Overview": "개요",
   "Expense totals": "지출 합계",
   "Shared pool total": "공동 비용 합계",
   "All expenses": "전체 지출",

@@ -882,6 +882,7 @@ export const LEDGER_SUMMARY_PHRASES = {
   "Expense composition": "支出构成",
   "Share of this currency's total": "占该币种支出比例",
   "Spending overview": "支出总览",
+  "Overview": "总览",
   "Expense totals": "支出合计",
   "Shared pool total": "共享池合计",
   "All expenses": "全部支出",

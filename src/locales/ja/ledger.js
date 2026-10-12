@@ -882,6 +882,7 @@ export const LEDGER_SUMMARY_PHRASES = {
   "Expense composition": "支出の内訳",
   "Share of this currency's total": "この通貨の合計に占める割合",
   "Spending overview": "支出の概要",
+  "Overview": "概要",
   "Expense totals": "支出合計",
   "Shared pool total": "共通費の合計",
   "All expenses": "すべての支出",

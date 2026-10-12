@@ -882,6 +882,7 @@ export const LEDGER_SUMMARY_PHRASES = {
   "Expense composition": "Distribución de gastos",
   "Share of this currency's total": "Proporción del total en esta moneda",
   "Spending overview": "Resumen de gastos",
+  "Overview": "Resumen",
   "Expense totals": "Totales de gastos",
   "Shared pool total": "Total del fondo compartido",
   "All expenses": "Todos los gastos",

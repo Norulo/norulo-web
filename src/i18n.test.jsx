@@ -23,36 +23,44 @@ describe("i18n storage resilience", () => {
     const { T, setLang } = await import("./i18n.jsx");
 
     expect(T("English", "Chinese")).toBe("English");
-    expect(() => setLang("zh")).not.toThrow();
+    let switching;
+    expect(() => {
+      switching = setLang("zh");
+    }).not.toThrow();
     expect(T("English", "Chinese")).toBe("Chinese");
+    // Finish the catalog import inside this test; a late import would
+    // otherwise resolve against the next suite's mocked catalogs.
+    await switching;
   });
 
   it("supports the expanded language list with object translations and English fallback", async () => {
     const { T, setLang } = await import("./i18n.jsx");
 
-    setLang("ja");
+    const switches = [setLang("ja")];
     expect(T("Custom", { zh: "zh-custom", ja: "ja-custom", ko: "ko-custom" })).toBe("ja-custom");
 
-    setLang("ko");
+    switches.push(setLang("ko"));
     expect(T("Custom", { zh: "zh-custom", ja: "ja-custom", ko: "ko-custom" })).toBe("ko-custom");
 
-    setLang("fr");
+    switches.push(setLang("fr"));
     expect(T("Custom", { zh: "zh-custom" })).toBe("Custom");
 
-    setLang("es");
+    switches.push(setLang("es"));
     expect(T("Custom", { es: "es-custom" })).toBe("es-custom");
+    await Promise.all(switches);
   });
 
   it("rejects unsupported language codes instead of normalizing aliases", async () => {
     const { T, setLang, useLang } = await import("./i18n.jsx");
 
-    setLang("zh-CN");
+    const switches = [setLang("zh-CN")];
     expect(T("Settings", "Chinese settings")).toBe("Settings");
     expect(T("Overview", "Overview")).toBe("Overview");
 
-    setLang("de");
+    switches.push(setLang("de"));
     expect(T("Settings", "Chinese settings")).toBe("Settings");
     expect(typeof useLang).toBe("function");
+    await Promise.all(switches);
   });
 });
 

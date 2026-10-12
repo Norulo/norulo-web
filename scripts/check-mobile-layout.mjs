@@ -495,7 +495,7 @@ async function checkLastControl(page, report, name) {
     )[0];
     const header = document.querySelector(".topbar");
     const visibleTop =
-      header && getComputedStyle(header).position === "sticky"
+      header && ["sticky", "fixed"].includes(getComputedStyle(header).position)
         ? Math.max(0, header.getBoundingClientRect().bottom)
         : 0;
     // Read-only material can follow the last action, especially on Billing.
@@ -532,7 +532,7 @@ async function checkLastControl(page, report, name) {
       bottom: box.bottom,
       height: innerHeight,
       visibleTop:
-        header && getComputedStyle(header).position === "sticky"
+        header && ["sticky", "fixed"].includes(getComputedStyle(header).position)
           ? Math.max(0, header.getBoundingClientRect().bottom)
           : 0,
       navTop:
@@ -551,6 +551,68 @@ async function checkLastControl(page, report, name) {
   assert(last.hit, `${name}: final control is not hit-testable ${JSON.stringify(last)}`);
   report.states.push({ name, footerControl: last.label, hit: last.hit, scrolledToControl });
   await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
+}
+
+// Keyboard focus and scripted navigation bring controls into view with
+// start, end or nearest alignment. Each must stop clear of the console header
+// and the fixed phone tab bar instead of landing underneath either one.
+async function checkScrollClearance(page, report, name) {
+  const probes = await page.evaluate(() => {
+    const controls = Array.from(
+      document.querySelectorAll(
+        '.main button:not(:disabled), .main input:not(:disabled):not([type="hidden"]), .main select:not(:disabled), .main textarea:not(:disabled), .main a[href]'
+      )
+    ).filter(
+      (element) =>
+        element.getClientRects().length && getComputedStyle(element).visibility !== "hidden"
+    );
+    if (controls.length < 2) return null;
+    const control = controls[Math.floor(controls.length / 2)];
+    const header = document.querySelector(".topbar");
+    const nav = document.querySelector(".mobile-tabbar");
+    const results = [];
+    for (const block of ["start", "end", "nearest"]) {
+      // Begin at the opposite end so every alignment performs a real scroll.
+      window.scrollTo({
+        top: block === "start" ? 0 : document.documentElement.scrollHeight,
+        behavior: "instant",
+      });
+      control.scrollIntoView({ block, inline: "nearest", behavior: "instant" });
+      const box = control.getBoundingClientRect();
+      const hit = document.elementFromPoint(
+        (box.left + box.right) / 2,
+        (box.top + box.bottom) / 2
+      );
+      results.push({
+        block,
+        label: control.getAttribute("aria-label") || control.textContent.trim() || control.tagName,
+        top: box.top,
+        bottom: box.bottom,
+        visibleTop:
+          header && ["sticky", "fixed"].includes(getComputedStyle(header).position)
+            ? Math.max(0, header.getBoundingClientRect().bottom)
+            : 0,
+        visibleBottom:
+          nav?.getClientRects().length && getComputedStyle(nav).position === "fixed"
+            ? nav.getBoundingClientRect().top
+            : innerHeight,
+        hit: hit === control || control.contains(hit),
+      });
+    }
+    window.scrollTo({ top: 0, behavior: "instant" });
+    return results;
+  });
+  assert(probes, `${name}: no interactive controls to bring into view`);
+  for (const probe of probes) {
+    const details = JSON.stringify(probe);
+    assert(
+      probe.top >= probe.visibleTop - tolerance && probe.bottom <= probe.visibleBottom + tolerance,
+      `${name}: control scrolled into view (${probe.block}) is obscured ${details}`
+    );
+    assert(probe.hit, `${name}: control scrolled into view (${probe.block}) is not hit-testable ${details}`);
+  }
+  report.states.push({ name, scrollClearance: probes.map((probe) => probe.block) });
+  await settle(page);
 }
 
 async function checkPreferences(page, report) {
@@ -1030,6 +1092,7 @@ try {
             await capture(page, report, "shared-reports");
           }
           await checkLastControl(page, report, `${path.slice(1)}-footer-hit`);
+          await checkScrollClearance(page, report, `${path.slice(1)}-scroll-clearance`);
         }
         await checkModal(page, fixture, report);
         await measure(page, report, "modal-closed-layout");

@@ -184,6 +184,42 @@ describe("Topbar navigation", () => {
   });
 });
 
+describe("Topbar scroll reservation", () => {
+  it("reserves the fixed header's measured height in flow and on the page scroller", () => {
+    const rect = vi
+      .spyOn(HTMLElement.prototype, "getBoundingClientRect")
+      .mockImplementation(function measured() {
+        return { top: 0, left: 0, right: 390, bottom: 65, width: 390, height: 65, x: 0, y: 0 };
+      });
+    try {
+      const view = render(
+        <div className="app">
+          <Topbar go={vi.fn()} breadcrumbs={[{ label: "Projects" }]} />
+        </div>
+      );
+      const root = document.documentElement;
+      expect(root.style.getPropertyValue("--workspace-header-height")).toBe("65px");
+      const spacer = view.container.querySelector(".topbar + .topbar-spacer");
+      expect(spacer).toHaveAttribute("aria-hidden", "true");
+      view.unmount();
+      expect(root.style.getPropertyValue("--workspace-header-height")).toBe("");
+    } finally {
+      rect.mockRestore();
+    }
+  });
+
+  it("keeps fixed console chrome out of scroll-into-view and reserves it on the scroller", () => {
+    const base = readFileSync(resolve(process.cwd(), "styles/base.css"), "utf8");
+    const topbar = base.match(/^\.topbar\s*\{(?<body>[^}]*)\}/m)?.groups?.body;
+    expect(topbar).toMatch(/position:\s*fixed;/);
+    expect(base).toMatch(/\.topbar-spacer\s*\{[^}]*height:\s*var\(--workspace-header-height/);
+    expect(base).toMatch(
+      /html:has\(\.app-frame\[data-console="true"\]\)\s*\{\s*scroll-padding-top:\s*calc\(var\(--workspace-header-height/
+    );
+    expect(base).toMatch(/scroll-padding-bottom:\s*calc\(var\(--mobile-nav-height\)/);
+  });
+});
+
 describe("Design token discipline", () => {
   function stylesOf(path) {
     return readFileSync(resolve(process.cwd(), path), "utf8");

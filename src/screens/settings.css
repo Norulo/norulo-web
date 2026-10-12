@@ -8,12 +8,8 @@
   gap: var(--space-3);
   min-width: 0;
 }
-.settings-section-body > :is(
-    .settings-sign-in-methods,
-    .github-installations-fieldset,
-    .notice,
-    .set-row
-  ) {
+.settings-section-body
+  > :is(.settings-sign-in-methods, .github-installations-fieldset, .notice, .set-row) {
   align-self: stretch;
 }
 .settings-section-body > .set-row {

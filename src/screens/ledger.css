@@ -1466,17 +1466,26 @@
     display: grid;
     grid-auto-flow: column;
     grid-auto-columns: minmax(0, 1fr);
+    align-items: stretch;
     gap: 8px;
     margin-bottom: 0;
   }
   .ledger-screen .ledger-view-controls > .btn {
+    flex-direction: column;
+    gap: 6px;
     min-width: 0;
-    padding-inline: var(--space-2);
+    min-height: 64px;
+    padding: var(--space-2) var(--space-1);
     border-color: var(--border);
-    font-size: var(--fs-md);
+    font-size: var(--fs-sm);
     line-height: 1.25;
     white-space: normal;
     text-align: center;
+  }
+  .ledger-view-controls .ledger-filter-count {
+    position: absolute;
+    top: 6px;
+    right: 6px;
   }
   .ledger-screen .panel {
     padding: 24px 0;

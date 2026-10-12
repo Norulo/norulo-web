@@ -24,11 +24,13 @@ export function Topbar({ go, breadcrumbs, loading = false, navigationDisabled = 
 
   React.useLayoutEffect(() => {
     const header = headerRef.current;
-    const app = header?.closest(".app");
-    if (!app) return;
+    if (!header?.closest(".app")) return;
+    // Publish on the root: the spacer, sticky sidebar and the page scroller's
+    // scroll-padding all reserve this fixed header's measured height.
+    const root = document.documentElement;
     const measure = () => {
       const height = Math.ceil(header.getBoundingClientRect().height);
-      if (height > 0) app.style.setProperty("--workspace-header-height", `${height}px`);
+      if (height > 0) root.style.setProperty("--workspace-header-height", `${height}px`);
     };
     measure();
     const observer = createFrameResizeObserver(measure);
@@ -37,93 +39,97 @@ export function Topbar({ go, breadcrumbs, loading = false, navigationDisabled = 
     return () => {
       observer?.disconnect();
       window.removeEventListener("resize", measure);
-      app.style.removeProperty("--workspace-header-height");
+      root.style.removeProperty("--workspace-header-height");
     };
   }, []);
 
   return (
-    <header className="topbar" ref={headerRef}>
-      <div className="topbar-location">
-        <a
-          className="brand topbar-brand-button"
-          aria-label={T("Go to Norulo home", "前往 Norulo 首页")}
-          {...screenLinkProps(go, "landing", {}, navigationDisabled)}
-        >
-          <img
-            className="brand-mark"
-            src="/brand-mark.png?v=a9632acbd7a5"
-            alt=""
-            aria-hidden="true"
-            width="24"
-            height="24"
-          />
-          <span>Norulo</span>
-        </a>
-        {breadcrumbs && (
-          <nav className="crumbs" aria-label={T("Breadcrumbs", "面包屑")}>
-            {breadcrumbs.map((crumb, index) => (
-              <React.Fragment key={`${crumb.label}-${index}`}>
-                {index > 0 && <span className="sep">/</span>}
-                {crumb.go && index !== breadcrumbs.length - 1 ? (
-                  <a
-                    className="crumb-button"
-                    aria-label={T(`Go to ${crumb.label}`, `前往 ${crumb.label}`)}
-                    {...screenLinkProps(go, crumb.go, {}, navigationDisabled)}
-                  >
-                    {crumb.label}
-                  </a>
-                ) : (
-                  <span className="crumb-button crumb-current" aria-current="page">
-                    {crumb.label}
-                  </span>
-                )}
-              </React.Fragment>
-            ))}
-          </nav>
-        )}
-      </div>
-      <div className="topbar-actions">
-        <InvitationInboxButton disabled={navigationDisabled} />
-        <PagePreferencesSlot />
-        {ledgers?.workspace && (
-          <div className="workspace-picker">
-            <select
-              id="workspace-select"
-              aria-label={T("Select ledger", "选择账本")}
-              title={ledgerLabel(ledgers.workspace)}
-              value={ledgers.workspace.id}
-              disabled={navigationDisabled}
-              onChange={(event) => {
-                if (!navigationDisabled) ledgers.onSelect(event.target.value);
-              }}
-            >
-              {ledgers.items.map((item) => (
-                <option key={item.id} value={item.id}>
-                  {ledgerLabel(item)}
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
-        {loading && (
-          <span
-            className="topbar-loading spin"
-            role="status"
-            aria-label={T("Loading", "正在加载")}
-            title={T("Loading", "正在加载")}
+    <>
+      <header className="topbar" ref={headerRef}>
+        <div className="topbar-location">
+          <a
+            className="brand topbar-brand-button"
+            aria-label={T("Go to Norulo home", "前往 Norulo 首页")}
+            {...screenLinkProps(go, "landing", {}, navigationDisabled)}
           >
-            <I.Refresh size={14} />
-          </span>
-        )}
-        <a
-          className="btn ghost sm"
-          aria-label={T("Open account settings", "打开账户设置")}
-          {...screenLinkProps(go, "settings", {}, navigationDisabled)}
-        >
-          <I.User size={14} />
-        </a>
-      </div>
-    </header>
+            <img
+              className="brand-mark"
+              src="/brand-mark.png?v=a9632acbd7a5"
+              alt=""
+              aria-hidden="true"
+              width="24"
+              height="24"
+            />
+            <span>Norulo</span>
+          </a>
+          {breadcrumbs && (
+            <nav className="crumbs" aria-label={T("Breadcrumbs", "面包屑")}>
+              {breadcrumbs.map((crumb, index) => (
+                <React.Fragment key={`${crumb.label}-${index}`}>
+                  {index > 0 && <span className="sep">/</span>}
+                  {crumb.go && index !== breadcrumbs.length - 1 ? (
+                    <a
+                      className="crumb-button"
+                      aria-label={T(`Go to ${crumb.label}`, `前往 ${crumb.label}`)}
+                      {...screenLinkProps(go, crumb.go, {}, navigationDisabled)}
+                    >
+                      {crumb.label}
+                    </a>
+                  ) : (
+                    <span className="crumb-button crumb-current" aria-current="page">
+                      {crumb.label}
+                    </span>
+                  )}
+                </React.Fragment>
+              ))}
+            </nav>
+          )}
+        </div>
+        <div className="topbar-actions">
+          <InvitationInboxButton disabled={navigationDisabled} />
+          <PagePreferencesSlot />
+          {ledgers?.workspace && (
+            <div className="workspace-picker">
+              <select
+                id="workspace-select"
+                aria-label={T("Select ledger", "选择账本")}
+                title={ledgerLabel(ledgers.workspace)}
+                value={ledgers.workspace.id}
+                disabled={navigationDisabled}
+                onChange={(event) => {
+                  if (!navigationDisabled) ledgers.onSelect(event.target.value);
+                }}
+              >
+                {ledgers.items.map((item) => (
+                  <option key={item.id} value={item.id}>
+                    {ledgerLabel(item)}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+          {loading && (
+            <span
+              className="topbar-loading spin"
+              role="status"
+              aria-label={T("Loading", "正在加载")}
+              title={T("Loading", "正在加载")}
+            >
+              <I.Refresh size={14} />
+            </span>
+          )}
+          <a
+            className="btn ghost sm"
+            aria-label={T("Open account settings", "打开账户设置")}
+            {...screenLinkProps(go, "settings", {}, navigationDisabled)}
+          >
+            <I.User size={14} />
+          </a>
+        </div>
+      </header>
+      {/* The fixed header leaves the page flow; this keeps its measured space. */}
+      <div className="topbar-spacer" aria-hidden="true" />
+    </>
   );
 }
 

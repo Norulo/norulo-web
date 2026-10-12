@@ -1,49 +1,40 @@
+/* Sits inside the shared public header/footer frame, flat like other pages. */
 .notfound-shell {
-  min-height: 100vh;
-  min-height: 100dvh;
   display: flex;
-  align-items: center;
   justify-content: center;
-  padding: var(--space-10) var(--space-5);
-  background:
-    radial-gradient(
-      circle at 50% 0%,
-      color-mix(in oklch, var(--accent) 10%, transparent) 0%,
-      transparent 50%
-    ),
-    var(--bg);
+  width: 100%;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: var(--space-16) var(--space-10);
 }
 .notfound-card {
   width: 100%;
-  max-width: 460px;
-  padding: var(--space-10) 36px;
+  max-width: 560px;
+  padding: var(--space-10);
   background: var(--bg-elev);
   border: 1px solid var(--border);
   text-align: center;
 }
 .notfound-code {
-  font-family: var(--font-display);
-  font-size: 4.5rem;
-  font-weight: 600;
-  letter-spacing: 0;
-  line-height: 1;
-  background: linear-gradient(180deg, var(--text) 30%, var(--text-3) 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  margin-bottom: var(--space-2);
+  color: var(--text-3);
+  font: 600 var(--fs-xs)/1.2 var(--font-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: var(--space-4);
 }
 .notfound-title {
   font-family: var(--font-display);
-  font-size: var(--fs-4xl);
-  font-weight: 600;
-  letter-spacing: 0;
-  margin: 0 0 var(--space-2);
+  font-size: var(--fs-public-title);
+  font-weight: 650;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+  margin: 0 0 var(--space-4);
 }
 .notfound-sub {
-  color: var(--text-3);
-  font-size: var(--fs-md);
-  line-height: 1.55;
+  color: var(--text-2);
+  font-size: var(--fs-2xl);
+  line-height: 1.6;
   margin: 0 0 var(--space-6);
   overflow-wrap: anywhere;
   overflow: hidden;
@@ -66,7 +57,7 @@
   margin-bottom: 18px;
 }
 .notfound-suggest-h {
-  font-size: var(--fs-xs);
+  font: 600 var(--fs-xs)/1.2 var(--font-mono);
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--text-3);
@@ -136,4 +127,18 @@
 }
 .notfound-suggest-arrow {
   color: var(--text-4);
+}
+@media (max-width: 760px) {
+  .notfound-shell {
+    padding: var(--space-12) var(--space-5);
+  }
+  .notfound-card {
+    padding: var(--space-8) var(--space-5);
+  }
+}
+@media (max-width: 420px) {
+  .notfound-shell {
+    padding-left: var(--space-4);
+    padding-right: var(--space-4);
+  }
 }

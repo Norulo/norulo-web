@@ -72,6 +72,8 @@ input[type="checkbox"] {
   --fs-3xl: 1.125rem;
   --fs-4xl: 1.375rem;
   --fs-page-title: 1.5rem;
+  /* Public document, pricing and status page titles share one scale. */
+  --fs-public-title: clamp(2rem, 1.5rem + 1.6vw, 2.75rem);
   --fs-section-title: 1.0625rem;
   --fs-value-primary: 2rem;
   --fs-value-primary-compact: 1.75rem;
@@ -1454,6 +1456,7 @@ details.panel[open] > summary.panel-h::after,
     --fs-xl: 1.0625rem;
     --fs-3xl: 1.25rem;
     --fs-4xl: 1.875rem;
+    --fs-public-title: 2.25rem;
     --fs-value-primary: 2.125rem;
     --fs-value-primary-compact: 1.875rem;
   }

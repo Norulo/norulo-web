@@ -4,6 +4,7 @@ import "./error.css";
 import { I } from "../icons.jsx";
 import { T, useLang } from "../i18n.jsx";
 import { screenLinkProps } from "../lib/navigation.js";
+import { PublicFooter, PublicHeader } from "./public-layout.jsx";
 
 export function NotFoundScreen({ go, requested, auth }) {
   useLang();
@@ -51,41 +52,47 @@ export function NotFoundScreen({ go, requested, auth }) {
       ];
 
   return (
-    <main id="main-content" tabIndex={-1} className="notfound-shell fade-in">
-      <div className="notfound-card">
-        <div className="notfound-code">404</div>
-        <h1 className="notfound-title">{T("This page took a wrong turn", "这个页面走丢了")}</h1>
-        <p className="notfound-sub">
-          {T(
-            "We couldn't find what you were looking for. The link may be outdated, or the screen may have been renamed.",
-            "我们找不到你想访问的页面。链接可能已过时,或该页面已被重命名。"
-          )}
-          {requested && (
-            <span className="notfound-req">
-              {" "}
-              · <span className="kbd">{requested}</span>
-            </span>
-          )}
-        </p>
-        <div className="notfound-suggest">
-          <div className="notfound-suggest-h">{T("Try one of these instead", "试试这些页面")}</div>
-          {suggestions.map((s) => (
-            <a key={s.k} className="notfound-suggest-i" {...screenLinkProps(go, s.k)}>
-              <span className="notfound-suggest-ic">{s.i}</span>
-              <div className="notfound-suggest-content">
-                <div className="notfound-suggest-t">{s.t}</div>
-                <div className="notfound-suggest-d">{s.d}</div>
-              </div>
-              <I.ArrowR size={12} className="notfound-suggest-arrow" />
+    <div className="landing fade-in">
+      <PublicHeader go={go} current="notfound" auth={auth} />
+      <main id="main-content" tabIndex={-1} className="notfound-shell">
+        <div className="notfound-card">
+          <div className="notfound-code">404</div>
+          <h1 className="notfound-title">{T("This page took a wrong turn", "这个页面走丢了")}</h1>
+          <p className="notfound-sub">
+            {T(
+              "We couldn't find what you were looking for. The link may be outdated, or the screen may have been renamed.",
+              "我们找不到你想访问的页面。链接可能已过时,或该页面已被重命名。"
+            )}
+            {requested && (
+              <span className="notfound-req">
+                {" "}
+                · <span className="kbd">{requested}</span>
+              </span>
+            )}
+          </p>
+          <div className="notfound-suggest">
+            <div className="notfound-suggest-h">
+              {T("Try one of these instead", "试试这些页面")}
+            </div>
+            {suggestions.map((s) => (
+              <a key={s.k} className="notfound-suggest-i" {...screenLinkProps(go, s.k)}>
+                <span className="notfound-suggest-ic">{s.i}</span>
+                <div className="notfound-suggest-content">
+                  <div className="notfound-suggest-t">{s.t}</div>
+                  <div className="notfound-suggest-d">{s.d}</div>
+                </div>
+                <I.ArrowR size={12} className="notfound-suggest-arrow" />
+              </a>
+            ))}
+          </div>
+          <div className="notfound-foot">
+            <a className="auth-link" href="mailto:contact@norulo.com">
+              contact@norulo.com
             </a>
-          ))}
+          </div>
         </div>
-        <div className="notfound-foot">
-          <a className="auth-link" href="mailto:contact@norulo.com">
-            contact@norulo.com
-          </a>
-        </div>
-      </div>
-    </main>
+      </main>
+      <PublicFooter go={go} current="notfound" />
+    </div>
   );
 }

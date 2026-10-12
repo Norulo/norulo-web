@@ -1,105 +1,49 @@
-@media (max-width: 760px) {
-  .status-hero,
-  .status-section {
-    padding-left: var(--space-5);
-    padding-right: var(--space-5);
-  }
-
-  .status-row {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-  }
-
-  .status-card-h,
-  .legal-foot-actions {
-    align-items: stretch;
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .legal-shell {
-    padding: 28px var(--space-5) 52px;
-  }
-
-  .status-row-pct {
-    text-align: left;
-  }
-}
-
-@media (max-width: 520px) {
-  .status-overall {
-    flex-wrap: wrap;
-  }
-}
-
 .legal-shell {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--space-8);
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-6) var(--space-10);
+  align-items: start;
   max-width: 1240px;
   margin: 0 auto;
-  padding: var(--space-10) var(--space-10) var(--space-16);
+  padding-top: var(--space-10);
+  padding-bottom: var(--space-16);
 }
 
 @media (min-width: 900px) {
   .legal-shell {
-    grid-template-columns: 240px 1fr;
+    grid-template-columns: 200px minmax(0, 1fr);
   }
 }
 
+/* Shares the docs sidebar: mono section label, plain rows, and a single
+   scrolling row with 44px targets below the two-column width. */
 .legal-side {
   position: sticky;
-  top: 16px;
+  top: var(--space-6);
   align-self: start;
   display: flex;
   flex-direction: column;
   gap: 2px;
-  padding: var(--space-1) 0;
-  font-size: var(--fs-sm);
-  border-left: 1px solid var(--border);
-  padding-left: var(--space-4);
-}
-
-@media (max-width: 899px) {
-  .legal-side {
-    position: static;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    min-width: 0;
-    overflow-x: auto;
-    gap: var(--space-1);
-    padding: 0 0 10px;
-    border-left: 0;
-    border-bottom: 1px solid var(--border);
-  }
-  .legal-side-h {
-    flex: 0 0 auto;
-    margin: 0 var(--space-1) 0 0;
-  }
-  .legal-side-i {
-    flex: 0 0 auto;
-  }
-  .legal-side-foot {
-    display: none;
-  }
+  font-size: var(--fs-md);
 }
 
 .legal-side-h {
+  font-family: var(--font-mono);
   font-size: var(--fs-xs);
+  font-weight: 600;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
   color: var(--text-3);
-  margin: var(--space-1) 0 6px;
+  margin-bottom: 6px;
+  padding: 0 10px;
 }
 
 .legal-side-i {
   display: block;
-  padding: 5px var(--space-2);
-  color: var(--text-3);
+  padding: 6px 10px;
+  color: var(--text-2);
   text-decoration: none;
-  font-size: var(--fs-sm);
+  font-size: var(--fs-md);
   line-height: 1.5;
 }
 
@@ -110,8 +54,36 @@
 
 .legal-side-foot {
   margin-top: var(--space-4);
-  padding-top: var(--space-3);
+  padding: var(--space-3) 10px 0;
   border-top: 1px solid var(--border);
+}
+
+@media (max-width: 899px) {
+  .legal-side {
+    position: static;
+    flex-direction: row;
+    align-items: center;
+    min-width: 0;
+    overflow-x: auto;
+    gap: var(--space-1);
+    padding-bottom: var(--space-1);
+    border-bottom: 1px solid var(--border);
+  }
+  .legal-side-h {
+    flex: 0 0 auto;
+    margin: 0 var(--space-1) 0 0;
+    padding: 0;
+  }
+  .legal-side-i {
+    display: flex;
+    align-items: center;
+    flex: 0 0 auto;
+    min-height: 44px;
+    white-space: nowrap;
+  }
+  .legal-side-foot {
+    display: none;
+  }
 }
 
 .legal-side-l {
@@ -139,6 +111,14 @@
   margin-bottom: var(--space-4);
 }
 
+.legal-crumbs a {
+  color: var(--text-3);
+}
+
+.legal-crumbs a:hover {
+  color: var(--text);
+}
+
 .legal-crumbs .sep {
   opacity: 0.5;
 }
@@ -150,17 +130,19 @@
 
 .legal-h1 {
   font-family: var(--font-display);
-  font-size: clamp(32px, 4.5vw, 44px);
+  font-size: var(--fs-public-title);
   line-height: 1.1;
-  letter-spacing: 0;
-  font-weight: 600;
-  margin: 0 0 14px;
+  letter-spacing: -0.02em;
+  font-weight: 650;
+  margin: 0 0 var(--space-4);
+  text-wrap: balance;
 }
 
 .legal-lede {
   font-size: var(--fs-2xl);
   line-height: 1.6;
   color: var(--text-2);
+  max-width: 68ch;
   margin: 0 0 var(--space-8);
   text-wrap: pretty;
   overflow-wrap: anywhere;
@@ -171,17 +153,19 @@
 .legal-h2 {
   font-family: var(--font-display);
   font-size: var(--fs-4xl);
-  font-weight: 600;
-  letter-spacing: 0;
-  margin: 36px 0 var(--space-3);
-  scroll-margin-top: 24px;
+  font-weight: 650;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  margin: var(--space-10) 0 var(--space-3);
+  scroll-margin-top: var(--space-6);
 }
 
 .legal-main p {
   font-size: var(--fs-lg);
   line-height: 1.7;
   color: var(--text-2);
-  margin: 0 0 14px;
+  max-width: 72ch;
+  margin: 0 0 var(--space-4);
 }
 
 .legal-main p b {
@@ -193,6 +177,7 @@
   font-size: var(--fs-lg);
   line-height: 1.7;
   color: var(--text-2);
+  max-width: 72ch;
   margin: 0 0 var(--space-4);
   padding-left: 18px;
 }
@@ -206,7 +191,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 36px;
+  margin-top: var(--space-10);
   padding-top: var(--space-4);
   border-top: 1px solid var(--border);
   font-size: var(--fs-sm);
@@ -216,7 +201,8 @@
 .status-hero {
   max-width: 1240px;
   margin: 0 auto;
-  padding: 56px var(--space-10) var(--space-6);
+  padding-top: var(--space-16);
+  padding-bottom: var(--space-8);
   text-align: center;
 }
 
@@ -233,8 +219,9 @@
 .status-overall h1 {
   font-family: var(--font-display);
   font-size: var(--fs-4xl);
-  font-weight: 600;
-  letter-spacing: 0;
+  font-weight: 650;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
   margin: 0;
 }
 
@@ -252,15 +239,18 @@
 }
 
 .status-sub {
+  max-width: 68ch;
+  margin: 0 auto var(--space-4);
   color: var(--text-3);
   font-size: var(--fs-md);
-  margin: 0 0 18px;
+  line-height: 1.6;
 }
 
 .status-section {
   max-width: 1240px;
   margin: 0 auto;
-  padding: var(--space-3) var(--space-10) 36px;
+  padding-top: 0;
+  padding-bottom: var(--space-16);
 }
 
 .status-card {
@@ -297,8 +287,8 @@
 .status-card-h h2 {
   font-family: var(--font-display);
   font-size: var(--fs-3xl);
-  font-weight: 600;
-  letter-spacing: 0;
+  font-weight: 650;
+  letter-spacing: -0.01em;
   margin: 0;
 }
 
@@ -384,6 +374,15 @@
     padding-left: var(--space-5);
     padding-right: var(--space-5);
   }
+
+  .legal-shell {
+    padding-top: var(--space-6);
+    padding-bottom: var(--space-12);
+  }
+
+  .status-hero {
+    padding-top: var(--space-12);
+  }
 }
 
 @media (max-width: 420px) {
@@ -398,5 +397,30 @@
 @media (prefers-reduced-motion: reduce) {
   .status-overall.operational .status-dot {
     animation: none !important;
+  }
+}
+
+@media (max-width: 760px) {
+  .status-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .status-card-h,
+  .legal-foot-actions {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .status-row-pct {
+    text-align: left;
+  }
+}
+
+@media (max-width: 520px) {
+  .status-overall {
+    flex-wrap: wrap;
   }
 }

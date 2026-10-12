@@ -1557,7 +1557,6 @@ export function PricingScreen({
           <div className="lp-hero-tag">
             <span className="dot pricing-hero-dot" />
             <span>{T("Account plans", "Account plans")}</span>
-            <I.ArrowR size={12} />
           </div>
           <h1 className="lp-title">{T("Pricing", "Pricing")}</h1>
           <p className="lp-sub">

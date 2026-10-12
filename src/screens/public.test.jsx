@@ -44,20 +44,26 @@ describe("GitHub account-link recovery", () => {
     ["ko", "GitHub 연결이 완료되지 않았습니다"],
     ["fr", "La connexion GitHub n’a pas abouti"],
     ["es", "La conexión con GitHub no se completó"],
-  ])("offers manual conflict recovery in %s without starting authorization", async (language, heading) => {
-    try {
-      await act(async () => setLang(language));
-      render(<GitHubOAuthFailureScreen code="GITHUB_IDENTITY_CONFLICT" />);
-      expect(screen.getByRole("heading", { name: heading })).toBeVisible();
-      expect(screen.getByRole("alert")).not.toBeEmptyDOMElement();
-      expect(screen.getAllByRole("link").map((link) => link.getAttribute("href"))).toEqual(["/settings", "/login"]);
-      expect(screen.queryByRole("button")).not.toBeInTheDocument();
-      expect(connectGitHubRepositories).not.toHaveBeenCalled();
-      expect(startGitHubLogin).not.toHaveBeenCalled();
-    } finally {
-      await act(async () => setLang("en"));
+  ])(
+    "offers manual conflict recovery in %s without starting authorization",
+    async (language, heading) => {
+      try {
+        await act(async () => setLang(language));
+        render(<GitHubOAuthFailureScreen code="GITHUB_IDENTITY_CONFLICT" />);
+        expect(screen.getByRole("heading", { name: heading })).toBeVisible();
+        expect(screen.getByRole("alert")).not.toBeEmptyDOMElement();
+        expect(screen.getAllByRole("link").map((link) => link.getAttribute("href"))).toEqual([
+          "/settings",
+          "/login",
+        ]);
+        expect(screen.queryByRole("button")).not.toBeInTheDocument();
+        expect(connectGitHubRepositories).not.toHaveBeenCalled();
+        expect(startGitHubLogin).not.toHaveBeenCalled();
+      } finally {
+        await act(async () => setLang("en"));
+      }
     }
-  });
+  );
 });
 
 describe("repository authorization outcomes", () => {
@@ -346,7 +352,9 @@ describe("public navigation links", () => {
     startGitHubLogin.mockClear().mockResolvedValueOnce({ status: "redirecting" });
     const onOperationBusy = vi.fn();
     const view = render(<LoginScreen go={vi.fn()} onOperationBusy={onOperationBusy} />);
-    await act(async () => fireEvent.click(screen.getByRole("button", { name: "Continue with GitHub" })));
+    await act(async () =>
+      fireEvent.click(screen.getByRole("button", { name: "Continue with GitHub" }))
+    );
     const opening = screen.getByRole("button", { name: "Opening GitHub..." });
     fireEvent.click(opening);
     expect(opening).toBeDisabled();
@@ -393,6 +401,40 @@ describe("public navigation links", () => {
       );
     }
     expect(styles).toMatch(/\.legal-main\s*{[^}]*max-width:\s*none;/s);
+  });
+
+  it("shares one title scale and document rhythm across public pages", () => {
+    const css = (name) => readFileSync(`src/screens/${name}.css`, "utf8");
+    const rule = (styles, selector) =>
+      styles.match(new RegExp(`^${selector}\\s*\\{(?<body>[^}]*)\\}`, "m"))?.groups?.body;
+    const titles = [
+      rule(css("docs"), "\\.docs-h1"),
+      rule(css("legal"), "\\.legal-h1"),
+      rule(css("billing"), "\\.pricing-hero > \\.lp-title"),
+      rule(css("error"), "\\.notfound-title"),
+    ];
+    for (const body of titles) {
+      expect(body).toContain("font-size: var(--fs-public-title);");
+      expect(body).toContain("font-weight: 650;");
+      expect(body).toContain("letter-spacing: -0.02em;");
+    }
+    for (const [styles, prefix] of [
+      [css("docs"), "docs"],
+      [css("legal"), "legal"],
+    ]) {
+      expect(rule(styles, `\\.${prefix}-h2`)).toContain(
+        "margin: var(--space-10) 0 var(--space-3);"
+      );
+      expect(styles).toMatch(
+        new RegExp(
+          `@media \\(min-width: 900px\\) \\{\\s*\\.${prefix}-shell \\{\\s*grid-template-columns: 200px minmax\\(0, 1fr\\);`
+        )
+      );
+      expect(styles).toMatch(
+        new RegExp(`@media \\(max-width: 899px\\) \\{\\s*\\.${prefix}-side \\{`)
+      );
+    }
+    expect(readFileSync("src/screens/error.css", "utf8")).not.toMatch(/gradient/);
   });
   it("opens landing footer legal pages from real links", async () => {
     const user = userEvent.setup();

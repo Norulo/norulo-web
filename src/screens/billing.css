@@ -684,7 +684,8 @@
 .pricing-hero {
   max-width: 1240px;
   margin: 0 auto;
-  padding: 80px var(--space-10) var(--space-10);
+  padding-top: var(--space-16);
+  padding-bottom: var(--space-10);
   text-align: center;
 }
 .pricing-hero-dot {
@@ -692,18 +693,6 @@
 }
 .pricing-faq.pricing-policy {
   padding-top: 0;
-}
-
-.pricing-hero .lp-hero-tag {
-  margin: 0 auto 22px;
-}
-
-.pricing-hero .lp-title {
-  margin-bottom: 18px;
-}
-
-.pricing-hero .lp-sub {
-  margin: 0 auto var(--space-8);
 }
 
 .pricing-toggle {
@@ -996,7 +985,7 @@
 
 @media (max-width: 900px) {
   .pricing-hero {
-    padding-top: 58px;
+    padding-top: var(--space-12);
     padding-bottom: var(--space-8);
   }
 }
@@ -1078,14 +1067,20 @@
   padding-right: var(--space-10);
 }
 
+.pricing-hero > .lp-hero-tag {
+  margin-bottom: var(--space-6);
+}
+
+/* Pricing uses the shared public page-title scale, centered over the tiers. */
 .pricing-hero > .lp-title {
   grid-column: auto;
   grid-row: auto;
   max-width: 100%;
   margin: 0 auto 18px;
-  font-size: clamp(42px, 6vw, 66px);
-  line-height: 1.06;
-  letter-spacing: -0.015em;
+  font-size: var(--fs-public-title);
+  font-weight: 650;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
   text-align: center;
 }
 

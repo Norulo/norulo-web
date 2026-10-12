@@ -106,8 +106,11 @@
 .recurring-delete-action > button {
   min-height: 44px;
 }
+/* The hidden opener keeps its box so confirming never resizes the row; the
+   global [hidden] rule is !important, so this reservation must be too.
+   visibility: hidden still removes it from focus and the accessibility tree. */
 .recurring-delete-action > button[hidden] {
-  display: inline-flex;
+  display: inline-flex !important;
   visibility: hidden;
   pointer-events: none;
 }
@@ -169,5 +172,9 @@
   .recurring-delete-action > button {
     max-width: 100%;
     white-space: normal;
+  }
+  .recurring-delete-confirmation > .btn {
+    height: 48px;
+    min-height: 48px;
   }
 }

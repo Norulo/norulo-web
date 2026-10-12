@@ -759,11 +759,17 @@
 .ledger-screen .ledger-category-row > .ledger-actions {
   align-self: center;
 }
+/* The title line and the inline rename editor share one line height, so
+   renaming swaps controls in place without resizing the row. */
+.ledger-screen .ledger-category-row {
+  --category-line: 32px;
+}
 .ledger-category-title {
   display: flex;
   align-items: center;
   gap: 6px;
   min-width: 0;
+  min-height: var(--category-line, 28px);
   margin-bottom: 6px;
 }
 .ledger-screen .ledger-category-title > h3 {
@@ -780,6 +786,28 @@
   width: 100%;
   max-width: 560px;
   margin-bottom: 6px;
+}
+/* While renaming, the editor holds the status too: the input, Save and
+   Cancel take the title line and the status keeps its own line below. */
+.ledger-screen .ledger-category-row .ledger-category-editor {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 6px 8px;
+  margin-bottom: 0;
+}
+.ledger-screen .ledger-category-row .ledger-category-editor > .ledger-meta {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+.ledger-screen .main .ledger-category-row .ledger-category-editor > input {
+  min-width: 0;
+  height: var(--category-line);
+  min-height: var(--category-line);
+  padding-block: 0;
+}
+.ledger-screen .ledger-category-row .ledger-category-editor > .btn {
+  height: var(--category-line);
 }
 /* Expense records read as one ledger table: every row shares the list's
    description, amount and action columns, so amounts align on one edge and
@@ -811,6 +839,33 @@
   justify-content: flex-end;
   flex-wrap: nowrap;
   gap: 4px;
+}
+/* Row actions that swap for an inline confirmation stack every state in one
+   cell; the hidden sets only reserve their size, so opening or cancelling a
+   confirmation never resizes the row or moves neighbouring columns. */
+.ledger-screen .ledger-actions.ledger-swap-actions {
+  --swap-gap: 10px;
+  display: grid;
+  align-items: center;
+  justify-items: end;
+}
+.ledger-screen .ledger-row-side > .ledger-swap-actions {
+  --swap-gap: 4px;
+}
+.ledger-screen .ledger-swap-actions .ledger-confirm-icon {
+  width: 28px;
+  padding: 0;
+}
+.ledger-screen .ledger-swap-actions > .ledger-action-set {
+  grid-area: 1 / 1;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: var(--swap-gap);
+}
+.ledger-screen .ledger-swap-actions > .ledger-action-reserve {
+  visibility: hidden;
+  pointer-events: none;
 }
 .ledger-screen .ledger-amount {
   --financial-size: var(--fs-value-secondary);
@@ -1390,6 +1445,9 @@
     width: 44px;
     height: 44px;
   }
+  .ledger-screen .ledger-category-row {
+    --category-line: 44px;
+  }
   .ledger-project-shortcuts > a,
   .ledger-your-projects .ledger-row-main h2 > a,
   .ledger-your-projects .ledger-project-links > a,
@@ -1564,6 +1622,27 @@
   }
   .ledger-screen .ledger-category-row > .ledger-actions {
     grid-column: 1 / -1;
+    justify-items: start;
+  }
+  /* Phones keep row actions on their own line, so renaming mirrors it: the
+     input takes the title line and Save/Cancel take the Archive/Remove line. */
+  .ledger-screen .ledger-category-row {
+    --category-line: 48px;
+  }
+  .ledger-screen .ledger-category-row .ledger-category-editor {
+    grid-template-columns: auto auto minmax(0, 1fr);
+    column-gap: 10px;
+  }
+  .ledger-screen .main .ledger-category-row .ledger-category-editor > input {
+    grid-column: 1 / -1;
+    grid-row: 1;
+  }
+  .ledger-screen .ledger-category-row .ledger-category-editor > .ledger-meta {
+    grid-row: 2;
+  }
+  .ledger-screen .ledger-category-row .ledger-category-editor > .btn {
+    grid-row: 3;
+    margin-top: 6px;
   }
 }
 @media (prefers-reduced-motion: reduce) {

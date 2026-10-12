@@ -382,6 +382,8 @@ async function checkCurrencyPalette(page) {
 
 async function checkPresentation(page, name) {
   const measured = await page.evaluate(() => {
+    // Hidden reserve copies only hold a swapped action cell's size.
+    const liveButtons = "button:not(.ledger-action-reserve button)";
     const rect = (element) => {
       const { left, right, top, bottom, width, height } = element.getBoundingClientRect();
       return { left, right, top, bottom, width, height };
@@ -428,7 +430,7 @@ async function checkPresentation(page, name) {
           actionGroups: Array.from(row.querySelectorAll(".ledger-actions, .panel-actions")).map(
             (group) => ({
               rect: rect(group),
-              buttons: Array.from(group.querySelectorAll("button")).map(rect),
+              buttons: Array.from(group.querySelectorAll(liveButtons)).map(rect),
             })
           ),
         };
@@ -1332,6 +1334,8 @@ async function checkApiKeys(page, report) {
 async function measureCategories(page, report, name) {
   await settle(page);
   const measured = await page.evaluate(() => {
+    // Hidden reserve copies only hold a swapped action cell's size.
+    const liveButtons = "button:not(.ledger-action-reserve button)";
     const rect = (element) => {
       const { left, right, top, bottom, width, height } = element.getBoundingClientRect();
       return { left, right, top, bottom, width, height };
@@ -1380,8 +1384,8 @@ async function measureCategories(page, report, name) {
               button.hasAttribute("data-category-rename") ||
               ["Rename", "重命名"].includes(button.textContent.trim())
           ),
-          buttons: row.querySelectorAll("button").length,
-          actions: Array.from(row.querySelectorAll(":scope > .ledger-actions button")).map(
+          buttons: row.querySelectorAll(liveButtons).length,
+          actions: Array.from(row.querySelectorAll(`:scope > .ledger-actions ${liveButtons}`)).map(
             (button) => ({
               rect: rect(button),
               label: button.getAttribute("aria-label") || button.textContent.trim(),

@@ -1000,6 +1000,16 @@ function ExpenseForm({
   );
 }
 
+function CategoryStatus({ category }) {
+  return (
+    <p className="ledger-meta">
+      {category.archivedAt
+        ? T("Archived · past expenses keep this category", "已归档 · 以前的支出仍保留此分类")
+        : T("Ready to use", "可用于记账")}
+    </p>
+  );
+}
+
 export function LedgerScreen(props) {
   const workspace = props.workspace;
   const identity = workspace
@@ -1068,6 +1078,7 @@ function ScopedLedgerScreen({
   const [editing, setEditing] = useState(null);
   const [creatingExpense, setCreatingExpense] = useState(false);
   const [confirmId, setConfirmId] = useState("");
+  const restoreRemoveFocusRef = useRef("");
   const [projectRemoval, setProjectRemoval] = useState(null);
   const [projectRemovalError, setProjectRemovalError] = useState("");
   const [projectRemovalConflict, setProjectRemovalConflict] = useState(false);
@@ -2942,7 +2953,7 @@ function ScopedLedgerScreen({
                               }
                             />
                             <button
-                              className="btn primary"
+                              className="btn primary sm"
                               type="submit"
                               disabled={blocked || !categoryEdit.name.trim()}
                             >
@@ -2959,6 +2970,9 @@ function ScopedLedgerScreen({
                             >
                               {T("Cancel")}
                             </button>
+                            {/* The status stays in the editor's grid so the controls can
+                                take the title and action lines without resizing the row. */}
+                            <CategoryStatus category={category} />
                           </form>
                         ) : (
                           <div className="ledger-category-title">
@@ -2987,18 +3001,13 @@ function ScopedLedgerScreen({
                               )}
                           </div>
                         )}
-                        <p className="ledger-meta">
-                          {category.archivedAt
-                            ? T(
-                                "Archived · past expenses keep this category",
-                                "已归档 · 以前的支出仍保留此分类"
-                              )
-                            : T("Ready to use", "可用于记账")}
-                        </p>
+                        {!(canManageCategories && categoryEdit?.id === category.id) && (
+                          <CategoryStatus category={category} />
+                        )}
                       </div>
                       {canManageCategories && categoryEdit?.id !== category.id && (
                           <div
-                            className="ledger-actions"
+                            className="ledger-actions ledger-swap-actions"
                             onKeyDown={(event) => {
                               if (event.key === "Escape" && categoryAction?.id === category.id) {
                                 event.preventDefault();
@@ -3007,9 +3016,9 @@ function ScopedLedgerScreen({
                             }}
                           >
                             {categoryAction?.id === category.id ? (
-                              <>
+                              <span className="ledger-action-set" key="confirm">
                                 <button
-                                  className="btn"
+                                  className="btn ghost sm ledger-confirm-icon"
                                   type="button"
                                   ref={categoryActionConfirm}
                                   aria-label={
@@ -3018,17 +3027,20 @@ function ScopedLedgerScreen({
                                           "{category}",
                                           category.name
                                         )
-                                      : undefined
+                                      : T("Confirm archive")
+                                  }
+                                  title={
+                                    categoryAction.kind === "remove"
+                                      ? T("Confirm remove", "确认移除")
+                                      : T("Confirm archive")
                                   }
                                   disabled={blocked}
                                   onClick={() => confirmCategoryAction(category)}
                                 >
-                                  {categoryAction.kind === "remove"
-                                    ? T("Confirm remove", "确认移除")
-                                    : T("Confirm archive")}
+                                  <I.Check size={16} aria-hidden="true" />
                                 </button>
                                 <button
-                                  className="btn"
+                                  className="btn ghost sm ledger-confirm-icon"
                                   type="button"
                                   aria-label={
                                     categoryAction.kind === "remove"
@@ -3036,16 +3048,17 @@ function ScopedLedgerScreen({
                                           "{category}",
                                           category.name
                                         )
-                                      : undefined
+                                      : T("Cancel")
                                   }
+                                  title={T("Cancel")}
                                   disabled={blocked}
                                   onClick={closeCategoryAction}
                                 >
-                                  {T("Cancel")}
+                                  <I.X size={16} aria-hidden="true" />
                                 </button>
-                              </>
+                              </span>
                             ) : (
-                              <>
+                              <span className="ledger-action-set" key="idle">
                                 {!category.archivedAt && (
                                   <button
                                     className="btn ghost sm"
@@ -3097,7 +3110,25 @@ function ScopedLedgerScreen({
                                 >
                                   {T("Remove")}
                                 </button>
-                              </>
+                              </span>
+                            )}
+                            {/* Confirming swaps Archive/Remove for two narrower icon buttons;
+                                inert copies of the idle buttons keep reserving the cell, so
+                                the row never resizes. */}
+                            {categoryAction?.id === category.id && (
+                              <span
+                                className="ledger-action-set ledger-action-reserve"
+                                aria-hidden="true"
+                              >
+                                {!category.archivedAt && (
+                                  <button className="btn ghost sm" type="button" tabIndex={-1} disabled>
+                                    {T("Archive")}
+                                  </button>
+                                )}
+                                <button className="btn ghost sm" type="button" tabIndex={-1} disabled>
+                                  {T("Remove")}
+                                </button>
+                              </span>
                             )}
                           </div>
                         )}
@@ -3280,7 +3311,7 @@ function ScopedLedgerScreen({
                       {expenses.map((expense) => (
                         <article className="ledger-expense-row" key={expense.id}>
                           <div className="ledger-row-main">
-                            <h3>{expense.purpose}</h3>
+                            <h3 id={`${viewId}-expense-${expense.id}`}>{expense.purpose}</h3>
                             <p className="ledger-meta">
                               {expense.occurredOn} ·{" "}
                               {categoryDisplayName(
@@ -3302,44 +3333,82 @@ function ScopedLedgerScreen({
                               />
                             </strong>
                             {canWriteExpenses && (
-                              <div className="ledger-actions">
-                                <button
-                                  className="btn ghost sm"
-                                  disabled={blocked}
-                                  onClick={(event) => {
-                                    expenseOpenerRef.current = event.currentTarget;
-                                    setEditing(expense);
-                                  }}
-                                  aria-label={`${T("Edit")} ${expense.purpose}`}
-                                >
-                                  {T("Edit")}
-                                </button>
+                              <div className="ledger-actions ledger-swap-actions">
                                 {confirmId === expense.id ? (
-                                  <>
+                                  <span
+                                    className="ledger-action-set"
+                                    key="confirm"
+                                    role="group"
+                                    aria-label={T("Confirm removal")}
+                                  >
                                     <button
-                                      className="btn ghost sm"
+                                      className="btn ghost sm ledger-confirm-icon"
+                                      aria-label={T("Confirm removal")}
+                                      aria-describedby={`${viewId}-expense-${expense.id}`}
+                                      title={T("Confirm removal")}
                                       disabled={blocked}
                                       onClick={() => removeExpense(expense)}
                                     >
-                                      {T("Confirm removal")}
+                                      <I.Check size={16} aria-hidden="true" />
                                     </button>
                                     <button
-                                      className="btn"
+                                      className="btn ghost sm ledger-confirm-icon"
+                                      aria-label={T("Cancel")}
+                                      title={T("Cancel")}
+                                      autoFocus
                                       disabled={blocked}
-                                      onClick={() => setConfirmId("")}
+                                      onClick={() => {
+                                        restoreRemoveFocusRef.current = expense.id;
+                                        setConfirmId("");
+                                      }}
                                     >
-                                      {T("Cancel")}
+                                      <I.X size={16} aria-hidden="true" />
                                     </button>
-                                  </>
+                                  </span>
                                 ) : (
-                                  <button
-                                    className="btn ghost sm"
-                                    disabled={blocked}
-                                    onClick={() => setConfirmId(expense.id)}
-                                    aria-label={`${T("Remove")} ${expense.purpose}`}
+                                  <span className="ledger-action-set" key="idle">
+                                    <button
+                                      className="btn ghost sm"
+                                      disabled={blocked}
+                                      onClick={(event) => {
+                                        expenseOpenerRef.current = event.currentTarget;
+                                        setEditing(expense);
+                                      }}
+                                      aria-label={`${T("Edit")} ${expense.purpose}`}
+                                    >
+                                      {T("Edit")}
+                                    </button>
+                                    <button
+                                      className="btn ghost sm"
+                                      ref={(node) => {
+                                        if (node && restoreRemoveFocusRef.current === expense.id) {
+                                          restoreRemoveFocusRef.current = "";
+                                          node.focus();
+                                        }
+                                      }}
+                                      disabled={blocked}
+                                      onClick={() => setConfirmId(expense.id)}
+                                      aria-label={`${T("Remove")} ${expense.purpose}`}
+                                    >
+                                      {T("Remove")}
+                                    </button>
+                                  </span>
+                                )}
+                                {/* Confirming swaps Edit/Remove for two narrower icon buttons;
+                                    inert copies of the idle buttons keep reserving the cell, so
+                                    the row and the amount column never move. */}
+                                {confirmId === expense.id && (
+                                  <span
+                                    className="ledger-action-set ledger-action-reserve"
+                                    aria-hidden="true"
                                   >
-                                    {T("Remove")}
-                                  </button>
+                                    <button className="btn ghost sm" type="button" tabIndex={-1} disabled>
+                                      {T("Edit")}
+                                    </button>
+                                    <button className="btn ghost sm" type="button" tabIndex={-1} disabled>
+                                      {T("Remove")}
+                                    </button>
+                                  </span>
                                 )}
                               </div>
                             )}

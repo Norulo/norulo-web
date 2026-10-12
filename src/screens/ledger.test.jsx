@@ -1715,6 +1715,40 @@ describe("ledger screens", () => {
     );
   });
 
+  it("confirms expense removal in place and returns focus when cancelled", async () => {
+    const expense = {
+      id: "exp_1",
+      target: { kind: "shared" },
+      occurredOn: "2026-09-27",
+      amount: "12.00",
+      amountMinor: 1200,
+      currency: "USD",
+      categoryId: "cat_1",
+      purpose: "Hosting",
+      note: null,
+      quantity: null,
+      unit: null,
+      revision: 1,
+    };
+    api.expenses.mockResolvedValue({ items: [expense], nextCursor: null });
+    render(<LedgerScreen go={vi.fn()} mode="shared" />);
+    const remove = await screen.findByRole("button", { name: /Remove Hosting/i });
+    await waitFor(() => expect(remove).toBeEnabled());
+    fireEvent.click(remove);
+    const actions = screen.getByRole("group", { name: "Confirm removal" });
+    expect(screen.getByRole("button", { name: "Confirm removal" })).toHaveAccessibleDescription(
+      "Hosting"
+    );
+    expect(screen.getByRole("button", { name: "Cancel" })).toHaveFocus();
+    // Inert copies of Edit/Remove reserve the cell without being exposed.
+    const reserve = actions.parentElement.querySelector(".ledger-action-reserve");
+    expect(reserve).toHaveAttribute("aria-hidden", "true");
+    expect(screen.queryByRole("button", { name: /^(Edit|Remove)$/ })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+    expect(screen.getByRole("button", { name: /Remove Hosting/i })).toHaveFocus();
+    expect(api.removeExpense).not.toHaveBeenCalled();
+  });
+
   it("preserves a historical project expense target and revision when editing", async () => {
     api.projects.mockResolvedValue({
       items: [

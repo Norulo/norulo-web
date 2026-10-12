@@ -1,6 +1,7 @@
 // @vitest-environment node
 import { describe, expect, it, vi } from "vitest";
 import { ApiError, SERVER_REQUEST_TIMEOUT_MS, http, request } from "./http.js";
+import { setRequestSessionIdentity, subscribeSessionRecheck } from "./session-recheck.js";
 
 describe("ApiError", () => {
   it("preserves structured backend error codes", () => {
@@ -176,6 +177,75 @@ describe("fetch transport", () => {
     expect(error.message).toBe("Request rate limit exceeded");
 
     fetchMock.mockRestore();
+  });
+
+  it("preserves the contract's nested error detail ahead of legacy top-level messages", async () => {
+    const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(
+      jsonResponse({ error: { code: "INVALID_INPUT", message: "Date range is inverted" }, message: "Legacy detail" }, { status: 422 })
+    );
+    try {
+      await expect(request("/api/v1/expenses")).rejects.toMatchObject({
+        code: "INVALID_INPUT", message: "Date range is inverted", status: 422,
+      });
+    } finally { fetchMock.mockRestore(); }
+  });
+
+  it("parses structured download failures without converting the error body into a Blob", async () => {
+    const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(
+      jsonResponse({ error: { code: "INVALID_INPUT", message: "Invalid export range" } }, { status: 422 })
+    );
+    try {
+      await expect(request("/api/v1/expenses/export", { responseType: "blob" })).rejects.toMatchObject({
+        code: "INVALID_INPUT", message: "Invalid export range", status: 422,
+      });
+    } finally { fetchMock.mockRestore(); }
+  });
+
+  it("rechecks one confirmed session for a group of protected 401s without replaying requests", async () => {
+    let complete;
+    const recheck = vi.fn(() => new Promise((resolve) => { complete = resolve; }));
+    const unsubscribe = subscribeSessionRecheck(recheck);
+    setRequestSessionIdentity("account-one");
+    const fetchMock = vi.spyOn(globalThis, "fetch").mockImplementation(() => Promise.resolve(
+      jsonResponse({ error: { code: "UNAUTHENTICATED" } }, { status: 401 })
+    ));
+    try {
+      await Promise.allSettled([
+        request("/api/v1/expenses"), request("/billing/plan"), request("/api-keys"),
+      ]);
+      expect(recheck).toHaveBeenCalledOnce();
+      expect(fetchMock).toHaveBeenCalledTimes(3);
+    } finally {
+      complete?.();
+      unsubscribe();
+      setRequestSessionIdentity(null);
+      fetchMock.mockRestore();
+    }
+  });
+
+  it("does not recheck for public auth, provider identity or an old account's 401", async () => {
+    const recheck = vi.fn();
+    const unsubscribe = subscribeSessionRecheck(recheck);
+    setRequestSessionIdentity("account-one");
+    const fetchMock = vi.spyOn(globalThis, "fetch");
+    try {
+      fetchMock.mockResolvedValueOnce(jsonResponse({ error: { code: "UNAUTHENTICATED" } }, { status: 401 }));
+      await expect(request("/auth/email/verify-code", { method: "POST" })).rejects.toBeInstanceOf(ApiError);
+      fetchMock.mockResolvedValueOnce(jsonResponse({ error: { code: "GITHUB_IDENTITY_REQUIRED" } }, { status: 401 }));
+      await expect(request("/integrations/github/authorize")).rejects.toBeInstanceOf(ApiError);
+      let resolveOld;
+      fetchMock.mockReturnValueOnce(new Promise((resolve) => { resolveOld = resolve; }));
+      const oldRead = request("/api/v1/expenses");
+      setRequestSessionIdentity("account-two");
+      resolveOld(jsonResponse({ error: { code: "UNAUTHENTICATED" } }, { status: 401 }));
+      await expect(oldRead).rejects.toBeInstanceOf(ApiError);
+      expect(recheck).not.toHaveBeenCalled();
+      expect(fetchMock).toHaveBeenCalledTimes(3);
+    } finally {
+      unsubscribe();
+      setRequestSessionIdentity(null);
+      fetchMock.mockRestore();
+    }
   });
 
   it("returns binary downloads as a blob rather than parsed JSON", async () => {

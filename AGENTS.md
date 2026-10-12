@@ -199,9 +199,10 @@ limitations accurately. Keep generated output, browser captures, caches and
 local configuration in existing ignored locations.
 
 For API-prefixed local browser validation build with `VITE_API_BASE_URL=/api`
-and a loopback VITE_APP_URL. Disable the inherited Vite preview proxy for
-static captures because its `/api` prefix also catches the `/api-keys` document
-route. Finish builds before browser captures, which rely on a stable dist tree.
+and a loopback VITE_APP_URL. Vite proxies use route-boundary expressions so
+`/api-keys` remains a document route. Disable upstream proxying for static
+captures that supply their own local API fixtures. Finish builds before browser
+captures, which rely on a stable dist tree.
 Use strict free ports and bounded loopback fixtures; do not call remote APIs.
 
 ## D1 cost controls

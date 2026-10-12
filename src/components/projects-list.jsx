@@ -8,6 +8,11 @@ const ProjectListRow = memo(function ProjectListRow({ model, go, navigationDisab
   const { project, label } = model;
   const productHref = projectUrlHref(project.productUrl);
   const archived = project.status === "archived";
+  // A malformed aggregate is unknown, not a successful empty expense list.
+  // Reject invalid entries too, before accessing their currency or rendering Total.
+  const totals = Array.isArray(project.totals) && project.totals.every(
+    (total) => total && typeof total === "object" && !Array.isArray(total),
+  ) ? project.totals : null;
   return (
     <article className={`ledger-project-row${archived ? " ledger-project-row-archived" : ""}`} role="listitem">
       <div className="ledger-row-main">
@@ -27,9 +32,11 @@ const ProjectListRow = memo(function ProjectListRow({ model, go, navigationDisab
       </div>
       <div className="ledger-project-total">
         <span className="ledger-project-label">{copy.expenseTotal}</span>
-        {project.totals.length
-          ? project.totals.map((total) => <Total key={total.currency} total={total} />)
-          : copy.noExpenses}
+        {totals === null
+          ? copy.unavailable
+          : totals.length
+            ? totals.map((total) => <Total key={total.currency} total={total} />)
+            : copy.noExpenses}
       </div>
       <div className="ledger-project-associations">
         {productHref ? (

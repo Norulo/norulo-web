@@ -1,4 +1,5 @@
 import { env } from "../config/env.js";
+import { captureRequestSessionScope, requestSessionRecheck } from "./session-recheck.js";
 
 export const SERVER_REQUEST_TIMEOUT_MS = 5 * 60 * 1000;
 
@@ -71,7 +72,7 @@ function combineSignals(signals) {
 }
 
 async function parseBody(response, responseType) {
-  if (responseType === "blob") return response.blob();
+  if (responseType === "blob" && response.ok) return response.blob();
   if (response.status === 204) return null;
   const text = await response.text();
   if (!text) return null;
@@ -129,6 +130,7 @@ export const http = {
 };
 
 export async function request(path, options = {}) {
+  const sessionScope = captureRequestSessionScope();
   try {
     const response = await http.request({
       url: path,
@@ -150,16 +152,23 @@ export async function request(path, options = {}) {
 
     if (error instanceof HttpStatusError) {
       const paused = error.response?.data?.error?.code === "D1_ACCESS_PAUSED";
-      throw new ApiError(
+      const failure = new ApiError(
         paused
           ? "Service is temporarily paused. Please try again later."
-          : error.response?.data?.message || error.message,
+          : error.response?.data?.error?.message || error.response?.data?.message || error.message,
         {
           status: error.response?.status,
           payload: error.response?.data,
           retryAfter: error.response?.retryAfter,
         }
       );
+      // Public auth failures and missing GitHub identity are separate from an
+      // expired account session. Ignore completions from canceled/old scopes.
+      if (failure.status === 401 && (!failure.code || failure.code === "UNAUTHENTICATED") &&
+          !options.signal?.aborted &&
+          /^\/(?:api\/v1|api-keys|billing|repositories|integrations)(?:\/|\?|$)/.test(path))
+        requestSessionRecheck(sessionScope);
+      throw failure;
     }
 
     throw error;

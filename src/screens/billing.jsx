@@ -6,6 +6,7 @@ import { FinancialValue } from "../components/financial-value.jsx";
 import { useErrorNotification } from "../components/notifications.jsx";
 import { I } from "../icons.jsx";
 import { T, useLang } from "../i18n.jsx";
+import { requestErrorText } from "../lib/request-error.js";
 import { pathFromScreen, screenLinkProps } from "../lib/navigation.js";
 import { formatBillingTimestamp } from "../lib/billing-date.js";
 import { safeBillingRedirectUrl } from "../lib/trusted-redirects.js";
@@ -728,7 +729,7 @@ export function BillingScreen({ go, navigate = (url) => window.location.assign(u
       if (!mountedRef.current) return;
       setPlan(payload);
     } catch (err) {
-      if (mountedRef.current) setError(err?.message || "Unable to load billing.");
+      if (mountedRef.current) setError(requestErrorText(err, T("Unable to load billing.", "无法加载账单。")));
     } finally {
       billingReadRef.current = false;
       if (mountedRef.current) setLoading(false);
@@ -839,7 +840,7 @@ export function BillingScreen({ go, navigate = (url) => window.location.assign(u
       if (!mountedRef.current) return;
       setChangeDraft(null);
     } catch (err) {
-      if (mountedRef.current) setError(err?.message || "Unable to change subscription.");
+      if (mountedRef.current) setError(requestErrorText(err, T("Unable to change subscription.", "无法更改订阅。")));
     } finally {
       if (billingMutationRef.current === actionKey) billingMutationRef.current = "";
       if (mountedRef.current) {
@@ -916,7 +917,7 @@ export function BillingScreen({ go, navigate = (url) => window.location.assign(u
       }));
       await refreshBillingPlan();
     } catch (err) {
-      if (mountedRef.current) setError(err?.message || "Unable to cancel subscription.");
+      if (mountedRef.current) setError(requestErrorText(err, T("Unable to cancel subscription.", "无法取消订阅。")));
     } finally {
       if (billingMutationRef.current === actionKey) billingMutationRef.current = "";
       if (mountedRef.current) {
@@ -966,7 +967,7 @@ export function BillingScreen({ go, navigate = (url) => window.location.assign(u
       }));
       await refreshBillingPlan();
     } catch (err) {
-      if (mountedRef.current) setError(err?.message || "Unable to resume subscription.");
+      if (mountedRef.current) setError(requestErrorText(err, T("Unable to resume subscription.", "无法恢复订阅。")));
     } finally {
       if (billingMutationRef.current === actionKey) billingMutationRef.current = "";
       if (mountedRef.current) {
@@ -1472,7 +1473,7 @@ export function PricingScreen({
       const billingInterval = payload?.account?.interval || "";
       if (billingInterval === "year") setInterval("year");
     } catch (err) {
-      setError(err?.message || "Unable to load pricing.");
+      setError(requestErrorText(err, T("Unable to load pricing.", "无法加载价格。")));
     }
   }, []);
 
@@ -1538,7 +1539,7 @@ export function PricingScreen({
       navigate(checkoutUrl);
     } catch (err) {
       if (checkoutRequestRef.current !== requestId) return;
-      setError(err?.message || "Unable to start checkout.");
+      setError(requestErrorText(err, T("Unable to start checkout.", "无法发起结账。")));
       checkoutPendingRef.current = false;
       setPendingAction("");
     } finally {

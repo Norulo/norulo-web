@@ -28,6 +28,7 @@
   "services": [{"binding": "NORULO_SERVER", "service": "norulo-server-production"}],
   "observability": {
     "enabled": true,
+    "issues": { "enabled": true },
     "redact_query_string": true,
     "logs": {
       "enabled": true,

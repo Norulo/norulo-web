@@ -336,7 +336,7 @@ describe("bounded project and Shared Pool recorded-expense pages", () => {
       openFilters();
       expect(screen.getByLabelText("From date")).toBeEnabled();
       fireEvent.change(screen.getByLabelText("From date"), { target: { value: "2026-09-15" } });
-      expect(signal.aborted).toBe(true);
+      await waitFor(() => expect(signal.aborted).toBe(true));
       await screen.findByRole("heading", { name: f.expenses[14].purpose });
       await settled();
       expect(screen.getByLabelText("What did you pay for?")).toBe(purpose);
@@ -357,7 +357,7 @@ describe("bounded project and Shared Pool recorded-expense pages", () => {
     await open(f);
     f.api.expenses.mockRejectedValueOnce({ status: 503, message: "Expense page temporarily unavailable" });
     fireEvent.click(pageButton("Next"));
-    expect(await screen.findByText("Expense page temporarily unavailable")).toBeVisible();
+    expect(await screen.findByText("The service is temporarily unavailable. Please try again later.")).toBeVisible();
     await settled();
     expect(purposes()).toEqual(f.expenses.slice(0, 10).map((expense) => expense.purpose));
     expect(within(pagination()).getByText("Page 1")).toBeVisible();
@@ -367,7 +367,7 @@ describe("bounded project and Shared Pool recorded-expense pages", () => {
     await nextPage(f);
     expect(f.api.expenses).toHaveBeenCalledTimes(3);
     expect(f.api.expenses.mock.calls[1][0]).toEqual(f.api.expenses.mock.calls[2][0]);
-    expect(screen.queryByText("Expense page temporarily unavailable")).not.toBeInTheDocument();
+    expect(screen.queryByText("The service is temporarily unavailable. Please try again later.")).not.toBeInTheDocument();
   });
 
   it.each(["shared", "project"].flatMap((mode) =>

@@ -36,11 +36,17 @@ import {
 } from "../components/github-authorization-notice.jsx";
 import { screenLinkProps } from "../lib/navigation.js";
 import { normalizeDecimalInput } from "../lib/decimal-input.js";
+import { requestErrorText, UserFacingError } from "../lib/request-error.js";
 import { Topbar, Sidebar, ViewTabs } from "../shell.jsx";
 import "./ledger.css";
 
 const EXPENSE_PAGE_SIZE = 10;
 const PROJECT_PAGE_SIZE = 25;
+const FILTER_DELAY_MS = 300;
+
+function invalidDateRange(filters) {
+  return Boolean(filters.from && filters.to && filters.from >= filters.to);
+}
 const ExpenseCharts = lazy(() =>
   import("../components/expense-charts.jsx").then((module) => ({ default: module.ExpenseCharts }))
 );
@@ -61,7 +67,7 @@ function validateExpensePage(page) {
     (page.nextCursor != null &&
       (typeof page.nextCursor !== "string" || !page.nextCursor))
   )
-    throw new Error(T("Expense page unavailable. Reload to retry."));
+    throw new UserFacingError(T("Expense page unavailable. Reload to retry."));
   return page;
 }
 
@@ -179,7 +185,7 @@ function errorText(error) {
   if (error?.status === 412) return T("Save conflict. Reload the latest record before retrying.");
   if (error?.status === 403)
     return T("Access changed. Review the current project and key permissions.");
-  return error?.payload?.error?.code || error?.message || T("Request failed. Please retry.");
+  return requestErrorText(error, T("Request failed. Please retry."));
 }
 
 function requestKey() {
@@ -218,8 +224,9 @@ function formatRecurringTotal(rule) {
     : T("Unavailable");
 }
 
-function LedgerFilters({ filters, onChange, categories = [], disabled = false }) {
+function LedgerFilters({ filters, onChange, categories = [], disabled = false, errorId }) {
   const fieldId = useId();
+  const invalidRange = invalidDateRange(filters);
   const update = (name, value) => {
     if (!disabled) onChange((old) => ({ ...old, [name]: value }));
   };
@@ -230,6 +237,8 @@ function LedgerFilters({ filters, onChange, categories = [], disabled = false })
         <input
           id={`${fieldId}-from`}
           type="date"
+          aria-invalid={invalidRange || undefined}
+          aria-describedby={invalidRange ? errorId : undefined}
           disabled={disabled}
           value={filters.from}
           onChange={(event) => update("from", event.target.value)}
@@ -240,6 +249,8 @@ function LedgerFilters({ filters, onChange, categories = [], disabled = false })
         <input
           id={`${fieldId}-before`}
           type="date"
+          aria-invalid={invalidRange || undefined}
+          aria-describedby={invalidRange ? errorId : undefined}
           disabled={disabled}
           value={filters.to}
           min={filters.from || undefined}
@@ -368,8 +379,17 @@ function LedgerViewToolbar({
           onChange={onFiltersChange}
           categories={categories}
           disabled={disabled}
+          errorId={`${filtersId}-range-error`}
         />
       </div>
+      {invalidDateRange(filters) && !["settings", "activity"].includes(view) && (
+        <p className="ledger-help" id={`${filtersId}-range-error`} role="alert">
+          {T(
+            "Before date must be later than From date. Previous results remain visible.",
+            "截止日期必须晚于起始日期，当前仍显示此前的数据。"
+          )}
+        </p>
+      )}
     </>
   );
 }
@@ -1038,6 +1058,7 @@ function ScopedLedgerScreen({
   const workspaceScope = `${workspace?.id || "personal"}:${workspace?.revision || 0}:${canManageProjects}:${canManageCategories}:${canWriteExpenses}`;
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [readFailed, setReadFailed] = useState(false);
   const [error, setError] = useState("");
   const [actionError, setActionError] = useState("");
   const [gitHubOutcome, setGitHubOutcome] = useState(null);
@@ -1047,6 +1068,16 @@ function ScopedLedgerScreen({
   const [revision, setRevision] = useState(0);
   const [loadedRequest, setLoadedRequest] = useState(0);
   const [filters, setFilters] = useState({ from: "", to: "", categoryId: "" });
+  const [appliedFilters, setAppliedFilters] = useState(filters);
+  const [settledFilters, setSettledFilters] = useState(filters);
+  const filtersUnapplied = filters !== appliedFilters;
+  const filtersPending = filtersUnapplied || appliedFilters !== settledFilters;
+  const filtersInvalid = invalidDateRange(filters);
+  useEffect(() => {
+    if (!filtersUnapplied || filtersInvalid) return undefined;
+    const timer = setTimeout(() => setAppliedFilters(filters), FILTER_DELAY_MS);
+    return () => clearTimeout(timer);
+  }, [filters, filtersUnapplied, filtersInvalid]);
   const [filtersExpanded, setFiltersExpanded] = useState(false);
   const [parentBusy, setBusy] = useState(false);
   const [recurringBusy, setRecurringBusy] = useState(false);
@@ -1060,7 +1091,9 @@ function ScopedLedgerScreen({
   const [reviewReadBusy, setReviewReadBusy] = useState(false);
   const writing = parentBusy || recurringBusy || reviewBusy || reviewReadBusy;
   const busy = writing || loadingMore || accessRefreshing || reviewReadBusy;
-  const blocked = busy || loading;
+  const resultsStale = readFailed && Boolean(data);
+  const readBlocked = busy || loading || filtersPending;
+  const blocked = readBlocked || resultsStale;
   const [repositoryLoading, setRepositoryLoading] = useState(false);
   const [description, setDescription] = useState("");
   const [developmentUrl, setDevelopmentUrl] = useState("");
@@ -1110,7 +1143,7 @@ function ScopedLedgerScreen({
   const writeRefreshPending = useRef(false);
   const recurringOperation = useRef(null);
   const readingGuard = useRef(false);
-  readingGuard.current = loading || loadingMore || accessRefreshing || reviewReadBusy;
+  readingGuard.current = loading || loadingMore || accessRefreshing || reviewReadBusy || filtersPending || resultsStale;
   const requestId = useRef(0);
   const moreController = useRef(null);
   const repositoryController = useRef(null);
@@ -1274,8 +1307,8 @@ function ScopedLedgerScreen({
     }
   };
   const filtered = useMemo(
-    () => Object.fromEntries(Object.entries(filters).filter(([, value]) => value)),
-    [filters]
+    () => Object.fromEntries(Object.entries(appliedFilters).filter(([, value]) => value)),
+    [appliedFilters]
   );
   const detailQuery = useMemo(
     () =>
@@ -1435,6 +1468,7 @@ function ScopedLedgerScreen({
       .then((result) => {
         if (!controller.signal.aborted && request === requestId.current) {
           setData(result);
+          setReadFailed(false);
           if (pendingGitHubOutcome.current?.scope === scope) {
             setGitHubOutcome(pendingGitHubOutcome.current.outcome);
             pendingGitHubOutcome.current = null;
@@ -1468,14 +1502,20 @@ function ScopedLedgerScreen({
         if (!controller.signal.aborted && request === requestId.current) {
           pendingGitHubOutcome.current = null;
           setGitHubOutcome(null);
-          setData(null);
+          setData((previous) =>
+            ["shared", "project"].includes(mode) && failure?.status !== 401 && !isLedgerAccessFailure(failure)
+              ? previous
+              : null
+          );
           setError(errorText(failure));
+          setReadFailed(true);
           if (isLedgerAccessFailure(failure)) onAccessChanged?.(failure);
         }
       })
       .finally(() => {
         if (!controller.signal.aborted && request === requestId.current) {
           setLoading(false);
+          setSettledFilters(appliedFilters);
           if (writeRefreshPending.current) {
             writeRefreshPending.current = false;
             inFlight.current = false;
@@ -1501,6 +1541,7 @@ function ScopedLedgerScreen({
     workspaceScope,
     api,
     canManageProjects,
+    appliedFilters,
     onAccessChanged,
   ]);
 
@@ -2424,7 +2465,7 @@ function ScopedLedgerScreen({
               <button
                 className="btn ghost"
                 onClick={reloadWithAccess}
-                disabled={loading || writing || accessRefreshing}
+                disabled={loading || writing || accessRefreshing || filtersPending}
                 aria-label={T("Reload")}
                 title={T("Reload")}
               >
@@ -2444,7 +2485,7 @@ function ScopedLedgerScreen({
               {error && (
                 <div className="notice notice-error">
                   {error}{" "}
-                  <button className="btn" disabled={blocked} onClick={reloadWithAccess}>
+                  <button className="btn" disabled={readBlocked} onClick={reloadWithAccess}>
                     {T("Retry")}
                   </button>
                 </div>
@@ -3176,11 +3217,19 @@ function ScopedLedgerScreen({
           )}
           {data && (mode === "shared" || mode === "project") && (
             <>
-              {loading && (
+              {(loading || (filtersPending && !filtersInvalid)) && (
                 <p className="ledger-help" role="status">
                   {T(
                     "Updating results… Previous results remain visible.",
                     "正在更新结果，当前仍显示此前的数据。"
+                  )}
+                </p>
+              )}
+              {readFailed && !loading && (
+                <p className="ledger-help" role="status">
+                  {T(
+                    "Could not update results. Previous results remain visible.",
+                    "未能更新结果，当前仍显示此前的数据。"
                   )}
                 </p>
               )}
@@ -3232,7 +3281,7 @@ function ScopedLedgerScreen({
                 role="tabpanel"
                 id={`${viewId}-panel-expenses`}
                 aria-labelledby={`${viewId}-tab-expenses`}
-                aria-busy={loading || loadingMore || writing}
+                aria-busy={loading || loadingMore || writing || filtersPending}
                 tabIndex={0}
                 hidden={view !== "expenses"}
               >
@@ -3505,7 +3554,7 @@ function ScopedLedgerScreen({
                 role="tabpanel"
                 id={`${viewId}-panel-reports`}
                 aria-labelledby={`${viewId}-tab-reports`}
-                aria-busy={loading || writing}
+                aria-busy={loading || writing || filtersPending}
                 tabIndex={0}
                 hidden={view !== "reports"}
               >

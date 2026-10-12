@@ -144,7 +144,7 @@ describe("product settings", () => {
   it("offers retry when account data fails without inventing an empty account", async () => {
     noruloApi.auth.getSession.mockRejectedValueOnce(new Error("session unavailable"));
     render(<SettingsScreen go={vi.fn()} />);
-    expect(await screen.findByRole("alert")).toHaveTextContent("session unavailable");
+    expect(await screen.findByRole("alert")).toHaveTextContent("Account data unavailable.");
     expect(screen.getByText("Account profile unavailable.")).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Reconnect GitHub" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Connect GitHub account" })).not.toBeInTheDocument();
@@ -229,7 +229,7 @@ describe("product settings", () => {
     expect(connectGitHubRepositories).not.toHaveBeenCalled();
     expect(signOut).not.toHaveBeenCalled();
     await act(async () => authorization.reject(new Error("GitHub authorize temporarily unavailable")));
-    expect(screen.getByRole("alert")).toHaveTextContent("GitHub authorize temporarily unavailable");
+    expect(screen.getByRole("alert")).toHaveTextContent("GitHub authorization failed.");
     expect(reconnect).toBeEnabled();
     expect(screen.getByRole("combobox", { name: "Select ledger" })).toBeEnabled();
     expect(noruloApi.integrations.list).toHaveBeenCalledOnce();
@@ -255,7 +255,7 @@ describe("product settings", () => {
       redirectTo: window.location.href,
       signal: expect.any(AbortSignal),
     });
-    expect(await screen.findByRole("alert")).toHaveTextContent("authorization unavailable");
+    expect(await screen.findByRole("alert")).toHaveTextContent("GitHub authorization failed.");
     expect(connectGitHubRepositories).not.toHaveBeenCalled();
     expect(noruloApi.integrations.list).toHaveBeenCalledOnce();
   });
@@ -302,7 +302,7 @@ describe("product settings", () => {
       redirectTo: window.location.href,
       signal: expect.any(AbortSignal),
     });
-    expect(await screen.findByRole("alert")).toHaveTextContent("authorization unavailable");
+    expect(await screen.findByRole("alert")).toHaveTextContent("GitHub authorization failed.");
     expect(connectGitHubRepositories).not.toHaveBeenCalled();
     expect(noruloApi.auth.getSession).toHaveBeenCalledOnce();
     expect(noruloApi.integrations.list).toHaveBeenCalledOnce();
@@ -332,7 +332,7 @@ describe("product settings", () => {
     });
     render(<SettingsScreen go={vi.fn()} />);
     expect(await screen.findByText("Taylor")).toBeInTheDocument();
-    expect(screen.getByRole("alert")).toHaveTextContent("GitHub is temporarily unavailable.");
+    expect(screen.getByRole("alert")).toHaveTextContent("The service is temporarily unavailable. Please try again later.");
     expect(screen.getByText("GitHub access unavailable.")).toBeInTheDocument();
     expect(screen.queryByText(/0 repositories authorized/i)).not.toBeInTheDocument();
     expect(connectGitHubRepositories).not.toHaveBeenCalled();
@@ -395,7 +395,7 @@ describe("product settings", () => {
     expect(connectGitHubRepositories).not.toHaveBeenCalled();
     expect(signOut).not.toHaveBeenCalled();
     await act(async () => request.reject(new Error("Mail delivery unavailable")));
-    expect(screen.getByRole("alert")).toHaveTextContent("Mail delivery unavailable");
+    expect(screen.getByRole("alert")).toHaveTextContent("Request failed. Please retry.");
     expect(email).toHaveValue("login@example.com");
     expect(email).toBeEnabled();
     expect(screen.getByRole("button", { name: "Connect repositories" })).toBeEnabled();
@@ -676,7 +676,7 @@ describe("product settings", () => {
       fireEvent.click(button);
       expect(githubAccess().queryByRole("status")).not.toBeInTheDocument();
       await act(async () => nextAction.reject(new Error("GitHub access unavailable")));
-      expect(screen.getByRole("alert")).toHaveTextContent("GitHub access unavailable");
+      expect(screen.getByRole("alert")).toHaveTextContent("GitHub authorization failed.");
       expect(githubAccess().queryByRole("status")).not.toBeInTheDocument();
       expect(noruloApi.integrations.list).toHaveBeenCalledTimes(2);
     }
@@ -735,9 +735,7 @@ describe("product settings", () => {
       expect(githubAccess().queryByRole("status")).not.toBeInTheDocument();
       if (failure === "account changed") expect(screen.getByText("Other user")).toBeVisible();
       else
-        expect(screen.getByRole("alert")).toHaveTextContent(
-          "Repository access could not be checked"
-        );
+        expect(screen.getByRole("alert")).toHaveTextContent("Account data unavailable.");
     }
   );
 
@@ -745,7 +743,7 @@ describe("product settings", () => {
     connectGitHubRepositories.mockRejectedValueOnce(new Error("Popup canceled"));
     withLedgers();
     fireEvent.click(await screen.findByRole("button", { name: "Connect repositories" }));
-    expect(await screen.findByRole("alert")).toHaveTextContent("Popup canceled");
+    expect(await screen.findByRole("alert")).toHaveTextContent("GitHub authorization failed.");
     expect(screen.getByRole("button", { name: "Connect repositories" })).toBeEnabled();
     expect(screen.getByRole("button", { name: "Sign out" })).toBeEnabled();
     expect(screen.getByRole("combobox", { name: "Select ledger" })).toBeEnabled();
@@ -795,7 +793,7 @@ describe("product settings", () => {
     expect(connectGitHubRepositories).not.toHaveBeenCalled();
     expect(screen.getByRole("combobox", { name: "Select ledger" })).toBeDisabled();
     await act(async () => pending.reject(new Error("Sign out failed")));
-    expect(screen.getByRole("alert")).toHaveTextContent("Sign out failed");
+    expect(screen.getByRole("alert")).toHaveTextContent("Request failed. Please retry.");
     expect(leave).toBeEnabled();
     expect(connect).toBeEnabled();
     expect(screen.getByRole("combobox", { name: "Select ledger" })).toBeEnabled();
@@ -817,7 +815,7 @@ describe("product settings", () => {
       new Error("GitHub temporarily unavailable")
     );
     render(<SettingsScreen go={vi.fn()} />);
-    expect(await screen.findByRole("alert")).toHaveTextContent("GitHub temporarily unavailable");
+    expect(await screen.findByRole("alert")).toHaveTextContent("Account data unavailable.");
     expect(screen.getByText("Taylor")).toBeInTheDocument();
     expect(
       screen.queryByRole("button", { name: /^connect repositories$/i })

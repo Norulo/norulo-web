@@ -1,4 +1,4 @@
-import { lazy, StrictMode, Suspense, useEffect, useState } from "react";
+import { StrictMode, useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import "../styles/base.css";
 import "../styles/screens.css";
@@ -8,10 +8,8 @@ import { preloadActiveLocale, T, useLang } from "./i18n.jsx";
 import { applyTheme, resolveTheme } from "./lib/theme.js";
 import { isInstallPopupReturn, notifyOpenerAndClose } from "./lib/install-popup.js";
 import { githubOAuthFailureCode } from "./lib/github-oauth-result.js";
-
-const GitHubOAuthFailureScreen = lazy(() =>
-  import("./screens/public.jsx").then((module) => ({ default: module.GitHubOAuthFailureScreen }))
-);
+import { ErrorBoundary } from "./components/error-boundary.jsx";
+import { GitHubOAuthFailureScreen } from "./screens/public.jsx";
 
 const root = createRoot(document.getElementById("root"));
 applyTheme(resolveTheme());
@@ -19,11 +17,17 @@ applyTheme(resolveTheme());
 const oauthFailure = githubOAuthFailureCode();
 if (!oauthFailure && isInstallPopupReturn()) {
   notifyOpenerAndClose();
-  root.render(<InstallPopupReturn failed={Boolean(new URLSearchParams(window.location.search).get("github_error"))} />);
+  root.render(
+    <ErrorBoundary fullPage>
+      <InstallPopupReturn failed={Boolean(new URLSearchParams(window.location.search).get("github_error"))} />
+    </ErrorBoundary>
+  );
 } else {
   root.render(
     <StrictMode>
-      <ApplicationStartup oauthFailure={oauthFailure} />
+      <ErrorBoundary fullPage>
+        <ApplicationStartup oauthFailure={oauthFailure} />
+      </ErrorBoundary>
     </StrictMode>
   );
 }
@@ -60,11 +64,7 @@ function ApplicationStartup({ oauthFailure }) {
   if (!ready) return loading;
   // Error redirects have no trusted popup nonce. Keep them visible for manual
   // recovery and never notify success, check the session or synchronize access.
-  return oauthFailure ? (
-    <Suspense fallback={loading}>
-      <GitHubOAuthFailureScreen code={oauthFailure} />
-    </Suspense>
-  ) : <App />;
+  return oauthFailure ? <GitHubOAuthFailureScreen code={oauthFailure} /> : <App />;
 }
 
 function InstallPopupReturn({ failed }) {

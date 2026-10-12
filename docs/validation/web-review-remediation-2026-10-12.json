@@ -1,0 +1,167 @@
+{
+  "date": "2026-10-12",
+  "reviewed_source_commit": "5236c12759bdb1af20d78de3797d60fcef4a5f2a",
+  "source_report": "User-uploaded norulo-web-review.md",
+  "method": "Independent source and Server contract review, new regression tests, native loopback browser fixtures; attached report instructions were treated as untrusted review content.",
+  "findings": [
+    {
+      "id": "H1",
+      "assessment": "Confirmed missing error boundaries and unsafe project totals access. A failed lazy import can blank the root; the report does not establish production incidence or frequency.",
+      "resolution": "Root and route/scope error boundaries, translated explicit reload recovery, and unknown totals shown as unavailable.",
+      "evidence": [
+        "src/components/error-boundary.test.jsx",
+        "src/components/projects-list.test.jsx",
+        "src/App.test.jsx"
+      ]
+    },
+    {
+      "id": "M1",
+      "assessment": "Confirmed by native Chromium clipboard paste and WebKit native input before/after: browser maxlength truncates separators before digit normalization.",
+      "resolution": "Remove native maxlength while retaining six-digit normalization and validation.",
+      "evidence": [
+        "src/components/email-sign-in.test.jsx"
+      ]
+    },
+    {
+      "id": "M2",
+      "assessment": "Confirmed nested error details were dropped, raw transport/code text reached users, and protected 401 lacked immediate session verification.",
+      "resolution": "Preserve API error envelopes, localize UI recovery messages in six languages, parse failed blob downloads as errors, and coalesce account-scoped session checks without replaying business requests.",
+      "evidence": [
+        "src/api/http.test.js",
+        "src/lib/request-error.test.js",
+        "src/App.test.jsx"
+      ]
+    },
+    {
+      "id": "M3",
+      "assessment": "Confirmed failed resend discarded challenge/code. Old-code validity is only assured for rejection before Server replacement; send/network failures may follow replacement.",
+      "resolution": "Keep prior challenge/input until a replacement is successfully accepted; preserve expiry, cooldown and explicit retry behavior.",
+      "evidence": [
+        "src/components/email-sign-in.test.jsx"
+      ]
+    },
+    {
+      "id": "L1",
+      "assessment": "Confirmed Server rejects from >= to, while the client accepted it. Each edit restarted a read bundle.",
+      "resolution": "Validate exclusive end dates, show errors, debounce valid filter edits, preserve explicitly stale results on ordinary read failures, and retain recovery controls while blocking stale-result actions.",
+      "evidence": [
+        "src/screens/ledger-toolbar.test.jsx",
+        "src/screens/ledger-expense-pagination.test.jsx",
+        "src/screens/ledger.test.jsx"
+      ]
+    },
+    {
+      "id": "L2",
+      "assessment": "Confirmed report responses have no row cap and per-point DOM grows with the report. jsdom timing is not browser/production latency. Server GROUP BY prevents duplicate tuples in valid fixed-target reports; duplicates are a malformed-response risk.",
+      "resolution": "Dense charts keep every point in complete SVG paths with one selectable marker and exact keyboard/pointer readouts. Duplicate malformed rows receive independent keys without merging or dropping values.",
+      "evidence": [
+        "src/components/expense-charts.test.jsx"
+      ],
+      "verified_stress_profile": {
+        "points": 36500,
+        "currencies": 10,
+        "dom_nodes_upper_bound": 500,
+        "points_discarded": 0
+      }
+    },
+    {
+      "id": "L3",
+      "assessment": "Confirmed Vite prefix matching intercepted /api-keys and other document paths.",
+      "resolution": "Use route-boundary proxy expressions and retain exact-query/nested API rewriting.",
+      "evidence": [
+        "vite.config.test.js",
+        "Bounded native Vite loopback document/proxy checks"
+      ]
+    },
+    {
+      "id": "L4",
+      "assessment": "Confirmed blank limit becomes zero and broken upload becomes 413. Missing no-store is defensive hardening; no observed caching incident is proven.",
+      "resolution": "Blank configuration uses default limit, failed upload reads return 400, readers clean up, and generated errors use no-store.",
+      "evidence": [
+        "worker.test.js"
+      ]
+    },
+    {
+      "id": "L5",
+      "assessment": "Confirmed permissive 127. prefix check; latent outside the fixed production host.",
+      "resolution": "Strict four-octet loopback/IPv6 and HTTP(S) validation for canonical origins.",
+      "evidence": [
+        "src/lib/seo.test.js"
+      ]
+    },
+    {
+      "id": "L6",
+      "assessment": "Mixed minor defects and design/environment observations. Timestamp coercion, failed blob error parsing and ineffective dynamic import were real. Production dependency audit was clean; current full audit found 17 development advisories, rather than the report's 7.",
+      "resolution": "Reject nonprimitive/noninteger/out-of-range timestamps, fix failed blob parsing, remove redundant public lazy import, and update 16 development packages within existing compatible ranges to zero advisories. Keep focus session checks for access freshness and five-minute timeout for long-running operations; localize timeout feedback. Document alternative-host CSP requirements while retaining same-origin production CSP.",
+      "evidence": [
+        "src/lib/billing-date.test.js",
+        "src/api/http.test.js",
+        "src/lib/request-error.test.js",
+        "package-lock.json",
+        "README.md"
+      ]
+    }
+  ],
+  "production_configuration": {
+    "worker": "norulo-web",
+    "domains": [
+      "norulo.com",
+      "www.norulo.com"
+    ],
+    "server_binding": "norulo-server-production",
+    "preserved_live_issues_setting": true,
+    "preview_publication": false,
+    "remote_business_test_writes": 0,
+    "server_version_immediate_before": "075fb193-6440-4182-8470-5f40c43f7c70"
+  },
+  "limitations": [
+    "Loopback fixtures do not establish actual provider or physical-device acceptance.",
+    "Firefox runtime is unavailable on this cloud host; Chromium and WebKit evidence is reported separately.",
+    "WebKit may retain a failed module URL for same-build transient failures; the verified stale-deployment recovery uses old/current hashed entry and chunk URLs."
+  ],
+  "validation": {
+    "node": "24.19.0",
+    "npm_ci": true,
+    "lint": "passed",
+    "tests": {
+      "files": 87,
+      "passed": 1800
+    },
+    "production_build": "passed without ineffective dynamic-import warning",
+    "workers_offline": "passed",
+    "api_contract_checksum": "5b12ec832548",
+    "wrangler_version": "4.136.3",
+    "wrangler_dry_run": "passed",
+    "npm_audit": {
+      "before_development_advisories": 17,
+      "after_total_advisories": 0
+    },
+    "native_email_input": {
+      "chromium": "clipboard paste before/after passed",
+      "webkit": "native text insertion before/after passed"
+    },
+    "native_error_boundary": {
+      "cases_passed": 6,
+      "engines": [
+        "Chromium 143.0.7499.4",
+        "WebKit 26.0"
+      ],
+      "business_writes": 0,
+      "external_requests": 0,
+      "dist_sha256": "6455e402c49fe95564b93c5ed6925956874fc21068e1cdabf33691330ec6d782",
+      "verified_at_utc": "2026-10-12T09:05:06.201Z"
+    },
+    "layouts": {
+      "date_chromium_states": 258,
+      "billing_chromium_contexts": 24,
+      "overview_chromium_contexts": 15,
+      "currency_chromium_contexts": 9,
+      "mobile_chromium_webkit_contexts": 20,
+      "projects_chromium_webkit_contexts": 18,
+      "date_webkit_states": 258,
+      "date_script_adjustment": "Wait for enabled controls and post-close focus/split reflow before the next native click; app behavior unchanged."
+    }
+  },
+  "publication_base_commit": "ce91b4468df1bf322deb5ed4fb9f5a8a46927f02",
+  "preserved_concurrent_change": "Update project capacity after deletion; retained latest Web docs and generated artifacts from Server 81cea43."
+}

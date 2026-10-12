@@ -5,6 +5,7 @@ import { I } from "../icons.jsx";
 import { LedgerSplit } from "../components/ledger-split.jsx";
 import { ConsoleLayout } from "../components/console-layout.jsx";
 import { T, useLang } from "../i18n.jsx";
+import { requestErrorText, UserFacingError } from "../lib/request-error.js";
 import { Sidebar, Topbar } from "../shell.jsx";
 import "./ledger.css";
 
@@ -48,7 +49,7 @@ function MemberIdentity({ name, login, children }) {
 
 function items(result) {
   if (!Array.isArray(result?.items))
-    throw new Error(T("Member data unavailable.", "成员数据暂不可用。"));
+    throw new UserFacingError(T("Member data unavailable.", "成员数据暂不可用。"));
   return result.items;
 }
 
@@ -160,7 +161,7 @@ function failureMessage(failure) {
       "This member or invitation is no longer available. Reload members to check access.",
       "此成员或邀请已不可用。请重新加载成员以检查权限。"
     );
-  return failure?.message || T("Member data unavailable.", "成员数据暂不可用。");
+  return requestErrorText(failure, T("Member data unavailable.", "成员数据暂不可用。"));
 }
 
 export function MembersScreen({
@@ -430,7 +431,7 @@ function MembersContent({
       const result = await api.previewInvitation({ token }, { signal: controller.signal });
       if (!current(ticket) || controller.signal.aborted || requestId !== previewId.current) return;
       if (!validInvitation(result)) {
-        throw new Error(T("Invitation data unavailable.", "邀请数据暂不可用。"));
+        throw new UserFacingError(T("Invitation data unavailable.", "邀请数据暂不可用。"));
       }
       setPreview(result);
       setAcceptAttempted(false);
@@ -606,7 +607,7 @@ function MembersContent({
       () => api.inviteMember(workspaceId, { role: inviteRole }, {}),
       (result) => {
         if (!result?.token)
-          throw new Error(T("Invitation link unavailable.", "邀请链接暂不可用。"));
+          throw new UserFacingError(T("Invitation link unavailable.", "邀请链接暂不可用。"));
         inviteVersion.current += 1;
         setCreatedInvite({
           ...result,
@@ -656,7 +657,7 @@ function MembersContent({
       () => api.acceptInvitation({ token }, {}),
       (result) => {
         if (!validInvitation(result) || !result.request)
-          throw new Error(T("Invitation data unavailable.", "邀请数据暂不可用。"));
+          throw new UserFacingError(T("Invitation data unavailable.", "邀请数据暂不可用。"));
         setPreview(result);
         callbacks.current.onInvitationRequestsChanged?.();
       },
@@ -682,7 +683,7 @@ function MembersContent({
         ),
       (result) => {
         if (result?.request?.status !== (decision === "approve" ? "approved" : "rejected"))
-          throw new Error(T("Invitation data unavailable.", "邀请数据暂不可用。"));
+          throw new UserFacingError(T("Invitation data unavailable.", "邀请数据暂不可用。"));
         focusReview.current = true;
         callbacks.current.onInvitationRequestsChanged?.();
       }

@@ -8,6 +8,7 @@ import {
 } from "../components/github-authorization-notice.jsx";
 import { T, useLang } from "../i18n.jsx";
 import { connectGitHubRepositories, signOut, startGitHubLogin } from "../lib/auth.js";
+import { requestErrorText } from "../lib/request-error.js";
 import { screenLinkProps } from "../lib/navigation.js";
 import { PublicFooter, PublicHeader } from "./public-layout.jsx";
 
@@ -88,8 +89,7 @@ export function GitHubOAuthFailureScreen({ code }) {
 }
 
 function getAuthErrorMessage(error) {
-  return (
-    error?.message ||
+  return requestErrorText(error,
     T("Sign-in is unavailable. Please try again later.", "登录暂不可用，请稍后重试。")
   );
 }

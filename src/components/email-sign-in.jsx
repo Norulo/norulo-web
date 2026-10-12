@@ -1,6 +1,7 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { noruloApi } from "../api/norulo.js";
 import { T, useLang } from "../i18n.jsx";
+import { requestErrorText, UserFacingError } from "../lib/request-error.js";
 import "./email-sign-in.css";
 
 function retrySeconds(failure) {
@@ -55,7 +56,7 @@ function emailErrorMessage(failure) {
         "邮箱登录暂不可用，请稍后重试。"
       );
     default:
-      return failure?.message || T("Request failed. Please retry.", "请求失败，请重试。");
+      return requestErrorText(failure, T("Request failed. Please retry.", "请求失败，请重试。"));
   }
 }
 
@@ -167,9 +168,7 @@ export function EmailSignIn({ purpose = "login", disabled = false, onBusy, onVer
     if (retryAt > Date.now() || (!challenge && !emailRef.current?.checkValidity())) return;
     const controller = begin("send");
     if (!controller) return;
-    const requestedEmail = email.trim();
-    setChallenge(null);
-    setCode("");
+    const requestedEmail = challenge?.email || email.trim();
     try {
       const response = await noruloApi.auth.requestEmailCode(
         { email: requestedEmail, purpose },
@@ -177,13 +176,14 @@ export function EmailSignIn({ purpose = "login", disabled = false, onBusy, onVer
       );
       if (controller.signal.aborted || !mountedRef.current) return;
       if (!response?.challengeId || !(Number(response.expiresIn) > 0)) {
-        throw new Error(
+        throw new UserFacingError(
           T("A code could not be requested. Please retry.", "未能请求验证码，请重试。")
         );
       }
       const time = Date.now();
       setNow(time);
       setEmail(requestedEmail);
+      setCode("");
       setRetryAt(time + Math.max(0, Number(response.retryAfter) || 0) * 1000);
       requestFocus(controller, codeRef);
       setChallenge({
@@ -192,7 +192,7 @@ export function EmailSignIn({ purpose = "login", disabled = false, onBusy, onVer
         expiresAt: time + Number(response.expiresIn) * 1000,
       });
     } catch (failure) {
-      showFailure(failure, controller, emailRef);
+      showFailure(failure, controller, challenge ? codeRef : emailRef);
     } finally {
       finish(controller);
     }
@@ -216,7 +216,7 @@ export function EmailSignIn({ purpose = "login", disabled = false, onBusy, onVer
       );
       if (controller.signal.aborted || !mountedRef.current) return;
       if (!response?.authenticated || !response?.user?.id) {
-        throw new Error(
+        throw new UserFacingError(
           T("Sign-in could not be confirmed. Please retry.", "未能确认登录状态，请重试。")
         );
       }
@@ -304,7 +304,6 @@ export function EmailSignIn({ purpose = "login", disabled = false, onBusy, onVer
             inputMode="numeric"
             autoComplete="one-time-code"
             pattern="[0-9]{6}"
-            maxLength={6}
             required
             value={code}
             disabled={locked}

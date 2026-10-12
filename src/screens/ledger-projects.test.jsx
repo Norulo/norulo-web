@@ -160,10 +160,10 @@ describe("Projects authorization and creation", () => {
     render(<LedgerScreen go={vi.fn()} mode="projects" authorizationError="Authorization notice" />);
     fireEvent.click(await screen.findByRole("button", { name: "Add project" }));
     await openGitHubLinks();
-    await screen.findByText("Repository provider unavailable");
+    await screen.findByText("Request failed. Please retry.");
     expect(screen.getAllByRole("alert")).toHaveLength(1);
     expect(screen.getByRole("alert")).toHaveTextContent("Authorization notice");
-    expect(screen.getByRole("alert")).toHaveTextContent("Repository provider unavailable");
+    expect(screen.getByRole("alert")).toHaveTextContent("Request failed. Please retry.");
     expect(screen.getByRole("link", { name: blankProject.name })).toBeVisible();
     expect(api.projects).toHaveBeenCalledTimes(1);
   });
@@ -321,7 +321,7 @@ describe("Projects authorization and creation", () => {
     fireEvent.click(await screen.findByRole("tab", { name: "Project settings" }));
     expect(api.repositories).not.toHaveBeenCalled();
     await openGitHubLinks();
-    expect(await screen.findByRole("alert")).toHaveTextContent("Repository list unavailable");
+    expect(await screen.findByRole("alert")).toHaveTextContent("Request failed. Please retry.");
     const name = screen.getByLabelText("Project name");
     expect(name).toBeRequired();
     fireEvent.change(name, { target: { value: "Local budget" } });
@@ -762,7 +762,7 @@ describe("Projects authorization and creation", () => {
     render(<LedgerScreen go={vi.fn()} mode="projects" />);
     await openGitHubLinks();
     await clickManageGitHubAccess();
-    expect(await screen.findByRole("alert")).toHaveTextContent("Projects could not be read");
+    expect(await screen.findByRole("alert")).toHaveTextContent("Request failed. Please retry.");
     expect(screen.queryByRole("status")).not.toBeInTheDocument();
   });
 
@@ -801,7 +801,7 @@ describe("Projects authorization and creation", () => {
     render(<LedgerScreen go={vi.fn()} mode="projects" />);
     await openGitHubLinks();
     await clickManageGitHubAccess();
-    expect(await screen.findByRole("alert")).toHaveTextContent("GitHub denied authorization");
+    expect(await screen.findByRole("alert")).toHaveTextContent("Request failed. Please retry.");
     expect(screen.getByRole("button", { name: /Manage GitHub access/i })).toBeEnabled();
     expect(api.repositories).toHaveBeenCalledTimes(1);
   });
@@ -1021,7 +1021,7 @@ describe("Projects authorization and creation", () => {
     render(<LedgerScreen go={vi.fn()} mode="projects" />);
     await nameProject();
     await openGitHubLinks();
-    expect(await screen.findByRole("alert")).toHaveTextContent("Repository list unavailable");
+    expect(await screen.findByRole("alert")).toHaveTextContent("Request failed. Please retry.");
     await closeGitHubLinks();
     expect(screen.getByRole("button", { name: "Create project" })).toBeEnabled();
     expect(screen.queryByText(/No repositories are available yet/i)).not.toBeInTheDocument();

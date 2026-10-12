@@ -317,7 +317,8 @@ describe("Owner project removal", () => {
     await user.click(within(settings).getByRole("button", { name: "Remove project" }));
     const dialog = screen.getByRole("dialog", { name: "Remove project?" });
     await user.click(within(dialog).getByRole("button", { name: "Confirm remove project" }));
-    expect(await within(dialog).findByRole("alert")).toHaveTextContent("Removal unavailable");
+    expect(await within(dialog).findByRole("alert")).toHaveTextContent("Request failed. Please retry.");
+    expect(screen.queryByText("Could not update results. Previous results remain visible.")).not.toBeInTheDocument();
     expect(within(settings).getByLabelText("Project name")).toHaveValue("Draft project");
     expect(within(settings).getByLabelText("Description")).toHaveValue("Draft description");
     expect(within(dialog).getByRole("button", { name: "Confirm remove project" })).toBeEnabled();

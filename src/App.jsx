@@ -2,14 +2,17 @@ import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } fro
 import { noruloApi } from "./api/norulo.js";
 import { createLedgerApi, ledgerApi } from "./api/ledger.js";
 import { captureGitHubRefreshScope, setGitHubRefreshIdentity } from "./api/github-refresh.js";
+import { setRequestSessionIdentity, subscribeSessionRecheck } from "./api/session-recheck.js";
 import { WorkspaceContext } from "./components/workspace-context.jsx";
 import { NotificationProvider } from "./components/notifications.jsx";
 import { InvitationInboxProvider } from "./components/invitation-inbox.jsx";
 import { ConsoleLayoutProvider } from "./components/console-layout.jsx";
+import { ErrorBoundary } from "./components/error-boundary.jsx";
 import { PagePreferencesProvider, PagePreferencesReady } from "./components/page-preferences.jsx";
 import { LANGUAGES, T, setLang, useLang } from "./i18n.jsx";
 import { I } from "./icons.jsx";
 import { connectGitHubRepositories } from "./lib/auth.js";
+import { requestErrorText, UserFacingError } from "./lib/request-error.js";
 import {
   applyTheme,
   readThemePreference,
@@ -328,7 +331,7 @@ export function App() {
             status: "error",
             items: [],
             selectedId: "",
-            error: error?.message || "Ledger access could not be loaded.",
+            error: requestErrorText(error, T("Ledger access could not be loaded.", "无法加载账本权限。")),
           });
         }
         return false;
@@ -411,7 +414,7 @@ export function App() {
             status: "error",
             items: [],
             selectedId: "",
-            error: error?.message || "Ledger access could not be loaded.",
+            error: requestErrorText(error, T("Ledger access could not be loaded.", "无法加载账本权限。")),
           });
         }
       });
@@ -740,7 +743,10 @@ export function App() {
   const authRef = useRef(auth);
   const authIdentityRef = useRef(null);
 
-  useEffect(() => () => setGitHubRefreshIdentity(null), []);
+  useEffect(() => () => {
+    setGitHubRefreshIdentity(null);
+    setRequestSessionIdentity(null);
+  }, []);
 
   useEffect(() => {
     authRef.current = auth;
@@ -750,6 +756,7 @@ export function App() {
     const resolvedAuth = typeof nextAuth === "function" ? nextAuth(authRef.current) : nextAuth;
     const nextIdentity = sessionIdentity(resolvedAuth.authenticated, resolvedAuth.session);
     setGitHubRefreshIdentity(resolvedAuth.authenticated ? resolvedAuth.session?.user?.id : null);
+    setRequestSessionIdentity(resolvedAuth.authenticated ? nextIdentity : null);
     if (authIdentityRef.current !== nextIdentity) {
       authIdentityRef.current = nextIdentity;
     }
@@ -766,7 +773,7 @@ export function App() {
   const acceptEmailSession = useCallback(
     (payload, { link = false } = {}) => {
       if (!payload?.authenticated || !payload?.user?.id) {
-        throw new Error(
+        throw new UserFacingError(
           T("Sign-in could not be confirmed. Please retry.", "未能确认登录状态，请重试。")
         );
       }
@@ -774,7 +781,7 @@ export function App() {
         link &&
         (!authRef.current.authenticated || authRef.current.session?.user?.id !== payload.user.id)
       ) {
-        throw new Error(
+        throw new UserFacingError(
           T(
             "Email linking could not be confirmed for this account. Please retry.",
             "未能确认邮箱已绑定到此账户，请重试。"
@@ -805,8 +812,9 @@ export function App() {
       deferUnauthenticated = false,
       confirmUnauthenticated = false,
       preserveAuthenticatedOnError = false,
+      force = false,
     } = {}) => {
-      if (sessionCheckingRef.current) return { skipped: true };
+      if (sessionCheckingRef.current && !force) return { skipped: true };
       sessionCheckingRef.current = true;
 
       if (sessionAbortRef.current) sessionAbortRef.current.abort();
@@ -848,7 +856,7 @@ export function App() {
       } catch (error) {
         if (controller.signal.aborted) return { aborted: true };
         const wasAuthenticated = Boolean(authRef.current?.authenticated);
-        if (preserveAuthenticatedOnError && wasAuthenticated) {
+        if (preserveAuthenticatedOnError && wasAuthenticated && error?.status !== 401) {
           setAuthState((previous) => ({ ...previous, status: "ready" }));
           return { authenticated: true, error, preserved: true };
         }
@@ -880,6 +888,14 @@ export function App() {
       checkSession({ isRetry: true, preserveAuthenticatedOnError: true });
     }, SESSION_SIGNED_OUT_CONFIRM_DELAY_MS);
   }, [checkSession, clearSessionConfirmTimer]);
+
+  useEffect(() => subscribeSessionRecheck(() => {
+    if (!authRef.current.authenticated) return;
+    clearSessionConfirmTimer();
+    // A protected 401 is stronger evidence than a focus event. Read the
+    // session immediately and let confirmed sign-out clear protected scopes.
+    return checkSession({ isRetry: true, preserveAuthenticatedOnError: true, force: true });
+  }), [checkSession, clearSessionConfirmTimer]);
 
   // Initial session check on mount, with a single retry on failure.
   // Many transient issues (server cold start, brief network hiccup) resolve within seconds.
@@ -990,7 +1006,7 @@ export function App() {
       .catch((error) => {
         if (controller.signal.aborted) return;
         setRepositoryAuthorizationError(
-          error?.message || "Unable to connect GitHub repository access."
+          requestErrorText(error, T("Unable to connect GitHub repository access.", "无法连接 GitHub 仓库权限。"))
         );
       });
     return () => controller.abort();
@@ -1433,10 +1449,12 @@ export function App() {
                   data-screen-label={screen}
                   key={screenKey}
                 >
-                  <Suspense fallback={<ScreenFallback />}>
-                    {body}
-                    <PagePreferencesReady />
-                  </Suspense>
+                  <ErrorBoundary key={screenKey} onError={() => reportPageOperation(false, screenKey)}>
+                    <Suspense fallback={<ScreenFallback />}>
+                      {body}
+                      <PagePreferencesReady />
+                    </Suspense>
+                  </ErrorBoundary>
                 </div>
               </PagePreferencesProvider>
             </WorkspaceContext.Provider>

@@ -747,7 +747,7 @@ describe("BillingScreen", () => {
 
     render(<PricingScreen go={vi.fn()} auth={{ authenticated: true }} navigate={vi.fn()} />);
 
-    expect(await screen.findByRole("alert")).toHaveTextContent(/timeout/i);
+    expect(await screen.findByRole("alert")).toHaveTextContent(/request timed out/i);
     expect(screen.getByRole("button", { name: /retry pricing/i })).toBeInTheDocument();
     expect(document.querySelectorAll(".pricing-card")).toHaveLength(0);
     expect(document.body).not.toHaveTextContent("Price unavailable");
@@ -1380,7 +1380,7 @@ describe("BillingScreen", () => {
 
     await user.click(await screen.findByRole("button", { name: /start pro/i }));
 
-    expect(await screen.findByRole("alert")).toHaveTextContent(/safe billing checkout URL/i);
+    expect(await screen.findByRole("alert")).toHaveTextContent("Unable to start checkout.");
     expect(navigate).not.toHaveBeenCalled();
   });
 
@@ -1400,7 +1400,7 @@ describe("BillingScreen", () => {
 
     await user.click(await screen.findByRole("button", { name: /start pro/i }));
 
-    expect(await screen.findByRole("alert")).toHaveTextContent(/safe billing checkout URL/i);
+    expect(await screen.findByRole("alert")).toHaveTextContent("Unable to start checkout.");
     expect(navigate).not.toHaveBeenCalled();
   });
 
@@ -1420,7 +1420,7 @@ describe("BillingScreen", () => {
 
     await user.click(await screen.findByRole("button", { name: /start pro/i }));
 
-    expect(await screen.findByRole("alert")).toHaveTextContent(/safe billing checkout URL/i);
+    expect(await screen.findByRole("alert")).toHaveTextContent("Unable to start checkout.");
     expect(navigate).not.toHaveBeenCalled();
   });
 
@@ -2396,7 +2396,7 @@ describe("BillingScreen", () => {
     await user.click(await screen.findByRole("button", { name: /switch to yearly/i }));
     await user.click(await screen.findByRole("button", { name: /confirm change/i }));
 
-    expect(await screen.findByRole("alert")).toHaveTextContent(/safe billing interval URL/i);
+    expect(await screen.findByRole("alert")).toHaveTextContent("Unable to change subscription.");
     expect(navigate).not.toHaveBeenCalled();
   });
 
@@ -2422,7 +2422,7 @@ describe("BillingScreen", () => {
     await user.click(await screen.findByRole("button", { name: /switch to yearly/i }));
     await user.click(await screen.findByRole("button", { name: /confirm change/i }));
 
-    expect(await screen.findByRole("alert")).toHaveTextContent(/safe billing interval URL/i);
+    expect(await screen.findByRole("alert")).toHaveTextContent("Unable to change subscription.");
     expect(navigate).not.toHaveBeenCalled();
   });
 });

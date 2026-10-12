@@ -5,6 +5,7 @@ import { App } from "./App.jsx";
 import { noruloApi } from "./api/norulo.js";
 import { createLedgerApi, ledgerApi } from "./api/ledger.js";
 import { captureGitHubRefreshScope } from "./api/github-refresh.js";
+import { captureRequestSessionScope, requestSessionRecheck } from "./api/session-recheck.js";
 import { NotificationProvider } from "./components/notifications.jsx";
 import { screenFromPath } from "./lib/navigation.js";
 
@@ -649,6 +650,77 @@ function authenticatedLedgers(items = [personal, team], actor = "alice") {
   ledgerApi.workspaces.mockResolvedValue({ items });
 }
 
+it("immediately confirms a protected 401 and removes private state without a focus event", async () => {
+  window.history.replaceState({}, "", "/projects");
+  authenticatedLedgers([personal]);
+  harness.enabled = true;
+  harness.apis.alice = { projects: vi.fn().mockResolvedValue({ items: [{ name: "Private project" }] }) };
+  render(<App />);
+  const draft = await screen.findByLabelText("Unsaved scope draft");
+  fireEvent.change(draft, { target: { value: "Private draft" } });
+  const readSignal = harness.apis.alice.projects.mock.calls[0][1].signal;
+  const recheck = pending();
+  noruloApi.auth.getSession.mockReturnValueOnce(recheck.promise);
+  act(() => {
+    const scope = captureRequestSessionScope();
+    requestSessionRecheck(scope);
+    requestSessionRecheck(scope);
+  });
+  await waitFor(() => expect(noruloApi.auth.getSession).toHaveBeenCalledTimes(2));
+  await act(async () => recheck.resolve({ authenticated: false }));
+  expect(window.location.pathname).toBe("/login");
+  expect(screen.queryByLabelText("Unsaved scope draft")).not.toBeInTheDocument();
+  expect(screen.queryByText("Private project")).not.toBeInTheDocument();
+  expect(readSignal.aborted).toBe(true);
+  expect(captureRequestSessionScope()).toBeNull();
+  expect(ledgerApi.workspaces).toHaveBeenCalledTimes(1);
+});
+
+it.each(["network", "unauthenticated"])("handles a %s session recheck after a protected 401 without replaying reads", async (failure) => {
+  window.history.replaceState({}, "", "/projects");
+  authenticatedLedgers([personal]);
+  harness.enabled = true;
+  harness.apis.alice = { projects: vi.fn().mockResolvedValue({ items: [{ name: "Private project" }] }) };
+  render(<App />);
+  const draft = await screen.findByLabelText("Unsaved scope draft");
+  fireEvent.change(draft, { target: { value: "Private draft" } });
+  const initialScope = captureRequestSessionScope();
+  noruloApi.auth.getSession.mockRejectedValueOnce(failure === "network"
+    ? new TypeError("Failed to fetch")
+    : Object.assign(new Error("Unauthenticated"), { status: 401 }));
+  act(() => requestSessionRecheck(initialScope));
+  await waitFor(() => expect(noruloApi.auth.getSession).toHaveBeenCalledTimes(2));
+  if (failure === "network") {
+    await waitFor(() => expect(screen.getByLabelText("Unsaved scope draft")).toHaveValue("Private draft"));
+    expect(window.location.pathname).toBe("/projects");
+    expect(captureRequestSessionScope()).toBe(initialScope);
+  } else {
+    await waitFor(() => expect(window.location.pathname).toBe("/login"));
+    expect(screen.queryByLabelText("Unsaved scope draft")).not.toBeInTheDocument();
+    expect(captureRequestSessionScope()).toBeNull();
+  }
+  expect(harness.apis.alice.projects).toHaveBeenCalledTimes(1);
+  expect(ledgerApi.workspaces).toHaveBeenCalledTimes(1);
+});
+
+it("supersedes a pending focus check when protected data reports an expired session", async () => {
+  window.history.replaceState({}, "", "/projects");
+  authenticatedLedgers([personal]);
+  render(<App />);
+  await screen.findByRole("heading", { name: "Projects" });
+  const focus = pending();
+  noruloApi.auth.getSession.mockReturnValueOnce(focus.promise).mockResolvedValueOnce({ authenticated: false });
+  act(() => window.dispatchEvent(new Event("focus")));
+  const focusSignal = noruloApi.auth.getSession.mock.calls[1][0].signal;
+  act(() => requestSessionRecheck(captureRequestSessionScope()));
+  await waitFor(() => expect(window.location.pathname).toBe("/login"));
+  expect(focusSignal.aborted).toBe(true);
+  await act(async () => focus.resolve({ authenticated: true, user: { id: "alice" } }));
+  expect(window.location.pathname).toBe("/login");
+  expect(captureRequestSessionScope()).toBeNull();
+  expect(noruloApi.auth.getSession).toHaveBeenCalledTimes(3);
+});
+
 function membersApi(overrides = {}) {
   return {
     members: vi.fn().mockResolvedValue({
@@ -846,7 +918,7 @@ it("clears protected cached access after an explicit access refresh fails withou
   await screen.findByRole("button", { name: "Invite member" });
   ledgerApi.workspaces.mockRejectedValueOnce(new Error("Access unavailable"));
   fireEvent.click(screen.getByRole("button", { name: "Reload" }));
-  expect(await screen.findByRole("alert")).toHaveTextContent("Access unavailable");
+  expect(await screen.findByRole("alert")).toHaveTextContent("Ledger access could not be loaded.");
   expect(screen.queryByRole("button", { name: "Invite member" })).not.toBeInTheDocument();
   expect(ledgerApi.workspaces).toHaveBeenCalledTimes(2);
 });

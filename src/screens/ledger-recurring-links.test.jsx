@@ -475,7 +475,7 @@ describe("Recurring entry in project and shared expenses", () => {
     await recurring(api);
     change("Category", "cat_one");
     fireEvent.click(screen.getByRole("button", { name: "Save schedule" }));
-    expect(await screen.findByText("Temporarily unavailable")).toBeVisible();
+    expect(await screen.findByText("Request failed. Please retry.")).toBeVisible();
     expect(screen.getByLabelText("What did you pay for?")).toHaveValue("Scheduled hosting");
     expect(screen.getByLabelText("Time zone")).toHaveValue("Europe/Paris");
     fireEvent.click(screen.getByRole("button", { name: "Save schedule" }));

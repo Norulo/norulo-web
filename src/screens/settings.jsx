@@ -8,6 +8,7 @@ import {
 import { EmailSignIn } from "../components/email-sign-in.jsx";
 import { I } from "../icons.jsx";
 import { T, useLang } from "../i18n.jsx";
+import { requestErrorText, UserFacingError } from "../lib/request-error.js";
 import {
   connectGitHubRepositories,
   manageGitHubInstallation,
@@ -140,7 +141,7 @@ export function SettingsScreen({ go, onSessionUpdated, onOperationBusy }) {
       [sessionResult, integrationsResult]
         .filter((result) => result.status === "rejected")
         .map(
-          (result) => result.reason?.message || T("Account data unavailable.", "账户数据暂不可用。")
+          (result) => requestErrorText(result.reason, T("Account data unavailable.", "账户数据暂不可用。"))
         )
         .concat(
           jevConfirmed
@@ -156,8 +157,8 @@ export function SettingsScreen({ go, onSessionUpdated, onOperationBusy }) {
         .concat(
           integrationsResult.status === "fulfilled" && integrationsResult.value?.githubRefreshError
             ? [
-                integrationsResult.value.githubRefreshError.message ||
-                  T("GitHub access unavailable."),
+                requestErrorText(integrationsResult.value.githubRefreshError,
+                  T("GitHub access unavailable.")),
               ]
             : []
         )
@@ -252,7 +253,7 @@ export function SettingsScreen({ go, onSessionUpdated, onOperationBusy }) {
         setError(
           failure?.code === "GITHUB_REAUTHORIZATION_REQUIRED"
             ? T("Reconnect your GitHub account before checking repository access.")
-            : failure?.message || T("GitHub authorization failed.", "GitHub 授权失败。")
+            : requestErrorText(failure, T("GitHub authorization failed.", "GitHub 授权失败。"))
         );
       }
     } finally {
@@ -281,7 +282,7 @@ export function SettingsScreen({ go, onSessionUpdated, onOperationBusy }) {
     try {
       await signOut();
     } catch (failure) {
-      if (mountedRef.current) setError(failure?.message || T("Request failed. Please retry."));
+      if (mountedRef.current) setError(requestErrorText(failure, T("Request failed. Please retry.")));
     } finally {
       actionRef.current = false;
       onOperationBusyRef.current?.(false);
@@ -499,7 +500,7 @@ export function SettingsScreen({ go, onSessionUpdated, onOperationBusy }) {
   };
   const emailLinked = async (updatedSession) => {
     if (!session?.user?.id || updatedSession?.user?.id !== session.user.id) {
-      throw new Error(
+      throw new UserFacingError(
         T(
           "Email linking could not be confirmed for this account. Please retry.",
           "未能确认邮箱已绑定到此账户，请重试。"

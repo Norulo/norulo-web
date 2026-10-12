@@ -129,7 +129,7 @@ describe("EmailSignIn", () => {
     expect(code).toHaveAttribute("inputmode", "numeric");
     expect(code).toHaveAttribute("autocomplete", "one-time-code");
     expect(code).toHaveAttribute("pattern", "[0-9]{6}");
-    expect(code).toHaveAttribute("maxlength", "6");
+    expect(code).not.toHaveAttribute("maxlength");
     expect(code).toBeRequired();
     fireEvent.change(code, { target: { value: "00 12-34more" } });
     expect(code).toHaveValue("001234");
@@ -137,6 +137,32 @@ describe("EmailSignIn", () => {
     expect(code.selectionStart).toBe(0);
     expect(code.selectionEnd).toBe(2);
     expect(screen.getByRole("button", { name: "Verify and sign in" })).toBeEnabled();
+  });
+
+  it.each([" 123456", "123 456", "123-456", "Your code: 123456", "123456\n"])(
+    "normalizes the entire pasted code %j before limiting its digits",
+    async (pasted) => {
+      render(<EmailSignIn />);
+      const code = await issueCode();
+      // Native maxlength truncates paste before React can normalize it.
+      expect(code).not.toHaveAttribute("maxlength");
+      fireEvent.change(code, { target: { value: pasted } });
+      expect(code).toHaveValue("123456");
+      expect(screen.getByRole("button", { name: "Verify and sign in" })).toBeEnabled();
+      noruloApi.auth.verifyEmailCode.mockResolvedValueOnce(SESSION);
+      await submit(code);
+      expect(noruloApi.auth.verifyEmailCode).toHaveBeenCalledWith(
+        { email: EMAIL, challengeId: "challenge_1", code: "123456" },
+        expect.anything()
+      );
+    }
+  );
+
+  it("keeps at most six digits when a pasted value contains extra digits", async () => {
+    render(<EmailSignIn />);
+    const code = await issueCode();
+    fireEvent.change(code, { target: { value: "00123456789" } });
+    expect(code).toHaveValue("001234");
   });
 
   it("honors the server cooldown and resends only on manual intent with a new challenge", async () => {
@@ -174,6 +200,117 @@ describe("EmailSignIn", () => {
       { email: EMAIL, challengeId: "challenge_2", code: "001234" },
       expect.anything()
     );
+  });
+
+  it.each(["rate-limit", "network", "malformed"])(
+    "preserves the current challenge and entered code after a failed %s resend",
+    async (failureKind) => {
+      const request = deferred();
+      const onVerified = vi.fn();
+      render(<EmailSignIn onVerified={onVerified} />);
+      await issueCode({ retryAfter: 0 });
+      const code = enterCode();
+      noruloApi.auth.requestEmailCode.mockReturnValueOnce(request.promise);
+      fireEvent.click(screen.getByRole("button", { name: "Resend code" }));
+
+      expect(code).toBeInTheDocument();
+      expect(code).toHaveValue("001234");
+      for (const control of [code, ...screen.getAllByRole("button")])
+        expect(control).toBeDisabled();
+      await submit(code);
+      expect(noruloApi.auth.verifyEmailCode).not.toHaveBeenCalled();
+
+      await act(async () => {
+        if (failureKind === "rate-limit") {
+          request.reject(
+            new ApiError("Server details.", {
+              status: 429,
+              payload: { error: { code: "EMAIL_RATE_LIMIT" } },
+              retryAfter: 7,
+            })
+          );
+        } else if (failureKind === "network") {
+          request.reject(new TypeError("Failed to fetch"));
+        } else {
+          request.resolve({ expiresIn: 600, retryAfter: 0 });
+        }
+      });
+
+      expect(screen.queryByRole("textbox", { name: "Email" })).not.toBeInTheDocument();
+      expect(screen.getByRole("textbox", { name: "6-digit code" })).toBe(code);
+      expect(code).toHaveValue("001234");
+      expect(code).toHaveFocus();
+      expect(screen.getByRole("alert")).toBeVisible();
+      expect(screen.getByRole("button", { name: "Verify and sign in" })).toBeEnabled();
+      const resend = screen.getByRole("button", { name: "Resend code" });
+      if (failureKind === "rate-limit") {
+        expect(resend).toBeDisabled();
+        expect(screen.getByRole("status")).toHaveTextContent("7s");
+      } else {
+        expect(resend).toBeEnabled();
+      }
+      expect(noruloApi.auth.requestEmailCode).toHaveBeenCalledTimes(2);
+      noruloApi.auth.verifyEmailCode.mockResolvedValueOnce(SESSION);
+      await submit(code);
+      expect(noruloApi.auth.verifyEmailCode).toHaveBeenLastCalledWith(
+        { email: EMAIL, challengeId: "challenge_1", code: "001234" },
+        expect.anything()
+      );
+      expect(onVerified).toHaveBeenCalledExactlyOnceWith(SESSION);
+    }
+  );
+
+  it("preserves expiry during a failed resend and waits for an explicit successful replacement", async () => {
+    render(<EmailSignIn />);
+    await issueCode({ expiresIn: 5, retryAfter: 0 });
+    const code = enterCode();
+    await advance(5_000);
+    noruloApi.auth.requestEmailCode.mockRejectedValueOnce(new TypeError("Failed to fetch"));
+    await act(async () => fireEvent.click(screen.getByRole("button", { name: "Resend code" })));
+
+    expect(code).toHaveValue("001234");
+    expect(screen.getByRole("status")).toHaveTextContent("This code has expired");
+    expect(screen.getByRole("button", { name: "Verify and sign in" })).toBeDisabled();
+    await submit(code);
+    expect(noruloApi.auth.verifyEmailCode).not.toHaveBeenCalled();
+    expect(noruloApi.auth.requestEmailCode).toHaveBeenCalledTimes(2);
+
+    noruloApi.auth.requestEmailCode.mockResolvedValueOnce({
+      challengeId: "replacement_challenge",
+      expiresIn: 600,
+      retryAfter: 0,
+    });
+    await act(async () => fireEvent.click(screen.getByRole("button", { name: "Resend code" })));
+    expect(code).toHaveValue("");
+    expect(screen.queryByRole("status")).not.toBeInTheDocument();
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+    noruloApi.auth.verifyEmailCode.mockResolvedValueOnce(SESSION);
+    await submit(enterCode());
+    expect(noruloApi.auth.verifyEmailCode).toHaveBeenLastCalledWith(
+      { email: EMAIL, challengeId: "replacement_challenge", code: "001234" },
+      expect.anything()
+    );
+  });
+
+  it("does not revive a server-invalidated challenge when its resend fails", async () => {
+    render(<EmailSignIn />);
+    await issueCode({ retryAfter: 0 });
+    const code = enterCode();
+    noruloApi.auth.verifyEmailCode.mockRejectedValueOnce(
+      new ApiError("Attempts exhausted.", {
+        status: 429,
+        payload: { error: { code: "EMAIL_ATTEMPTS_EXCEEDED" } },
+      })
+    );
+    await submit(code);
+    noruloApi.auth.requestEmailCode.mockRejectedValueOnce(new TypeError("Failed to fetch"));
+    await act(async () => fireEvent.click(screen.getByRole("button", { name: "Resend code" })));
+
+    expect(code).toHaveValue("001234");
+    expect(screen.getByRole("button", { name: "Verify and sign in" })).toBeDisabled();
+    await submit(code);
+    expect(noruloApi.auth.verifyEmailCode).toHaveBeenCalledOnce();
+    expect(noruloApi.auth.requestEmailCode).toHaveBeenCalledTimes(2);
   });
 
   it.each(["", "12345", "1234"])(
@@ -310,6 +447,35 @@ describe("EmailSignIn", () => {
 
     await issueCode();
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+  });
+
+  it.each([
+    [
+      new TypeError("Failed to fetch"),
+      "Cannot connect to the service. Check your connection and try again.",
+    ],
+    [
+      new DOMException("browser-specific timeout details", "TimeoutError"),
+      "The request timed out. Check the latest data before trying again.",
+    ],
+    [
+      new ApiError("Internal stack details.", { status: 502 }),
+      "The service is temporarily unavailable. Please try again later.",
+    ],
+    [
+      new ApiError("Provider details.", { payload: { error: { code: "UNKNOWN_PROVIDER_CODE" } } }),
+      "Request failed. Please retry.",
+    ],
+  ])("shows safe guidance for a failed email request", async (failure, expected) => {
+    render(<EmailSignIn />);
+    const email = screen.getByRole("textbox", { name: "Email" });
+    fireEvent.change(email, { target: { value: EMAIL } });
+    noruloApi.auth.requestEmailCode.mockRejectedValueOnce(failure);
+    await submit(email);
+    expect(screen.getByRole("alert").textContent).toBe(expected);
+    expect(email).toHaveValue(EMAIL);
+    expect(email).toBeEnabled();
+    expect(noruloApi.auth.requestEmailCode).toHaveBeenCalledOnce();
   });
 
   it.each(["send", "verify"])(

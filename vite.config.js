@@ -8,20 +8,23 @@ export default defineConfig({
     host: "0.0.0.0",
     port: 5173,
     proxy: {
-      "/api": {
+      "^/api(?:/|\\?|$)": {
         target: "http://localhost:8080",
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api(?=\/|$)/, "") || "/",
+        rewrite: (path) => {
+          const stripped = path.replace(/^\/api(?=\/|\?|$)/, "");
+          return stripped.startsWith("?") ? `/${stripped}` : stripped || "/";
+        },
       },
-      "/health": {
+      "^/health(?:/|\\?|$)": {
         target: "http://localhost:8080",
         changeOrigin: true,
       },
-      "/auth": {
+      "^/auth(?:/|\\?|$)": {
         target: "http://localhost:8080",
         changeOrigin: true,
       },
-      "/webhooks": {
+      "^/webhooks(?:/|\\?|$)": {
         target: "http://localhost:8080",
         changeOrigin: true,
       },

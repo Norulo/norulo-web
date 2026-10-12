@@ -327,7 +327,7 @@ describe("public navigation links", () => {
     expect(go).not.toHaveBeenCalled();
     expect(startGitHubLogin).not.toHaveBeenCalled();
     await act(async () => reject(new Error("Mail unavailable")));
-    expect(screen.getByRole("alert")).toHaveTextContent("Mail unavailable");
+    expect(screen.getByRole("alert")).toHaveTextContent("Request failed. Please retry.");
     expect(github).toBeEnabled();
     expect(terms).toHaveAttribute("href", "/terms");
     expect(screen.getByRole("textbox", { name: "Email" })).toHaveValue("new@example.com");

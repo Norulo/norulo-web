@@ -973,6 +973,15 @@ async function measureRecurring(page, report, name, editorOpen) {
 async function closeForm(form) {
   await form.locator('.ledger-actions > button[type="button"]').click();
   await form.waitFor({ state: "detached" });
+  // Closing restores the opener's focus and changes the split width. Let both
+  // finish before the next native pointer click selects a record action.
+  await settle(form.page());
+}
+
+async function editExpense(page) {
+  const opener = page.locator(".ledger-expense-row .ledger-actions button[aria-label]").first();
+  await opener.and(page.locator(":enabled")).waitFor();
+  await opener.click();
 }
 
 async function checkScope(page, report, mode) {
@@ -996,6 +1005,7 @@ async function checkScope(page, report, mode) {
   await filters.locator('input[type="date"]').nth(1).fill("2026-11-01");
   await filters.locator("select").selectOption({ index: 1 });
   await page.locator('[role="tabpanel"][id$="-panel-expenses"][aria-busy="false"]').waitFor();
+  await page.locator('.page-h button[aria-controls="expense-form"]:enabled').waitFor();
   await measure(page, report, `${mode}-filters-populated`);
   const csv = new URL(
     await page.locator('a[download="expenses.csv"]').getAttribute("href"),
@@ -1031,7 +1041,7 @@ async function checkScope(page, report, mode) {
     await resizeSide(page, 520, report, `${mode}-recurring-create-pane-520`);
   }
   await closeForm(form);
-  await page.locator(".ledger-expense-row .ledger-actions button[aria-label]").first().click();
+  await editExpense(page);
   await form.waitFor();
   await measure(page, report, `${mode}-edit-expense-populated`);
   await form.locator('.ledger-fields input[type="date"]').first().fill("");
@@ -1069,7 +1079,7 @@ async function checkScope(page, report, mode) {
     await keyboardSide(page, report, `${mode}-recurring-edit-keyboard`, schedulePanel);
 
     // Independent ordinary and recurring editors must target their own rail.
-    await page.locator(".ledger-expense-row .ledger-actions button[aria-label]").first().click();
+    await editExpense(page);
     await form.waitFor();
     const ordinaryWidth = await page
       .locator("#expense-form")

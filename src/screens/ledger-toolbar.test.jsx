@@ -1,5 +1,5 @@
 import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { LedgerScreen } from "./ledger.jsx";
 
 const workspace = (fields = {}) => ({
@@ -81,7 +81,139 @@ const requestCounts = (api) =>
     api.reportCategories,
   ].map((method) => method.mock.calls.length);
 
+afterEach(() => vi.useRealTimers());
+
 describe("Shared expense and project view toolbar", () => {
+  it.each(["shared", "project"])(
+    "rejects inverted and equal %s date ranges without requests or misleading exports",
+    async (mode) => {
+      const { api, expense } = fixture({ mode });
+      render(<LedgerScreen api={api} go={vi.fn()} mode={mode} projectId="prj_current" />);
+      await screen.findByText(expense.purpose);
+      const originalReads = requestCounts(api);
+      vi.useFakeTimers();
+      fireEvent.click(filterToggle());
+      const from = screen.getByLabelText("From date");
+      const before = screen.getByLabelText("Before date");
+      fireEvent.change(from, { target: { value: "2026-09-10" } });
+      fireEvent.change(before, { target: { value: "2026-09-01" } });
+      await act(async () => vi.advanceTimersByTime(1000));
+      expect(requestCounts(api)).toEqual(originalReads);
+      expect(screen.getByRole("alert")).toHaveTextContent("Before date must be later than From date. Previous results remain visible.");
+      expect(from).toHaveAttribute("aria-invalid", "true");
+      expect(before).toHaveAttribute("aria-describedby", screen.getByRole("alert").id);
+      expect(screen.getByText(expense.purpose)).toBeVisible();
+      expect(screen.queryByText("No expenses match these filters")).not.toBeInTheDocument();
+      expect(screen.getByRole("link", { name: "Export CSV" })).not.toHaveAttribute("href");
+      expect(screen.getByRole("button", { name: "Edit " + expense.purpose })).toBeDisabled();
+      fireEvent.click(filterToggle());
+      expect(screen.getByRole("alert")).toBeVisible();
+      fireEvent.click(filterToggle());
+      fireEvent.change(before, { target: { value: "2026-09-10" } });
+      await act(async () => vi.advanceTimersByTime(1000));
+      expect(requestCounts(api)).toEqual(originalReads);
+      fireEvent.change(before, { target: { value: "2026-09-11" } });
+      await act(async () => vi.advanceTimersByTime(300));
+      expect(api.expenses).toHaveBeenLastCalledWith({ ...targetQuery(mode), from: "2026-09-10", to: "2026-09-11", limit: 10 }, expect.anything());
+      expect(api.expenses).toHaveBeenCalledTimes(2);
+      expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+      expect(screen.getByRole("link", { name: "Export CSV" })).toHaveAttribute("href");
+    }
+  );
+
+  it("coalesces date and category edits into one final query and cancels a pending query on scope loss", async () => {
+    const { api, expense } = fixture();
+    const view = render(<LedgerScreen api={api} go={vi.fn()} mode="shared" workspace={workspace()} />);
+    await screen.findByText(expense.purpose);
+    vi.useFakeTimers();
+    fireEvent.click(filterToggle());
+    const from = screen.getByLabelText("From date");
+    for (const value of ["0002-09-01", "0020-09-01", "0202-09-01", "2026-09-01"]) {
+      fireEvent.change(from, { target: { value } });
+      await act(async () => vi.advanceTimersByTime(100));
+    }
+    fireEvent.change(screen.getByLabelText("Before date"), { target: { value: "2026-10-01" } });
+    fireEvent.change(screen.getByLabelText("Filter category"), { target: { value: "cat_hosting" } });
+    expect(api.expenses).toHaveBeenCalledOnce();
+    await act(async () => vi.advanceTimersByTime(299));
+    expect(api.expenses).toHaveBeenCalledOnce();
+    await act(async () => vi.advanceTimersByTime(1));
+    expect(api.expenses).toHaveBeenCalledTimes(2);
+    expect(api.categories).toHaveBeenCalledTimes(2);
+    const expected = { target: "shared", from: "2026-09-01", to: "2026-10-01", categoryId: "cat_hosting" };
+    expect(api.expenses).toHaveBeenLastCalledWith({ ...expected, limit: 10 }, expect.anything());
+    for (const report of [api.reportSummary, api.reportTimeseries, api.reportCategories])
+      expect(report).toHaveBeenLastCalledWith(expected, expect.anything());
+    fireEvent.change(from, { target: { value: "2026-09-02" } });
+    const current = fixture({ purpose: "New workspace records" });
+    view.rerender(<LedgerScreen api={current.api} go={vi.fn()} mode="shared" workspace={workspace({ id: "wsp_next" })} />);
+    await act(async () => vi.advanceTimersByTime(500));
+    expect(api.expenses).toHaveBeenCalledTimes(2);
+    expect(current.api.expenses).toHaveBeenCalledExactlyOnceWith({ target: "shared", limit: 10 }, expect.anything());
+    expect(screen.getByText("New workspace records")).toBeVisible();
+    expect(screen.getByLabelText("From date")).toHaveValue("");
+  });
+
+  it("keeps invalid filters correctable when an earlier valid range read fails", async () => {
+    const { api, expense } = fixture();
+    render(<LedgerScreen api={api} go={vi.fn()} mode="shared" />);
+    await screen.findByText(expense.purpose);
+    let rejectRead;
+    api.expenses.mockImplementationOnce(() => new Promise((_, reject) => { rejectRead = reject; }));
+    fireEvent.click(filterToggle());
+    fireEvent.change(screen.getByLabelText("From date"), { target: { value: "2026-09-10" } });
+    await waitFor(() => expect(api.expenses).toHaveBeenCalledTimes(2));
+    fireEvent.change(screen.getByLabelText("Before date"), { target: { value: "2026-09-01" } });
+    await act(async () => rejectRead({ status: 503 }));
+    expect(screen.getByText(expense.purpose)).toBeVisible();
+    expect(screen.getByText("Could not update results. Previous results remain visible.")).toBeVisible();
+    expect(screen.getByLabelText("Before date")).toBeEnabled();
+    expect(screen.getByRole("link", { name: "Export CSV" })).not.toHaveAttribute("href");
+    expect(api.expenses).toHaveBeenCalledTimes(2);
+    fireEvent.change(screen.getByLabelText("Before date"), { target: { value: "2026-10-01" } });
+    await waitFor(() => expect(screen.getByRole("link", { name: "Export CSV" })).toHaveAttribute("href"));
+    expect(api.expenses).toHaveBeenCalledTimes(3);
+    expect(api.expenses).toHaveBeenLastCalledWith({ target: "shared", from: "2026-09-10", to: "2026-10-01", limit: 10 }, expect.anything());
+    expect(screen.queryByText("Could not update results. Previous results remain visible.")).not.toBeInTheDocument();
+  });
+
+  it("blocks old cursors and record actions after a failed filter read until an explicit successful reload", async () => {
+    const { api, expense } = fixture();
+    api.expenses.mockResolvedValue({ items: [expense], nextCursor: "old-filter-cursor" });
+    render(<LedgerScreen api={api} go={vi.fn()} mode="shared" />);
+    await screen.findByText(expense.purpose);
+    api.expenses.mockRejectedValueOnce({ status: 503 });
+    fireEvent.click(filterToggle());
+    fireEvent.change(screen.getByLabelText("From date"), { target: { value: "2026-09-10" } });
+    await screen.findByText("Could not update results. Previous results remain visible.");
+    expect(screen.getByText(expense.purpose)).toBeVisible();
+    const next = screen.getByRole("button", { name: "Next", exact: true });
+    expect(next).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Edit " + expense.purpose })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Remove " + expense.purpose })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Expense review" })).toBeDisabled();
+    expect(screen.getByRole("link", { name: "Export CSV" })).not.toHaveAttribute("href");
+    expect(screen.getByLabelText("From date")).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Reload" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Retry" })).toBeEnabled();
+    fireEvent.click(next);
+    fireEvent.click(screen.getByRole("button", { name: "Expense review" }));
+    expect(api.expenses).toHaveBeenCalledTimes(2);
+    api.expenses.mockResolvedValueOnce({ items: [{ ...expense, purpose: "Current filtered records" }], nextCursor: "new-filter-cursor" });
+    fireEvent.click(screen.getByRole("button", { name: "Reload" }));
+    await screen.findByText("Current filtered records");
+    await waitFor(() => expect(screen.getByRole("button", { name: "Next", exact: true })).toBeEnabled());
+    expect(screen.queryByText("Could not update results. Previous results remain visible.")).not.toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Export CSV" })).toHaveAttribute("href");
+    expect(api.expenses).toHaveBeenLastCalledWith({ target: "shared", from: "2026-09-10", limit: 10 }, expect.anything());
+    api.expenses.mockResolvedValueOnce({ items: [{ ...expense, id: "exp_next", purpose: "Next filtered page" }], nextCursor: null });
+    fireEvent.click(screen.getByRole("button", { name: "Next", exact: true }));
+    await screen.findByText("Next filtered page");
+    expect(api.expenses).toHaveBeenCalledTimes(4);
+    expect(api.expenses).toHaveBeenLastCalledWith({ target: "shared", from: "2026-09-10", cursor: "new-filter-cursor", limit: 10 }, expect.anything());
+    expect(api.expenses.mock.calls.some(([query]) => query.cursor === "old-filter-cursor")).toBe(false);
+  });
+
   it.each(["shared", "project"])("appends the %s operation log and loads its fixed target only on intent", async (mode) => {
     const { api, expense } = fixture({ mode });
     const readonly = workspace({ permissions: { manageProjects: false, manageCategories: false, writeExpenses: false } });
@@ -355,6 +487,7 @@ describe("Shared expense and project view toolbar", () => {
     fireEvent.click(filterToggle());
     fireEvent.change(screen.getByLabelText("From date"), { target: { value: "2026-09-01" } });
     expect(screen.getByText(/Updating results/)).toBeVisible();
+    await waitFor(() => expect(old.api.expenses).toHaveBeenCalledTimes(2));
     const pendingSignal = old.api.expenses.mock.calls.at(-1)[1].signal;
     const mode = next.mode || initial.mode;
     const projectId = next.projectId ?? initial.projectId;

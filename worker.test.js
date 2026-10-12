@@ -57,6 +57,7 @@ describe("Cloudflare Worker API proxy", () => {
       }
     );
     expect(response.status).toBe(502);
+    expect(response.headers.get("Cache-Control")).toBe("no-store");
     expect(network).not.toHaveBeenCalled();
     expect(diagnostic.mock.calls).toEqual([[JSON.stringify({
       code: "NORULO_API_SERVICE_UNREACHABLE", status: 502,
@@ -423,6 +424,7 @@ describe("Cloudflare Worker API proxy", () => {
     const response = await worker.fetch(new Request("https://norulo.com/api/health"), {});
 
     expect(response.status).toBe(500);
+    expect(response.headers.get("Cache-Control")).toBe("no-store");
     await expect(response.json()).resolves.toEqual({
       message: "NORULO_API_ORIGIN is not configured.",
     });
@@ -461,6 +463,7 @@ describe("Cloudflare Worker API proxy", () => {
     });
 
     expect(response.status).toBe(502);
+    expect(response.headers.get("Cache-Control")).toBe("no-store");
     await expect(response.json()).resolves.toEqual({
       message: "Unable to reach Norulo API upstream.",
     });
@@ -538,6 +541,7 @@ describe("Cloudflare Worker API proxy", () => {
     );
 
     expect(response.status).toBe(413);
+    expect(response.headers.get("Cache-Control")).toBe("no-store");
     await expect(response.json()).resolves.toEqual({ message: "Request body is too large." });
     expect(fetchMock).not.toHaveBeenCalled();
   });
@@ -557,6 +561,70 @@ describe("Cloudflare Worker API proxy", () => {
     expect(response.status).toBe(413);
     await expect(response.json()).resolves.toEqual({ message: "Request body is too large." });
     expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it.each([undefined, "", " \t "])("uses the default body limit for an unset limit: %j", async (limit) => {
+    const body = new Uint8Array(1024 * 1024);
+    body[0] = 0;
+    body[body.length - 1] = 255;
+    const service = { fetch: vi.fn(async (forwarded) => {
+      const forwardedBytes = new Uint8Array(await forwarded.arrayBuffer());
+      expect(forwardedBytes).toHaveLength(body.length);
+      expect(forwardedBytes.every((byte, index) => byte === body[index])).toBe(true);
+      return new Response("{}");
+    }) };
+    const response = await worker.fetch(new Request("https://norulo.com/api/api/v1/expenses", {
+      method: "POST", body,
+    }), {
+      NORULO_API_ORIGIN: "https://api.norulo.com",
+      NORULO_SERVER: service,
+      NORULO_PROXY_MAX_BODY_BYTES: limit,
+    });
+    expect(response.status).toBe(200);
+    expect(service.fetch).toHaveBeenCalledOnce();
+  });
+
+  it("retains an explicitly configured zero-byte limit", async () => {
+    const service = { fetch: vi.fn() };
+    const response = await worker.fetch(new Request("https://norulo.com/api/api/v1/expenses", {
+      method: "POST", body: "x",
+    }), {
+      NORULO_API_ORIGIN: "https://api.norulo.com", NORULO_SERVER: service,
+      NORULO_PROXY_MAX_BODY_BYTES: "0",
+    });
+    expect(response.status).toBe(413);
+    expect(service.fetch).not.toHaveBeenCalled();
+  });
+
+  it("rejects default-limit overflow before forwarding", async () => {
+    const service = { fetch: vi.fn() };
+    const response = await worker.fetch(new Request("https://norulo.com/api/api/v1/expenses", {
+      method: "POST", body: new Uint8Array(1024 * 1024 + 1),
+    }), {
+      NORULO_API_ORIGIN: "https://api.norulo.com", NORULO_SERVER: service,
+      NORULO_PROXY_MAX_BODY_BYTES: "",
+    });
+    expect(response.status).toBe(413);
+    expect(service.fetch).not.toHaveBeenCalled();
+  });
+
+  it("reports a failed client upload as a bad request without forwarding partial bytes", async () => {
+    let reads = 0;
+    const body = new ReadableStream({
+      pull(controller) {
+        if (reads++ === 0) controller.enqueue(new Uint8Array([0, 255]));
+        else controller.error(new Error("private-client-stream-error"));
+      },
+    });
+    const service = { fetch: vi.fn() };
+    const response = await worker.fetch(new Request("https://norulo.com/api/api/v1/expenses", {
+      method: "POST", body, duplex: "half",
+    }), { NORULO_API_ORIGIN: "https://api.norulo.com", NORULO_SERVER: service });
+    expect(response.status).toBe(400);
+    expect(response.headers.get("Cache-Control")).toBe("no-store");
+    await expect(response.json()).resolves.toEqual({ message: "Unable to read request body." });
+    expect(service.fetch).not.toHaveBeenCalled();
+    expect(body.locked).toBe(false);
   });
 
   it("streams proxied request bodies without buffering them first", async () => {

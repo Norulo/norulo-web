@@ -7,6 +7,7 @@ import {
 import { openGitHubInstallPopup } from "./install-popup.js";
 import { pathFromScreen } from "./navigation.js";
 import { safeGitHubAuthorizeUrl, safeGitHubInstallationUrl } from "./trusted-redirects.js";
+import { gitHubManageErrorText } from "./request-error.js";
 
 function getScreenRedirectUrl(screen) {
   const redirectUrl = new URL(window.location.href);
@@ -56,25 +57,11 @@ function repositoryAuthorizationError(payload) {
   return error;
 }
 
-const GITHUB_MANAGE_ERROR_MESSAGES = {
-  github_account_mismatch:
-    "GitHub account mismatch. Choose a GitHub account with access to this installation, then try again.",
-  github_installation_not_visible:
-    "This GitHub account cannot access that installation. Choose the right GitHub account or an organization admin account.",
-  github_org_admin_required:
-    "Use a GitHub organization owner or admin account to manage this installation.",
-  github_identity_reauth_required:
-    "Reconnect this GitHub account before managing the installation.",
-  github_installation_deleted:
-    "This GitHub App installation is no longer available. Reinstall it or remove it from Norulo.",
-  github_app_installation_not_completed:
-    "GitHub installation was not completed. Open the installation flow again to continue.",
-};
-
 function normalizeGitHubPopupError(error) {
   const code = error?.code || "";
-  if (!GITHUB_MANAGE_ERROR_MESSAGES[code]) return error;
-  const normalized = new Error(GITHUB_MANAGE_ERROR_MESSAGES[code]);
+  const message = gitHubManageErrorText(code);
+  if (!message) return error;
+  const normalized = new Error(message);
   normalized.code = code;
   return normalized;
 }

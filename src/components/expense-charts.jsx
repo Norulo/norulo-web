@@ -10,6 +10,7 @@ const PLOT_HEIGHT = 200;
 const TOP = 12;
 const BASELINE = 188;
 const PRECISION = 10000n;
+const INDIVIDUAL_POINT_LIMIT = 200;
 
 function bucketTime(bucket) {
   if (typeof bucket !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(bucket)) return null;
@@ -21,6 +22,7 @@ function bucketTime(bucket) {
 
 function currencySeries(groups, dimension, categories, minorAmount, archivedLabel, removedLabel) {
   const series = new Map();
+  const keyOccurrences = new Map();
   let unavailable = false;
   for (const row of Array.isArray(groups) ? groups : []) {
     const amount = minorAmount?.(row?.amountMinor);
@@ -41,12 +43,17 @@ function currencySeries(groups, dimension, categories, minorAmount, archivedLabe
         ? row.bucket
         : categoryDisplayName(category, removedLabel, archivedLabel);
     const points = series.get(row.currency) || [];
+    const identity = JSON.stringify([row.currency, row.target || "", row.projectId || "", dimension === "bucket" ? row.bucket : row.categoryId ?? null]);
+    const occurrence = keyOccurrences.get(identity) || 0;
+    keyOccurrences.set(identity, occurrence + 1);
     points.push({
       row,
       amount,
       time,
       label,
-      key: `${row.target || ""}:${row.projectId || ""}:${row.bucket || row.categoryId || "unknown"}`,
+      // The Server groups these dimensions uniquely. Keep malformed repeated
+      // rows distinct as well, without silently dropping or summing their money.
+      key: occurrence ? `${identity}:${occurrence}` : identity,
     });
     series.set(row.currency, points);
   }
@@ -96,47 +103,65 @@ function CurrencyChart({ currency, points, dimension, formatTotal, title }) {
   const selectedIndex =
     retainedIndex >= 0 ? retainedIndex : dimension === "bucket" ? points.length - 1 : 0;
   const selected = points[selectedIndex];
-  const largest = points.reduce((max, point) => (point.amount > max ? point.amount : max), 0n);
-  const padding = Math.min(12, width / 8);
-  const plotWidth = width - padding * 2;
-  const firstTime = points[0].time;
-  const timeRange = points[points.length - 1].time - firstTime;
-  const slotWidth = plotWidth / points.length;
-  const plotted = points.map((point, index) => {
-    // Only the bounded integer ratio reaches Number; monetary values stay exact.
-    const ratio =
-      largest === 0n ? 0 : Number((point.amount * PRECISION) / largest) / Number(PRECISION);
-    const x =
-      dimension === "bucket"
-        ? timeRange === 0
-          ? width / 2
-          : padding + ((point.time - firstTime) / timeRange) * plotWidth
-        : padding + (index + 0.5) * slotWidth;
-    return { ...point, x, y: BASELINE - ratio * (BASELINE - TOP) };
-  });
-  const line = plotted.map((point) => `${point.x},${point.y}`).join(" ");
-  const area =
-    plotted.length > 1 && largest > 0n
-      ? `M ${plotted[0].x} ${BASELINE} L ${plotted.map((point) => `${point.x} ${point.y}`).join(" L ")} L ${plotted[plotted.length - 1].x} ${BASELINE} Z`
-      : null;
+  const dense = points.length > INDIVIDUAL_POINT_LIMIT;
+  const { largest, padding, slotWidth, plotted, line, area, bars, zeros } = useMemo(() => {
+    const largest = points.reduce((max, point) => (point.amount > max ? point.amount : max), 0n);
+    const padding = Math.min(12, width / 8);
+    const plotWidth = width - padding * 2;
+    const firstTime = points[0].time;
+    const timeRange = points[points.length - 1].time - firstTime;
+    const slotWidth = plotWidth / points.length;
+    const barWidth = Math.min(48, slotWidth * 0.62);
+    const plotted = points.map((point, index) => {
+      // Only the bounded integer ratio reaches Number; monetary values stay exact.
+      const ratio =
+        largest === 0n ? 0 : Number((point.amount * PRECISION) / largest) / Number(PRECISION);
+      const x =
+        dimension === "bucket"
+          ? timeRange === 0
+            ? width / 2
+            : padding + ((point.time - firstTime) / timeRange) * plotWidth
+          : padding + (index + 0.5) * slotWidth;
+      return { ...point, x, y: BASELINE - ratio * (BASELINE - TOP) };
+    });
+    const line = dimension === "bucket" ? plotted.map((point) => `${point.x},${point.y}`).join(" ") : "";
+    const area =
+      dimension === "bucket" && plotted.length > 1 && largest > 0n
+        ? `M ${plotted[0].x} ${BASELINE} L ${plotted.map((point) => `${point.x} ${point.y}`).join(" L ")} L ${plotted[plotted.length - 1].x} ${BASELINE} Z`
+        : null;
+    // Dense charts retain every coordinate in paths. Only the selected point
+    // needs its own DOM nodes; all original values remain keyboard/pointer accessible.
+    const bars = dense && dimension !== "bucket"
+      ? plotted.map((point) => `M ${point.x - barWidth / 2} ${BASELINE} V ${point.y} H ${point.x + barWidth / 2} V ${BASELINE} Z`).join(" ")
+      : "";
+    const zeros = dense && dimension !== "bucket"
+      ? plotted.filter((point) => point.amount === 0n).map((point) => `M ${point.x - barWidth / 2} ${BASELINE} H ${point.x + barWidth / 2}`).join(" ")
+      : "";
+    return { largest, padding, slotWidth, plotted, line, area, bars, zeros };
+  }, [points, width, dimension, dense]);
   const selectedPoint = plotted[selectedIndex];
 
   function select(index, focus = false) {
     const point = points[index];
     if (!point) return;
     setSelectedKey(point.key);
-    if (focus) pointRefs.current.get(point.key)?.focus();
+    if (focus) pointRefs.current.get(dense ? selected.key : point.key)?.focus();
   }
 
   function inspectPointer(event) {
     const bounds = event.currentTarget.getBoundingClientRect();
     if (!bounds.width) return;
     const x = ((event.clientX - bounds.left) / bounds.width) * width;
-    const nearest = plotted.reduce(
-      (index, point, candidate) =>
-        Math.abs(point.x - x) < Math.abs(plotted[index].x - x) ? candidate : index,
-      0
-    );
+    let left = 0;
+    let right = plotted.length - 1;
+    while (left < right) {
+      const middle = Math.floor((left + right) / 2);
+      if (plotted[middle].x < x) left = middle + 1;
+      else right = middle;
+    }
+    const nearest = left > 0 && Math.abs(plotted[left - 1].x - x) <= Math.abs(plotted[left].x - x)
+      ? left - 1
+      : left;
     select(nearest);
   }
 
@@ -234,13 +259,20 @@ function CurrencyChart({ currency, points, dimension, formatTotal, title }) {
               />
             </g>
           )}
-          {plotted.map((point, index) => {
+          {dense && dimension !== "bucket" && (
+            <g aria-hidden="true">
+              <path className="expense-chart-bar" d={bars} />
+              {zeros && <path className="expense-chart-zero" d={zeros} />}
+            </g>
+          )}
+          {(dense ? [selectedPoint] : plotted).map((point, renderedIndex) => {
+            const index = dense ? selectedIndex : renderedIndex;
             const start = index === 0 ? 0 : (plotted[index - 1].x + point.x) / 2;
             const end = index === points.length - 1 ? width : (point.x + plotted[index + 1].x) / 2;
             const barWidth = Math.min(48, slotWidth * 0.62);
             return (
               <g
-                key={point.key}
+                key={dense ? "selected" : point.key}
                 ref={(node) => {
                   if (node) pointRefs.current.set(point.key, node);
                   else pointRefs.current.delete(point.key);

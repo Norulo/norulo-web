@@ -997,6 +997,7 @@ describe("ledger screens", () => {
     expect(
       await screen.findByText("Updating results… Previous results remain visible.")
     ).toBeVisible();
+    await waitFor(() => expect(api.expenses).toHaveBeenCalledTimes(2));
     expect(screen.getByRole("button", { name: "Edit Existing hosting" })).toBeInTheDocument();
     expect(screen.getByLabelText("What did you pay for?")).toHaveValue("Unsaved draft");
     expect(screen.getByRole("tabpanel", { name: "Expenses" })).toHaveAttribute("aria-busy", "true");
@@ -1274,7 +1275,7 @@ describe("ledger screens", () => {
     await screen.findByText("No expenses match these filters");
     fireEvent.click(screen.getByRole("button", { name: "Clear filters" }));
     await waitFor(() => expect(screen.getByLabelText("From date")).toHaveValue(""));
-    expect(screen.getByText("No expenses for this target yet.")).toBeVisible();
+    expect(await screen.findByText("No expenses for this target yet.")).toBeVisible();
   });
 
   it("opens expense entry only on intent and closes it on cancel", async () => {
@@ -1442,7 +1443,7 @@ describe("ledger screens", () => {
     await openGitHubLinks();
     await clickManageGitHubAccess();
     expect(await screen.findByRole("alert")).toHaveTextContent(
-      "GitHub authorization was cancelled"
+      "Request failed. Please retry."
     );
     expect(screen.getByRole("button", { name: /Manage GitHub access/i })).toBeEnabled();
   });
@@ -2205,6 +2206,7 @@ describe("ledger screens", () => {
       expect(api.reportTimeseries).toHaveBeenLastCalledWith(expected, expect.anything());
       expect(api.reportCategories).toHaveBeenLastCalledWith(expected, expect.anything());
     });
+    await waitFor(() => expect(screen.getByRole("link", { name: "Export CSV" })).toHaveAttribute("href"));
     const exportUrl = new URL(screen.getByRole("link", { name: "Export CSV" }).href);
     expect(exportUrl.searchParams.get("target")).toBe("shared");
     expect(exportUrl.searchParams.get("from")).toBe("2026-09-01");

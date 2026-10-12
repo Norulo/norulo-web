@@ -246,6 +246,13 @@ npm run dev
 
 The development server runs at `http://localhost:5173`. Set `VITE_API_BASE_URL=/api` when proxying to a local Server Worker configured in `vite.config.js`. Set `VITE_GITHUB_APP_SLUG` only for the public GitHub installation link. Browser environment variables must never contain GitHub, Creem, or Jev secrets.
 
+The supplied Cloudflare deployment uses the same-origin `/api` proxy and a
+`connect-src 'self'` content security policy. Absolute API bases are accepted for
+development or separately hosted clients. An alternative host must configure
+its own CSP to permit the exact API origin, together with the Server's CORS and
+cookie settings; setting `VITE_API_BASE_URL` alone does not enable cross-origin
+access in this Worker deployment.
+
 `npm run check` runs lint, Vitest, and the production build. `npm run check:workers` checks the Worker configuration without publishing. `npm run deploy:workers` publishes and requires the current deployment scope and reviewed production bindings. The current task excludes preview publication.
 
 `npm run test:layout` checks the built app in Chromium, WebKit and Firefox with

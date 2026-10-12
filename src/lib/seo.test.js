@@ -62,6 +62,22 @@ describe("public SEO metadata", () => {
     expect(metadata.canonical).toBe("https://norulo.com/pricing");
   });
 
+  it.each([
+    "https://127.evil.example", "https://127.0.0.1.evil.example",
+    "https://localhost.evil.example", "ftp://localhost", "https://preview.norulo.com",
+  ])("rejects a non-loopback canonical origin: %s", (origin) => {
+    expect(seoMetadataForPath("/pricing", { origin }).canonical).toBe(
+      "https://norulo.com/pricing"
+    );
+  });
+
+  it.each([
+    "http://localhost:5173", "http://127.0.0.1:5173", "http://127.8.9.10:5173",
+    "http://[::1]:5173", "https://127.255.255.255",
+  ])("preserves local canonical origins: %s", (origin) => {
+    expect(seoMetadataForPath("/pricing", { origin }).canonical).toBe(`${origin}/pricing`);
+  });
+
   it("renders social, canonical, and structured-data head tags", () => {
     const html = renderSeoHead(
       seoMetadataForPath("/", {

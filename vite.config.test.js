@@ -9,9 +9,12 @@ describe("vite production build inputs", () => {
 
 describe("vite development API proxy", () => {
   it("strips the /api prefix to match the production Worker proxy", () => {
-    expect(config.server.proxy["/api"].rewrite("/api/auth/session?fresh=1")).toBe(
+    const apiProxy = config.server.proxy["^/api(?:/|\\?|$)"];
+    expect(apiProxy.rewrite("/api/auth/session?fresh=1")).toBe(
       "/auth/session?fresh=1"
     );
-    expect(config.server.proxy["/api"].rewrite("/api")).toBe("/");
+    expect(apiProxy.rewrite("/api")).toBe("/");
+    expect(apiProxy.rewrite("/api?fresh=1")).toBe("/?fresh=1");
+    expect(apiProxy.rewrite("/api/api/v1/expenses")).toBe("/api/v1/expenses");
   });
 });

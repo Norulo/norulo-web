@@ -15,6 +15,41 @@ afterEach(() => {
 });
 
 describe("Projects list filtering and announcements", () => {
+  it.each([undefined, null, {}, "invalid", [null], ["invalid"], [[]]])(
+    "keeps malformed expense totals unavailable without crashing or displaying no expenses: %j",
+    (totals) => {
+      render(<ProjectsList
+        page={{ items: [{ ...projects[0], totals }, projects[1]], nextCursor: null }}
+        go={vi.fn()}
+        labelForProject={(project) => project.name}
+        Total={Total}
+        onLoadMore={vi.fn()}
+      />);
+      const malformed = screen.getByRole("link", { name: "Platform" }).closest("article");
+      expect(malformed).toHaveTextContent("Unavailable");
+      expect(within(malformed).queryByText("No expenses")).not.toBeInTheDocument();
+      const valid = screen.getByRole("link", { name: "Old service" }).closest("article");
+      expect(valid).toHaveTextContent("No expenses");
+    },
+  );
+
+  it("preserves all supplied currency totals rather than replacing them with empty expenses", () => {
+    const CurrencyTotal = ({ total }) => <span>{`${total.currency} ${total.amountMinor}`}</span>;
+    render(<ProjectsList
+      page={{ items: [{ ...projects[0], totals: [
+        { currency: "USD", amountMinor: "123456789012345678901" },
+        { currency: "JPY", amountMinor: "42" },
+      ] }], nextCursor: null }}
+      go={vi.fn()}
+      labelForProject={(project) => project.name}
+      Total={CurrencyTotal}
+      onLoadMore={vi.fn()}
+    />);
+    expect(screen.getByText("USD 123456789012345678901")).toBeVisible();
+    expect(screen.getByText("JPY 42")).toBeVisible();
+    expect(screen.queryByText("No expenses")).not.toBeInTheDocument();
+  });
+
   it("updates memoized row copy when the selected locale catalog finishes loading", async () => {
     const addListener = vi.spyOn(window, "addEventListener");
     render(<ProjectsList

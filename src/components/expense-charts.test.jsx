@@ -53,6 +53,83 @@ afterEach(() => {
 });
 
 describe("ExpenseCharts", () => {
+  it("bounds dense trend DOM while retaining every calendar coordinate and exact keyboard value", () => {
+    const groups = Array.from({ length: 3650 }, (_, index) => ({
+      bucket: new Date(Date.UTC(2016, 0, index + 1)).toISOString().slice(0, 10),
+      currency: "USD",
+      amountMinor: (900719925474099312345678901n + BigInt(index)).toString(),
+    }));
+    const currencies = ["USD", "JPY", "EUR", "GBP", "CAD", "AUD", "CHF", "CNY", "KRW", "INR"];
+    const allGroups = currencies.flatMap((currency) => groups.map((row) => ({ ...row, currency })));
+    const { container } = render(fixture({ groups: allGroups }));
+    expect(allGroups).toHaveLength(36500);
+    expect(container.querySelectorAll("*").length).toBeLessThan(500);
+    for (const currency of currencies) {
+      expect(points(currency)).toHaveLength(1);
+      expect(chart(currency).querySelector(".expense-chart-line").getAttribute("points").split(" ")).toHaveLength(groups.length);
+    }
+    const mark = points("USD")[0];
+    act(() => mark.focus());
+    fireEvent.keyDown(mark, { key: "Home" });
+    expect(mark).toHaveFocus();
+    expect(mark).toHaveAttribute("data-label", groups[0].bucket);
+    expect(mark).toHaveAttribute("data-amount-minor", groups[0].amountMinor);
+    expect(readout("USD")).toHaveTextContent(formatTotal(groups[0]));
+    fireEvent.keyDown(mark, { key: "ArrowRight" });
+    expect(mark).toHaveFocus();
+    expect(readout("USD")).toHaveTextContent(formatTotal(groups[1]));
+    fireEvent.keyDown(mark, { key: "End" });
+    expect(mark).toHaveAttribute("data-label", groups.at(-1).bucket);
+    fireEvent.click(within(chart("USD")).getByRole("button", { name: "Previous value" }));
+    expect(mark).toHaveAttribute("data-label", groups.at(-2).bucket);
+    const plot = screen.getByRole("group", { name: "Expenses over time · USD" });
+    vi.spyOn(plot, "getBoundingClientRect").mockReturnValue({ left: 100, width: 600 });
+    fireEvent.click(plot, { clientX: 112 });
+    expect(readout("USD")).toHaveTextContent(formatTotal(groups[0]));
+  });
+
+  it("retains all dense category bars with independent currency scales and exact navigation", () => {
+    const categories = Array.from({ length: 205 }, (_, index) => ({ id: `category_${index}`, name: `Category ${index}` }));
+    const groups = categories.flatMap((category, index) => [
+      { categoryId: category.id, currency: "USD", amountMinor: (BigInt(index) * 100n).toString() },
+      { categoryId: category.id, currency: "JPY", amountMinor: (BigInt(index) * 10000n).toString() },
+    ]);
+    const { container } = render(fixture({ dimension: "category", categories, groups }));
+    expect(container.querySelectorAll("*").length).toBeLessThan(150);
+    for (const currency of ["USD", "JPY"]) {
+      expect(points(currency)).toHaveLength(1);
+      const bars = chart(currency).querySelector("path.expense-chart-bar").getAttribute("d");
+      expect(bars.match(/M /g)).toHaveLength(categories.length);
+      const mark = points(currency)[0];
+      expect(mark).toHaveAttribute("data-y", "12");
+      act(() => mark.focus());
+      fireEvent.keyDown(mark, { key: "End" });
+      expect(mark).toHaveFocus();
+      expect(mark).toHaveAttribute("data-y", "188");
+      expect(readout(currency)).toHaveTextContent(`Category 0${currency} ${currency === "JPY" ? "0" : "0.00"}`);
+      fireEvent.keyDown(mark, { key: "ArrowLeft" });
+      expect(readout(currency)).toHaveTextContent(`Category 1${currency} ${currency === "JPY" ? "10,000" : "1.00"}`);
+    }
+  });
+
+  it.each(["bucket", "category"])("keeps repeated %s rows separately selectable without duplicate keys or altered money", (dimension) => {
+    const errors = vi.spyOn(console, "error").mockImplementation(() => {});
+    render(fixture({ dimension, groups: [
+      { target: "shared", bucket: "2026-10-01", categoryId: null, currency: "USD", amountMinor: "100" },
+      { target: "shared", bucket: "2026-10-01", categoryId: null, currency: "USD", amountMinor: "200" },
+    ] }));
+    const marks = points("USD");
+    expect(marks).toHaveLength(2);
+    act(() => marks[1].focus());
+    fireEvent.keyDown(marks[1], { key: "Home" });
+    expect(marks[0]).toHaveFocus();
+    expect(readout("USD")).toHaveTextContent(`USD ${dimension === "bucket" ? "1.00" : "2.00"}`);
+    fireEvent.keyDown(marks[0], { key: "End" });
+    expect(marks[1]).toHaveFocus();
+    expect(readout("USD")).toHaveTextContent(`USD ${dimension === "bucket" ? "2.00" : "1.00"}`);
+    expect(errors).not.toHaveBeenCalled();
+  });
+
   it("lets touch users inspect dense data using visible steps without moving focus into the plot", () => {
     render(
       fixture({

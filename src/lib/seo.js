@@ -110,11 +110,17 @@ function cleanPathname(pathname) {
 function canonicalOrigin(origin) {
   try {
     const parsed = new URL(String(origin || PRODUCTION_ORIGIN));
+    if (!["http:", "https:"].includes(parsed.protocol)) return PRODUCTION_ORIGIN;
     const hostname = parsed.hostname.toLowerCase();
     if (hostname === "norulo.com" || hostname === "www.norulo.com") {
       return PRODUCTION_ORIGIN;
     }
-    const loopback = hostname === "localhost" || hostname === "::1" || hostname.startsWith("127.");
+    const normalized = hostname.replace(/^\[|\]$/g, "");
+    const parts = normalized.split(".");
+    const loopback = normalized === "localhost" || normalized === "::1" || (
+      parts.length === 4 && parts[0] === "127" &&
+      parts.every((part) => /^\d+$/.test(part) && Number(part) <= 255)
+    );
     return loopback ? parsed.origin : PRODUCTION_ORIGIN;
   } catch {
     return PRODUCTION_ORIGIN;

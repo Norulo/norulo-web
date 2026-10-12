@@ -50,6 +50,9 @@ export async function proxyApiRequest(request, env, incomingUrl = new URL(reques
   if (proxyBody.tooLarge) {
     return json({ message: "Request body is too large." }, 413);
   }
+  if (proxyBody.readFailed) {
+    return json({ message: "Unable to read request body." }, 400);
+  }
 
   const init = {
     method: request.method,
@@ -243,13 +246,15 @@ async function proxyRequestBody(request, env) {
       if (!value) continue;
       totalBytes += value.byteLength;
       if (totalBytes > maxBytes) {
-        await reader.cancel();
+        await reader.cancel().catch(() => {});
         return { tooLarge: true };
       }
       chunks.push(value);
     }
   } catch {
-    return { tooLarge: true };
+    return { readFailed: true };
+  } finally {
+    reader.releaseLock();
   }
   return { body: concatChunks(chunks, totalBytes) };
 }
@@ -265,7 +270,9 @@ function concatChunks(chunks, totalBytes) {
 }
 
 function proxyMaxBodyBytes(env) {
-  const configured = Number(env.NORULO_PROXY_MAX_BODY_BYTES);
+  const value = env.NORULO_PROXY_MAX_BODY_BYTES;
+  if (value == null || String(value).trim() === "") return DEFAULT_PROXY_MAX_BODY_BYTES;
+  const configured = Number(value);
   return Number.isFinite(configured) && configured >= 0 ? configured : DEFAULT_PROXY_MAX_BODY_BYTES;
 }
 
@@ -330,6 +337,9 @@ function withoutClientProxyHeaders(sourceHeaders) {
 function json(payload, status) {
   return new Response(JSON.stringify(payload), {
     status,
-    headers: { "Content-Type": "application/json; charset=utf-8" },
+    headers: {
+      "Content-Type": "application/json; charset=utf-8",
+      "Cache-Control": "no-store",
+    },
   });
 }

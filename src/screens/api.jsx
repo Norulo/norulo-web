@@ -8,6 +8,7 @@ import { SkeletonLine } from "../components/skeleton.jsx";
 import { useErrorNotification } from "../components/notifications.jsx";
 import { I } from "../icons.jsx";
 import { T, useLang } from "../i18n.jsx";
+import { requestErrorText, UserFacingError } from "../lib/request-error.js";
 import { screenLinkProps } from "../lib/navigation.js";
 import { API_KEY_SCOPES, API_KEY_SCOPE_VALUES, DEFAULT_SCOPE_VALUES } from "./ledger-api-scopes.js";
 import { Sidebar, Topbar } from "../shell.jsx";
@@ -107,7 +108,7 @@ function projectChoices(payload) {
         !/^prj_[A-Za-z0-9_-]{1,100}$/.test(project.id)
     )
   ) {
-    throw new Error(T("Project list response was malformed.", "项目列表响应格式错误。"));
+    throw new UserFacingError(T("Project list response was malformed.", "项目列表响应格式错误。"));
   }
   return {
     items: payload.items.map((project) => {
@@ -317,7 +318,7 @@ export function ApiKeysScreen({
     setCreatedCredential(null);
     setRevokeTarget(null);
     setLoadedOnce(false);
-    setError(failure?.message || T("Unable to load API keys.", "无法加载 API key。"));
+    setError(requestErrorText(failure, T("Unable to load API keys.", "无法加载 API key。")));
     setProjectPage(emptyProjectPage());
     setSelectedProjectIds([]);
     setProjectQuery("");
@@ -363,7 +364,7 @@ export function ApiKeysScreen({
       } catch (err) {
         if (!current()) return;
         handleAccessFailure(err);
-        setError(err?.message || T("Unable to load API keys.", "无法加载 API key。"));
+        setError(requestErrorText(err, T("Unable to load API keys.", "无法加载 API key。")));
       } finally {
         if (current()) setLoading(false);
       }
@@ -413,7 +414,7 @@ export function ApiKeysScreen({
           (cursor && next.items.every((project) => loadedIds.has(project.id))))
       ) {
         setProjectPaginationBlocked(true);
-        throw new Error(T("Pagination did not advance. Reload to retry."));
+        throw new UserFacingError(T("Pagination did not advance. Reload to retry."));
       }
       if (cursor) projectCursorHistoryRef.current.add(cursor);
       setProjectPage((previous) => {
@@ -435,7 +436,7 @@ export function ApiKeysScreen({
     } catch (failure) {
       if (!current()) return;
       handleAccessFailure(failure);
-      setProjectError(failure?.message || T("Unable to load projects.", "无法加载项目。"));
+      setProjectError(requestErrorText(failure, T("Unable to load projects.", "无法加载项目。")));
     } finally {
       if (current()) setProjectLoading(false);
       if (projectReadControllerRef.current === controller) projectReadControllerRef.current = null;
@@ -473,7 +474,7 @@ export function ApiKeysScreen({
       await read(ticket);
     } catch (failure) {
       if (current())
-        setError(failure?.message || T("Unable to load API keys.", "无法加载 API key。"));
+        setError(requestErrorText(failure, T("Unable to load API keys.", "无法加载 API key。")));
     } finally {
       if (current()) {
         accessReloadRef.current = null;
@@ -599,7 +600,7 @@ export function ApiKeysScreen({
         (projectIds.length > 100 ||
           projectIds.some((id) => !projectPage.items.some((project) => project.id === id)))
       ) {
-        throw new Error(
+        throw new UserFacingError(
           T(
             "Some selected projects are no longer available. Choose projects again.",
             "部分已选项目已不可用，请重新选择项目。"
@@ -618,10 +619,10 @@ export function ApiKeysScreen({
       if (!current()) return;
       const key = normalizeApiKey(createdApiKeyRecord(payload));
       const token = createdApiKeyToken(payload);
-      if (!key) throw new Error(T("API key response was malformed.", "API key 响应格式错误。"));
+      if (!key) throw new UserFacingError(T("API key response was malformed.", "API key 响应格式错误。"));
       setKeys((current) => [key, ...current.filter((item) => item.id !== key.id)]);
       if (!token) {
-        throw new Error(
+        throw new UserFacingError(
           T(
             "The API key was created, but its one-time token was missing. Revoke it and create another key.",
             "API key 已创建，但响应中缺少仅显示一次的令牌。请吊销该密钥并重新创建。"
@@ -638,7 +639,7 @@ export function ApiKeysScreen({
     } catch (err) {
       if (!current()) return;
       handleAccessFailure(err);
-      setError(err?.message || T("Unable to create API key.", "无法创建 API key。"));
+      setError(requestErrorText(err, T("Unable to create API key.", "无法创建 API key。")));
     } finally {
       if (current()) {
         mutationInFlightRef.current = null;
@@ -675,7 +676,7 @@ export function ApiKeysScreen({
     } catch (err) {
       if (!current()) return;
       handleAccessFailure(err);
-      setError(err?.message || T("Unable to revoke API key.", "无法吊销 API key。"));
+      setError(requestErrorText(err, T("Unable to revoke API key.", "无法吊销 API key。")));
     } finally {
       if (current()) {
         mutationInFlightRef.current = null;

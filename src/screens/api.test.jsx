@@ -1209,7 +1209,7 @@ describe("API screens", () => {
       />
     );
     fireEvent.click(await screen.findByRole("button", { name: "Retry" }));
-    expect(await screen.findByText("Access unavailable")).toBeVisible();
+    expect(await screen.findByText("Unable to load API keys.")).toBeVisible();
     expect(screen.getByRole("button", { name: "Retry" })).toBeEnabled();
     expect(onReloadAccess).toHaveBeenCalledTimes(1);
     expect(noruloApi.apiKeys.list).toHaveBeenCalledTimes(1);
@@ -1559,7 +1559,7 @@ describe("API screens", () => {
     expect(noruloApi.apiKeys.create).not.toHaveBeenCalled();
     await act(async () => pendingProjects.reject(new Error("Project service unavailable")));
     const picker = document.querySelector(".api-project-picker");
-    expect(within(picker).getByRole("alert")).toHaveTextContent("Project service unavailable");
+    expect(within(picker).getByRole("alert")).toHaveTextContent("Unable to load projects.");
     expect(create).toBeDisabled();
     expect(projects).toHaveBeenCalledTimes(1);
     expect(screen.queryByText("No projects in this ledger")).not.toBeInTheDocument();
@@ -1618,7 +1618,7 @@ describe("API screens", () => {
     expect(screen.queryByText("secret/repo")).not.toBeInTheDocument();
     expect(screen.queryByText("false")).not.toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Load more projects" }));
-    expect(await screen.findByText("Next page unavailable")).toBeVisible();
+    expect(await screen.findByText("Unable to load projects.")).toBeVisible();
     expect(screen.getByRole("checkbox", { name: "Standalone project" })).toBeChecked();
     expect(screen.getByRole("button", { name: "Create key" })).toBeDisabled();
     await user.click(screen.getByRole("button", { name: "Retry projects" }));

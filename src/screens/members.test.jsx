@@ -673,7 +673,7 @@ describe("Members screen", () => {
     show();
     fireEvent.click(await screen.findByRole("button", { name: "Remove bob" }));
     fireEvent.click(screen.getByRole("button", { name: "Confirm remove bob" }));
-    expect(await screen.findByRole("alert")).toHaveTextContent("Connection lost");
+    expect(await screen.findByRole("alert")).toHaveTextContent("Member data unavailable.");
     const retry = screen.getByRole("button", { name: "Confirm remove bob" });
     await waitFor(() => expect(retry).toBeEnabled());
     expect(retry).toHaveFocus();
@@ -782,7 +782,7 @@ describe("Members screen", () => {
     });
     show();
     fireEvent.change(await openRole(), { target: { value: "viewer" } });
-    expect(await screen.findByRole("alert")).toHaveTextContent("Network unavailable");
+    expect(await screen.findByRole("alert")).toHaveTextContent("Member data unavailable.");
     const draft = screen.getByRole("combobox", { name: "Role for bob" });
     expect(draft).toHaveValue("viewer");
     expect(draft).toBeEnabled();
@@ -894,7 +894,7 @@ describe("Members screen", () => {
       .mockResolvedValue({ items: [owner, { ...editor, role: "viewer", revision: 4 }] });
     show();
     fireEvent.change(await openRole(), { target: { value: "viewer" } });
-    expect(await screen.findByRole("alert")).toHaveTextContent("Request rejected");
+    expect(await screen.findByRole("alert")).toHaveTextContent("The service is temporarily unavailable. Please try again later.");
     await waitFor(() =>
       expect(screen.getByRole("heading", { name: "Ledger members" })).toHaveFocus()
     );
@@ -1232,7 +1232,7 @@ describe("Members screen", () => {
     api.previewInvitation.mockResolvedValueOnce(preview).mockReturnValueOnce(pending.promise);
     show({ workspace: null });
     fireEvent.click(await screen.findByRole("button", { name: "Request to join" }));
-    await screen.findByText("Connection lost");
+    await screen.findByText("Member data unavailable.");
     expect(screen.getByRole("button", { name: "Request to join" })).toBeDisabled();
     expect(api.previewInvitation).toHaveBeenCalledTimes(1);
     expect(api.acceptInvitation).toHaveBeenCalledTimes(1);
@@ -1255,7 +1255,7 @@ describe("Members screen", () => {
     const changed = vi.fn();
     show({ workspace: null, onMembershipChanged: changed });
     fireEvent.click(await screen.findByRole("button", { name: "Request to join" }));
-    await screen.findByText("Connection lost");
+    await screen.findByText("Member data unavailable.");
     fireEvent.click(screen.getByRole("button", { name: "Check invitation again" }));
     fireEvent.click(await screen.findByRole("button", { name: "Open shared ledger" }));
     expect(api.acceptInvitation).toHaveBeenCalledTimes(1);

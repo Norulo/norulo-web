@@ -3728,65 +3728,67 @@ function ScopedLedgerScreen({
                           )}
                           <fieldset className="api-scope-panel">
                             <legend>{T("Project repositories", "项目仓库")}</legend>
-                            <div className="api-scope-list">
-                              {[
-                                ...boundRepositoryIds(data.project)
-                                  .map((id) => {
-                                    const repository = data.project.repositories?.find(
-                                      (repo) => repo.githubRepoId === id
-                                    );
-                                    return {
-                                      githubRepoId: id,
-                                      fullName:
-                                        repository?.githubAccess === "authorized"
-                                          ? repository.githubFullName
-                                          : !repository &&
-                                              data.project.githubAccess === "authorized"
-                                            ? data.project.githubFullName
-                                            : null,
-                                      account: repository?.account,
-                                    };
-                                  })
-                                  .filter(
-                                    (repo) =>
-                                      !organizationId ||
-                                      String(repo.account?.id) === organizationId ||
-                                      projectRepoIds.includes(repo.githubRepoId)
-                                  ),
-                                ...availableRepos.filter(
-                                  (repo) =>
-                                    !boundRepositoryIds(data.project).includes(repo.githubRepoId)
-                                ),
-                              ].map((repo) => (
-                                <label className="api-scope-row" key={repo.githubRepoId}>
-                                  <input
-                                    type="checkbox"
-                                    checked={projectRepoIds.includes(repo.githubRepoId)}
-                                    disabled={
-                                      blocked ||
-                                      (!projectRepoIds.includes(repo.githubRepoId) &&
-                                        (repositoryLoading ||
-                                          !data.repositories ||
-                                          needsGitHubReconnect ||
-                                          projectRepoIds.length >= 30))
-                                    }
-                                    onChange={(event) => {
-                                      projectSettingsDirty.current = true;
-                                      setProjectRepoIds((old) =>
-                                        event.target.checked
-                                          ? [...old, repo.githubRepoId]
-                                          : old.filter((id) => id !== repo.githubRepoId)
+                            <div className="ledger-repository-list">
+                              <div className="api-scope-list">
+                                {[
+                                  ...boundRepositoryIds(data.project)
+                                    .map((id) => {
+                                      const repository = data.project.repositories?.find(
+                                        (repo) => repo.githubRepoId === id
                                       );
-                                    }}
-                                  />
-                                  <span className="api-scope-copy">
-                                    <span>
-                                      {repo.fullName ||
-                                        `${T("Repository", "仓库")} #${repo.githubRepoId}`}
+                                      return {
+                                        githubRepoId: id,
+                                        fullName:
+                                          repository?.githubAccess === "authorized"
+                                            ? repository.githubFullName
+                                            : !repository &&
+                                                data.project.githubAccess === "authorized"
+                                              ? data.project.githubFullName
+                                              : null,
+                                        account: repository?.account,
+                                      };
+                                    })
+                                    .filter(
+                                      (repo) =>
+                                        !organizationId ||
+                                        String(repo.account?.id) === organizationId ||
+                                        projectRepoIds.includes(repo.githubRepoId)
+                                    ),
+                                  ...availableRepos.filter(
+                                    (repo) =>
+                                      !boundRepositoryIds(data.project).includes(repo.githubRepoId)
+                                  ),
+                                ].map((repo) => (
+                                  <label className="api-scope-row" key={repo.githubRepoId}>
+                                    <input
+                                      type="checkbox"
+                                      checked={projectRepoIds.includes(repo.githubRepoId)}
+                                      disabled={
+                                        blocked ||
+                                        (!projectRepoIds.includes(repo.githubRepoId) &&
+                                          (repositoryLoading ||
+                                            !data.repositories ||
+                                            needsGitHubReconnect ||
+                                            projectRepoIds.length >= 30))
+                                      }
+                                      onChange={(event) => {
+                                        projectSettingsDirty.current = true;
+                                        setProjectRepoIds((old) =>
+                                          event.target.checked
+                                            ? [...old, repo.githubRepoId]
+                                            : old.filter((id) => id !== repo.githubRepoId)
+                                        );
+                                      }}
+                                    />
+                                    <span className="api-scope-copy">
+                                      <span>
+                                        {repo.fullName ||
+                                          `${T("Repository", "仓库")} #${repo.githubRepoId}`}
+                                      </span>
                                     </span>
-                                  </span>
-                                </label>
-                              ))}
+                                  </label>
+                                ))}
+                              </div>
                             </div>
                             <p className="ledger-help">
                               {projectRepoIds.length} / 30 {T("repositories", "个仓库")}

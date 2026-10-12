@@ -261,7 +261,11 @@
   margin: 0;
   font-size: var(--fs-md);
 }
+/* Repository checklists scroll in a wrapper around the equal-row grid, so the
+   cap never constrains the 1fr tracks and every row stays reachable. */
 .ledger-repository-list {
+  min-width: 0;
+  border-bottom: 1px solid var(--border);
   max-block-size: 18rem;
   overflow-y: auto;
   overscroll-behavior: contain;

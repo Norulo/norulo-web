@@ -67,18 +67,20 @@ export function ProjectRepositoryPicker({
       {selectedRepository && repositories.length > 1 && (
         <fieldset className="api-scope-panel">
           <legend>{T("Additional repositories (optional)", "其他仓库（选填）")}</legend>
-          <div className="api-scope-list ledger-repository-list">
-            {additionalOptions.map((repo) => (
-              <label className="api-scope-row" key={repo.githubRepoId}>
-                <input
-                  type="checkbox"
-                  checked={additionalRepoIds.includes(repo.githubRepoId)}
-                  disabled={disabled || (selectedCount >= 30 && !additionalRepoIds.includes(repo.githubRepoId))}
-                  onChange={(event) => onAdditionalChange(repo.githubRepoId, event.target.checked)}
-                />
-                <span className="api-scope-copy"><span>{repo.fullName}</span></span>
-              </label>
-            ))}
+          <div className="ledger-repository-list">
+            <div className="api-scope-list">
+              {additionalOptions.map((repo) => (
+                <label className="api-scope-row" key={repo.githubRepoId}>
+                  <input
+                    type="checkbox"
+                    checked={additionalRepoIds.includes(repo.githubRepoId)}
+                    disabled={disabled || (selectedCount >= 30 && !additionalRepoIds.includes(repo.githubRepoId))}
+                    onChange={(event) => onAdditionalChange(repo.githubRepoId, event.target.checked)}
+                  />
+                  <span className="api-scope-copy"><span>{repo.fullName}</span></span>
+                </label>
+              ))}
+            </div>
           </div>
           <p className="ledger-help" role="status" aria-live="polite" aria-atomic="true">
             {selectedCount} / 30 {T("repositories", "个仓库")}

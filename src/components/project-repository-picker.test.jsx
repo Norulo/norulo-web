@@ -43,4 +43,26 @@ describe("Project repository local search", () => {
     fireEvent.change(search, { target: { value: "" } });
     expect(screen.getByRole("checkbox", { name: "team/api" })).toBeChecked();
   });
+
+  it("scrolls every loaded repository inside a wrapper around the equal-row list", () => {
+    const many = Array.from({ length: 30 }, (_, index) => ({
+      githubRepoId: index + 1,
+      fullName: `team/repository-${index + 1}`,
+    }));
+    render(<ProjectRepositoryPicker
+      repositories={many}
+      selectedRepository={many[0]}
+      additionalRepoIds={[]}
+      selectedCount={1}
+      onSelect={vi.fn()}
+      onAdditionalChange={vi.fn()}
+    />);
+    const checkboxes = screen.getAllByRole("checkbox");
+    expect(checkboxes).toHaveLength(29);
+    const list = checkboxes[0].closest(".api-scope-list");
+    // The height cap belongs to the scroll wrapper, never to the 1fr grid itself.
+    expect(list).not.toHaveClass("ledger-repository-list");
+    expect(list.parentElement).toHaveClass("ledger-repository-list");
+    expect(list.querySelectorAll(".api-scope-row")).toHaveLength(29);
+  });
 });

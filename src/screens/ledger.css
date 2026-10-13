@@ -831,13 +831,24 @@
   display: grid;
   grid-template-columns: auto auto;
   grid-template-columns: subgrid;
-  align-items: start;
+  align-items: center;
   column-gap: 24px;
   min-width: 0;
 }
 .ledger-screen .ledger-expense-row .ledger-amount {
   justify-self: end;
   text-align: right;
+}
+/* Keep the currency above the exact value; the whole money stack shares the
+   action pair's vertical center. */
+.ledger-screen .ledger-expense-row .financial-value-money {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+.ledger-screen .ledger-expense-row .financial-value-currency {
+  margin-inline-end: 0;
 }
 .ledger-screen .ledger-row-side > .ledger-actions {
   justify-content: flex-end;
@@ -916,13 +927,16 @@
     grid-column: 1;
     display: flex;
     flex-wrap: wrap;
-    align-items: flex-start;
+    align-items: center;
     justify-content: space-between;
     gap: 8px 16px;
   }
   .ledger-screen .ledger-expense-row .ledger-amount {
     justify-self: start;
     text-align: left;
+  }
+  .ledger-screen .ledger-expense-row .financial-value-money {
+    align-items: flex-start;
   }
 }
 .ledger-screen .ledger-form {

@@ -1,5 +1,28 @@
 # Norulo production deployment
 
+The recurring schedule controls release was verified on 2026-10-13. Web source
+`e3b26881688dcf4b14fd4f949fab5bf092641602` is deployed as version
+`031a6cf6-d3d0-44ba-b0a2-c4db9f92388a`; Server source
+`263a4c15cb6615eedb0de3128f29e998d5186857` is deployed as version
+`0cc26b2f-3a7d-4966-a07d-cd779ab8a236`. Both have 100% production traffic.
+Creation and editing derive read-only repeat dates from the start date, provide
+a searchable timezone picker with Custom last, and allow clearing the optional
+end date. Server edits/resumes save the first unconsumed future period.
+
+All 1,870 Web tests, 3,239 Server tests and 107 subtests passed. Local Chromium
+passed 50 new interaction states and 258 existing date-layout states. Lint,
+builds, offline configuration/module checks and deployment dry-runs passed;
+actual upload payloads matched the reviewed artifacts. Production readback
+confirmed all resources, public variables, six Secret names, logging, limits and
+the daily cron were preserved. Twenty final anonymous GET checks passed,
+including 14 byte-identical assets, direct/proxied health and 401 protection.
+Three earlier urllib probes met Browser Integrity Check code 1010; using the
+browser User-Agent allowed the final checks. No production financial writes,
+migrations, manual cron or journal reset occurred. Browser evidence is local
+Chromium, not authenticated customer or physical-device acceptance.
+See the [production release record](../../norulo-server/docs/validation/recurring-schedule-controls-production-2026-10-13.json).
+
+
 The Web security review release was verified on 2026-10-12 at 15:25:47 UTC.
 Web main source `e2c72018aa467e4db3f3c14461a162be1a38f2b8` is deployed as
 version `263da268-8498-4874-be61-64ebc03eeb2a` with 100% production traffic.

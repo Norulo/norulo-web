@@ -1,0 +1,176 @@
+{
+  "verifiedAtUTC": "2026-10-13T08:20:08.711379+00:00",
+  "sourceCommit": "108ee46d2eeda1937ef9c829d33794c637fc8cf0",
+  "worker": "norulo-web",
+  "version": "ee523bfd-aef0-4989-9e46-77a3ee2b15ee",
+  "deploymentId": "f349eb74-803b-49f9-9144-cefcbd60102a",
+  "deploymentCreatedOn": "2026-10-13T08:15:56.324232Z",
+  "trafficPercent": 100,
+  "serverVersionPreserved": "624d697a-a208-4aee-8000-87bd1f5a8a72",
+  "changes": [
+    "The parent expense-list grid defines the shared 32px column gap; expense record subgrids inherit it.",
+    "Browser regression checks require the short ordinary expense amount to remain on one rendered line."
+  ],
+  "validation": {
+    "webTests": 1877,
+    "webTestFiles": 89,
+    "lint": "passed",
+    "productionBuild": "passed",
+    "offlineWorkerConfig": "passed",
+    "wranglerDryRun": "passed",
+    "workerPayloadMatchesDryRun": true,
+    "workerSHA256": "a0f8477d17411ae2db2989a2c7ed8963f4919ad6fe0144d779f0fffe2147aa7a",
+    "browserProfiles": 12,
+    "layoutStates": 774,
+    "browsers": [
+      "Chromium 143.0.7499.4",
+      "Firefox 144.0.2",
+      "WebKit 26.0"
+    ],
+    "localRecord": "expense-firefox-layout-local-2026-10-13.json",
+    "sourceCI": {
+      "runId": 38367869223,
+      "url": "https://github.com/Norulo/norulo-web/actions/runs/38367869223"
+    },
+    "sourceAnnotationMatched": true,
+    "webSettingsPreservedExceptReleaseAnnotations": true,
+    "serverSettingsAndDeploymentPreserved": true,
+    "webExposure": {
+      "enabled": false,
+      "previews_enabled": false
+    },
+    "public": {
+      "checks": [
+        {
+          "url": "https://norulo.com/",
+          "status": 200,
+          "setCookie": false,
+          "currentBootstrapReferenced": true
+        },
+        {
+          "url": "https://norulo.com/api/health",
+          "status": 200,
+          "setCookie": false
+        },
+        {
+          "url": "https://norulo.com/api/api/v1/me",
+          "status": 401,
+          "setCookie": false
+        },
+        {
+          "url": "https://api.norulo.com/health",
+          "status": 200,
+          "setCookie": false
+        },
+        {
+          "url": "https://api.norulo.com/api/v1/me",
+          "status": 401,
+          "setCookie": false
+        },
+        {
+          "url": "https://norulo.com/assets/index-BdnT1kGy.css",
+          "status": 200,
+          "setCookie": false
+        },
+        {
+          "url": "https://norulo.com/assets/index-Chg-uyp5.js",
+          "status": 200,
+          "setCookie": false
+        },
+        {
+          "url": "https://norulo.com/assets/ledger-Bx8BdLCh.css",
+          "status": 200,
+          "setCookie": false
+        },
+        {
+          "url": "https://norulo.com/assets/ledger-OwWBG5cr.css",
+          "status": 200,
+          "setCookie": false
+        },
+        {
+          "url": "https://norulo.com/assets/ledger-fTjzigwq.js",
+          "status": 200,
+          "setCookie": false
+        },
+        {
+          "url": "https://norulo.com/assets/ledger-overview-3yw_v4x9.js",
+          "status": 200,
+          "setCookie": false
+        },
+        {
+          "url": "https://norulo.com/assets/ledger-split-CQzeAw2x.js",
+          "status": 200,
+          "setCookie": false
+        },
+        {
+          "url": "https://norulo.com/assets/ledger-summary-BCXxMUsC.js",
+          "status": 200,
+          "setCookie": false
+        }
+      ],
+      "assets": [
+        {
+          "path": "assets/index-BdnT1kGy.css",
+          "status": 200,
+          "byteIdentical": true,
+          "sha256": "298b18663f6632726ff7d6946af16712903e5e6dc43221bbc62f0be817db9a46"
+        },
+        {
+          "path": "assets/index-Chg-uyp5.js",
+          "status": 200,
+          "byteIdentical": true,
+          "sha256": "05ebde33a86709e07540cee17c884e03a48a3b01315ccd509754abe3875cedf9"
+        },
+        {
+          "path": "assets/ledger-Bx8BdLCh.css",
+          "status": 200,
+          "byteIdentical": true,
+          "sha256": "7d56ba535172bb9983a6c4be6a0c1277e40f62f9a935763ab577d255eb6871ef"
+        },
+        {
+          "path": "assets/ledger-OwWBG5cr.css",
+          "status": 200,
+          "byteIdentical": true,
+          "sha256": "c454e37d78917f3c58808d961bf942c9b9cd16672cb0d7e0dd3658d52e5f651f"
+        },
+        {
+          "path": "assets/ledger-fTjzigwq.js",
+          "status": 200,
+          "byteIdentical": true,
+          "sha256": "3ddfb29b73060bd10f901d778ae2ee91ddb50c03e8c075a9d395d2e1d6aa2911"
+        },
+        {
+          "path": "assets/ledger-overview-3yw_v4x9.js",
+          "status": 200,
+          "byteIdentical": true,
+          "sha256": "bf8d4c85382bf344717d7b122061f60d1a3bed61be535ea195881755a2741e21"
+        },
+        {
+          "path": "assets/ledger-split-CQzeAw2x.js",
+          "status": 200,
+          "byteIdentical": true,
+          "sha256": "b7efe9d095e14ffd4e0ac099bc72fff6954d7fc31cf07d8aceb24e584703652b"
+        },
+        {
+          "path": "assets/ledger-summary-BCXxMUsC.js",
+          "status": 200,
+          "byteIdentical": true,
+          "sha256": "fe317aeacd4331528c9e67da089b390f760a427a29958f10ca33e7d5c27c8317"
+        }
+      ],
+      "bootstrap": "/assets/index-Chg-uyp5.js",
+      "publicGETs": 13,
+      "matchedAssets": 8
+    },
+    "limitations": [
+      "Browser engines and simulated viewports; physical devices and authenticated production journeys were not checked.",
+      "Firefox touch profiles do not establish coarse-pointer emulation.",
+      "WebKit used its stock executable with workspace-installed Debian libraries and a local launch wrapper."
+    ]
+  },
+  "operations": {
+    "productionBusinessWrites": 0,
+    "SQLAPICalls": 0,
+    "serverDeployments": 0
+  }
+}

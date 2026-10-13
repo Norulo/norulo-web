@@ -1,5 +1,21 @@
 # Norulo production deployment
 
+The Firefox expense layout correction was published on 2026-10-13. Web main
+source `108ee46d2eeda1937ef9c829d33794c637fc8cf0` is deployed as version
+`ee523bfd-aef0-4989-9e46-77a3ee2b15ee` with 100% production traffic.
+The parent expense list defines its shared column gap, and record subgrids
+inherit it, preserving single-line short amounts and contained currency badges.
+
+All 1,877 Web tests, lint, production build, offline configuration checks and
+deployment dry-run passed. Local Chromium, Firefox and WebKit passed 774 layout
+states across 12 profiles. The [source CI run](https://github.com/Norulo/norulo-web/actions/runs/38367869223)
+tracks the same repair commit. Production readback matched the source annotation
+and preserved Web configuration. Server settings and its deployment remain at
+`624d697a-a208-4aee-8000-87bd1f5a8a72`. Thirteen anonymous GET checks passed,
+including eight byte-identical assets and the corrected ledger stylesheet.
+No production business writes or SQL API calls occurred. Browser evidence uses
+local fixtures and simulated viewports. See the [Firefox layout release record](validation/expense-firefox-layout-production-2026-10-13.json).
+
 The expense last-source release was verified on 2026-10-13. Web source
 01a7d87b0466b3a8b0ab03cd302ac23dfb97d9f1 is deployed as
 5bf1f851-7d00-4784-b4a9-e1caf0212ad2; Server source

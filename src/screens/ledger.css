@@ -914,12 +914,27 @@
 .ledger-screen .ledger-expense-row .ledger-meta {
   font-variant-numeric: tabular-nums;
 }
+/* The last operation source closes the record as a muted footnote on its own
+   line, below the date, category and note it describes. */
 .ledger-screen .ledger-expense-row .ledger-expense-source {
-  max-width: 100%;
+  display: flex;
+  flex: 1 0 100%;
+  align-items: flex-start;
+  gap: 6px;
   min-width: 0;
-  white-space: normal;
+  margin-top: 4px;
+  color: var(--text-3);
+  font-size: var(--fs-sm);
+  line-height: 1.5;
   overflow-wrap: anywhere;
-  align-self: baseline;
+}
+.ledger-screen .ledger-expense-row .ledger-expense-source > svg {
+  flex-shrink: 0;
+  /* Center the glyph on the first text line (0.75rem at 1.5 line height). */
+  margin-top: calc((var(--fs-sm) * 1.5 - 12px) / 2);
+}
+.ledger-screen .ledger-expense-row .ledger-expense-source > span {
+  min-width: 0;
 }
 .ledger-screen .ledger-expense-row .ledger-row-main > p:not(.ledger-meta) {
   padding-left: 10px;

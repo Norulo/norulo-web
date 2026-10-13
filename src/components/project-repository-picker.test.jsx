@@ -105,6 +105,23 @@ describe("Project repository dropdown search", () => {
     expect(screen.getByRole("checkbox", { name: "team/api" })).toBeChecked();
   });
 
+  it("clears the search in place without closing the dropdown or changing the selection", async () => {
+    const user = userEvent.setup();
+    const { onSelect, onSubmit } = harness();
+    await user.click(trigger());
+    expect(screen.queryByRole("button", { name: "Clear search" })).not.toBeInTheDocument();
+    await user.type(search(), "docs");
+    expect(screen.queryByRole("option", { name: "team/api" })).not.toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Clear search" }));
+    expect(search()).toHaveValue("");
+    expect(search()).toHaveFocus();
+    expect(screen.getByRole("option", { name: "team/api" })).toBeInTheDocument();
+    expect(search()).toHaveAttribute("aria-activedescendant", screen.getByRole("option", { name: "team/web" }).id);
+    expect(screen.queryByRole("button", { name: "Clear search" })).not.toBeInTheDocument();
+    expect(onSelect).not.toHaveBeenCalled();
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+
   it("chooses matching repositories and clears selection with keyboard without submitting the form", async () => {
     const user = userEvent.setup();
     const { onSelect, onSubmit } = harness();

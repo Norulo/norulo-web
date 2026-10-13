@@ -3364,8 +3364,8 @@ function ScopedLedgerScreen({
                                 T("Category not loaded", "类别尚未加载"),
                               )}
                             </p>
-                            <ExpenseSourceTag source={expense.lastSource} />
                             {expense.note && <p>{expense.note}</p>}
+                            <ExpenseSourceTag source={expense.lastSource} />
                           </div>
                           <div className="ledger-row-side">
                             <strong className="ledger-amount">

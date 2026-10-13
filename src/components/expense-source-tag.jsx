@@ -1,4 +1,5 @@
 import { T, useLang } from "../i18n.jsx";
+import { I } from "../icons.jsx";
 
 const COPY = {
   label: ["Last operation source", { zh: "最后操作来源", ja: "最後の操作元", ko: "마지막 작업 출처", fr: "Origine de la dernière opération", es: "Origen de la última operación" }],
@@ -14,14 +15,24 @@ const text = (key) => T(...COPY[key]);
 export function ExpenseSourceTag({ source }) {
   useLang();
   let label = text("unknown");
+  let Glyph = I.Clock;
   if (source?.kind === "recurring" && source.action === "create") {
     label = text("recurring");
+    Glyph = I.Refresh;
   } else if (["owner", "member"].includes(source?.kind) &&
       ["create", "update"].includes(source?.action) && typeof source.userId === "string" && source.userId) {
     const name = [source.name, source.githubLogin, source.userId]
       .find((value) => typeof value === "string" && value.trim());
     label = `${text(source.kind)} · ${name} · ${text(source.action)}`;
+    Glyph = source.via === "api_key" ? I.Terminal : I.User;
     if (source.via === "api_key") label += ` · ${T("API key")}`;
   }
-  return <span className="tag ledger-expense-source" aria-label={`${text("label")}: ${label}`}>{label}</span>;
+  // Quiet provenance footnote: muted body text with a small glyph, not a chip,
+  // so it never competes with the purpose, date or amount.
+  return (
+    <span className="ledger-expense-source" aria-label={`${text("label")}: ${label}`}>
+      <Glyph size={12} aria-hidden="true" />
+      <span>{label}</span>
+    </span>
+  );
 }

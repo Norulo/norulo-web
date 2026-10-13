@@ -250,11 +250,13 @@ export function ProjectRepositoryPicker({
               }}
             >
               <div className="project-repository-picker-search">
-                <label htmlFor={`${fieldId}-search`}>{T("Find a repository", "查找仓库")}</label>
+                <I.Search size={16} aria-hidden="true" />
                 <input
                   id={`${fieldId}-search`}
                   ref={searchRef}
                   type="search"
+                  aria-label={T("Find a repository", "查找仓库")}
+                  placeholder={T("Find a repository", "查找仓库")}
                   autoComplete="off"
                   autoCapitalize="none"
                   autoCorrect="off"
@@ -275,11 +277,26 @@ export function ProjectRepositoryPicker({
                   }}
                   onKeyDown={(event) => navigate(event, true)}
                 />
-                <p className="project-repository-picker-guidance" id={guidanceId}>
-                  {hasMore
-                    ? T("Search applies to loaded authorized repositories only. Load more repositories to include the next page.")
-                    : T("Search the loaded authorized repositories. Selected repositories stay selected when you search.")}
-                </p>
+                {search && (
+                  <button
+                    type="button"
+                    className="btn ghost sm project-repository-picker-clear"
+                    aria-label={T("Clear search", "清除搜索")}
+                    title={T("Clear search", "清除搜索")}
+                    // Keep focus in the search field so the dropdown stays open.
+                    onPointerDown={(event) => event.preventDefault()}
+                    onClick={() => {
+                      const index = selectedRepository
+                        ? repositories.findIndex((repo) => repo.githubRepoId === selectedRepository.githubRepoId)
+                        : -1;
+                      setSearch("");
+                      setActiveIndex(selectedRepository ? Math.max(0, index) + 1 : 0);
+                      focusWithoutScroll(searchRef.current);
+                    }}
+                  >
+                    <I.X size={16} aria-hidden="true" />
+                  </button>
+                )}
               </div>
               {query && matchingRepositories.length === 0 && (
                 <p className="project-repository-picker-empty" role="status">{T("No loaded repositories match this search.")}</p>
@@ -293,7 +310,7 @@ export function ProjectRepositoryPicker({
                       if (node) optionRefs.current.set(index, node);
                       else optionRefs.current.delete(index);
                     }}
-                    className={"project-repository-picker-option" + (active === index ? " is-active" : "")}
+                    className={"project-repository-picker-option" + (repo ? "" : " is-empty") + (active === index ? " is-active" : "")}
                     role="option"
                     aria-selected={selectedIndex === index}
                     onPointerMove={(event) => {
@@ -307,6 +324,11 @@ export function ProjectRepositoryPicker({
                   </li>
                 ))}
               </ul>
+              <p className="project-repository-picker-guidance" id={guidanceId}>
+                {hasMore
+                  ? T("Search applies to loaded authorized repositories only. Load more repositories to include the next page.")
+                  : T("Search the loaded authorized repositories. Selected repositories stay selected when you search.")}
+              </p>
             </div>
           )}
         </div>

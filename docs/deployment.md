@@ -1,5 +1,23 @@
 # Norulo production deployment
 
+The recorded expense money layout was verified on 2026-10-13. Web source
+`8ea95221c4bff9d72dd59eab543ef28a7714f941` is deployed as version
+`e157ae8e-0f90-48d6-a26f-584338090cef` with 100% production traffic.
+Project and shared-pool rows place the currency above the exact amount, and
+center the whole money stack beside Edit/Remove. Narrow lists align the stack
+on the left; confirmation states retain their reserved action space.
+
+All 1,870 tests, lint, build, offline checks and dry-run passed. Independent CSS
+review passed. Local Chromium verified 88 new states across eight profiles and
+258 existing layout states. Tablet/phone touch actions remain 44px/48px; exact
+long values remain selectable. Twenty-two production GET checks passed,
+including 16 byte-identical assets and the updated ledger stylesheet.
+Configuration, logging and disabled preview exposure were preserved; Server
+remains at `0cc26b2f-3a7d-4966-a07d-cd779ab8a236`. No production business
+writes or SQL API calls occurred. Browser evidence uses local fixtures and
+simulated viewports. See the [expense layout release record](validation/expense-amount-actions-production-2026-10-13.json).
+
+
 The recurring read-only and alignment correction was verified on 2026-10-13.
 Web source `58ade571df758c465f30ec042e413c8ac227e749` is deployed as version
 `0986be4a-4569-4a26-a62f-b3fc3dd97853` with 100% production traffic. Derived

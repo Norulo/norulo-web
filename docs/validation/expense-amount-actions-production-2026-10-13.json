@@ -1,0 +1,368 @@
+{
+  "verifiedAtUTC": "2026-10-13 03:29:44 UTC",
+  "sourceCommit": "8ea95221c4bff9d72dd59eab543ef28a7714f941",
+  "worker": "norulo-web",
+  "version": "e157ae8e-0f90-48d6-a26f-584338090cef",
+  "trafficPercent": 100,
+  "serverVersionPreserved": "0cc26b2f-3a7d-4966-a07d-cd779ab8a236",
+  "changes": [
+    "Recorded expense rows place the currency above the exact amount, right-aligned on wide lists and left-aligned on narrow lists.",
+    "The whole money stack and Edit/Remove action pair share a vertical center; project and shared-pool rows retain common columns and stable confirmation sizing."
+  ],
+  "validation": {
+    "lint": "passed",
+    "webTests": 1870,
+    "webTestFiles": 88,
+    "webTestDurationSeconds": 109.11,
+    "build": "passed",
+    "offlineWorkerConfig": "passed",
+    "wranglerDryRun": "passed",
+    "uploadedWorkerPayloadMatches": true,
+    "workerSHA256": "a0f8477d17411ae2db2989a2c7ed8963f4919ad6fe0144d779f0fffe2147aa7a",
+    "sourceMapMatchesExceptOutputDirectory": true,
+    "independentCSSReview": "passed",
+    "browser": {
+      "engine": "Chromium",
+      "version": "143.0.7499.4",
+      "profiles": 8,
+      "interactionStates": 88,
+      "existingLayoutProfiles": 4,
+      "existingLayoutStates": 258,
+      "scopes": [
+        "project",
+        "shared-pool"
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "widths": [
+        1440,
+        1280,
+        320
+      ],
+      "currencyNumberGapPx": 4,
+      "normalMaximumStackActionCenterDifferencePx": 0.0078125,
+      "sameRowTolerancePx": 1,
+      "currencyAndNumberEdgesAligned": true,
+      "confirmCancelPositionsStable": true,
+      "longAmountsRemainExactAndSelectable": true,
+      "touchActionHeightPx": {
+        "tablet": 44,
+        "phone": 48
+      },
+      "viewerActionsAbsent": true,
+      "formSubmits": 0,
+      "externalRequestsDelivered": 0,
+      "guardViolations": 0,
+      "physicalDeviceAcceptance": false,
+      "authenticatedProductionAcceptance": false,
+      "profileRequests": [
+        {
+          "profile": "desktop-1440-en-light",
+          "buttonHeights": [
+            28
+          ],
+          "requests": {
+            "total": 82,
+            "api": 24,
+            "static": 58,
+            "blockedFonts": 0,
+            "violations": 0,
+            "externalDelivered": 0
+          }
+        },
+        {
+          "profile": "desktop-1440-en-dark",
+          "buttonHeights": [
+            28
+          ],
+          "requests": {
+            "total": 82,
+            "api": 24,
+            "static": 58,
+            "blockedFonts": 0,
+            "violations": 0,
+            "externalDelivered": 0
+          }
+        },
+        {
+          "profile": "tablet-1280-zh-light",
+          "buttonHeights": [
+            44
+          ],
+          "requests": {
+            "total": 84,
+            "api": 24,
+            "static": 60,
+            "blockedFonts": 0,
+            "violations": 0,
+            "externalDelivered": 0
+          }
+        },
+        {
+          "profile": "tablet-1280-zh-dark",
+          "buttonHeights": [
+            44
+          ],
+          "requests": {
+            "total": 84,
+            "api": 24,
+            "static": 60,
+            "blockedFonts": 0,
+            "violations": 0,
+            "externalDelivered": 0
+          }
+        },
+        {
+          "profile": "phone-320-zh-light",
+          "buttonHeights": [
+            48
+          ],
+          "requests": {
+            "total": 85,
+            "api": 24,
+            "static": 61,
+            "blockedFonts": 0,
+            "violations": 0,
+            "externalDelivered": 0
+          }
+        },
+        {
+          "profile": "phone-320-zh-dark",
+          "buttonHeights": [
+            48
+          ],
+          "requests": {
+            "total": 84,
+            "api": 24,
+            "static": 60,
+            "blockedFonts": 0,
+            "violations": 0,
+            "externalDelivered": 0
+          }
+        },
+        {
+          "profile": "desktop-1440-en-viewer",
+          "buttonHeights": [],
+          "requests": {
+            "total": 80,
+            "api": 22,
+            "static": 58,
+            "blockedFonts": 0,
+            "violations": 0,
+            "externalDelivered": 0
+          }
+        },
+        {
+          "profile": "phone-320-zh-viewer",
+          "buttonHeights": [],
+          "requests": {
+            "total": 82,
+            "api": 22,
+            "static": 60,
+            "blockedFonts": 0,
+            "violations": 0,
+            "externalDelivered": 0
+          }
+        }
+      ],
+      "existingLayoutRequests": [
+        {
+          "profile": "desktop-1440",
+          "counts": {
+            "total": 83,
+            "api": 49,
+            "static": 34,
+            "blockedFonts": 0,
+            "violations": 0,
+            "externalDelivered": 0
+          },
+          "states": 81
+        },
+        {
+          "profile": "tablet-1280-zh",
+          "counts": {
+            "total": 86,
+            "api": 51,
+            "static": 35,
+            "blockedFonts": 0,
+            "violations": 0,
+            "externalDelivered": 0
+          },
+          "states": 81
+        },
+        {
+          "profile": "phone-390-to-320",
+          "counts": {
+            "total": 81,
+            "api": 47,
+            "static": 34,
+            "blockedFonts": 0,
+            "violations": 0,
+            "externalDelivered": 0
+          },
+          "states": 48
+        },
+        {
+          "profile": "android-size-412-to-360",
+          "counts": {
+            "total": 81,
+            "api": 47,
+            "static": 34,
+            "blockedFonts": 0,
+            "violations": 0,
+            "externalDelivered": 0
+          },
+          "states": 48
+        }
+      ]
+    },
+    "production": {
+      "publicGETs": 22,
+      "matchedAssets": 16,
+      "health": "direct/proxied 200",
+      "anonymousProfile": "direct/proxied 401",
+      "currentBootstrapReferenced": true,
+      "currentBootstrap": "index-zyDx6omr.js",
+      "configurationBindingsLoggingPreserved": true,
+      "releaseAnnotationUpdated": true,
+      "workersDev": false,
+      "previewURLs": false,
+      "SQLAPICalls": 0,
+      "businessWrites": 0,
+      "checks": [
+        {
+          "url": "https://norulo.com/",
+          "status": 200,
+          "setCookie": false,
+          "currentBootstrapReferenced": true
+        },
+        {
+          "url": "https://api.norulo.com/health",
+          "status": 200,
+          "setCookie": false
+        },
+        {
+          "url": "https://norulo.com/api/health",
+          "status": 200,
+          "setCookie": false
+        },
+        {
+          "url": "https://api.norulo.com/api/v1/me",
+          "status": 401,
+          "setCookie": false
+        },
+        {
+          "url": "https://norulo.com/api/api/v1/me",
+          "status": 401,
+          "setCookie": false
+        },
+        {
+          "url": "https://www.norulo.com/shared?release_check=expense_money_stack",
+          "status": 308,
+          "setCookie": false,
+          "location": "https://norulo.com/shared?release_check=expense_money_stack"
+        }
+      ],
+      "assets": [
+        {
+          "path": "assets/catalog-B8KJjadu.js",
+          "status": 200,
+          "byteIdentical": true,
+          "sha256": "7c0e8a4c105c68fd614dfba5781e4c251eaf19c45f0677103a456942793b3065"
+        },
+        {
+          "path": "assets/catalog-BX4z-5r4.js",
+          "status": 200,
+          "byteIdentical": true,
+          "sha256": "b37b0cf0810d30039512b38bc0f3212a7154ffdd81958a635703d9f97d3c2b39"
+        },
+        {
+          "path": "assets/catalog-BjHzieHD.js",
+          "status": 200,
+          "byteIdentical": true,
+          "sha256": "0ef8b06c4218b34db50a28ad72ea6995106b187943a43ce2bdef496748510146"
+        },
+        {
+          "path": "assets/catalog-CjcJEyNv.js",
+          "status": 200,
+          "byteIdentical": true,
+          "sha256": "8d81703b72836e7c3823699a3916a370368aed18c1b288051b7247896dbd93d2"
+        },
+        {
+          "path": "assets/catalog-_RVz-jlF.js",
+          "status": 200,
+          "byteIdentical": true,
+          "sha256": "22d1ba93a4e11656d35247ae159b6613aca808d7dbb2355ee8d66d9821f8888e"
+        },
+        {
+          "path": "assets/index-zyDx6omr.js",
+          "status": 200,
+          "byteIdentical": true,
+          "sha256": "aa4d8229deca4e4ba294b36f50915edb25213f80f8845a3228a702ea8a88d41e"
+        },
+        {
+          "path": "assets/ledger-Bx8BdLCh.css",
+          "status": 200,
+          "byteIdentical": true,
+          "sha256": "7d56ba535172bb9983a6c4be6a0c1277e40f62f9a935763ab577d255eb6871ef"
+        },
+        {
+          "path": "assets/ledger-D8ev3QlR.js",
+          "status": 200,
+          "byteIdentical": true,
+          "sha256": "3e2b15b4cc2dbf7dc2bfe2be712657ad860db44ee955ff54b6577dd25a162174"
+        },
+        {
+          "path": "assets/ledger-DdhWqbQ_.css",
+          "status": 200,
+          "byteIdentical": true,
+          "sha256": "cc4c301c6c5af5b4762e793126be65e5bb1d10d9bf76f661d790b985acfa983d"
+        },
+        {
+          "path": "assets/ledger-overview-CgpXlazD.js",
+          "status": 200,
+          "byteIdentical": true,
+          "sha256": "4414e0d762226a9266be7006c2cc0670297ad3b862d707eb387178da005043e8"
+        },
+        {
+          "path": "assets/ledger-split-zI5DUX84.js",
+          "status": 200,
+          "byteIdentical": true,
+          "sha256": "f1a05c904c49cb525e9f57cd45730d23bd29f1f91bb124c8fb971fd4106fd3c2"
+        },
+        {
+          "path": "assets/ledger-summary-Cj648L56.js",
+          "status": 200,
+          "byteIdentical": true,
+          "sha256": "88e818c65dd489178d98a4235c16d9b80b2bcb9a70877f5334575af12828df7c"
+        },
+        {
+          "path": "assets/recurring-expenses-OK6LKyUI.js",
+          "status": 200,
+          "byteIdentical": true,
+          "sha256": "95c5c068eda4dcdd766a6f9fb353ff2c6cd65203592068230907a4158f0a1b51"
+        },
+        {
+          "path": "assets/recurring-schedule-fields-BuRCiz_h.css",
+          "status": 200,
+          "byteIdentical": true,
+          "sha256": "f6c3ff7984d52a8a3da5cd93572ac74c65ce16d4fb242879dc85f88d6b6e1707"
+        },
+        {
+          "path": "assets/recurring-schedule-fields-YtOaMmJd.js",
+          "status": 200,
+          "byteIdentical": true,
+          "sha256": "0f4db6e43bca5ca46ed4d365ca7492d2c697a95a76d71e0ea65ed1942224c76c"
+        },
+        {
+          "path": "openapi/ledger-v1.json",
+          "status": 200,
+          "byteIdentical": true,
+          "sha256": "e60a0af18cf6cb5fef2c3a89859ae5a60b16b3515a8c333eec33b303cc461e6b"
+        }
+      ]
+    }
+  }
+}

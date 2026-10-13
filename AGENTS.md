@@ -1,5 +1,18 @@
 # Norulo Web
 
+## 2026-10-13 expense last source
+
+Expense.lastSource is read-only and contains the last successful creation/edit
+source, stored atomically in expenses.last_source_json. Owner/member identity is
+a bounded public snapshot; never expose email, API-key token/hash or credential
+IDs. Recurring initial/background/pending generation uses recurring/create; a
+later human edit replaces it. Failed CAS and creation replay do not overwrite
+the stored source. Old rows stay null/Source unknown, without historical backfill.
+Display one wrapping tag in project and shared-pool expense rows, across all
+six languages. Source unknown is a valid legacy state; API-key operations show
+the actual account plus API key, never a credential identifier.
+
+
 ## 2026-10-13 recurring schedule controls
 
 Browser creation and editing derive weekday, day, month and quarter month from

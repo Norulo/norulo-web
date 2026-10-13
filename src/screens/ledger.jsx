@@ -8,6 +8,7 @@ import { ProjectsList } from "../components/projects-list.jsx";
 import { ProjectRepositoryPicker } from "../components/project-repository-picker.jsx";
 import { ConsoleLayout } from "../components/console-layout.jsx";
 import { FinancialValue } from "../components/financial-value.jsx";
+import { ExpenseSourceTag } from "../components/expense-source-tag.jsx";
 import { CurrencyPicker } from "../components/currency-picker.jsx";
 import { RecurringScheduleFields } from "../components/recurring-schedule-fields.jsx";
 import { scheduleFromStartDate } from "../lib/recurring-schedule.js";
@@ -3363,6 +3364,7 @@ function ScopedLedgerScreen({
                                 T("Category not loaded", "类别尚未加载"),
                               )}
                             </p>
+                            <ExpenseSourceTag source={expense.lastSource} />
                             {expense.note && <p>{expense.note}</p>}
                           </div>
                           <div className="ledger-row-side">

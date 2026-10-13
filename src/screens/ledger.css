@@ -911,6 +911,13 @@
 .ledger-screen .ledger-expense-row .ledger-meta {
   font-variant-numeric: tabular-nums;
 }
+.ledger-screen .ledger-expense-row .ledger-expense-source {
+  max-width: 100%;
+  min-width: 0;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  align-self: baseline;
+}
 .ledger-screen .ledger-expense-row .ledger-row-main > p:not(.ledger-meta) {
   padding-left: 10px;
   border-left: 1px solid var(--border-strong);

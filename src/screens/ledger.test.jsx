@@ -67,9 +67,23 @@ async function openGitHubLinks() {
   const summary = await screen.findByText("Link GitHub repositories (optional)", {
     selector: "summary",
   });
-  fireEvent.click(summary);
+  if (!summary.closest("details").open) fireEvent.click(summary);
   await waitFor(() => expect(summary.parentElement).toHaveAttribute("open"));
   await waitFor(() => expect(screen.queryByText("Loading repositories…")).not.toBeInTheDocument());
+}
+
+async function openRepositoryDropdown() {
+  await openGitHubLinks();
+  const picker = await screen.findByRole("combobox", { name: "Repository" });
+  await waitFor(() => expect(picker).toBeEnabled());
+  if (picker.getAttribute("aria-expanded") !== "true") fireEvent.click(picker);
+  await screen.findByRole("searchbox", { name: "Find a repository" });
+  return picker;
+}
+
+async function selectRepository(name) {
+  await openRepositoryDropdown();
+  fireEvent.click(await screen.findByRole("option", { name }));
 }
 
 async function clickManageGitHubAccess() {
@@ -1474,6 +1488,7 @@ describe("ledger screens", () => {
     render(<LedgerScreen go={vi.fn()} mode="projects" />);
     await openGitHubLinks();
     await clickManageGitHubAccess();
+    await openRepositoryDropdown();
     expect(await screen.findByRole("option", { name: "alice/project" })).toBeInTheDocument();
     expect(github.connect).toHaveBeenCalledTimes(1);
   });
@@ -1485,6 +1500,7 @@ describe("ledger screens", () => {
     api.categories.mockRejectedValue({ status: 503 });
     render(<LedgerScreen go={vi.fn()} mode="projects" />);
     await openGitHubLinks();
+    await openRepositoryDropdown();
     expect(await screen.findByRole("option", { name: "alice/project" })).toBeInTheDocument();
     expect(screen.getByText(/Choose one to thirty authorized repositories/i)).toBeInTheDocument();
     expect(api.projects).toHaveBeenCalledTimes(1);
@@ -1508,7 +1524,7 @@ describe("ledger screens", () => {
       target: { value: "My project" },
     });
     await openGitHubLinks();
-    fireEvent.change(await screen.findByLabelText("Repository"), { target: { value: "202" } });
+    await selectRepository("alice/project");
     fireEvent.click(screen.getByRole("button", { name: /Create project/i }));
     await waitFor(() => expect(go).toHaveBeenCalledWith("ledgerProject", { id: "prj_new" }));
     expect(api.createProject).toHaveBeenCalledWith(
@@ -1536,6 +1552,7 @@ describe("ledger screens", () => {
     expect(github.connect).not.toHaveBeenCalled();
     fireEvent.click(screen.getByRole("button", { name: "Manage GitHub access" }));
     await waitFor(() => expect(github.connect).toHaveBeenCalledWith({ add: true, signal: expect.any(AbortSignal) }));
+    await openRepositoryDropdown();
     expect(await screen.findByRole("option", { name: "alice/project" })).toBeInTheDocument();
     expect(api.createProject).not.toHaveBeenCalled();
   });
@@ -1547,6 +1564,7 @@ describe("ledger screens", () => {
     const more = await screen.findByRole("button", { name: "Load more repositories" });
     expect(api.repositories).toHaveBeenCalledTimes(1);
     fireEvent.click(more);
+    await openRepositoryDropdown();
     expect(await screen.findByRole("option", { name: "alice/project" })).toBeInTheDocument();
     expect(github.connect).not.toHaveBeenCalled();
     expect(api.repositories).toHaveBeenCalledTimes(2);
@@ -1555,7 +1573,7 @@ describe("ledger screens", () => {
   it("does not implicitly select the first available repository", async () => {
     render(<LedgerScreen go={vi.fn()} mode="projects" />);
     await openGitHubLinks();
-    expect(await screen.findByRole("combobox", { name: "Repository" })).toHaveValue("");
+    expect(await screen.findByRole("combobox", { name: "Repository" })).toHaveTextContent("Choose a repository");
     expect(github.connect).not.toHaveBeenCalled();
     expect(screen.getByRole("button", { name: "Create project" })).toBeDisabled();
   });
@@ -1608,8 +1626,9 @@ describe("ledger screens", () => {
     });
     await openGitHubLinks();
     fireEvent.click(await screen.findByRole("button", { name: /Load more repositories/i }));
+    await openRepositoryDropdown();
     expect(await screen.findByRole("option", { name: "alice/later" })).toBeInTheDocument();
-    fireEvent.change(screen.getByLabelText("Repository"), { target: { value: "404" } });
+    await selectRepository("alice/later");
     fireEvent.click(screen.getByRole("button", { name: /Create project/i }));
     await waitFor(() =>
       expect(api.createProject).toHaveBeenCalledWith(
@@ -1650,7 +1669,7 @@ describe("ledger screens", () => {
     fireEvent.click(screen.getByRole("button", { name: "Add project" }));
     fireEvent.change(screen.getByLabelText("Project name"), { target: { value: "New project" } });
     await openGitHubLinks();
-    fireEvent.change(await screen.findByLabelText("Repository"), { target: { value: "303" } });
+    await selectRepository("alice/new");
     fireEvent.change(screen.getByLabelText(/Project description/i), {
       target: { value: "New project" },
     });

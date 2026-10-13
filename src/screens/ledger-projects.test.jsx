@@ -67,13 +67,18 @@ async function closeGitHubLinks() {
   await waitFor(() => expect(screen.getByRole("button", { name: "Create project" })).toBeEnabled());
 }
 
-async function selectRepository(id) {
+async function openRepositoryDropdown() {
   await openGitHubLinks();
-  const picker = await screen.findByLabelText("Repository");
+  const picker = await screen.findByRole("combobox", { name: "Repository" });
   await waitFor(() => expect(picker).toBeEnabled());
-  fireEvent.change(picker, {
-    target: { value: String(id) },
-  });
+  if (picker.getAttribute("aria-expanded") !== "true") fireEvent.click(picker);
+  await screen.findByRole("searchbox", { name: "Find a repository" });
+  return picker;
+}
+
+async function selectRepository(name) {
+  await openRepositoryDropdown();
+  fireEvent.click(await screen.findByRole("option", { name }));
 }
 
 const blankProject = {
@@ -147,7 +152,7 @@ describe("Projects authorization and creation", () => {
     expect(create).toBeEnabled();
     expect(create).not.toHaveAttribute("aria-describedby");
     await openGitHubLinks();
-    await screen.findByLabelText("Repository");
+    await screen.findByRole("combobox", { name: "Repository" });
     expect(create).toBeDisabled();
     expect(document.getElementById(create.getAttribute("aria-describedby"))).toHaveTextContent(
       "Choose a repository, or close optional GitHub links",
@@ -179,13 +184,17 @@ describe("Projects authorization and creation", () => {
     });
     render(<LedgerScreen go={vi.fn()} mode="projects" />);
     await nameProject("Platform");
-    await selectRepository(202);
+    await selectRepository("alice/web");
     fireEvent.click(screen.getByRole("checkbox", { name: "alice/api" }));
+    expect(screen.queryByRole("searchbox", { name: "Find a repository" })).not.toBeInTheDocument();
+    await openRepositoryDropdown();
     fireEvent.change(screen.getByRole("searchbox", { name: "Find a repository" }), {
       target: { value: "docs" },
     });
-    expect(screen.getByRole("combobox", { name: "Repository" })).toHaveValue("202");
-    expect(screen.queryByRole("checkbox", { name: "alice/api" })).not.toBeInTheDocument();
+    expect(screen.getByRole("combobox", { name: "Repository" })).toHaveTextContent("alice/web");
+    expect(screen.getByRole("option", { name: "alice/web" })).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByRole("option", { name: "alice/docs" })).toHaveAttribute("aria-selected", "false");
+    expect(screen.getByRole("checkbox", { name: "alice/api" })).toBeChecked();
     expect(screen.getByRole("checkbox", { name: "alice/docs" })).toBeVisible();
     expect(api.repositories).toHaveBeenCalledTimes(1);
     expect(screen.getByRole("button", { name: "Load more repositories" })).toBeEnabled();
@@ -276,7 +285,7 @@ describe("Projects authorization and creation", () => {
     fireEvent.change(await screen.findByLabelText("GitHub organization (optional)"), {
       target: { value: "8" },
     });
-    fireEvent.change(screen.getByLabelText("Repository"), { target: { value: "202" } });
+    await selectRepository("team/project");
     await closeGitHubLinks();
     fireEvent.click(screen.getByRole("button", { name: "Create project" }));
     await waitFor(() =>
@@ -476,13 +485,13 @@ describe("Projects authorization and creation", () => {
     });
     render(<LedgerScreen go={vi.fn()} />);
     fireEvent.click(await screen.findByRole("button", { name: "Add project" }));
-    await openGitHubLinks();
+    await openRepositoryDropdown();
     expect(
       screen.queryByRole("option", { name: "team/occupied-on-later-page" })
     ).not.toBeInTheDocument();
-    expect(await screen.findByLabelText("Repository")).toHaveValue("");
-    fireEvent.change(screen.getByLabelText("Repository"), { target: { value: "303" } });
-    expect(screen.getByLabelText("Repository")).toHaveValue("303");
+    expect(screen.getByRole("combobox", { name: "Repository" })).toHaveTextContent("Choose a repository");
+    await selectRepository("team/available");
+    expect(screen.getByRole("combobox", { name: "Repository" })).toHaveTextContent("team/available");
     expect(screen.getByRole("button", { name: "Load more projects" })).toBeEnabled();
     expect(api.projects).toHaveBeenCalledTimes(1);
   });
@@ -497,7 +506,7 @@ describe("Projects authorization and creation", () => {
     });
     render(<LedgerScreen go={vi.fn()} mode="projects" />);
     await nameProject("Platform");
-    await selectRepository(202);
+    await selectRepository("alice/web");
     fireEvent.click(screen.getByRole("checkbox", { name: "alice/api" }));
     fireEvent.click(screen.getByRole("button", { name: "Create project" }));
     await waitFor(() =>
@@ -536,8 +545,9 @@ describe("Projects authorization and creation", () => {
     fireEvent.change(await screen.findByLabelText("GitHub organization (optional)"), {
       target: { value: "8" },
     });
+    await openRepositoryDropdown();
     expect(screen.queryByRole("option", { name: "alice/personal" })).not.toBeInTheDocument();
-    fireEvent.change(screen.getByLabelText("Repository"), { target: { value: "303" } });
+    await selectRepository("team/web");
     fireEvent.click(screen.getByRole("checkbox", { name: "team/api" }));
     fireEvent.click(screen.getByRole("button", { name: "Create project" }));
     await waitFor(() =>
@@ -576,12 +586,12 @@ describe("Projects authorization and creation", () => {
     });
     render(<LedgerScreen go={vi.fn()} />);
     fireEvent.click(await screen.findByRole("button", { name: "Add project" }));
-    await openGitHubLinks();
+    await openRepositoryDropdown();
     expect(screen.queryByRole("option", { name: "alice/web" })).not.toBeInTheDocument();
     expect(screen.queryByRole("option", { name: "alice/api" })).not.toBeInTheDocument();
-    expect(await screen.findByLabelText("Repository")).toHaveValue("");
-    fireEvent.change(screen.getByLabelText("Repository"), { target: { value: "404" } });
-    expect(screen.getByLabelText("Repository")).toHaveValue("404");
+    expect(screen.getByRole("combobox", { name: "Repository" })).toHaveTextContent("Choose a repository");
+    await selectRepository("alice/new");
+    expect(screen.getByRole("combobox", { name: "Repository" })).toHaveTextContent("alice/new");
   });
 
   it("limits a project to thirty repositories without disabling removal of a selected repository", async () => {
@@ -594,7 +604,7 @@ describe("Projects authorization and creation", () => {
     });
     render(<LedgerScreen go={vi.fn()} />);
     await nameProject();
-    await selectRepository(1);
+    await selectRepository("team/repo-1");
     for (let id = 2; id <= 30; id += 1) fireEvent.click(screen.getByLabelText(`team/repo-${id}`));
     expect(screen.getByRole("checkbox", { name: "team/repo-31" })).toBeDisabled();
     expect(screen.getByRole("checkbox", { name: "team/repo-30" })).toBeEnabled();
@@ -613,13 +623,13 @@ describe("Projects authorization and creation", () => {
     });
     render(<LedgerScreen go={vi.fn()} />);
     await nameProject();
-    await selectRepository(202);
+    await selectRepository("alice/web");
     fireEvent.click(await screen.findByRole("checkbox", { name: "alice/removed" }));
     fireEvent.click(screen.getByRole("button", { name: "Reload" }));
     await waitFor(() =>
       expect(screen.queryByRole("checkbox", { name: "alice/removed" })).not.toBeInTheDocument()
     );
-    await selectRepository(202);
+    await selectRepository("alice/project");
     fireEvent.click(screen.getByRole("button", { name: "Create project" }));
     await waitFor(() =>
       expect(api.createProject).toHaveBeenCalledWith(
@@ -673,6 +683,7 @@ describe("Projects authorization and creation", () => {
     render(<LedgerScreen go={vi.fn()} mode="projects" />);
     await openGitHubLinks();
     await clickManageGitHubAccess();
+    await openRepositoryDropdown();
     expect(await screen.findByRole("option", { name: "alice/project" })).toBeInTheDocument();
     expect(github.connect).toHaveBeenCalledTimes(1);
     expect(api.repositories).toHaveBeenCalledTimes(2);
@@ -745,6 +756,7 @@ describe("Projects authorization and creation", () => {
 
     finishReload({ items: [], nextCursor: null });
     expect((await screen.findByText(message)).closest('[role="status"]')).toBeInTheDocument();
+    await openRepositoryDropdown();
     expect(await screen.findByRole("option", { name: "alice/project" })).toBeInTheDocument();
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
     expect(api.repositories).toHaveBeenCalledTimes(2);
@@ -959,16 +971,15 @@ describe("Projects authorization and creation", () => {
     });
     render(<LedgerScreen go={vi.fn()} mode="projects" />);
     await nameProject();
-    await selectRepository(303);
+    await selectRepository("alice/second");
     fireEvent.click(screen.getByRole("button", { name: "Reload" }));
-    await waitFor(() =>
-      expect(screen.queryByRole("option", { name: "alice/second" })).not.toBeInTheDocument()
-    );
-    expect(screen.getByLabelText("Repository")).toHaveValue("");
+    await openRepositoryDropdown();
+    expect(screen.queryByRole("option", { name: "alice/second" })).not.toBeInTheDocument();
+    expect(screen.getByRole("combobox", { name: "Repository" })).toHaveTextContent("Choose a repository");
     expect(screen.getByRole("button", { name: "Create project" })).toBeDisabled();
     fireEvent.click(screen.getByRole("button", { name: /Create project/i }));
     expect(api.createProject).not.toHaveBeenCalled();
-    await selectRepository(202);
+    await selectRepository("alice/project");
     fireEvent.click(screen.getByRole("button", { name: /Create project/i }));
     await waitFor(() =>
       expect(api.createProject).toHaveBeenCalledWith(
@@ -1140,6 +1151,7 @@ describe("Projects authorization and creation", () => {
     await nameProject();
     await openGitHubLinks();
     await waitFor(() => expect(api.repositories).toHaveBeenCalledTimes(1));
+    expect(screen.queryByRole("combobox", { name: "Repository" })).not.toBeInTheDocument();
     expect(screen.queryByRole("option", { name: "alice/candidate" })).not.toBeInTheDocument();
     expect(github.login).not.toHaveBeenCalled();
     expect(github.connect).not.toHaveBeenCalled();
@@ -1178,6 +1190,7 @@ describe("Projects authorization and creation", () => {
     expect(api.reportSummary).not.toHaveBeenCalled();
     view.rerender(<LedgerScreen go={vi.fn()} mode="projects" authorizationRevision={1} />);
     await openGitHubLinks();
+    await openRepositoryDropdown();
     expect(await screen.findByRole("option", { name: "alice/project" })).toBeInTheDocument();
     finish({ items: [{ githubRepoId: 303, fullName: "alice/obsolete" }], nextCursor: null });
     await Promise.resolve();
@@ -1199,6 +1212,7 @@ describe("Projects authorization and creation", () => {
     fireEvent.click(await screen.findByRole("button", { name: "Check repository access" }));
     await openGitHubLinks();
     fireEvent.click(await screen.findByRole("button", { name: "Load more repositories" }));
+    await openRepositoryDropdown();
     expect(await screen.findByRole("option", { name: "alice/second" })).toBeInTheDocument();
     expect(api.repositories).toHaveBeenCalledTimes(3);
   });
@@ -1232,6 +1246,7 @@ describe("Projects authorization and creation", () => {
     let finish;
     const view = render(<LedgerScreen go={vi.fn()} mode="projects" authorizationRevision={0} />);
     await openGitHubLinks();
+    await openRepositoryDropdown();
     expect(await screen.findByRole("option", { name: "alice/project" })).toBeInTheDocument();
     api.repositories.mockImplementationOnce(
       () =>
@@ -1249,6 +1264,7 @@ describe("Projects authorization and creation", () => {
     });
     view.rerender(<LedgerScreen go={vi.fn()} mode="projects" authorizationRevision={2} />);
     await openGitHubLinks();
+    await openRepositoryDropdown();
     expect(await screen.findByRole("option", { name: "alice/current" })).toBeInTheDocument();
     finish({ items: [{ githubRepoId: 303, fullName: "alice/stale" }], nextCursor: null });
     await Promise.resolve();

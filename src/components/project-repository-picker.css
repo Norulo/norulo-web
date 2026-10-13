@@ -1,0 +1,136 @@
+.project-repository-picker {
+  position: relative;
+  min-width: 0;
+  width: 100%;
+}
+.project-repository-picker-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid var(--border-strong);
+  background: var(--bg-elev);
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+}
+.project-repository-picker-trigger > svg {
+  flex-shrink: 0;
+  color: var(--text-3);
+}
+.project-repository-picker-value {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.project-repository-picker-placeholder {
+  color: var(--text-3);
+}
+.project-repository-picker select.project-repository-picker-validation {
+  /* Validation stays native; onInvalid opens the visible picker and cancels
+     native focus. Removing the proxy from layout also avoids WebKit's native
+     long-option intrinsic overflow. */
+  display: none;
+}
+.project-repository-picker-popover {
+  position: absolute;
+  inset-inline: 0;
+  top: calc(100% + 4px);
+  z-index: var(--z-float);
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 4px;
+  border: 1px solid var(--border-strong);
+  background: var(--bg-elev);
+  overflow-y: auto;
+}
+.project-repository-picker-popover[data-side="top"] {
+  top: auto;
+  bottom: calc(100% + 4px);
+}
+.project-repository-picker-search {
+  display: grid;
+  flex: 0 0 auto;
+  gap: 8px;
+  min-width: 0;
+  padding: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.project-repository-picker-search label {
+  color: var(--text-2);
+  font-size: var(--fs-md);
+}
+.project-repository-picker-search input {
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid var(--border-strong);
+  background: var(--bg-elev);
+  color: var(--text);
+  font: inherit;
+}
+.project-repository-picker-options {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 44px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.project-repository-picker-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 44px;
+  padding: 10px 12px;
+  color: var(--text-2);
+  font-size: var(--fs-md);
+  line-height: 1.6;
+  cursor: pointer;
+}
+.project-repository-picker-option > span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.project-repository-picker-option > svg {
+  flex-shrink: 0;
+  color: var(--accent);
+}
+.project-repository-picker-option.is-active {
+  background: var(--accent-soft);
+  color: var(--text);
+}
+.project-repository-picker-guidance,
+.project-repository-picker-empty {
+  margin: 0;
+  color: var(--text-3);
+  font-size: var(--fs-sm);
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.project-repository-picker-empty {
+  padding: 12px;
+}
+@media (any-pointer: coarse) {
+  .project-repository-picker-trigger,
+  .project-repository-picker-search input,
+  .project-repository-picker-option {
+    font-size: 1rem;
+  }
+}
+@media (max-width: 760px) {
+  .project-repository-picker-trigger,
+  .project-repository-picker-option,
+  .project-repository-picker-search input {
+    min-height: 48px;
+    font-size: 1rem;
+  }
+}

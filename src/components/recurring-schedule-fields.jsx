@@ -55,9 +55,10 @@ export function RecurringScheduleFields({ schedule, onChange, disabled = false }
         </div>
       )}
       {frequency !== "weekly" && (
-        <label>
-          {T("Day of month")}
+        <div className="ledger-field">
+          <label htmlFor={`${id}-day`}>{T("Day of month")}</label>
           <input
+            id={`${id}-day`}
             type="number"
             min="1"
             max="31"
@@ -66,7 +67,7 @@ export function RecurringScheduleFields({ schedule, onChange, disabled = false }
             disabled={disabled}
             readOnly
           />
-        </label>
+        </div>
       )}
       {frequency === "quarterly" && (
         <div className="ledger-field">
@@ -82,9 +83,10 @@ export function RecurringScheduleFields({ schedule, onChange, disabled = false }
         </div>
       )}
       {frequency === "yearly" && (
-        <label>
-          {T("Month of year")}
+        <div className="ledger-field">
+          <label htmlFor={`${id}-month`}>{T("Month of year")}</label>
           <input
+            id={`${id}-month`}
             type="number"
             min="1"
             max="12"
@@ -93,7 +95,7 @@ export function RecurringScheduleFields({ schedule, onChange, disabled = false }
             disabled={disabled}
             readOnly
           />
-        </label>
+        </div>
       )}
       <div className="ledger-field">
         <label htmlFor={`${id}-timezone`}>{T("Time zone")}</label>

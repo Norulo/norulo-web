@@ -1,11 +1,53 @@
+.recurring-schedule-fields {
+  --recurring-control-height: 42px;
+  --recurring-clear-height: 44px;
+}
+.ledger-screen .main .recurring-schedule-fields > .ledger-field {
+  grid-template-rows: minmax(28px, 1fr) var(--recurring-control-height);
+  row-gap: 10px;
+}
+.ledger-screen .main .recurring-schedule-fields > .ledger-field > label {
+  align-content: center;
+}
+.ledger-screen .main .recurring-schedule-fields > .ledger-field > :is(input, select),
+.ledger-screen .main .recurring-schedule-fields .timezone-picker-trigger {
+  height: var(--recurring-control-height);
+  min-height: var(--recurring-control-height);
+}
+.ledger-screen .main .recurring-schedule-fields input[readonly] {
+  background: var(--bg-soft);
+  color: var(--text-3);
+  -webkit-text-fill-color: var(--text-3);
+  border-color: var(--border);
+}
 .recurring-end-date-heading {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 4px 8px;
+  position: relative;
   min-width: 0;
+  padding-inline-end: 80px;
+}
+.recurring-end-date-heading > label {
+  height: 100%;
+  align-content: center;
 }
 .recurring-end-date-heading > .btn {
-  min-height: 44px;
+  /* Keep the label row compact while preserving the full touch target. The
+     field's row gap leaves this target clear of the date input below it. */
+  position: absolute;
+  inset-inline-end: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  height: var(--recurring-clear-height);
+  min-height: var(--recurring-clear-height);
+  min-width: var(--recurring-clear-height);
+}
+@media (any-pointer: coarse) {
+  .recurring-schedule-fields {
+    --recurring-control-height: 44px;
+  }
+}
+@media (max-width: 760px) {
+  .recurring-schedule-fields {
+    --recurring-control-height: 48px;
+    --recurring-clear-height: 48px;
+  }
 }

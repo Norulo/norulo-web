@@ -1,5 +1,20 @@
 # Norulo production deployment
 
+The expense last-source release was verified on 2026-10-13. Web source
+01a7d87b0466b3a8b0ab03cd302ac23dfb97d9f1 is deployed as
+5bf1f851-7d00-4784-b4a9-e1caf0212ad2; Server source
+9a899adf281acd573d4aaefe1e4a469e17e45518 is deployed as
+624d697a-a208-4aee-8000-87bd1f5a8a72. Both versions serve 100% traffic.
+Project and shared-pool expenses display one six-language tag with the latest
+Owner/member creation/edit source or recurring generation. Old records display
+Source unknown until edited. Server applied only migration 0014 for schema v14.
+All 1,877 Web tests, lint/build/offline checks, 3,244 Server tests and 107 subtests,
+72 Chromium language/viewport states, and nine final local native source requests
+passed. Thirteen read-only public checks passed and seven assets matched dist.
+Bindings, public variables, Secret names, limits, observability and the daily cron
+were preserved. See the [verified source release record](../../norulo-server/docs/validation/expense-last-source-production-2026-10-13.json).
+
+
 The recorded expense money layout was verified on 2026-10-13. Web source
 `8ea95221c4bff9d72dd59eab543ef28a7714f941` is deployed as version
 `e157ae8e-0f90-48d6-a26f-584338090cef` with 100% production traffic.

@@ -1,0 +1,60 @@
+{
+  "verifiedAtUTC": "2026-10-13 02:58:23 UTC",
+  "sourceCommit": "58ade571df758c465f30ec042e413c8ac227e749",
+  "worker": "norulo-web",
+  "version": "0986be4a-4569-4a26-a62f-b3fc3dd97853",
+  "trafficPercent": 100,
+  "serverVersionPreserved": "0cc26b2f-3a7d-4966-a07d-cd779ab8a236",
+  "changes": [
+    "Grey background, text, WebKit text fill and borders for derived read-only inputs; text selection preserved.",
+    "Equal-sized aligned controls and consistent label rows; Clear keeps its 44px/phone 48px target without increasing the end-date heading height."
+  ],
+  "validation": {
+    "lint": "passed",
+    "webTests": 1870,
+    "webTestFiles": 88,
+    "build": "passed",
+    "offlineWorkerConfig": "passed",
+    "wranglerDryRun": "passed",
+    "uploadedWorkerPayloadMatches": true,
+    "browser": {
+      "engine": "Chromium",
+      "profiles": 8,
+      "interactionStates": 99,
+      "closedFrequencyStyleChecks": 64,
+      "supplementaryTabletStates": 24,
+      "existingLayoutStates": 258,
+      "monthlyTablet": {
+        "paneWidth": 480,
+        "controlHeight": 44,
+        "topDifference": 0,
+        "bottomDifference": 0,
+        "heightDifference": 0,
+        "themes": [
+          "light",
+          "dark"
+        ],
+        "forms": [
+          "create",
+          "edit"
+        ]
+      },
+      "mobileWidth": 320,
+      "sameRowTolerancePx": 1,
+      "readonlyRemainsSelectable": true,
+      "physicalDeviceAcceptance": false
+    },
+    "production": {
+      "publicGETs": 20,
+      "matchedAssets": 14,
+      "health": "direct/proxied 200",
+      "anonymousProfile": "direct/proxied 401",
+      "currentBootstrapReferenced": true,
+      "configurationBindingsLoggingPreserved": true,
+      "workersDev": false,
+      "previewURLs": false,
+      "SQLAPICalls": 0,
+      "businessWrites": 0
+    }
+  }
+}

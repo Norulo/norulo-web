@@ -1,5 +1,23 @@
 # Norulo production deployment
 
+The recurring read-only and alignment correction was verified on 2026-10-13.
+Web source `58ade571df758c465f30ec042e413c8ac227e749` is deployed as version
+`0986be4a-4569-4a26-a62f-b3fc3dd97853` with 100% production traffic. Derived
+inputs use muted colors, and all recurring controls share equal heights and
+aligned edges. Clear retains its touch target without enlarging the label row.
+
+All 1,870 tests, lint, build, offline configuration checks and dry-run passed.
+Local Chromium passed 99 interaction states, 64 frequency styling checks,
+24 supplementary tablet states and 258 existing layout states. In light/dark
+480px tablet rails, creation and editing both show 44px timezone/end controls
+with zero difference in their top, bottom and height. Twenty production GET
+checks passed, including 14 byte-identical assets. Bindings/logging/exposure
+were preserved; Server remains at `0cc26b2f-3a7d-4966-a07d-cd779ab8a236`.
+No production business writes or SQL API calls were performed. Local Chromium
+evidence does not establish physical-device acceptance. See the
+[alignment release record](validation/recurring-readonly-alignment-production-2026-10-13.json).
+
+
 The recurring schedule controls release was verified on 2026-10-13. Web source
 `e3b26881688dcf4b14fd4f949fab5bf092641602` is deployed as version
 `031a6cf6-d3d0-44ba-b0a2-c4db9f92388a`; Server source

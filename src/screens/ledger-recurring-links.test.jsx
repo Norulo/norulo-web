@@ -87,7 +87,11 @@ async function recurring(api, mode = "shared") {
   change("Start date", "2026-10-08");
   change("Amount", "12.50");
   change("What did you pay for?", "Scheduled hosting");
-  change("Time zone", "Europe/Paris");
+  fireEvent.click(screen.getByRole("combobox", { name: "Time zone", exact: true }));
+  fireEvent.change(screen.getByRole("searchbox", { name: "Search time zones" }), {
+    target: { value: "Paris" },
+  });
+  fireEvent.click(await screen.findByRole("option", { name: "Europe/Paris", exact: true }));
 }
 
 describe("Project links in the real ledger views", () => {
@@ -403,24 +407,36 @@ describe("Recurring entry in project and shared expenses", () => {
   });
 
   it.each([
-    ["weekly", { weekday: 2 }],
-    ["monthly", { day: 31 }],
-    ["quarterly", { day: 31, quarterMonth: 2 }],
-    ["yearly", { day: 31, month: 12 }],
+    ["weekly", { weekday: 7 }],
+    ["monthly", { day: 8 }],
+    ["quarterly", { day: 8, quarterMonth: 2 }],
+    ["yearly", { day: 8, month: 11 }],
   ])(
-    "sends only %s calendar conditions, exact amounts and explicit category",
+    "derives only %s calendar conditions from the start date, with exact amounts and explicit category",
     async (frequency, conditions) => {
       const api = client();
       await recurring(api);
       change("Frequency", frequency);
+      change("Start date", "2026-11-08");
       expect(screen.getByLabelText("Category")).not.toBeRequired();
       change("Category", "cat_one");
-      if (frequency === "weekly") change("Weekday", "2");
-      else change("Day of month", "31");
-      if (frequency === "quarterly") {
-        change("Month of quarter", "2");
+      if (frequency === "weekly") {
+        expect(screen.getByLabelText("Weekday")).toHaveValue("Sunday");
+        expect(screen.getByLabelText("Weekday")).toHaveAttribute("readonly");
+        expect(screen.queryByLabelText("Day of month")).not.toBeInTheDocument();
+      } else {
+        expect(screen.getByLabelText("Day of month")).toHaveValue(8);
+        expect(screen.getByLabelText("Day of month")).toHaveAttribute("readonly");
+        expect(screen.queryByLabelText("Weekday")).not.toBeInTheDocument();
       }
-      if (frequency === "yearly") change("Month of year", "12");
+      if (frequency === "quarterly") {
+        expect(screen.getByLabelText("Month of quarter")).toHaveValue("Second month");
+        expect(screen.getByLabelText("Month of quarter")).toHaveAttribute("readonly");
+      }
+      if (frequency === "yearly") {
+        expect(screen.getByLabelText("Month of year")).toHaveValue(11);
+        expect(screen.getByLabelText("Month of year")).toHaveAttribute("readonly");
+      }
       change("End date (optional)", "2027-12-31");
       fireEvent.click(screen.getByRole("button", { name: "Save schedule" }));
       await waitFor(() => expect(api.createRecurringRule).toHaveBeenCalledTimes(1));
@@ -437,13 +453,44 @@ describe("Recurring entry in project and shared expenses", () => {
           frequency,
           ...conditions,
           timezone: "Europe/Paris",
-          startOn: "2026-10-08",
+          startOn: "2026-11-08",
           endOn: "2027-12-31",
         },
       });
       expect(api.createRecurringRule.mock.calls[0][1]).toMatch(/^[a-f0-9]{32}$/);
       expect(api.createExpense).not.toHaveBeenCalled();
       expect(api.updateExpense).not.toHaveBeenCalled();
+    }
+  );
+
+  it.each(["shared", "project"])(
+    "clears an optional %s plan end date and submits null without changing its start date",
+    async (mode) => {
+      const api = client();
+      await recurring(api, mode);
+      change("Category", "cat_one");
+      const endDate = screen.getByLabelText("End date (optional)");
+      const clear = screen.getByRole("button", { name: "Clear end date" });
+      expect(endDate).toHaveValue("");
+      expect(endDate).not.toBeRequired();
+      expect(clear).toBeDisabled();
+      change("End date (optional)", "2027-12-31");
+      expect(clear).toBeEnabled();
+      fireEvent.click(clear);
+      expect(endDate).toHaveValue("");
+      expect(clear).toBeDisabled();
+      expect(screen.getByLabelText("Start date")).toHaveValue("2026-10-08");
+      expect(screen.getByLabelText("Day of month")).toHaveValue(8);
+      fireEvent.click(screen.getByRole("button", { name: "Save schedule" }));
+      await waitFor(() => expect(api.createRecurringRule).toHaveBeenCalledTimes(1));
+      expect(api.createRecurringRule.mock.calls[0][0].schedule).toEqual({
+        frequency: "monthly",
+        day: 8,
+        timezone: "Europe/Paris",
+        startOn: "2026-10-08",
+        endOn: null,
+      });
+      expect(api.createExpense).not.toHaveBeenCalled();
     }
   );
 
@@ -477,7 +524,7 @@ describe("Recurring entry in project and shared expenses", () => {
     fireEvent.click(screen.getByRole("button", { name: "Save schedule" }));
     expect(await screen.findByText("Request failed. Please retry.")).toBeVisible();
     expect(screen.getByLabelText("What did you pay for?")).toHaveValue("Scheduled hosting");
-    expect(screen.getByLabelText("Time zone")).toHaveValue("Europe/Paris");
+    expect(screen.getByLabelText("Time zone")).toHaveTextContent("Europe/Paris");
     fireEvent.click(screen.getByRole("button", { name: "Save schedule" }));
     await waitFor(() => expect(api.createRecurringRule).toHaveBeenCalledTimes(2));
     expect(api.createRecurringRule.mock.calls[0][1]).toEqual(

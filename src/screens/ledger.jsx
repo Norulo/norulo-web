@@ -10,6 +10,7 @@ import { ConsoleLayout } from "../components/console-layout.jsx";
 import { FinancialValue } from "../components/financial-value.jsx";
 import { CurrencyPicker } from "../components/currency-picker.jsx";
 import { RecurringScheduleFields } from "../components/recurring-schedule-fields.jsx";
+import { scheduleFromStartDate } from "../lib/recurring-schedule.js";
 import {
   PROJECT_URL_MAX_BYTES,
   githubOrganizationHref,
@@ -669,7 +670,6 @@ function ExpenseForm({
   const validationId = useId();
   const [expenseType, setExpenseType] = useState(recurrence ? "recurring" : "one-time");
   const [schedule, setSchedule] = useState(() => {
-    const now = new Date();
     let timezone = "UTC";
     try {
       timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
@@ -678,10 +678,6 @@ function ExpenseForm({
     }
     return {
       frequency: "monthly",
-      weekday: now.getDay() || 7,
-      day: now.getDate(),
-      quarterMonth: (now.getMonth() % 3) + 1,
-      month: now.getMonth() + 1,
       timezone,
       endOn: null,
       ...recurrence,
@@ -701,6 +697,7 @@ function ExpenseForm({
         }
       : emptyExpense()
   );
+  const derivedSchedule = scheduleFromStartDate(schedule, draft.occurredOn);
   const [validation, setValidation] = useState("");
   const [invalidDecimal, setInvalidDecimal] = useState("");
   const [automaticCategory, setAutomaticCategory] = useState(false);
@@ -804,14 +801,14 @@ function ExpenseForm({
             timezone: schedule.timezone.trim(),
             startOn: draft.occurredOn,
             endOn: schedule.endOn || null,
-            ...(schedule.frequency === "weekly" ? { weekday: Number(schedule.weekday) } : {}),
+            ...(schedule.frequency === "weekly" ? { weekday: derivedSchedule.weekday } : {}),
             ...(["monthly", "quarterly", "yearly"].includes(schedule.frequency)
-              ? { day: Number(schedule.day) }
+              ? { day: derivedSchedule.day }
               : {}),
             ...(schedule.frequency === "quarterly"
-              ? { quarterMonth: Number(schedule.quarterMonth) }
+              ? { quarterMonth: derivedSchedule.quarterMonth }
               : {}),
-            ...(schedule.frequency === "yearly" ? { month: Number(schedule.month) } : {}),
+            ...(schedule.frequency === "yearly" ? { month: derivedSchedule.month } : {}),
           }
         : null;
     const result = await onSubmit(
@@ -936,7 +933,7 @@ function ExpenseForm({
       {expenseType === "recurring" && (
         <>
           <RecurringScheduleFields
-            schedule={{ ...schedule, startOn: draft.occurredOn }}
+            schedule={derivedSchedule}
             disabled={busy}
             onChange={(next) => {
               createKey.current = requestKey();
@@ -946,8 +943,7 @@ function ExpenseForm({
           />
           <p className="ledger-help" id={recurringDateHelpId}>
             {T(
-              "Each due date adds a separate expense.",
-              "每个到期日新增一笔支出。"
+              "Repeat dates follow the start date. Each calendar period adds one expense; shorter months use their last day."
             )}
           </p>
           {!value && draft.occurredOn && scheduleToday && (

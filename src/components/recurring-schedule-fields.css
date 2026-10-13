@@ -1,0 +1,11 @@
+.recurring-end-date-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px 8px;
+  min-width: 0;
+}
+.recurring-end-date-heading > .btn {
+  min-height: 44px;
+}

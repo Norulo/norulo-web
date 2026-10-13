@@ -1,5 +1,8 @@
 import { useId } from "react";
 import { T, useLang } from "../i18n.jsx";
+import { scheduleFromStartDate } from "../lib/recurring-schedule.js";
+import { TimezonePicker } from "./timezone-picker.jsx";
+import "./recurring-schedule-fields.css";
 
 export const recurringFrequencies = () => [
   ["weekly", T("Every week", "每周")],
@@ -20,8 +23,8 @@ const weekdays = () => [
 export function RecurringScheduleFields({ schedule, onChange, disabled = false }) {
   useLang();
   const id = useId();
-  const update = (name, value) => onChange({ ...schedule, [name]: value });
-  const number = (event) => (event.target.value === "" ? "" : Number(event.target.value));
+  const derived = scheduleFromStartDate(schedule);
+  const update = (name, value) => onChange({ ...derived, [name]: value });
   const frequency = schedule.frequency || "monthly";
   return (
     <div className="ledger-fields recurring-schedule-fields">
@@ -31,16 +34,7 @@ export function RecurringScheduleFields({ schedule, onChange, disabled = false }
           id={`${id}-frequency`}
           value={frequency}
           disabled={disabled}
-          onChange={(event) =>
-            onChange({
-              ...schedule,
-              frequency: event.target.value,
-              weekday: schedule.weekday ?? 1,
-              day: schedule.day ?? 1,
-              quarterMonth: schedule.quarterMonth ?? 1,
-              month: schedule.month ?? 1,
-            })
-          }
+          onChange={(event) => update("frequency", event.target.value)}
         >
           {recurringFrequencies().map(([value, label]) => (
             <option key={value} value={value}>
@@ -52,18 +46,12 @@ export function RecurringScheduleFields({ schedule, onChange, disabled = false }
       {frequency === "weekly" && (
         <div className="ledger-field">
           <label htmlFor={`${id}-weekday`}>{T("Weekday")}</label>
-          <select
+          <input
             id={`${id}-weekday`}
-            value={schedule.weekday ?? 1}
+            value={derived.weekday ? weekdays()[derived.weekday - 1] : ""}
             disabled={disabled}
-            onChange={(event) => update("weekday", Number(event.target.value))}
-          >
-            {weekdays().map((label, index) => (
-              <option key={index + 1} value={index + 1}>
-                {label}
-              </option>
-            ))}
-          </select>
+            readOnly
+          />
         </div>
       )}
       {frequency !== "weekly" && (
@@ -74,27 +62,23 @@ export function RecurringScheduleFields({ schedule, onChange, disabled = false }
             min="1"
             max="31"
             required
-            value={schedule.day ?? 1}
+            value={derived.day}
             disabled={disabled}
-            onChange={(event) => update("day", number(event))}
+            readOnly
           />
         </label>
       )}
       {frequency === "quarterly" && (
         <div className="ledger-field">
           <label htmlFor={`${id}-quarter`}>{T("Month of quarter")}</label>
-          <select
+          <input
             id={`${id}-quarter`}
-            value={schedule.quarterMonth ?? 1}
+            value={derived.quarterMonth
+              ? [T("First month"), T("Second month"), T("Third month")][derived.quarterMonth - 1]
+              : ""}
             disabled={disabled}
-            onChange={(event) => update("quarterMonth", Number(event.target.value))}
-          >
-            {[T("First month"), T("Second month"), T("Third month")].map((label, index) => (
-              <option key={index + 1} value={index + 1}>
-                {label}
-              </option>
-            ))}
-          </select>
+            readOnly
+          />
         </div>
       )}
       {frequency === "yearly" && (
@@ -105,33 +89,45 @@ export function RecurringScheduleFields({ schedule, onChange, disabled = false }
             min="1"
             max="12"
             required
-            value={schedule.month ?? 1}
+            value={derived.month}
             disabled={disabled}
-            onChange={(event) => update("month", number(event))}
+            readOnly
           />
         </label>
       )}
-      <label>
-        {T("Time zone")}
-        <input
+      <div className="ledger-field">
+        <label htmlFor={`${id}-timezone`}>{T("Time zone")}</label>
+        <TimezonePicker
+          id={`${id}-timezone`}
+          label={T("Time zone")}
           value={schedule.timezone || ""}
           required
-          maxLength={100}
           disabled={disabled}
-          placeholder={T("e.g. Europe/Paris")}
-          onChange={(event) => update("timezone", event.target.value)}
+          onChange={(value) => update("timezone", value)}
         />
-      </label>
-      <label>
-        {T("End date (optional)")}
+      </div>
+      <div className="ledger-field">
+        <div className="recurring-end-date-heading">
+          <label htmlFor={`${id}-end`}>{T("End date (optional)")}</label>
+          <button
+            type="button"
+            className="btn ghost sm"
+            aria-label={T("Clear end date")}
+            disabled={disabled || !schedule.endOn}
+            onClick={() => update("endOn", null)}
+          >
+            {T("Clear")}
+          </button>
+        </div>
         <input
+          id={`${id}-end`}
           type="date"
           value={schedule.endOn || ""}
           min={schedule.startOn || undefined}
           disabled={disabled}
           onChange={(event) => update("endOn", event.target.value || null)}
         />
-      </label>
+      </div>
     </div>
   );
 }

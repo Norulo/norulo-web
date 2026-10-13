@@ -121,11 +121,19 @@ afterEach(() => {
 });
 
 describe("RecurringScheduleFields", () => {
-  it("keeps native frequency-specific fields and emits a complete schedule without changing its start date or timezone", () => {
+  it("derives readonly frequency fields from the start date without changing its timezone", () => {
     function Fields() {
       const [schedule, setSchedule] = useState(rule().schedule);
       return (
         <>
+          <label>
+            Test start date
+            <input
+              type="date"
+              value={schedule.startOn}
+              onChange={(event) => setSchedule({ ...schedule, startOn: event.target.value })}
+            />
+          </label>
           <RecurringScheduleFields
             schedule={schedule}
             onChange={(next) => {
@@ -139,23 +147,75 @@ describe("RecurringScheduleFields", () => {
     }
     const changes = vi.fn();
     render(<Fields />);
-    expect(screen.getByLabelText("Day of month")).toHaveValue(31);
+    expect(screen.getByLabelText("Day of month")).toHaveValue(1);
+    expect(screen.getByLabelText("Day of month")).toHaveAttribute("readonly");
+    expect(changes).not.toHaveBeenCalled();
     expect(screen.queryByLabelText("Weekday")).not.toBeInTheDocument();
     fireEvent.change(screen.getByLabelText("Frequency"), { target: { value: "weekly" } });
     expect(screen.queryByLabelText("Day of month")).not.toBeInTheDocument();
-    fireEvent.change(screen.getByLabelText("Weekday"), { target: { value: "7" } });
+    expect(screen.getByLabelText("Weekday")).toHaveValue("Thursday");
+    expect(screen.getByLabelText("Weekday")).toHaveAttribute("readonly");
     expect(changes.mock.lastCall[0]).toMatchObject({
       frequency: "weekly",
-      weekday: 7,
+      weekday: 4,
       timezone: "Europe/Paris",
       startOn: "2026-10-01",
     });
+    fireEvent.change(screen.getByLabelText("Test start date"), { target: { value: "2026-11-08" } });
+    expect(screen.getByLabelText("Weekday")).toHaveValue("Sunday");
     fireEvent.change(screen.getByLabelText("Frequency"), { target: { value: "quarterly" } });
-    fireEvent.change(screen.getByLabelText("Month of quarter"), { target: { value: "3" } });
-    expect(changes.mock.lastCall[0].quarterMonth).toBe(3);
+    expect(screen.getByLabelText("Day of month")).toHaveValue(8);
+    expect(screen.getByLabelText("Month of quarter")).toHaveValue("Second month");
+    expect(screen.getByLabelText("Month of quarter")).toHaveAttribute("readonly");
+    expect(changes.mock.lastCall[0].quarterMonth).toBe(2);
     fireEvent.change(screen.getByLabelText("Frequency"), { target: { value: "yearly" } });
     expect(screen.getByLabelText("Month of year")).toHaveAttribute("max", "12");
-    expect(screen.getByLabelText("End date (optional)")).toHaveAttribute("min", "2026-10-01");
+    expect(screen.getByLabelText("Month of year")).toHaveValue(11);
+    expect(screen.getByLabelText("Month of year")).toHaveAttribute("readonly");
+    expect(screen.getByLabelText("End date (optional)")).toHaveAttribute("min", "2026-11-08");
+    fireEvent.change(screen.getByLabelText("Test start date"), { target: { value: "" } });
+    expect(screen.getByLabelText("Day of month")).toHaveValue(null);
+    expect(screen.getByLabelText("Month of year")).toHaveValue(null);
+    fireEvent.change(screen.getByLabelText("Frequency"), { target: { value: "weekly" } });
+    expect(screen.getByLabelText("Weekday")).toHaveValue("");
+    fireEvent.change(screen.getByLabelText("Frequency"), { target: { value: "quarterly" } });
+    expect(screen.getByLabelText("Month of quarter")).toHaveValue("");
+  });
+
+  it.each([
+    ["2026-01-04", "Sunday", 4, 1, "First month"],
+    ["2026-12-31", "Thursday", 31, 12, "Third month"],
+  ])("uses the selected calendar date %s even when browser-local date fields differ", (startOn, weekday, day, month, quarterMonth) => {
+    vi.spyOn(Date.prototype, "getDay").mockReturnValue(2);
+    vi.spyOn(Date.prototype, "getDate").mockReturnValue(15);
+    vi.spyOn(Date.prototype, "getMonth").mockReturnValue(5);
+    function Fields() {
+      const [schedule, setSchedule] = useState({ ...rule().schedule, startOn });
+      return <RecurringScheduleFields schedule={schedule} onChange={setSchedule} />;
+    }
+    render(<Fields />);
+    expect(screen.getByLabelText("Day of month")).toHaveValue(day);
+    fireEvent.change(screen.getByLabelText("Frequency"), { target: { value: "weekly" } });
+    expect(screen.getByLabelText("Weekday")).toHaveValue(weekday);
+    fireEvent.change(screen.getByLabelText("Frequency"), { target: { value: "yearly" } });
+    expect(screen.getByLabelText("Month of year")).toHaveValue(month);
+    fireEvent.change(screen.getByLabelText("Frequency"), { target: { value: "quarterly" } });
+    expect(screen.getByLabelText("Day of month")).toHaveValue(day);
+    expect(screen.getByLabelText("Month of quarter")).toHaveValue(quarterMonth);
+  });
+
+  it("clears an optional end date as null and keeps the clear action disabled while busy", () => {
+    const changes = vi.fn();
+    const schedule = { ...rule().schedule, endOn: "2027-12-31" };
+    const view = render(<RecurringScheduleFields schedule={schedule} onChange={changes} disabled />);
+    expect(screen.getByRole("button", { name: "Clear end date" })).toBeDisabled();
+    view.rerender(<RecurringScheduleFields schedule={schedule} onChange={changes} />);
+    fireEvent.click(screen.getByRole("button", { name: "Clear end date" }));
+    expect(changes).toHaveBeenCalledExactlyOnceWith(expect.objectContaining({ startOn: schedule.startOn, endOn: null }));
+    view.rerender(<RecurringScheduleFields schedule={{ ...schedule, endOn: null }} onChange={changes} />);
+    expect(screen.getByLabelText("End date (optional)")).toHaveValue("");
+    expect(screen.getByLabelText("End date (optional)")).not.toBeRequired();
+    expect(screen.getByRole("button", { name: "Clear end date" })).toBeDisabled();
   });
 });
 
@@ -554,7 +614,7 @@ describe("RecurringExpenses", () => {
     fireEvent.click(button("Edit schedule"));
     fireEvent.change(screen.getByLabelText("Purpose"), { target: { value: "Changed" } });
     fireEvent.change(screen.getByLabelText("Frequency"), { target: { value: "weekly" } });
-    fireEvent.change(screen.getByLabelText("Weekday"), { target: { value: "5" } });
+    expect(screen.getByLabelText("Weekday")).toHaveValue("Thursday");
     api.recurringRules.mockResolvedValue({
       items: [rule({ target: project, revision: 3 })],
       nextCursor: null,
@@ -577,7 +637,7 @@ describe("RecurringExpenses", () => {
         unit: null,
         schedule: {
           frequency: "weekly",
-          weekday: 5,
+          weekday: 4,
           timezone: "Europe/Paris",
           startOn: "2026-10-01",
           endOn: null,

@@ -43,6 +43,14 @@ export function requestErrorText(error, fallback) {
     return T("The request is too large. Reduce its size and try again.", "请求内容过大，请减少内容后重试。");
   if (code === "UNTRUSTED_ORIGIN")
     return T("This request could not be verified. Reload the page and try again.", "无法验证此请求，请重新加载页面后重试。");
+  if (code === "RECURRING_SCHEDULE_SEARCH_LIMIT")
+    return T("A next date could not be determined. Review the schedule's start and end dates before saving.", {
+      zh: "无法确定下一次计划日期，请检查起始和结束日期后再保存。",
+      ja: "次回の日付を決定できませんでした。開始日と終了日を確認してから保存してください。",
+      ko: "다음 날짜를 결정할 수 없습니다. 시작일과 종료일을 확인한 후 저장하세요.",
+      fr: "La prochaine date n’a pas pu être déterminée. Vérifiez les dates de début et de fin avant d’enregistrer.",
+      es: "No se pudo determinar la próxima fecha. Revisa las fechas de inicio y fin antes de guardar.",
+    });
   if (["UNAUTHENTICATED"].includes(code) || error?.status === 401)
     return T("Your session has expired. Please sign in again.", "会话已过期，请重新登录。");
   if (code === "INVALID_INPUT" || [400, 422].includes(error?.status))

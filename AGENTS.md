@@ -1,5 +1,21 @@
 # Norulo Web
 
+## 2026-10-13 recurring schedule controls
+
+Browser creation and editing derive weekday, day, month and quarter month from
+the chosen start date, displaying those selectors read-only. Derive the submitted
+selectors too; changing frequency must never revive a stale draft selector.
+Calendar strings must not shift with the browser's local timezone. Existing
+rules and expenses change only through explicit authorized saves.
+TimezonePicker enumerates browser-supported IANA zones, includes UTC and the
+saved value, and keeps Custom last. Preserve existing aliases/unknown-to-browser
+saved names; normalize new custom names before Server validation. End-date Clear
+sets endOn=null and never submits the form. Preserve six languages and keyboard,
+viewport, disabled-state and mobile access.
+Server edits/resumes now exclude posted and retained pending period identities
+before saving the next pointer; keep that Server-selected date in the list.
+
+
 Current public-launch scope defers real payments. Preserve the truthful Free-only
 catalog and disabled paid checkout, Owner AI policy, user-confirmed real expense
 recording and the mobile profile/setup layout corrections. Production logging

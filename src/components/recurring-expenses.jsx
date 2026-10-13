@@ -6,6 +6,7 @@ import { EXPENSE_CAPACITY_COPY, EXPENSE_CAPACITY_ERRORS } from "../locales/expen
 import { FinancialValue } from "./financial-value.jsx";
 import { LedgerSplit } from "./ledger-split.jsx";
 import { recurringFrequencies } from "./recurring-schedule-fields.jsx";
+import { scheduleFromStartDate } from "../lib/recurring-schedule.js";
 import "./recurring-expenses.css";
 
 export { RecurringScheduleFields } from "./recurring-schedule-fields.jsx";
@@ -76,6 +77,7 @@ const validRule = (rule, target) =>
   );
 
 function templateFields(rule, fields, schedule) {
+  schedule = scheduleFromStartDate(schedule, schedule.startOn || fields.occurredOn);
   const frequency = schedule.frequency;
   return {
     target: rule.target,

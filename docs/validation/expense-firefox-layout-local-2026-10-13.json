@@ -1,0 +1,217 @@
+{
+  "verifiedAtUTC": "2026-10-13T08:10:58.398203+00:00",
+  "scope": "Local browser fixtures and uncommitted Web fix; no publication or production acceptance.",
+  "baseCommit": "a491ca75e8adc5f4a706ed98b78570be156512a4",
+  "originalCI": "https://github.com/Norulo/norulo-web/actions/runs/38364556820",
+  "reproduction": {
+    "engine": "Firefox 144.0.2",
+    "viewportWidth": 1440,
+    "amount": "12.00",
+    "amountWidthPx": 31.8,
+    "amountLines": 2,
+    "currencyLeftOverflowPx": 1.25,
+    "failedAssertion": "financial part escapes its row/side bounds",
+    "cause": "Parent expense-list grid had a zero column gap while its nested row and side subgrids used 32px and 24px; Firefox under-sized the money track."
+  },
+  "fix": {
+    "sharedListColumnGapPx": 32,
+    "recordColumnGap": "inherit",
+    "regression": "Short ordinary expense amounts must occupy one rendered line in every checked state.",
+    "files": {
+      "src/screens/ledger.css": "345407e2c3e811b9293e6d06d3009e8f599c6495de74a4283747055a1b4f01c9",
+      "scripts/check-date-layout.mjs": "22048a74b807baf2ca133ec744261014ae0386de1b555123ac7ee9668c1b4f2e"
+    }
+  },
+  "validation": {
+    "npmCheck": "passed",
+    "webTestFiles": 89,
+    "webTests": 1877,
+    "offlineWorkerConfig": "passed",
+    "workerSyntax": "passed",
+    "changedFileFormatting": "passed",
+    "diffWhitespace": "passed",
+    "browserCommand": "node scripts/check-date-layout.mjs",
+    "browserProfiles": 12,
+    "layoutStates": 774,
+    "profiles": [
+      {
+        "engine": "chromium",
+        "version": "143.0.7499.4",
+        "profile": "desktop-1440",
+        "layoutStates": 81,
+        "requestCounts": {
+          "total": 83,
+          "api": 49,
+          "static": 34,
+          "blockedFonts": 0,
+          "violations": 0,
+          "externalDelivered": 0
+        }
+      },
+      {
+        "engine": "chromium",
+        "version": "143.0.7499.4",
+        "profile": "tablet-1280-zh",
+        "layoutStates": 81,
+        "requestCounts": {
+          "total": 86,
+          "api": 51,
+          "static": 35,
+          "blockedFonts": 0,
+          "violations": 0,
+          "externalDelivered": 0
+        }
+      },
+      {
+        "engine": "chromium",
+        "version": "143.0.7499.4",
+        "profile": "phone-390-to-320",
+        "layoutStates": 48,
+        "requestCounts": {
+          "total": 81,
+          "api": 47,
+          "static": 34,
+          "blockedFonts": 0,
+          "violations": 0,
+          "externalDelivered": 0
+        }
+      },
+      {
+        "engine": "chromium",
+        "version": "143.0.7499.4",
+        "profile": "android-size-412-to-360",
+        "layoutStates": 48,
+        "requestCounts": {
+          "total": 81,
+          "api": 47,
+          "static": 34,
+          "blockedFonts": 0,
+          "violations": 0,
+          "externalDelivered": 0
+        }
+      },
+      {
+        "engine": "webkit",
+        "version": "26.0",
+        "profile": "desktop-1440",
+        "layoutStates": 81,
+        "requestCounts": {
+          "total": 81,
+          "api": 49,
+          "static": 32,
+          "blockedFonts": 0,
+          "violations": 0,
+          "externalDelivered": 0
+        }
+      },
+      {
+        "engine": "webkit",
+        "version": "26.0",
+        "profile": "tablet-1280-zh",
+        "layoutStates": 81,
+        "requestCounts": {
+          "total": 82,
+          "api": 49,
+          "static": 33,
+          "blockedFonts": 0,
+          "violations": 0,
+          "externalDelivered": 0
+        }
+      },
+      {
+        "engine": "webkit",
+        "version": "26.0",
+        "profile": "phone-390-to-320",
+        "layoutStates": 48,
+        "requestCounts": {
+          "total": 78,
+          "api": 47,
+          "static": 31,
+          "blockedFonts": 0,
+          "violations": 0,
+          "externalDelivered": 0
+        }
+      },
+      {
+        "engine": "webkit",
+        "version": "26.0",
+        "profile": "android-size-412-to-360",
+        "layoutStates": 48,
+        "requestCounts": {
+          "total": 78,
+          "api": 47,
+          "static": 31,
+          "blockedFonts": 0,
+          "violations": 0,
+          "externalDelivered": 0
+        }
+      },
+      {
+        "engine": "firefox",
+        "version": "144.0.2",
+        "profile": "desktop-1440",
+        "layoutStates": 81,
+        "requestCounts": {
+          "total": 81,
+          "api": 49,
+          "static": 32,
+          "blockedFonts": 0,
+          "violations": 0,
+          "externalDelivered": 0
+        }
+      },
+      {
+        "engine": "firefox",
+        "version": "144.0.2",
+        "profile": "tablet-1280-zh",
+        "layoutStates": 81,
+        "requestCounts": {
+          "total": 82,
+          "api": 49,
+          "static": 33,
+          "blockedFonts": 0,
+          "violations": 0,
+          "externalDelivered": 0
+        }
+      },
+      {
+        "engine": "firefox",
+        "version": "144.0.2",
+        "profile": "phone-390-to-320",
+        "layoutStates": 48,
+        "requestCounts": {
+          "total": 77,
+          "api": 45,
+          "static": 32,
+          "blockedFonts": 0,
+          "violations": 0,
+          "externalDelivered": 0
+        }
+      },
+      {
+        "engine": "firefox",
+        "version": "144.0.2",
+        "profile": "android-size-412-to-360",
+        "layoutStates": 48,
+        "requestCounts": {
+          "total": 79,
+          "api": 47,
+          "static": 32,
+          "blockedFonts": 0,
+          "violations": 0,
+          "externalDelivered": 0
+        }
+      }
+    ],
+    "limitations": [
+      "Browser engines and simulated viewports; physical devices and authenticated production journeys were not checked.",
+      "Firefox touch profiles do not establish coarse-pointer emulation.",
+      "WebKit used its stock executable with workspace-installed Debian libraries and a local launch wrapper."
+    ]
+  },
+  "publication": {
+    "pushed": false,
+    "deployed": false,
+    "remoteCIRerun": false
+  }
+}

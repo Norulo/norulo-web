@@ -818,13 +818,16 @@
    Edit/Remove stay in a single column beside them. */
 .ledger-screen .ledger-list:has(> .ledger-expense-row) {
   grid-template-columns: minmax(0, 1fr) auto auto;
+  /* Define the shared gap here so nested subgrids size the money track with
+     the same gutters as the records, including in Firefox. */
+  column-gap: 32px;
 }
 .ledger-screen .ledger-expense-row {
   grid-column: 1 / -1;
   grid-template-columns: minmax(0, 1fr) auto auto;
   grid-template-columns: subgrid;
   align-items: start;
-  column-gap: 32px;
+  column-gap: inherit;
 }
 .ledger-screen .ledger-expense-row > .ledger-row-side {
   grid-column: 2 / 4;
@@ -1012,7 +1015,6 @@
   margin: 4px 0 0;
   overflow-wrap: anywhere;
 }
-
 
 .ledger-project-removal-description {
   display: grid;

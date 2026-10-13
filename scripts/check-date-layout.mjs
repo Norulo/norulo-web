@@ -503,6 +503,15 @@ async function checkPresentation(page, name) {
       row.number.fontSize > row.currency.fontSize,
       `${name}: currency and amount have no visible type hierarchy ${details}`
     );
+    if (row.ordinary) {
+      // The short 12.00 fixture fits even the narrowest supported list. A
+      // wrapped number exposes under-sized subgrid tracks before text escapes.
+      assert.equal(
+        new Set(row.number.fragments.map((fragment) => Math.round(fragment.top))).size,
+        1,
+        `${name}: short ordinary expense amount wraps ${details}`
+      );
+    }
     for (const part of [row.value, row.currency, row.number, row.side]) {
       assert(
         !["hidden", "clip"].includes(part.overflowX) &&

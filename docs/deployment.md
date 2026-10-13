@@ -1,5 +1,22 @@
 # Norulo production deployment
 
+The repository dropdown release was verified on 2026-10-13. Web source
+`070b9a93627984780f5e8c896854fe3efd5abf44` is deployed as version
+`4559fe15-86b4-4991-b3c3-16cebdca0c4f` with 100% production traffic.
+Find a repository now appears inside the Repository dropdown. Search filters
+loaded authorized dropdown choices while preserving selected repositories and
+the full additional checklist. Keyboard/IME, required validation, six locales,
+phone sizing and WebKit long-name/focus layout handling are retained.
+
+All 1,889 unit tests, lint, production build, offline checks and dry-run passed;
+160 focused tests also passed. Local Chromium/WebKit verified 90 repository
+picker states and 148 Projects regression states. Local Firefox could not start
+in this container; CI retains three-engine checks. Eight anonymous production
+GET checks passed, including three byte-identical current build assets.
+Bindings, logging, domains and disabled preview exposure were verified. Server
+remains at `624d697a-a208-4aee-8000-87bd1f5a8a72`. No production business
+writes or SQL API calls occurred. See the [repository dropdown release record](validation/repository-dropdown-production-2026-10-13.json).
+
 The Firefox expense layout correction was published on 2026-10-13. Web main
 source `108ee46d2eeda1937ef9c829d33794c637fc8cf0` is deployed as version
 `ee523bfd-aef0-4989-9e46-77a3ee2b15ee` with 100% production traffic.

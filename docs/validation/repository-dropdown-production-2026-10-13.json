@@ -1,0 +1,785 @@
+{
+  "verifiedAtUTC": "2026-10-13T08:31:33.231406+00:00",
+  "sourceCommit": "070b9a93627984780f5e8c896854fe3efd5abf44",
+  "worker": "norulo-web",
+  "version": "4559fe15-86b4-4991-b3c3-16cebdca0c4f",
+  "trafficPercent": 100,
+  "serverVersionPreserved": "624d697a-a208-4aee-8000-87bd1f5a8a72",
+  "changes": [
+    "Find a repository is inside the Repository dropdown and focuses when opened; its query filters loaded authorized dropdown choices only.",
+    "Authorized primary and additional selections remain intact. The separate additional checklist remains complete and respects the thirty-repository cap.",
+    "Preserves native required validation, disabled controls, keyboard/IME handling, outside dismissal, six locales and mobile sizing.",
+    "Prevents WebKit long-name overflow and recalculates popup position after native focus, query and parent-form layout changes."
+  ],
+  "validation": {
+    "lint": "passed",
+    "webTests": 1889,
+    "webTestFiles": 89,
+    "webTestDurationSeconds": 89.02,
+    "finalFocusedTests": 160,
+    "build": "passed",
+    "offlineWorkerConfig": "passed",
+    "wranglerDryRun": "passed",
+    "uploadedWorkerPayloadMatches": true,
+    "workerSHA256": "a0f8477d17411ae2db2989a2c7ed8963f4919ad6fe0144d779f0fffe2147aa7a",
+    "independentReview": "passed",
+    "browser": [
+      {
+        "scope": "repository-picker",
+        "engine": "chromium",
+        "version": "143.0.7499.4",
+        "contexts": 9,
+        "states": 45,
+        "profiles": [
+          "desktop-1440-rail260",
+          "desktop-short-rail260",
+          "phone-short",
+          "phone-320-en",
+          "phone-320-zh",
+          "phone-320-ja",
+          "phone-320-ko",
+          "phone-320-fr",
+          "phone-320-es"
+        ],
+        "requests": [
+          {
+            "total": 29,
+            "api": 6,
+            "repositories": 1,
+            "inherited": {
+              "total": 27,
+              "api": 4,
+              "blockedFonts": 0,
+              "writes": 0,
+              "externalDelivered": 0
+            }
+          },
+          {
+            "total": 30,
+            "api": 6,
+            "repositories": 1,
+            "inherited": {
+              "total": 28,
+              "api": 4,
+              "blockedFonts": 0,
+              "writes": 0,
+              "externalDelivered": 0
+            }
+          },
+          {
+            "total": 29,
+            "api": 6,
+            "repositories": 1,
+            "inherited": {
+              "total": 27,
+              "api": 4,
+              "blockedFonts": 0,
+              "writes": 0,
+              "externalDelivered": 0
+            }
+          },
+          {
+            "total": 29,
+            "api": 6,
+            "repositories": 1,
+            "inherited": {
+              "total": 27,
+              "api": 4,
+              "blockedFonts": 0,
+              "writes": 0,
+              "externalDelivered": 0
+            }
+          },
+          {
+            "total": 30,
+            "api": 6,
+            "repositories": 1,
+            "inherited": {
+              "total": 28,
+              "api": 4,
+              "blockedFonts": 0,
+              "writes": 0,
+              "externalDelivered": 0
+            }
+          },
+          {
+            "total": 30,
+            "api": 6,
+            "repositories": 1,
+            "inherited": {
+              "total": 28,
+              "api": 4,
+              "blockedFonts": 0,
+              "writes": 0,
+              "externalDelivered": 0
+            }
+          },
+          {
+            "total": 30,
+            "api": 6,
+            "repositories": 1,
+            "inherited": {
+              "total": 28,
+              "api": 4,
+              "blockedFonts": 0,
+              "writes": 0,
+              "externalDelivered": 0
+            }
+          },
+          {
+            "total": 30,
+            "api": 6,
+            "repositories": 1,
+            "inherited": {
+              "total": 28,
+              "api": 4,
+              "blockedFonts": 0,
+              "writes": 0,
+              "externalDelivered": 0
+            }
+          },
+          {
+            "total": 30,
+            "api": 6,
+            "repositories": 1,
+            "inherited": {
+              "total": 28,
+              "api": 4,
+              "blockedFonts": 0,
+              "writes": 0,
+              "externalDelivered": 0
+            }
+          }
+        ]
+      },
+      {
+        "scope": "repository-picker",
+        "engine": "webkit",
+        "version": "26.0",
+        "contexts": 9,
+        "states": 45,
+        "profiles": [
+          "desktop-1440-rail260",
+          "desktop-short-rail260",
+          "phone-short",
+          "phone-320-en",
+          "phone-320-zh",
+          "phone-320-ja",
+          "phone-320-ko",
+          "phone-320-fr",
+          "phone-320-es"
+        ],
+        "requests": [
+          {
+            "total": 29,
+            "api": 6,
+            "repositories": 1,
+            "inherited": {
+              "total": 27,
+              "api": 4,
+              "blockedFonts": 0,
+              "writes": 0,
+              "externalDelivered": 0
+            }
+          },
+          {
+            "total": 30,
+            "api": 6,
+            "repositories": 1,
+            "inherited": {
+              "total": 28,
+              "api": 4,
+              "blockedFonts": 0,
+              "writes": 0,
+              "externalDelivered": 0
+            }
+          },
+          {
+            "total": 28,
+            "api": 6,
+            "repositories": 1,
+            "inherited": {
+              "total": 26,
+              "api": 4,
+              "blockedFonts": 0,
+              "writes": 0,
+              "externalDelivered": 0
+            }
+          },
+          {
+            "total": 28,
+            "api": 6,
+            "repositories": 1,
+            "inherited": {
+              "total": 26,
+              "api": 4,
+              "blockedFonts": 0,
+              "writes": 0,
+              "externalDelivered": 0
+            }
+          },
+          {
+            "total": 29,
+            "api": 6,
+            "repositories": 1,
+            "inherited": {
+              "total": 27,
+              "api": 4,
+              "blockedFonts": 0,
+              "writes": 0,
+              "externalDelivered": 0
+            }
+          },
+          {
+            "total": 29,
+            "api": 6,
+            "repositories": 1,
+            "inherited": {
+              "total": 27,
+              "api": 4,
+              "blockedFonts": 0,
+              "writes": 0,
+              "externalDelivered": 0
+            }
+          },
+          {
+            "total": 29,
+            "api": 6,
+            "repositories": 1,
+            "inherited": {
+              "total": 27,
+              "api": 4,
+              "blockedFonts": 0,
+              "writes": 0,
+              "externalDelivered": 0
+            }
+          },
+          {
+            "total": 29,
+            "api": 6,
+            "repositories": 1,
+            "inherited": {
+              "total": 27,
+              "api": 4,
+              "blockedFonts": 0,
+              "writes": 0,
+              "externalDelivered": 0
+            }
+          },
+          {
+            "total": 29,
+            "api": 6,
+            "repositories": 1,
+            "inherited": {
+              "total": 27,
+              "api": 4,
+              "blockedFonts": 0,
+              "writes": 0,
+              "externalDelivered": 0
+            }
+          }
+        ]
+      },
+      {
+        "scope": "projects-regression",
+        "engine": "chromium",
+        "version": "143.0.7499.4",
+        "contexts": 9,
+        "states": 74,
+        "profiles": [
+          "desktop-1440",
+          "tablet-1024",
+          "phone-390",
+          "phone-320-en",
+          "phone-320-zh",
+          "phone-320-ja",
+          "phone-320-ko",
+          "phone-320-fr",
+          "phone-320-es"
+        ],
+        "requests": [
+          {
+            "total": 29,
+            "projects": 2,
+            "inherited": {
+              "total": 27,
+              "api": 4,
+              "blockedFonts": 0,
+              "writes": 0,
+              "externalDelivered": 0
+            }
+          },
+          {
+            "total": 29,
+            "projects": 2,
+            "inherited": {
+              "total": 27,
+              "api": 4,
+              "blockedFonts": 0,
+              "writes": 0,
+              "externalDelivered": 0
+            }
+          },
+          {
+            "total": 30,
+            "projects": 2,
+            "inherited": {
+              "total": 28,
+              "api": 4,
+              "blockedFonts": 0,
+              "writes": 0,
+              "externalDelivered": 0
+            }
+          },
+          {
+            "total": 29,
+            "projects": 2,
+            "inherited": {
+              "total": 27,
+              "api": 4,
+              "blockedFonts": 0,
+              "writes": 0,
+              "externalDelivered": 0
+            }
+          },
+          {
+            "total": 30,
+            "projects": 2,
+            "inherited": {
+              "total": 28,
+              "api": 4,
+              "blockedFonts": 0,
+              "writes": 0,
+              "externalDelivered": 0
+            }
+          },
+          {
+            "total": 30,
+            "projects": 2,
+            "inherited": {
+              "total": 28,
+              "api": 4,
+              "blockedFonts": 0,
+              "writes": 0,
+              "externalDelivered": 0
+            }
+          },
+          {
+            "total": 30,
+            "projects": 2,
+            "inherited": {
+              "total": 28,
+              "api": 4,
+              "blockedFonts": 0,
+              "writes": 0,
+              "externalDelivered": 0
+            }
+          },
+          {
+            "total": 30,
+            "projects": 2,
+            "inherited": {
+              "total": 28,
+              "api": 4,
+              "blockedFonts": 0,
+              "writes": 0,
+              "externalDelivered": 0
+            }
+          },
+          {
+            "total": 30,
+            "projects": 2,
+            "inherited": {
+              "total": 28,
+              "api": 4,
+              "blockedFonts": 0,
+              "writes": 0,
+              "externalDelivered": 0
+            }
+          }
+        ]
+      },
+      {
+        "scope": "projects-regression",
+        "engine": "webkit",
+        "version": "26.0",
+        "contexts": 9,
+        "states": 74,
+        "profiles": [
+          "desktop-1440",
+          "tablet-1024",
+          "phone-390",
+          "phone-320-en",
+          "phone-320-zh",
+          "phone-320-ja",
+          "phone-320-ko",
+          "phone-320-fr",
+          "phone-320-es"
+        ],
+        "requests": [
+          {
+            "total": 29,
+            "projects": 2,
+            "inherited": {
+              "total": 27,
+              "api": 4,
+              "blockedFonts": 0,
+              "writes": 0,
+              "externalDelivered": 0
+            }
+          },
+          {
+            "total": 29,
+            "projects": 2,
+            "inherited": {
+              "total": 27,
+              "api": 4,
+              "blockedFonts": 0,
+              "writes": 0,
+              "externalDelivered": 0
+            }
+          },
+          {
+            "total": 29,
+            "projects": 2,
+            "inherited": {
+              "total": 27,
+              "api": 4,
+              "blockedFonts": 0,
+              "writes": 0,
+              "externalDelivered": 0
+            }
+          },
+          {
+            "total": 28,
+            "projects": 2,
+            "inherited": {
+              "total": 26,
+              "api": 4,
+              "blockedFonts": 0,
+              "writes": 0,
+              "externalDelivered": 0
+            }
+          },
+          {
+            "total": 29,
+            "projects": 2,
+            "inherited": {
+              "total": 27,
+              "api": 4,
+              "blockedFonts": 0,
+              "writes": 0,
+              "externalDelivered": 0
+            }
+          },
+          {
+            "total": 29,
+            "projects": 2,
+            "inherited": {
+              "total": 27,
+              "api": 4,
+              "blockedFonts": 0,
+              "writes": 0,
+              "externalDelivered": 0
+            }
+          },
+          {
+            "total": 29,
+            "projects": 2,
+            "inherited": {
+              "total": 27,
+              "api": 4,
+              "blockedFonts": 0,
+              "writes": 0,
+              "externalDelivered": 0
+            }
+          },
+          {
+            "total": 29,
+            "projects": 2,
+            "inherited": {
+              "total": 27,
+              "api": 4,
+              "blockedFonts": 0,
+              "writes": 0,
+              "externalDelivered": 0
+            }
+          },
+          {
+            "total": 29,
+            "projects": 2,
+            "inherited": {
+              "total": 27,
+              "api": 4,
+              "blockedFonts": 0,
+              "writes": 0,
+              "externalDelivered": 0
+            }
+          }
+        ]
+      }
+    ],
+    "firefoxLocalLimitation": "Container uid_map EROFS / SWGL framebuffer initialization prevented startup; no successful local Firefox claim. CI retains all three engines.",
+    "physicalDeviceAcceptance": false,
+    "authenticatedProductionAcceptance": false,
+    "upstreamIntegration": "Preserved main 249df1a and its independently released expense-only Firefox CSS/script correction before the final lint/build/dry-run. Repository component and unit-test source were unchanged by rebase."
+  },
+  "publication": {
+    "branch": "main",
+    "codePushedBeforeDeploy": true,
+    "productionOnly": true,
+    "publicChecks": {
+      "verifiedAtUTC": "2026-10-13T08:31:33.231406+00:00",
+      "passed": true,
+      "publicGETs": 8,
+      "matchedAssets": 3,
+      "pickerMarker": "repository-picker",
+      "automaticRetries": 0,
+      "businessWrites": 0,
+      "SQLAPICalls": 0,
+      "authenticatedProductionAcceptance": false,
+      "checks": [
+        {
+          "url": "https://norulo.com/",
+          "status": 200,
+          "expectedStatus": 200,
+          "setCookie": false,
+          "passed": true,
+          "currentBootstrapReferenced": true,
+          "securityHeadersPresent": true
+        },
+        {
+          "url": "https://norulo.com/assets/index-CstpdBgk.js",
+          "status": 200,
+          "expectedStatus": 200,
+          "setCookie": false,
+          "passed": true,
+          "path": "assets/index-CstpdBgk.js",
+          "byteIdentical": true,
+          "sha256": "6b609f0748f0cededc7e7ca1b2565ac9f2c4898d55e78f66c48c73e8ce980919",
+          "localSha256": "6b609f0748f0cededc7e7ca1b2565ac9f2c4898d55e78f66c48c73e8ce980919"
+        },
+        {
+          "url": "https://norulo.com/assets/ledger-D9A15lXY.js",
+          "status": 200,
+          "expectedStatus": 200,
+          "setCookie": false,
+          "passed": true,
+          "path": "assets/ledger-D9A15lXY.js",
+          "byteIdentical": true,
+          "sha256": "cf63fa8f3163f202810f3d43cc1f7709e7679275a3f220ca0cf30e7d86c6540c",
+          "localSha256": "cf63fa8f3163f202810f3d43cc1f7709e7679275a3f220ca0cf30e7d86c6540c"
+        },
+        {
+          "url": "https://norulo.com/assets/ledger-D2d8Onbm.css",
+          "status": 200,
+          "expectedStatus": 200,
+          "setCookie": false,
+          "passed": true,
+          "path": "assets/ledger-D2d8Onbm.css",
+          "byteIdentical": true,
+          "sha256": "cc82c3d4476ab7288efe0fc7229722d3ebf18491badcdaba7224d7c0382cfeb2",
+          "localSha256": "cc82c3d4476ab7288efe0fc7229722d3ebf18491badcdaba7224d7c0382cfeb2"
+        },
+        {
+          "url": "https://api.norulo.com/health",
+          "status": 200,
+          "expectedStatus": 200,
+          "setCookie": false,
+          "passed": true,
+          "healthJSON": {
+            "ok": true,
+            "service": "norulo-server",
+            "database": {
+              "type": "d1",
+              "configured": true
+            }
+          }
+        },
+        {
+          "url": "https://norulo.com/api/health",
+          "status": 200,
+          "expectedStatus": 200,
+          "setCookie": false,
+          "passed": true,
+          "healthJSON": {
+            "ok": true,
+            "service": "norulo-server",
+            "database": {
+              "type": "d1",
+              "configured": true
+            }
+          }
+        },
+        {
+          "url": "https://norulo.com/api/api/v1/me",
+          "status": 401,
+          "expectedStatus": 401,
+          "setCookie": false,
+          "passed": true
+        },
+        {
+          "url": "https://www.norulo.com/shared?release_check=repository_picker",
+          "status": 308,
+          "expectedStatus": 308,
+          "setCookie": false,
+          "passed": true,
+          "location": "https://norulo.com/shared?release_check=repository_picker"
+        }
+      ]
+    },
+    "readback": {
+      "accountId": "84e421f26c708c0cf437e287eed11fa1",
+      "worker": "norulo-web",
+      "calls": [
+        {
+          "key": "deployments",
+          "status": 200,
+          "success": true,
+          "result": {
+            "deployments": [
+              {
+                "id": "8276fc15-dacd-45ba-baab-19d32ba15e3c",
+                "source": "wrangler",
+                "strategy": "percentage",
+                "annotations": {
+                  "workers/message": "Integrate repository search into dropdown; Web main source 070b9a93627984780f5e8c896854fe3efd5abf44",
+                  "workers/triggered_by": "deployment"
+                },
+                "versions": [
+                  {
+                    "version_id": "4559fe15-86b4-4991-b3c3-16cebdca0c4f",
+                    "percentage": 100
+                  }
+                ],
+                "created_on": "2026-10-13T08:30:22.162321Z"
+              }
+            ]
+          },
+          "errors": []
+        },
+        {
+          "key": "settings",
+          "status": 200,
+          "success": true,
+          "result": {
+            "placement": {},
+            "compatibility_date": "2026-05-25",
+            "compatibility_flags": [],
+            "usage_model": "standard",
+            "tags": [],
+            "tail_consumers": [],
+            "logpush": false,
+            "observability": {
+              "enabled": true,
+              "head_sampling_rate": 1,
+              "redact_query_string": true,
+              "logs": {
+                "enabled": true,
+                "head_sampling_rate": 0.01,
+                "persist": true,
+                "invocation_logs": false
+              },
+              "traces": {
+                "enabled": false,
+                "persist": true,
+                "head_sampling_rate": 1
+              },
+              "issues": {
+                "enabled": true
+              }
+            },
+            "annotations": {
+              "workers/message": "Integrate repository search into dropdown; Web main source 070b9a93627984780f5e8c896854fe3efd5abf44",
+              "workers/tag": "070b9a9",
+              "workers/triggered_by": "version_upload"
+            },
+            "bindings": [
+              {
+                "name": "ASSETS",
+                "type": "assets"
+              },
+              {
+                "name": "NORULO_API_ORIGIN",
+                "text": "https://api.norulo.com",
+                "type": "plain_text"
+              },
+              {
+                "name": "NORULO_MODE",
+                "text": "production",
+                "type": "plain_text"
+              },
+              {
+                "environment": "production",
+                "name": "NORULO_SERVER",
+                "service": "norulo-server-production",
+                "type": "service"
+              }
+            ]
+          },
+          "errors": []
+        },
+        {
+          "key": "exposure",
+          "status": 200,
+          "success": true,
+          "result": {
+            "enabled": false,
+            "previews_enabled": false
+          },
+          "errors": []
+        },
+        {
+          "key": "domains",
+          "status": 200,
+          "success": true,
+          "result": [
+            {
+              "hostname": "norulo.com",
+              "service": "norulo-web",
+              "environment": "production",
+              "enabled": true,
+              "previews_enabled": false
+            },
+            {
+              "hostname": "www.norulo.com",
+              "service": "norulo-web",
+              "environment": "production",
+              "enabled": true,
+              "previews_enabled": false
+            }
+          ],
+          "errors": null
+        },
+        {
+          "key": "serverDeployments",
+          "status": 200,
+          "success": true,
+          "result": {
+            "deployments": [
+              {
+                "id": "a7f9adf3-1b46-4859-8efd-44ae9f8d5b9e",
+                "source": "wrangler",
+                "strategy": "percentage",
+                "annotations": {
+                  "workers/triggered_by": "deployment"
+                },
+                "versions": [
+                  {
+                    "version_id": "624d697a-a208-4aee-8000-87bd1f5a8a72",
+                    "percentage": 100
+                  }
+                ],
+                "created_on": "2026-10-13T07:36:48.569701Z"
+              }
+            ]
+          },
+          "errors": []
+        }
+      ]
+    },
+    "bindingsLoggingDomainsAndPreviewExposureVerified": true,
+    "productionBusinessWrites": 0,
+    "SQLAPICalls": 0
+  }
+}

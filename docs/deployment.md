@@ -1,5 +1,24 @@
 # Norulo production deployment
 
+The Free 300-record allowance release was verified on 2026-10-14. Web main
+`98361a1` is deployed as `89e91178-074d-4e76-be3e-e9b07e30fb38`; Server main
+`90801f8` is deployed as `645a2153-e946-4fe9-a733-eaa015c5e9f4`, both at 100%
+traffic. Docs, API/agent guidance, example policy and all runtime configurations
+now describe 300 Free records; the anonymous production catalog returns 300.
+Current Server-provided allowances remain authoritative. No migration or
+existing expense rewrite was needed.
+
+All 3,280 Server tests plus 107 subtests, 1,905 Web tests, 149 final Web focused
+tests, lint/build, contract/offline checks and dry-run passed. Chromium passed
+72 billing layout states. Twelve bounded local native requests passed with
+79 native statements, 81 rows read and 36 rows written, excluding local CLI
+migration setup; no remote fixture/provider request was used. All 731 Server
+upload files match the reviewed dry-run. Fourteen anonymous production GETs
+passed, including six matching assets and the 300-record catalog. Bindings,
+Secrets, activation and daily cron were retained; the latest main's declared
+REST frequency bindings were also included. No remote business write or SQL
+API call was made. See the [Free 300 release record](validation/free-300-production-2026-10-14.json).
+
 The Coding Agent expense workflow was verified on 2026-10-14. Web source
 `63661ab` is deployed as `ddb03f56-c864-4a9f-b31f-32a43ba3856f` at 100% traffic.
 Docs and API open with the five-step setup journey, linked from the homepage

@@ -906,80 +906,6 @@ function MembersContent({
                               </p>
                             )}
                           </MemberIdentity>
-                          <div
-                            className="member-role-control"
-                            data-unlocked={editable && editId === member.userId}
-                            aria-busy={busy && editId === member.userId}
-                          >
-                            {editable ? (
-                              <>
-                                <select
-                                  id={`role-${member.userId}`}
-                                  ref={editId === member.userId ? roleInput : undefined}
-                                  aria-label={T("Role for {member}", "{member} 的角色").replace(
-                                    "{member}",
-                                    label
-                                  )}
-                                  value={roles[member.userId] || member.role}
-                                  disabled={disabled || editId !== member.userId}
-                                  onChange={(event) => saveRole(member, event.target.value)}
-                                  onKeyDown={(event) => {
-                                    if (event.key === "Escape" && !busy) {
-                                      event.preventDefault();
-                                      closeRole(member.userId);
-                                    }
-                                  }}
-                                >
-                                  {grantableRoles.map((role) => (
-                                    <option key={role} value={role}>
-                                      {roleName(role)}
-                                    </option>
-                                  ))}
-                                </select>
-                                <button
-                                  className="btn ghost member-role-lock"
-                                  type="button"
-                                  ref={(element) => {
-                                    if (element) editOpeners.current.set(member.userId, element);
-                                    else editOpeners.current.delete(member.userId);
-                                  }}
-                                  aria-label={(editId !== member.userId
-                                    ? T("Edit role for {member}", "编辑 {member} 的角色")
-                                    : roles[member.userId] !== member.role
-                                      ? T("Save role for {member}", "保存 {member} 的角色")
-                                      : T(
-                                          "Cancel role editing for {member}",
-                                          "取消编辑 {member} 的角色"
-                                        )
-                                  ).replace("{member}", label)}
-                                  aria-pressed={editId === member.userId}
-                                  aria-controls={`role-${member.userId}`}
-                                  disabled={disabled}
-                                  onClick={() => {
-                                    if (disabled || !current(lifecycle.current)) return;
-                                    if (editId === member.userId) {
-                                      const role = roles[member.userId] || member.role;
-                                      if (role !== member.role) saveRole(member, role);
-                                      else closeRole(member.userId);
-                                      return;
-                                    }
-                                    focusAction.current = null;
-                                    setRemoveId("");
-                                    setRoles({ [member.userId]: member.role });
-                                    setEditId(member.userId);
-                                  }}
-                                >
-                                  {editId === member.userId ? (
-                                    <I.Unlock size={16} aria-hidden="true" />
-                                  ) : (
-                                    <I.Lock size={16} aria-hidden="true" />
-                                  )}
-                                </button>
-                              </>
-                            ) : (
-                              <p className="member-role">{roleName(member.role)}</p>
-                            )}
-                          </div>
                           {editable && (
                             <div
                               className="panel-actions member-actions member-remove-actions"
@@ -1053,6 +979,80 @@ function MembersContent({
                               )}
                             </div>
                           )}
+                          <div
+                            className="member-role-control"
+                            data-unlocked={editable && editId === member.userId}
+                            aria-busy={busy && editId === member.userId}
+                          >
+                            {editable ? (
+                              <>
+                                <button
+                                  className="btn ghost member-role-lock"
+                                  type="button"
+                                  ref={(element) => {
+                                    if (element) editOpeners.current.set(member.userId, element);
+                                    else editOpeners.current.delete(member.userId);
+                                  }}
+                                  aria-label={(editId !== member.userId
+                                    ? T("Edit role for {member}", "编辑 {member} 的角色")
+                                    : roles[member.userId] !== member.role
+                                      ? T("Save role for {member}", "保存 {member} 的角色")
+                                      : T(
+                                          "Cancel role editing for {member}",
+                                          "取消编辑 {member} 的角色"
+                                        )
+                                  ).replace("{member}", label)}
+                                  aria-pressed={editId === member.userId}
+                                  aria-controls={`role-${member.userId}`}
+                                  disabled={disabled}
+                                  onClick={() => {
+                                    if (disabled || !current(lifecycle.current)) return;
+                                    if (editId === member.userId) {
+                                      const role = roles[member.userId] || member.role;
+                                      if (role !== member.role) saveRole(member, role);
+                                      else closeRole(member.userId);
+                                      return;
+                                    }
+                                    focusAction.current = null;
+                                    setRemoveId("");
+                                    setRoles({ [member.userId]: member.role });
+                                    setEditId(member.userId);
+                                  }}
+                                >
+                                  {editId === member.userId ? (
+                                    <I.Unlock size={16} aria-hidden="true" />
+                                  ) : (
+                                    <I.Lock size={16} aria-hidden="true" />
+                                  )}
+                                </button>
+                                <select
+                                  id={`role-${member.userId}`}
+                                  ref={editId === member.userId ? roleInput : undefined}
+                                  aria-label={T("Role for {member}", "{member} 的角色").replace(
+                                    "{member}",
+                                    label
+                                  )}
+                                  value={roles[member.userId] || member.role}
+                                  disabled={disabled || editId !== member.userId}
+                                  onChange={(event) => saveRole(member, event.target.value)}
+                                  onKeyDown={(event) => {
+                                    if (event.key === "Escape" && !busy) {
+                                      event.preventDefault();
+                                      closeRole(member.userId);
+                                    }
+                                  }}
+                                >
+                                  {grantableRoles.map((role) => (
+                                    <option key={role} value={role}>
+                                      {roleName(role)}
+                                    </option>
+                                  ))}
+                                </select>
+                              </>
+                            ) : (
+                              <p className="member-role">{roleName(member.role)}</p>
+                            )}
+                          </div>
                         </article>
                       );
                     })}

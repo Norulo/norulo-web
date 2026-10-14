@@ -624,6 +624,25 @@ describe("Members screen", () => {
     });
   });
 
+  it("places management buttons before the role badge, which ends each row on one line", async () => {
+    show();
+    const remove = await screen.findByRole("button", { name: "Remove bob" });
+    const row = remove.closest("article");
+    const role = within(row).getByRole("combobox", { name: "Role for bob" });
+    const lock = within(row).getByRole("button", { name: "Edit role for bob" });
+    const control = role.closest(".member-role-control");
+    expect(row.lastElementChild).toBe(control);
+    expect(remove.compareDocumentPosition(control) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(lock.compareDocumentPosition(role) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+
+    const ownerRow = screen.getByText("Alice").closest("article");
+    expect(ownerRow.lastElementChild).toHaveClass("member-role-control");
+
+    const styles = (await import("node:fs")).readFileSync("src/screens/members.css", "utf8");
+    expect(styles).toMatch(/\.member-row > \.member-role-control \{\s*grid-column: -2 \/ -1;\s*justify-self: end;/);
+    expect(styles).toMatch(/\.members-screen \.member-row \.member-role \{[^}]*white-space: nowrap;/);
+  });
+
   it("replaces Remove with named confirmation icons in the existing row action slot", async () => {
     show();
     const remove = await screen.findByRole("button", { name: "Remove bob" });

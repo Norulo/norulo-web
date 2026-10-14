@@ -10,7 +10,9 @@ describe("REST integration journey", () => {
     render(<ApiIntegrationGuide base="https://preview-api.norulo.com" ids={["quickstart"]} />);
     expect(screen.getByRole("heading", { name: "Quickstart: save your first expense" })).toHaveAttribute("id", "quickstart");
     const start = integrationSections("https://preview-api.norulo.com")[0].blocks.find(block => block.title === "firstExpense").code;
-    expect(start).toContain("export NORULO_API_KEY=");
+    expect(start).toContain("read -r -s");
+    expect(start).toContain("export NORULO_API_KEY");
+    expect(start).not.toContain("PASTE_YOUR_ONE_TIME_KEY");
     expect(start).toContain("api /api/v1/me");
     expect(start).toContain("api /api/v1/categories");
     expect(start).toContain("categoryId:$category");

@@ -25,5 +25,8 @@ describe("landing positioning", () => {
     expect(screen.getByText("Review category reports")).toBeInTheDocument();
     expect(screen.getByText("Compare currencies separately")).toBeInTheDocument();
     expect(screen.getByText("Control API access")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Let your Coding Agent organize expenses." })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Follow the Agent setup guide" })).toHaveAttribute("href", "/developers/docs#agent-setup");
+    expect(screen.getByRole("link", { name: "Open API · Copy for Agent" })).toHaveAttribute("href", "/developers/api#overview");
   });
 });

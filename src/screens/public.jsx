@@ -11,6 +11,7 @@ import { connectGitHubRepositories, signOut, startGitHubLogin } from "../lib/aut
 import { requestErrorText } from "../lib/request-error.js";
 import { screenLinkProps } from "../lib/navigation.js";
 import { PublicFooter, PublicHeader } from "./public-layout.jsx";
+import { AGENT_GUIDE } from "../locales/agent-guide.js";
 
 export function GitHubOAuthFailureScreen({ code }) {
   useLang();
@@ -210,6 +211,14 @@ export function LandingScreen({ go, auth }) {
                 <I.ArrowL /> {T("Sign out", "退出登录")}
               </button>
             )}
+            <a className="btn lg" href="/developers/docs#agent-setup">
+              <I.Code /> {T(...AGENT_GUIDE.startLink)}
+            </a>
+          </div>
+          <div className="lp-agent">
+            <h2>{T(...AGENT_GUIDE.landingTitle)}</h2>
+            <p>{T(...AGENT_GUIDE.landingText)}</p>
+            <a className="auth-link" href="/developers/api#overview">{T(...AGENT_GUIDE.steps[0].label)}</a>
           </div>
           <div className="lp-meta">
             <span>

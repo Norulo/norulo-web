@@ -1,8 +1,11 @@
 import "./docs.css";
+import { useEffect } from "react";
 import { I } from "../icons.jsx";
 import { T, useLang } from "../i18n.jsx";
 import { screenLinkProps } from "../lib/navigation.js";
 import { DOCS_GUIDE } from "../locales/docs-guide.js";
+import { AGENT_GUIDE } from "../locales/agent-guide.js";
+import { AgentSetupGuide } from "./agent-setup.jsx";
 import { PublicFooter, PublicHeader } from "./public-layout.jsx";
 
 const SECTIONS = [
@@ -91,6 +94,12 @@ const SECTIONS = [
 
 export function DocsScreen({ go, auth }) {
   useLang();
+  useEffect(() => {
+    const anchor = window.location.hash.slice(1);
+    if (!anchor) return;
+    const frame = requestAnimationFrame(() => document.getElementById(anchor)?.scrollIntoView());
+    return () => cancelAnimationFrame(frame);
+  }, []);
   return (
     <div className="landing fade-in">
       <PublicHeader go={go} current="docs" auth={auth} />
@@ -98,6 +107,7 @@ export function DocsScreen({ go, auth }) {
         <aside className="docs-side">
           <div className="docs-side-g">
             <div className="docs-side-h">{T("Docs", "文档")}</div>
+            <a className="docs-side-i" href="#agent-setup">{T(...AGENT_GUIDE.title)}</a>
             {SECTIONS.map((section) => (
               <a key={section.id} className="docs-side-i" href={`#${section.id}`}>
                 {T(...section.title)}
@@ -120,6 +130,7 @@ export function DocsScreen({ go, auth }) {
               "记录项目及公共支出，查看逐币汇总。"
             )}
           </p>
+          <AgentSetupGuide />
           <div className="docs-callout">
             <I.Shield size={16} />
             <div>

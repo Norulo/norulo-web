@@ -4,6 +4,18 @@ import { DocsScreen } from "./docs.jsx";
 import { setLang } from "../i18n.jsx";
 
 describe("product Docs", () => {
+  it("puts the Agent journey first with API, credential setup and verification links", () => {
+    render(<DocsScreen go={vi.fn()} auth={{ authenticated: false }} />);
+    const headings = screen.getAllByRole("heading", { level: 2 });
+    expect(headings[0]).toHaveAttribute("id", "agent-setup");
+    const section = headings[0].closest("section");
+    expect(section.querySelector("ol").children).toHaveLength(5);
+    expect(screen.getByRole("link", { name: "Open API · Copy for Agent" })).toHaveAttribute("href", "/developers/api#overview");
+    expect(screen.getByRole("link", { name: "Create API key" })).toHaveAttribute("href", "/api-keys");
+    expect(screen.getByRole("link", { name: "Review expense totals" })).toHaveAttribute("href", "/overview");
+    expect(section).toHaveTextContent("NORULO_API_KEY");
+    expect(section).toHaveTextContent("no receipt-upload endpoint");
+  });
   afterEach(() => setLang("en"));
   it("explains project and shared expense workflows", () => {
     render(<DocsScreen go={vi.fn()} auth={{ authenticated: false }} />);

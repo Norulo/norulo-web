@@ -7,6 +7,20 @@ function definitions(markdown) {
 }
 
 describe("API documentation for agents", () => {
+  it("explains empty-ledger setup using real supported resources before expense writes", () => {
+    const markdown = agentMarkdown("https://api.norulo.com");
+    const setup = markdown.split("## From an empty ledger to useful expense records")[1].split("## Authentication")[0];
+    for (const path of ["/api/v1/me", "/api/v1/categories", "/api/v1/projects", "/api/v1/expenses", "/api/v1/reports/summary", "/api/v1/expense-recurring-rules"])
+      expect(contract.paths[path]).toBeDefined();
+    expect(setup.indexOf("POST /api/v1/categories")).toBeLessThan(setup.indexOf("POST /api/v1/expenses,"));
+    expect(markdown).toContain("Categories belong to the ledger");
+    expect(markdown).toContain("the shared pool is a cost destination inside that ledger");
+    expect(markdown).toContain("Read-only defaults cannot add expenses");
+    expect(markdown).toContain("has no image/PDF receipt-upload endpoint");
+    expect(markdown).toContain("ask for secure configuration, not the plaintext token");
+    expect(setup).toContain("skipped duplicates, unresolved inputs and failed/uncertain writes");
+    expect(setup).toContain("do not also import that same initial cost");
+  });
   it("covers every Bearer endpoint with its current scope, write headers and success shape", () => {
     const markdown = agentMarkdown("https://api.norulo.com");
     for (const [path, item] of Object.entries(contract.paths)) {

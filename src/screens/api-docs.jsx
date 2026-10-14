@@ -5,6 +5,8 @@ import { ApiReference, referenceMarkdown } from "./api-reference.jsx";
 import { agentMarkdown } from "./api-agent.js";
 import { ApiDocsCopyButton } from "./api-docs-copy-button.jsx";
 import { API_GUIDE_COPY } from "../locales/api-guide.js";
+import { AGENT_GUIDE } from "../locales/agent-guide.js";
+import { AgentSetupGuide, agentSetupMarkdown } from "./agent-setup.jsx";
 import { env } from "../config/env.js";
 import { I } from "../icons.jsx";
 import { T, useLang } from "../i18n.jsx";
@@ -90,6 +92,7 @@ function markdown(base, example, createExample, projectExample, reviewExample) {
     "",
     base,
     "",
+    agentSetupMarkdown(),
     integrationMarkdown(base),
     "",
     referenceMarkdown(),
@@ -182,6 +185,7 @@ export function ApiDocsScreen({ go, auth }) {
   ].join(" \\\n");
   const nav = [
     ["overview", "Overview"],
+    ["agent-setup", AGENT_GUIDE.title[0]],
     ["quickstart", "Quickstart: save your first expense"],
     ["environments", "Environments and request URLs"],
     ["authentication", "Authentication"],
@@ -241,7 +245,7 @@ export function ApiDocsScreen({ go, auth }) {
               <a key={id} className="docs-side-i" href={`#${id}`}>
                 {T(
                   label,
-                  label === "Complete API reference"
+                  id === "agent-setup" ? AGENT_GUIDE.title[1] : label === "Complete API reference"
                     ? {
                         zh: "完整 API 参考",
                         ja: "API リファレンス全体",
@@ -302,6 +306,7 @@ export function ApiDocsScreen({ go, auth }) {
               "记录项目和公共池支出，按币种读取汇总。平台账单是独立的账户服务。"
             )}
           </p>
+          <AgentSetupGuide />
           <ApiIntegrationGuide base={base} ids={["quickstart", "environments"]} />
           <h2 id="authentication" className="docs-h2">
             {T("Authentication", "认证")}

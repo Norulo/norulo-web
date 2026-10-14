@@ -103,6 +103,13 @@ Bearer-accessible operation and deduplicated request/response schemas from the
 same generated contract. Both exports retain selectable Markdown when clipboard
 access is unavailable; controls and recovery copy support all six UI languages.
 
+Docs opens with the five-step Coding Agent journey, also linked in the homepage
+hero and shown at the top of API docs: copy the guide, create a scoped API key,
+configure secure runtime variables, provide costs or supported receipt images/PDFs,
+then verify saved records. Agent copy explains ledger/project/shared-pool/category
+relationships and how to reuse or create resources before recording expenses.
+Receipt extraction happens in the external agent; REST accepts structured JSON.
+
 Default limits are Free **3 projects / 100 expense records**, Pro **20 / 20,000**,
 and Max **100 / 100,000**. Billing renders the Server's configured limits and
 personal-ledger Used / Total allowance as exact figures with accessible native

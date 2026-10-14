@@ -215,6 +215,38 @@
   margin: 0 0 var(--space-4);
   max-width: 72ch;
 }
+.docs-agent-setup {
+  padding: var(--space-5);
+  margin-bottom: var(--space-8);
+  border: 1px solid color-mix(in oklch, var(--accent) 30%, var(--border));
+  background: color-mix(in oklch, var(--accent) 5%, var(--bg-elev));
+  overflow-wrap: anywhere;
+}
+.docs-agent-setup > .docs-h2 {
+  margin-top: 0;
+}
+.docs-agent-setup h3 {
+  margin: var(--space-4) 0 var(--space-2);
+  font-size: var(--fs-xl);
+  line-height: 1.5;
+}
+.docs-agent-steps {
+  padding-inline-start: var(--space-5);
+}
+.docs-agent-steps li {
+  margin-bottom: var(--space-5);
+  padding-inline-start: var(--space-2);
+}
+.docs-agent-steps li::marker {
+  color: var(--accent);
+  font-weight: 600;
+}
+.docs-agent-setup .docs-agent-prompt {
+  padding: var(--space-4);
+  border: 1px solid var(--border);
+  background: var(--bg-elev);
+  user-select: text;
+}
 .docs-main a {
   color: var(--accent);
   text-decoration: none;

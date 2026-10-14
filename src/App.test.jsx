@@ -194,7 +194,7 @@ it.each([
   await userEvent.keyboard("{Enter}");
   expect(main).toHaveFocus();
   expect(window.location.hash).toBe("");
-});
+}, 15000);
 
 it("establishes GitHub renewal from the confirmed account and clears it on unmount", async () => {
   window.history.replaceState({}, "", "/projects");

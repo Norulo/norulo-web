@@ -34,6 +34,25 @@ refreshes. Full details are in
 
 # Norulo production deployment
 
+The ledger-switch navigation fix was verified on 2026-10-14. Web main source
+`7ba841c35133c834e20ab9f435d37d8e6f88d7e7` is deployed as
+`51702576-5649-4495-b48d-6bdb6e7881b2` with 100% production traffic.
+Selecting another ledger now replaces the current route with `/projects`,
+clearing the old project ID, query and fragment. Membership loss also leaves an
+old project detail route before falling back. Repeated selection keeps the
+current page and draft; notification links retain their explicit destinations.
+
+All 1,936 tests in 91 files, lint, production build, offline Worker checks and
+dry-run passed. Final local Chromium verified 28 switch states across English
+and Chinese desktop/phone fixtures. Another 74 project layout states across
+nine profiles and six languages passed before the latest upstream allowance copy
+update; the final switch checks used the final built entry. Fifty-one production
+checks passed, including 18 anonymous GETs, byte-identical assets, configuration,
+health, 401 protection and canonical redirects. Server remains at
+`f6e778ff-9f9e-4d98-99c9-27a7f210df73`. No Server deployment, migration or
+production business write was needed. See the
+[actual release record](validation/ledger-switch-production-2026-10-14.json).
+
 The paid allowance release was verified on 2026-10-14. Server main source
 `704c2a14825446b820471e37a40b0638edd33043` is deployed as
 `e04c7335-dd0d-4431-ab26-ffe5815ac955`; Web main source

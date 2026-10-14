@@ -1,0 +1,1701 @@
+{
+  "task": "Safe navigation when selecting another ledger",
+  "verified_at_utc": "2026-10-14T12:55:32.894467+00:00",
+  "scope": {
+    "changed_repository": "Norulo/norulo-web",
+    "server_changed": false,
+    "server_redeployed": false,
+    "production_hosts": [
+      "norulo.com",
+      "www.norulo.com"
+    ],
+    "preview_deployed": false
+  },
+  "source_commit": "7ba841c35133c834e20ab9f435d37d8e6f88d7e7",
+  "source_base_commit": "fdc1b012d3419f628e8d475bbb24025b203d9202",
+  "web_version": "51702576-5649-4495-b48d-6bdb6e7881b2",
+  "web_traffic_percentage": 100,
+  "retained_server_version": [
+    {
+      "version_id": "f6e778ff-9f9e-4d98-99c9-27a7f210df73",
+      "percentage": 100
+    }
+  ],
+  "behavior": [
+    "Selecting a different accessible ledger returns to /projects and replaces the current history entry.",
+    "Old project IDs, query parameters and fragments are cleared before the selected ledger renders.",
+    "A lost selected membership also leaves an old project detail route before falling back to another ledger.",
+    "Selecting the same ledger preserves the current page and draft; notification targets remain explicit.",
+    "Old reads are aborted and late responses do not restore prior ledger data or drafts."
+  ],
+  "local_validation": {
+    "lint_passed": true,
+    "test_files_passed": 91,
+    "tests_passed": 1936,
+    "full_test_duration_seconds": 158.05,
+    "test_command": "npm run test -- --maxWorkers=1 --testTimeout=15000",
+    "focused_app_tests_passed": 75,
+    "production_build_passed": true,
+    "offline_worker_checks_passed": true,
+    "wrangler_version": "4.149.0",
+    "dry_run_passed": true,
+    "independent_source_and_test_review_passed": true,
+    "final_ledger_switch_browser": {
+      "completedAt": "2026-10-14T12:53:20.675Z",
+      "sourceCommit": "fdc1b012d3419f628e8d475bbb24025b203d9202",
+      "entryAsset": "/assets/index-CKie1VC_.js",
+      "scope": "Final dist local Chromium browser verification only; bounded loopback GET fixtures, no remote business APIs, business writes, polling, physical devices or other engine acceptance.",
+      "ledgerSwitch": {
+        "contexts": 4,
+        "states": 28,
+        "reports": [
+          {
+            "profile": "desktop-en",
+            "chromium": "143.0.7499.4",
+            "counts": {
+              "total": 66,
+              "api": 30,
+              "externalDelivered": 0,
+              "writes": 0,
+              "inherited": {
+                "total": 37,
+                "api": 1,
+                "blockedFonts": 0,
+                "writes": 0,
+                "externalDelivered": 0
+              }
+            },
+            "pointer": {
+              "coarse": false,
+              "touchPoints": 0
+            },
+            "states": [
+              "initial-personal-list",
+              "shared-list",
+              "same-ledger-noop",
+              "shared-detail-to-personal-list-query-hash-cleared",
+              "back-returns-list-current-personal-ledger",
+              "personal-detail-to-shared-list-query-hash-cleared",
+              "back-returns-list-current-shared-ledger"
+            ]
+          },
+          {
+            "profile": "desktop-zh",
+            "chromium": "143.0.7499.4",
+            "counts": {
+              "total": 68,
+              "api": 30,
+              "externalDelivered": 0,
+              "writes": 0,
+              "inherited": {
+                "total": 39,
+                "api": 1,
+                "blockedFonts": 0,
+                "writes": 0,
+                "externalDelivered": 0
+              }
+            },
+            "pointer": {
+              "coarse": false,
+              "touchPoints": 0
+            },
+            "states": [
+              "initial-personal-list",
+              "shared-list",
+              "same-ledger-noop",
+              "shared-detail-to-personal-list-query-hash-cleared",
+              "back-returns-list-current-personal-ledger",
+              "personal-detail-to-shared-list-query-hash-cleared",
+              "back-returns-list-current-shared-ledger"
+            ]
+          },
+          {
+            "profile": "phone-en",
+            "chromium": "143.0.7499.4",
+            "counts": {
+              "total": 66,
+              "api": 30,
+              "externalDelivered": 0,
+              "writes": 0,
+              "inherited": {
+                "total": 37,
+                "api": 1,
+                "blockedFonts": 0,
+                "writes": 0,
+                "externalDelivered": 0
+              }
+            },
+            "pointer": {
+              "coarse": true,
+              "touchPoints": 1
+            },
+            "states": [
+              "initial-personal-list",
+              "shared-list",
+              "same-ledger-noop",
+              "shared-detail-to-personal-list-query-hash-cleared",
+              "back-returns-list-current-personal-ledger",
+              "personal-detail-to-shared-list-query-hash-cleared",
+              "back-returns-list-current-shared-ledger"
+            ]
+          },
+          {
+            "profile": "phone-zh",
+            "chromium": "143.0.7499.4",
+            "counts": {
+              "total": 68,
+              "api": 30,
+              "externalDelivered": 0,
+              "writes": 0,
+              "inherited": {
+                "total": 39,
+                "api": 1,
+                "blockedFonts": 0,
+                "writes": 0,
+                "externalDelivered": 0
+              }
+            },
+            "pointer": {
+              "coarse": true,
+              "touchPoints": 1
+            },
+            "states": [
+              "initial-personal-list",
+              "shared-list",
+              "same-ledger-noop",
+              "shared-detail-to-personal-list-query-hash-cleared",
+              "back-returns-list-current-personal-ledger",
+              "personal-detail-to-shared-list-query-hash-cleared",
+              "back-returns-list-current-shared-ledger"
+            ]
+          }
+        ]
+      },
+      "earlierProjectsLayout": {
+        "evidence": "browser-summary.json",
+        "contexts": 9,
+        "states": 74,
+        "note": "Earlier completed local Projects layout run retained; not rerun for this final dist."
+      }
+    },
+    "projects_layout_browser": {
+      "contexts": 9,
+      "states": 74,
+      "reports": [
+        {
+          "profile": "desktop-1440",
+          "chromium": "143.0.7499.4",
+          "states": 15,
+          "requests": {
+            "total": 31,
+            "projects": 2,
+            "inherited": {
+              "total": 29,
+              "api": 4,
+              "blockedFonts": 0,
+              "writes": 0,
+              "externalDelivered": 0
+            }
+          }
+        },
+        {
+          "profile": "tablet-1024",
+          "chromium": "143.0.7499.4",
+          "states": 9,
+          "requests": {
+            "total": 31,
+            "projects": 2,
+            "inherited": {
+              "total": 29,
+              "api": 4,
+              "blockedFonts": 0,
+              "writes": 0,
+              "externalDelivered": 0
+            }
+          }
+        },
+        {
+          "profile": "phone-390",
+          "chromium": "143.0.7499.4",
+          "states": 7,
+          "requests": {
+            "total": 33,
+            "projects": 2,
+            "inherited": {
+              "total": 31,
+              "api": 4,
+              "blockedFonts": 0,
+              "writes": 0,
+              "externalDelivered": 0
+            }
+          }
+        },
+        {
+          "profile": "phone-320-en",
+          "chromium": "143.0.7499.4",
+          "states": 8,
+          "requests": {
+            "total": 31,
+            "projects": 2,
+            "inherited": {
+              "total": 29,
+              "api": 4,
+              "blockedFonts": 0,
+              "writes": 0,
+              "externalDelivered": 0
+            }
+          }
+        },
+        {
+          "profile": "phone-320-zh",
+          "chromium": "143.0.7499.4",
+          "states": 7,
+          "requests": {
+            "total": 33,
+            "projects": 2,
+            "inherited": {
+              "total": 31,
+              "api": 4,
+              "blockedFonts": 0,
+              "writes": 0,
+              "externalDelivered": 0
+            }
+          }
+        },
+        {
+          "profile": "phone-320-ja",
+          "chromium": "143.0.7499.4",
+          "states": 7,
+          "requests": {
+            "total": 33,
+            "projects": 2,
+            "inherited": {
+              "total": 31,
+              "api": 4,
+              "blockedFonts": 0,
+              "writes": 0,
+              "externalDelivered": 0
+            }
+          }
+        },
+        {
+          "profile": "phone-320-ko",
+          "chromium": "143.0.7499.4",
+          "states": 7,
+          "requests": {
+            "total": 33,
+            "projects": 2,
+            "inherited": {
+              "total": 31,
+              "api": 4,
+              "blockedFonts": 0,
+              "writes": 0,
+              "externalDelivered": 0
+            }
+          }
+        },
+        {
+          "profile": "phone-320-fr",
+          "chromium": "143.0.7499.4",
+          "states": 7,
+          "requests": {
+            "total": 33,
+            "projects": 2,
+            "inherited": {
+              "total": 31,
+              "api": 4,
+              "blockedFonts": 0,
+              "writes": 0,
+              "externalDelivered": 0
+            }
+          }
+        },
+        {
+          "profile": "phone-320-es",
+          "chromium": "143.0.7499.4",
+          "states": 7,
+          "requests": {
+            "total": 33,
+            "projects": 2,
+            "inherited": {
+              "total": 31,
+              "api": 4,
+              "blockedFonts": 0,
+              "writes": 0,
+              "externalDelivered": 0
+            }
+          }
+        }
+      ]
+    },
+    "projects_layout_limit": "74 layout states ran before the subsequent upstream allowance copy update; final 28 switch states ran against the final built entry.",
+    "canonical_contract_check_passed": true,
+    "canonical_contract_source_commit": "2fc9b48"
+  },
+  "production_verification": {
+    "verified_at_utc": "2026-10-14T12:55:32.894467+00:00",
+    "source_commit": "7ba841c35133c834e20ab9f435d37d8e6f88d7e7",
+    "baseline_file": "before-deploy.json",
+    "baseline_checked_at_utc": "2026-10-14T12:54:17.547226+00:00",
+    "web_version": "51702576-5649-4495-b48d-6bdb6e7881b2",
+    "retained_server_version": [
+      {
+        "version_id": "f6e778ff-9f9e-4d98-99c9-27a7f210df73",
+        "percentage": 100
+      }
+    ],
+    "passed": true,
+    "checks": [
+      {
+        "name": "published source matches local HEAD",
+        "passed": true,
+        "details": {
+          "expected": "7ba841c35133c834e20ab9f435d37d8e6f88d7e7",
+          "actual": "7ba841c35133c834e20ab9f435d37d8e6f88d7e7"
+        }
+      },
+      {
+        "name": "new Web version serves all traffic",
+        "passed": true,
+        "details": {
+          "actual": [
+            {
+              "version_id": "51702576-5649-4495-b48d-6bdb6e7881b2",
+              "percentage": 100
+            }
+          ]
+        }
+      },
+      {
+        "name": "source annotation includes exact commit",
+        "passed": true,
+        "details": {}
+      },
+      {
+        "name": "Web settings preserved: bindings",
+        "passed": true,
+        "details": {}
+      },
+      {
+        "name": "Web settings preserved: compatibility_date",
+        "passed": true,
+        "details": {}
+      },
+      {
+        "name": "Web settings preserved: compatibility_flags",
+        "passed": true,
+        "details": {}
+      },
+      {
+        "name": "Web settings preserved: observability",
+        "passed": true,
+        "details": {}
+      },
+      {
+        "name": "Web settings preserved: usage_model",
+        "passed": true,
+        "details": {}
+      },
+      {
+        "name": "Web settings preserved: tail_consumers",
+        "passed": true,
+        "details": {}
+      },
+      {
+        "name": "Web settings preserved: logpush",
+        "passed": true,
+        "details": {}
+      },
+      {
+        "name": "Web settings preserved: placement",
+        "passed": true,
+        "details": {}
+      },
+      {
+        "name": "Web settings preserved: tags",
+        "passed": true,
+        "details": {}
+      },
+      {
+        "name": "Web domains preserved",
+        "passed": true,
+        "details": {}
+      },
+      {
+        "name": "Web subdomain preserved",
+        "passed": true,
+        "details": {}
+      },
+      {
+        "name": "Web static serving and headers preserved",
+        "passed": true,
+        "details": {}
+      },
+      {
+        "name": "Server active version preserved",
+        "passed": true,
+        "details": {
+          "actual": [
+            {
+              "version_id": "f6e778ff-9f9e-4d98-99c9-27a7f210df73",
+              "percentage": 100
+            }
+          ]
+        }
+      },
+      {
+        "name": "Server settings preserved",
+        "passed": true,
+        "details": {}
+      },
+      {
+        "name": "Server domains preserved",
+        "passed": true,
+        "details": {}
+      },
+      {
+        "name": "Server subdomain preserved",
+        "passed": true,
+        "details": {}
+      },
+      {
+        "name": "Server version resources preserved",
+        "passed": true,
+        "details": {}
+      },
+      {
+        "name": "published asset bytes: /assets/i18n-OwqZr5_P.js",
+        "passed": true,
+        "details": {
+          "local_sha256": "c23af955280df218845cc1c476fc3058a3823ac9d5c7911b62a63481d17bba9b",
+          "remote_sha256": "c23af955280df218845cc1c476fc3058a3823ac9d5c7911b62a63481d17bba9b"
+        }
+      },
+      {
+        "name": "immutable asset cache: /assets/i18n-OwqZr5_P.js",
+        "passed": true,
+        "details": {}
+      },
+      {
+        "name": "published asset bytes: /assets/index-CKie1VC_.js",
+        "passed": true,
+        "details": {
+          "local_sha256": "89030c4ab1874d53b9fbaf17c4fbb5df6642f44e979ac168895b3d1b032d6124",
+          "remote_sha256": "89030c4ab1874d53b9fbaf17c4fbb5df6642f44e979ac168895b3d1b032d6124"
+        }
+      },
+      {
+        "name": "immutable asset cache: /assets/index-CKie1VC_.js",
+        "passed": true,
+        "details": {}
+      },
+      {
+        "name": "published asset bytes: /assets/index-CyL2mzIf.css",
+        "passed": true,
+        "details": {
+          "local_sha256": "2acea59c41106e8eedb9048503a32542b66d6a787929ee079d186d4592934fdb",
+          "remote_sha256": "2acea59c41106e8eedb9048503a32542b66d6a787929ee079d186d4592934fdb"
+        }
+      },
+      {
+        "name": "immutable asset cache: /assets/index-CyL2mzIf.css",
+        "passed": true,
+        "details": {}
+      },
+      {
+        "name": "published asset bytes: /assets/ledger-Bl2wZyhc.js",
+        "passed": true,
+        "details": {
+          "local_sha256": "ae0ba12ceb41318e6ca6419ddd896f290a29cebb908e63c2a912c60d45460ade",
+          "remote_sha256": "ae0ba12ceb41318e6ca6419ddd896f290a29cebb908e63c2a912c60d45460ade"
+        }
+      },
+      {
+        "name": "immutable asset cache: /assets/ledger-Bl2wZyhc.js",
+        "passed": true,
+        "details": {}
+      },
+      {
+        "name": "published asset bytes: /assets/members-C8nkm2IJ.js",
+        "passed": true,
+        "details": {
+          "local_sha256": "5cbc7232060945222f8117311c51f6b46912f049e2788525062dbeaa4818bfe8",
+          "remote_sha256": "5cbc7232060945222f8117311c51f6b46912f049e2788525062dbeaa4818bfe8"
+        }
+      },
+      {
+        "name": "immutable asset cache: /assets/members-C8nkm2IJ.js",
+        "passed": true,
+        "details": {}
+      },
+      {
+        "name": "published asset bytes: /assets/navigation-DHQunuIk.js",
+        "passed": true,
+        "details": {
+          "local_sha256": "3263b96060ca8322c4c1cf88bb6d4476f95045a1510c15f30698085e21c8f528",
+          "remote_sha256": "3263b96060ca8322c4c1cf88bb6d4476f95045a1510c15f30698085e21c8f528"
+        }
+      },
+      {
+        "name": "immutable asset cache: /assets/navigation-DHQunuIk.js",
+        "passed": true,
+        "details": {}
+      },
+      {
+        "name": "published asset bytes: /assets/norulo-DBdsjYwQ.js",
+        "passed": true,
+        "details": {
+          "local_sha256": "40b4d485546aa539515b675720676f485d87cfd812ce041aebc8ae9064783b1c",
+          "remote_sha256": "40b4d485546aa539515b675720676f485d87cfd812ce041aebc8ae9064783b1c"
+        }
+      },
+      {
+        "name": "immutable asset cache: /assets/norulo-DBdsjYwQ.js",
+        "passed": true,
+        "details": {}
+      },
+      {
+        "name": "published asset bytes: /assets/rolldown-runtime-Bh1tDfsg.js",
+        "passed": true,
+        "details": {
+          "local_sha256": "1b13387cb23dc39bf70e31677c21f6db5cad3377b96f286b6ee444496e5bfea7",
+          "remote_sha256": "1b13387cb23dc39bf70e31677c21f6db5cad3377b96f286b6ee444496e5bfea7"
+        }
+      },
+      {
+        "name": "immutable asset cache: /assets/rolldown-runtime-Bh1tDfsg.js",
+        "passed": true,
+        "details": {}
+      },
+      {
+        "name": "published asset bytes: /assets/shell-Sn6aMDQ7.js",
+        "passed": true,
+        "details": {
+          "local_sha256": "a55ce9f6a00c2571f688935361377a5cf01830ecd3e9f77d01c0d69667953e6d",
+          "remote_sha256": "a55ce9f6a00c2571f688935361377a5cf01830ecd3e9f77d01c0d69667953e6d"
+        }
+      },
+      {
+        "name": "immutable asset cache: /assets/shell-Sn6aMDQ7.js",
+        "passed": true,
+        "details": {}
+      },
+      {
+        "name": "published asset bytes: /assets/vendor-CHwUWPSh.js",
+        "passed": true,
+        "details": {
+          "local_sha256": "bb88671736f2acdd1ab57aa4ca82fd7fa055a58dc8bf06a9a3f41f49dcb355e1",
+          "remote_sha256": "bb88671736f2acdd1ab57aa4ca82fd7fa055a58dc8bf06a9a3f41f49dcb355e1"
+        }
+      },
+      {
+        "name": "immutable asset cache: /assets/vendor-CHwUWPSh.js",
+        "passed": true,
+        "details": {}
+      },
+      {
+        "name": "published asset bytes: /assets/vendor-react-9XhioiGP.js",
+        "passed": true,
+        "details": {
+          "local_sha256": "109ae04dfb036b92515ae052411c426365e48876c4b00de7f1d7a289e0e6ef75",
+          "remote_sha256": "109ae04dfb036b92515ae052411c426365e48876c4b00de7f1d7a289e0e6ef75"
+        }
+      },
+      {
+        "name": "immutable asset cache: /assets/vendor-react-9XhioiGP.js",
+        "passed": true,
+        "details": {}
+      },
+      {
+        "name": "published asset bytes: /norulo-logo.png",
+        "passed": true,
+        "details": {
+          "local_sha256": "a9632acbd7a5ad48ad5ff25d6269f617c7655446365344c9db42d504213c710f",
+          "remote_sha256": "a9632acbd7a5ad48ad5ff25d6269f617c7655446365344c9db42d504213c710f"
+        }
+      },
+      {
+        "name": "page shell: /",
+        "passed": true,
+        "details": {}
+      },
+      {
+        "name": "security headers: /",
+        "passed": true,
+        "details": {}
+      },
+      {
+        "name": "page shell: /projects",
+        "passed": true,
+        "details": {}
+      },
+      {
+        "name": "security headers: /projects",
+        "passed": true,
+        "details": {}
+      },
+      {
+        "name": "health: https://api.norulo.com/health",
+        "passed": true,
+        "details": {}
+      },
+      {
+        "name": "health: https://norulo.com/api/health",
+        "passed": true,
+        "details": {}
+      },
+      {
+        "name": "anonymous protected account boundary",
+        "passed": true,
+        "details": {}
+      },
+      {
+        "name": "WWW canonical redirect",
+        "passed": true,
+        "details": {}
+      }
+    ],
+    "public_GET_requests": [
+      {
+        "url": "https://norulo.com/assets/i18n-OwqZr5_P.js",
+        "status": 200,
+        "sha256": "c23af955280df218845cc1c476fc3058a3823ac9d5c7911b62a63481d17bba9b",
+        "set_cookie_present": false,
+        "tls_verified": true
+      },
+      {
+        "url": "https://norulo.com/assets/index-CKie1VC_.js",
+        "status": 200,
+        "sha256": "89030c4ab1874d53b9fbaf17c4fbb5df6642f44e979ac168895b3d1b032d6124",
+        "set_cookie_present": false,
+        "tls_verified": true
+      },
+      {
+        "url": "https://norulo.com/assets/index-CyL2mzIf.css",
+        "status": 200,
+        "sha256": "2acea59c41106e8eedb9048503a32542b66d6a787929ee079d186d4592934fdb",
+        "set_cookie_present": false,
+        "tls_verified": true
+      },
+      {
+        "url": "https://norulo.com/assets/ledger-Bl2wZyhc.js",
+        "status": 200,
+        "sha256": "ae0ba12ceb41318e6ca6419ddd896f290a29cebb908e63c2a912c60d45460ade",
+        "set_cookie_present": false,
+        "tls_verified": true
+      },
+      {
+        "url": "https://norulo.com/assets/members-C8nkm2IJ.js",
+        "status": 200,
+        "sha256": "5cbc7232060945222f8117311c51f6b46912f049e2788525062dbeaa4818bfe8",
+        "set_cookie_present": false,
+        "tls_verified": true
+      },
+      {
+        "url": "https://norulo.com/assets/navigation-DHQunuIk.js",
+        "status": 200,
+        "sha256": "3263b96060ca8322c4c1cf88bb6d4476f95045a1510c15f30698085e21c8f528",
+        "set_cookie_present": false,
+        "tls_verified": true
+      },
+      {
+        "url": "https://norulo.com/assets/norulo-DBdsjYwQ.js",
+        "status": 200,
+        "sha256": "40b4d485546aa539515b675720676f485d87cfd812ce041aebc8ae9064783b1c",
+        "set_cookie_present": false,
+        "tls_verified": true
+      },
+      {
+        "url": "https://norulo.com/assets/rolldown-runtime-Bh1tDfsg.js",
+        "status": 200,
+        "sha256": "1b13387cb23dc39bf70e31677c21f6db5cad3377b96f286b6ee444496e5bfea7",
+        "set_cookie_present": false,
+        "tls_verified": true
+      },
+      {
+        "url": "https://norulo.com/assets/shell-Sn6aMDQ7.js",
+        "status": 200,
+        "sha256": "a55ce9f6a00c2571f688935361377a5cf01830ecd3e9f77d01c0d69667953e6d",
+        "set_cookie_present": false,
+        "tls_verified": true
+      },
+      {
+        "url": "https://norulo.com/assets/vendor-CHwUWPSh.js",
+        "status": 200,
+        "sha256": "bb88671736f2acdd1ab57aa4ca82fd7fa055a58dc8bf06a9a3f41f49dcb355e1",
+        "set_cookie_present": false,
+        "tls_verified": true
+      },
+      {
+        "url": "https://norulo.com/assets/vendor-react-9XhioiGP.js",
+        "status": 200,
+        "sha256": "109ae04dfb036b92515ae052411c426365e48876c4b00de7f1d7a289e0e6ef75",
+        "set_cookie_present": false,
+        "tls_verified": true
+      },
+      {
+        "url": "https://norulo.com/norulo-logo.png",
+        "status": 200,
+        "sha256": "a9632acbd7a5ad48ad5ff25d6269f617c7655446365344c9db42d504213c710f",
+        "set_cookie_present": false,
+        "tls_verified": true
+      },
+      {
+        "url": "https://norulo.com/",
+        "status": 200,
+        "sha256": "77d1f28d493a92e4bfef25a6a4a411d66cfdf34f2288d344d5d1b815dbcdf132",
+        "set_cookie_present": false,
+        "tls_verified": true
+      },
+      {
+        "url": "https://norulo.com/projects",
+        "status": 200,
+        "sha256": "076809eeafed44cb7a21e7d951d8afb3114010b06cb02d93a30e58bae8f7da80",
+        "set_cookie_present": false,
+        "tls_verified": true
+      },
+      {
+        "url": "https://api.norulo.com/health",
+        "status": 200,
+        "sha256": "fb437ad47c6e9f3241477d292e451632361c8432ff389ca9313c4995fab7eaee",
+        "set_cookie_present": false,
+        "tls_verified": true
+      },
+      {
+        "url": "https://norulo.com/api/health",
+        "status": 200,
+        "sha256": "fb437ad47c6e9f3241477d292e451632361c8432ff389ca9313c4995fab7eaee",
+        "set_cookie_present": false,
+        "tls_verified": true
+      },
+      {
+        "url": "https://norulo.com/api/api/v1/me",
+        "status": 401,
+        "sha256": "48220ecdf89ae5e130bd1bb8c1705c83a32388d380f556d02aab160247b16bdb",
+        "set_cookie_present": false,
+        "tls_verified": true
+      },
+      {
+        "url": "https://www.norulo.com/projects?release=ledger-switch",
+        "status": 308,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "set_cookie_present": false,
+        "tls_verified": true
+      }
+    ],
+    "management_GET_requests": 10,
+    "retries": 0,
+    "management_writes": 0,
+    "business_writes": 0,
+    "D1_operations": 0,
+    "limitations": [
+      "Anonymous shells and byte checks do not establish authenticated ledger or physical-device acceptance."
+    ]
+  },
+  "remote_operations": {
+    "deployments": 1,
+    "management_writes_other_than_web_deployment": 0,
+    "business_writes": 0,
+    "migrations": 0,
+    "D1_SQL_API_calls": 0,
+    "manual_cron_invocations": 0
+  },
+  "limitations": [
+    "Browser tests use bounded Chromium loopback fixtures, including simulated phone and desktop views; they do not establish physical-device or authenticated customer acceptance.",
+    "The change preserves upstream API artifacts and contracts; it changes only App routing and regression tests."
+  ],
+  "before_deploy": {
+    "checked_at_utc": "2026-10-14T12:54:17.547226+00:00",
+    "account_id": "84e421f26c708c0cf437e287eed11fa1",
+    "management_GET_requests": 10,
+    "workers": {
+      "norulo-web": {
+        "deployment": {
+          "id": "83462887-ddbe-41e6-a20d-c287b9eea297",
+          "source": "wrangler",
+          "strategy": "percentage",
+          "annotations": {
+            "workers/message": "Jev call allowances and Free trials; source 9621562f617231bd42eff9de92f19dc064b1d129",
+            "workers/triggered_by": "deployment"
+          },
+          "versions": [
+            {
+              "version_id": "de8d4cce-9057-4db3-87d6-499959931513",
+              "percentage": 100
+            }
+          ],
+          "created_on": "2026-10-14T12:04:57.109753Z"
+        },
+        "settings": {
+          "compatibility_date": "2026-05-25",
+          "compatibility_flags": [],
+          "observability": {
+            "enabled": true,
+            "head_sampling_rate": 1,
+            "redact_query_string": true,
+            "logs": {
+              "enabled": true,
+              "head_sampling_rate": 0.01,
+              "persist": true,
+              "invocation_logs": false
+            },
+            "traces": {
+              "enabled": false,
+              "persist": true,
+              "head_sampling_rate": 1
+            },
+            "issues": {
+              "enabled": true
+            }
+          },
+          "usage_model": "standard",
+          "tail_consumers": [],
+          "logpush": false,
+          "placement": {},
+          "tags": [],
+          "annotations": {
+            "workers/message": "Jev call allowances and Free trials; source 9621562f617231bd42eff9de92f19dc064b1d129",
+            "workers/triggered_by": "version_upload"
+          },
+          "bindings": [
+            {
+              "name": "ASSETS",
+              "type": "assets"
+            },
+            {
+              "name": "NORULO_API_ORIGIN",
+              "text": "https://api.norulo.com",
+              "type": "plain_text"
+            },
+            {
+              "name": "NORULO_MODE",
+              "text": "production",
+              "type": "plain_text"
+            },
+            {
+              "environment": "production",
+              "name": "NORULO_SERVER",
+              "service": "norulo-server-production",
+              "type": "service"
+            }
+          ]
+        },
+        "domains": [
+          {
+            "hostname": "norulo.com",
+            "service": "norulo-web",
+            "environment": "production",
+            "enabled": true,
+            "previews_enabled": false
+          },
+          {
+            "hostname": "www.norulo.com",
+            "service": "norulo-web",
+            "environment": "production",
+            "enabled": true,
+            "previews_enabled": false
+          }
+        ],
+        "subdomain": {
+          "enabled": false,
+          "previews_enabled": false
+        },
+        "version_annotations": {
+          "workers/message": "Jev call allowances and Free trials; source 9621562f617231bd42eff9de92f19dc064b1d129",
+          "workers/triggered_by": "version_upload"
+        },
+        "script_runtime": {
+          "assets": {
+            "not_found_handling": "single-page-application",
+            "headers": {
+              "version": 2,
+              "rules": {
+                "/*": {
+                  "set": {
+                    "cache-control": "no-cache",
+                    "content-security-policy": "default-src 'self'; script-src 'self' 'sha256-1F/1Oh03zl+94G1RlYByAJCYDweLbJXS6JpGtSn68xs='; script-src-attr 'none'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-src 'none'; frame-ancestors 'none'; form-action 'self'",
+                    "permissions-policy": "camera=(), microphone=(), geolocation=(), payment=()",
+                    "referrer-policy": "strict-origin-when-cross-origin",
+                    "strict-transport-security": "max-age=15552000",
+                    "x-content-type-options": "nosniff",
+                    "x-frame-options": "DENY"
+                  },
+                  "unset": []
+                },
+                "/apple-touch-icon.png": {
+                  "set": {
+                    "cache-control": "public, max-age=86400"
+                  },
+                  "unset": [
+                    "Cache-Control"
+                  ]
+                },
+                "/assets/*": {
+                  "set": {
+                    "cache-control": "public, max-age=31536000, immutable"
+                  },
+                  "unset": [
+                    "Cache-Control"
+                  ]
+                },
+                "/brand-mark.png": {
+                  "set": {
+                    "cache-control": "public, max-age=86400"
+                  },
+                  "unset": [
+                    "Cache-Control"
+                  ]
+                },
+                "/fonts/*": {
+                  "set": {
+                    "cache-control": "public, max-age=604800"
+                  },
+                  "unset": [
+                    "Cache-Control"
+                  ]
+                }
+              }
+            },
+            "raw_headers": "/*\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: strict-origin-when-cross-origin\n  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()\n  X-Frame-Options: DENY\n  Content-Security-Policy: default-src 'self'; script-src 'self' 'sha256-1F/1Oh03zl+94G1RlYByAJCYDweLbJXS6JpGtSn68xs='; script-src-attr 'none'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-src 'none'; frame-ancestors 'none'; form-action 'self'\n  Strict-Transport-Security: max-age=15552000\n  Cache-Control: no-cache\n\n/assets/*\n  ! Cache-Control\n  Cache-Control: public, max-age=31536000, immutable\n\n/fonts/*\n  ! Cache-Control\n  Cache-Control: public, max-age=604800\n\n/brand-mark.png\n  ! Cache-Control\n  Cache-Control: public, max-age=86400\n\n/apple-touch-icon.png\n  ! Cache-Control\n  Cache-Control: public, max-age=86400\n",
+            "static_routing": {
+              "user_worker": [
+                "/*"
+              ],
+              "asset_worker": [
+                "/assets/*"
+              ]
+            },
+            "serve_directly": true,
+            "raw_run_worker_first": [
+              "/*",
+              "!/assets/*"
+            ],
+            "base_path": "/"
+          },
+          "compatibility_date": "2026-05-25",
+          "usage_model": "standard"
+        }
+      },
+      "norulo-server-production": {
+        "deployment": {
+          "id": "ffd226b5-5d31-45e6-97ea-ef7beba0ae59",
+          "source": "wrangler",
+          "strategy": "percentage",
+          "annotations": {
+            "workers/message": "Jev calls and lifetime Free trials; source ad63c4d790215cabb41911faaffc06d73ee864e8",
+            "workers/triggered_by": "deployment"
+          },
+          "versions": [
+            {
+              "version_id": "f6e778ff-9f9e-4d98-99c9-27a7f210df73",
+              "percentage": 100
+            }
+          ],
+          "created_on": "2026-10-14T12:02:11.899403Z"
+        },
+        "settings": {
+          "compatibility_date": "2026-09-23",
+          "compatibility_flags": [
+            "python_workers"
+          ],
+          "observability": {
+            "enabled": true,
+            "head_sampling_rate": 1,
+            "redact_query_string": true,
+            "logs": {
+              "enabled": true,
+              "head_sampling_rate": 1,
+              "persist": true,
+              "invocation_logs": false
+            },
+            "traces": {
+              "enabled": false,
+              "persist": true,
+              "head_sampling_rate": 1
+            }
+          },
+          "limits": {
+            "cpu_ms": 300000,
+            "subrequests": 9000
+          },
+          "usage_model": "standard",
+          "tail_consumers": [],
+          "logpush": false,
+          "placement": {},
+          "tags": [],
+          "annotations": {
+            "workers/message": "Jev calls and lifetime Free trials; source ad63c4d790215cabb41911faaffc06d73ee864e8",
+            "workers/triggered_by": "version_upload"
+          },
+          "bindings": [
+            {
+              "name": "API_CREDENTIAL_BURST_RATE_LIMIT",
+              "namespace_id": "1012765925",
+              "simple": {
+                "limit": 120,
+                "period": 10
+              },
+              "type": "ratelimit"
+            },
+            {
+              "name": "API_CREDENTIAL_RATE_LIMIT",
+              "namespace_id": "1009527699",
+              "simple": {
+                "limit": 600,
+                "period": 60
+              },
+              "type": "ratelimit"
+            },
+            {
+              "name": "API_IP_BURST_RATE_LIMIT",
+              "namespace_id": "1744429548",
+              "simple": {
+                "limit": 300,
+                "period": 10
+              },
+              "type": "ratelimit"
+            },
+            {
+              "name": "API_IP_RATE_LIMIT",
+              "namespace_id": "1820219268",
+              "simple": {
+                "limit": 1200,
+                "period": 60
+              },
+              "type": "ratelimit"
+            },
+            {
+              "name": "AUTH_RATE_LIMIT",
+              "namespace_id": "1576996832",
+              "simple": {
+                "limit": 20,
+                "period": 60
+              },
+              "type": "ratelimit"
+            },
+            {
+              "database_id": "c41a1ab7-dffa-4c5d-a213-25f1bb6c78c5",
+              "id": "c41a1ab7-dffa-4c5d-a213-25f1bb6c78c5",
+              "name": "DB",
+              "type": "d1"
+            },
+            {
+              "allowed_sender_addresses": [
+                "login@auth.norulo.com"
+              ],
+              "name": "EMAIL",
+              "type": "send_email"
+            },
+            {
+              "class_name": "EmailAdmission",
+              "name": "EMAIL_ADMISSION",
+              "namespace_id": "6588312f00f74840a37463e72a2d75eb",
+              "type": "durable_object_namespace"
+            },
+            {
+              "name": "NORULO_ALLOWED_ORIGINS",
+              "text": "https://norulo.com",
+              "type": "plain_text"
+            },
+            {
+              "name": "NORULO_APP_URL",
+              "text": "https://norulo.com",
+              "type": "plain_text"
+            },
+            {
+              "name": "NORULO_COOKIE_SAME_SITE",
+              "text": "None",
+              "type": "plain_text"
+            },
+            {
+              "name": "NORULO_CREEM_API_BASE_URL",
+              "text": "https://api.creem.io",
+              "type": "plain_text"
+            },
+            {
+              "name": "NORULO_CREEM_API_KEY",
+              "type": "secret_text"
+            },
+            {
+              "name": "NORULO_CREEM_PRODUCT_IDS_JSON",
+              "text": "{\"pro\":{\"month\":\"prod_1epM6PhPRtYV9kBpdYW10O\",\"year\":\"prod_1sjSCiHtaGv7Ayv1gdC0G0\"},\"max\":{\"month\":\"prod_2HxOZvntzCz5nswEIv4L4K\",\"year\":\"prod_FjgOMROB94ZJDIopXdcRn\"}}",
+              "type": "plain_text"
+            },
+            {
+              "name": "NORULO_CREEM_WEBHOOK_SECRET",
+              "type": "secret_text"
+            },
+            {
+              "name": "NORULO_D1_ACCESS_ENABLED",
+              "text": "1",
+              "type": "plain_text"
+            },
+            {
+              "name": "NORULO_EMAIL_AUTH_ENABLED",
+              "text": "1",
+              "type": "plain_text"
+            },
+            {
+              "name": "NORULO_EMAIL_CODE_SECRET",
+              "type": "secret_text"
+            },
+            {
+              "name": "NORULO_EMAIL_FROM",
+              "text": "login@auth.norulo.com",
+              "type": "plain_text"
+            },
+            {
+              "name": "NORULO_GITHUB_APP_SLUG",
+              "text": "norulo",
+              "type": "plain_text"
+            },
+            {
+              "name": "NORULO_GITHUB_CALLBACK_URL",
+              "text": "https://norulo.com/api/auth/github/callback",
+              "type": "plain_text"
+            },
+            {
+              "name": "NORULO_GITHUB_CLIENT_ID",
+              "text": "Iv23li78ZPeUgSxJkLUj",
+              "type": "plain_text"
+            },
+            {
+              "name": "NORULO_GITHUB_CLIENT_SECRET",
+              "type": "secret_text"
+            },
+            {
+              "name": "NORULO_GITHUB_TOKEN_KEY",
+              "type": "secret_text"
+            },
+            {
+              "name": "NORULO_JEV_SUGGESTIONS_ENABLED",
+              "text": "1",
+              "type": "plain_text"
+            },
+            {
+              "name": "NORULO_JEV_SUGGESTIONS_EVALUATED",
+              "text": "1",
+              "type": "plain_text"
+            },
+            {
+              "name": "NORULO_MODE",
+              "text": "production",
+              "type": "plain_text"
+            },
+            {
+              "name": "NORULO_PLAN_LIMITS_JSON",
+              "text": "{\"free\":{\"projects\":3,\"records\":300,\"writesPerMinute\":10,\"writesPerMonth\":1000,\"jevMonthlyBudgetUsd\":\"0.00\"},\"pro\":{\"projects\":20,\"records\":20000,\"writesPerMinute\":60,\"writesPerMonth\":10000,\"jevMonthlyBudgetUsd\":\"3.00\"},\"max\":{\"projects\":100,\"records\":200000,\"writesPerMinute\":60,\"writesPerMonth\":10000,\"jevMonthlyBudgetUsd\":\"12.00\"}}",
+              "type": "plain_text"
+            },
+            {
+              "name": "NORULO_PREVIEW_BUSINESS_CLEAR_ID",
+              "text": "",
+              "type": "plain_text"
+            },
+            {
+              "name": "NORULO_PREVIEW_BUSINESS_CLEAR_MANIFEST",
+              "text": "",
+              "type": "plain_text"
+            },
+            {
+              "name": "NORULO_PREVIEW_SCHEMA_V11_UPGRADE_ENABLED",
+              "text": "0",
+              "type": "plain_text"
+            },
+            {
+              "name": "NORULO_RECURRING_EXPENSES_ENABLED",
+              "text": "1",
+              "type": "plain_text"
+            },
+            {
+              "class_name": "RecurringScheduler",
+              "name": "RECURRING_SCHEDULER",
+              "namespace_id": "b3f41def1906481e9c72662debf4b505",
+              "type": "durable_object_namespace"
+            },
+            {
+              "name": "TYPESAFE_API_KEY",
+              "type": "secret_text"
+            }
+          ]
+        },
+        "domains": [
+          {
+            "hostname": "api.norulo.com",
+            "service": "norulo-server-production",
+            "environment": "production",
+            "enabled": true,
+            "previews_enabled": false
+          }
+        ],
+        "subdomain": {
+          "enabled": false,
+          "previews_enabled": false
+        },
+        "version_annotations": {
+          "workers/message": "Jev calls and lifetime Free trials; source ad63c4d790215cabb41911faaffc06d73ee864e8",
+          "workers/triggered_by": "version_upload"
+        },
+        "script_runtime": {
+          "migration_tag": "norulo-recurring-scheduler-v1",
+          "compatibility_date": "2026-09-23",
+          "compatibility_flags": [
+            "python_workers"
+          ],
+          "usage_model": "standard",
+          "limits": {
+            "cpu_ms": 300000,
+            "subrequests": 9000
+          }
+        }
+      }
+    }
+  },
+  "after_deploy": {
+    "checked_at_utc": "2026-10-14T12:55:15.137030+00:00",
+    "account_id": "84e421f26c708c0cf437e287eed11fa1",
+    "management_GET_requests": 10,
+    "workers": {
+      "norulo-web": {
+        "deployment": {
+          "id": "1566b38f-54c8-4ec4-875c-e507d03e68a2",
+          "source": "wrangler",
+          "strategy": "percentage",
+          "annotations": {
+            "workers/message": "Fix ledger switching navigation; source 7ba841c35133c834e20ab9f435d37d8e6f88d7e7",
+            "workers/triggered_by": "deployment"
+          },
+          "versions": [
+            {
+              "version_id": "51702576-5649-4495-b48d-6bdb6e7881b2",
+              "percentage": 100
+            }
+          ],
+          "created_on": "2026-10-14T12:54:48.081682Z"
+        },
+        "settings": {
+          "compatibility_date": "2026-05-25",
+          "compatibility_flags": [],
+          "observability": {
+            "enabled": true,
+            "head_sampling_rate": 1,
+            "redact_query_string": true,
+            "logs": {
+              "enabled": true,
+              "head_sampling_rate": 0.01,
+              "persist": true,
+              "invocation_logs": false
+            },
+            "traces": {
+              "enabled": false,
+              "persist": true,
+              "head_sampling_rate": 1
+            },
+            "issues": {
+              "enabled": true
+            }
+          },
+          "usage_model": "standard",
+          "tail_consumers": [],
+          "logpush": false,
+          "placement": {},
+          "tags": [],
+          "annotations": {
+            "workers/message": "Fix ledger switching navigation; source 7ba841c35133c834e20ab9f435d37d8e6f88d7e7",
+            "workers/triggered_by": "version_upload"
+          },
+          "bindings": [
+            {
+              "name": "ASSETS",
+              "type": "assets"
+            },
+            {
+              "name": "NORULO_API_ORIGIN",
+              "text": "https://api.norulo.com",
+              "type": "plain_text"
+            },
+            {
+              "name": "NORULO_MODE",
+              "text": "production",
+              "type": "plain_text"
+            },
+            {
+              "environment": "production",
+              "name": "NORULO_SERVER",
+              "service": "norulo-server-production",
+              "type": "service"
+            }
+          ]
+        },
+        "domains": [
+          {
+            "hostname": "norulo.com",
+            "service": "norulo-web",
+            "environment": "production",
+            "enabled": true,
+            "previews_enabled": false
+          },
+          {
+            "hostname": "www.norulo.com",
+            "service": "norulo-web",
+            "environment": "production",
+            "enabled": true,
+            "previews_enabled": false
+          }
+        ],
+        "subdomain": {
+          "enabled": false,
+          "previews_enabled": false
+        },
+        "version_annotations": {
+          "workers/message": "Fix ledger switching navigation; source 7ba841c35133c834e20ab9f435d37d8e6f88d7e7",
+          "workers/triggered_by": "version_upload"
+        },
+        "script_runtime": {
+          "assets": {
+            "not_found_handling": "single-page-application",
+            "headers": {
+              "version": 2,
+              "rules": {
+                "/*": {
+                  "set": {
+                    "cache-control": "no-cache",
+                    "content-security-policy": "default-src 'self'; script-src 'self' 'sha256-1F/1Oh03zl+94G1RlYByAJCYDweLbJXS6JpGtSn68xs='; script-src-attr 'none'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-src 'none'; frame-ancestors 'none'; form-action 'self'",
+                    "permissions-policy": "camera=(), microphone=(), geolocation=(), payment=()",
+                    "referrer-policy": "strict-origin-when-cross-origin",
+                    "strict-transport-security": "max-age=15552000",
+                    "x-content-type-options": "nosniff",
+                    "x-frame-options": "DENY"
+                  },
+                  "unset": []
+                },
+                "/apple-touch-icon.png": {
+                  "set": {
+                    "cache-control": "public, max-age=86400"
+                  },
+                  "unset": [
+                    "Cache-Control"
+                  ]
+                },
+                "/assets/*": {
+                  "set": {
+                    "cache-control": "public, max-age=31536000, immutable"
+                  },
+                  "unset": [
+                    "Cache-Control"
+                  ]
+                },
+                "/brand-mark.png": {
+                  "set": {
+                    "cache-control": "public, max-age=86400"
+                  },
+                  "unset": [
+                    "Cache-Control"
+                  ]
+                },
+                "/fonts/*": {
+                  "set": {
+                    "cache-control": "public, max-age=604800"
+                  },
+                  "unset": [
+                    "Cache-Control"
+                  ]
+                }
+              }
+            },
+            "raw_headers": "/*\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: strict-origin-when-cross-origin\n  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()\n  X-Frame-Options: DENY\n  Content-Security-Policy: default-src 'self'; script-src 'self' 'sha256-1F/1Oh03zl+94G1RlYByAJCYDweLbJXS6JpGtSn68xs='; script-src-attr 'none'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-src 'none'; frame-ancestors 'none'; form-action 'self'\n  Strict-Transport-Security: max-age=15552000\n  Cache-Control: no-cache\n\n/assets/*\n  ! Cache-Control\n  Cache-Control: public, max-age=31536000, immutable\n\n/fonts/*\n  ! Cache-Control\n  Cache-Control: public, max-age=604800\n\n/brand-mark.png\n  ! Cache-Control\n  Cache-Control: public, max-age=86400\n\n/apple-touch-icon.png\n  ! Cache-Control\n  Cache-Control: public, max-age=86400\n",
+            "static_routing": {
+              "user_worker": [
+                "/*"
+              ],
+              "asset_worker": [
+                "/assets/*"
+              ]
+            },
+            "serve_directly": true,
+            "raw_run_worker_first": [
+              "/*",
+              "!/assets/*"
+            ],
+            "base_path": "/"
+          },
+          "compatibility_date": "2026-05-25",
+          "usage_model": "standard"
+        }
+      },
+      "norulo-server-production": {
+        "deployment": {
+          "id": "ffd226b5-5d31-45e6-97ea-ef7beba0ae59",
+          "source": "wrangler",
+          "strategy": "percentage",
+          "annotations": {
+            "workers/message": "Jev calls and lifetime Free trials; source ad63c4d790215cabb41911faaffc06d73ee864e8",
+            "workers/triggered_by": "deployment"
+          },
+          "versions": [
+            {
+              "version_id": "f6e778ff-9f9e-4d98-99c9-27a7f210df73",
+              "percentage": 100
+            }
+          ],
+          "created_on": "2026-10-14T12:02:11.899403Z"
+        },
+        "settings": {
+          "compatibility_date": "2026-09-23",
+          "compatibility_flags": [
+            "python_workers"
+          ],
+          "observability": {
+            "enabled": true,
+            "head_sampling_rate": 1,
+            "redact_query_string": true,
+            "logs": {
+              "enabled": true,
+              "head_sampling_rate": 1,
+              "persist": true,
+              "invocation_logs": false
+            },
+            "traces": {
+              "enabled": false,
+              "persist": true,
+              "head_sampling_rate": 1
+            }
+          },
+          "limits": {
+            "cpu_ms": 300000,
+            "subrequests": 9000
+          },
+          "usage_model": "standard",
+          "tail_consumers": [],
+          "logpush": false,
+          "placement": {},
+          "tags": [],
+          "annotations": {
+            "workers/message": "Jev calls and lifetime Free trials; source ad63c4d790215cabb41911faaffc06d73ee864e8",
+            "workers/triggered_by": "version_upload"
+          },
+          "bindings": [
+            {
+              "name": "API_CREDENTIAL_BURST_RATE_LIMIT",
+              "namespace_id": "1012765925",
+              "simple": {
+                "limit": 120,
+                "period": 10
+              },
+              "type": "ratelimit"
+            },
+            {
+              "name": "API_CREDENTIAL_RATE_LIMIT",
+              "namespace_id": "1009527699",
+              "simple": {
+                "limit": 600,
+                "period": 60
+              },
+              "type": "ratelimit"
+            },
+            {
+              "name": "API_IP_BURST_RATE_LIMIT",
+              "namespace_id": "1744429548",
+              "simple": {
+                "limit": 300,
+                "period": 10
+              },
+              "type": "ratelimit"
+            },
+            {
+              "name": "API_IP_RATE_LIMIT",
+              "namespace_id": "1820219268",
+              "simple": {
+                "limit": 1200,
+                "period": 60
+              },
+              "type": "ratelimit"
+            },
+            {
+              "name": "AUTH_RATE_LIMIT",
+              "namespace_id": "1576996832",
+              "simple": {
+                "limit": 20,
+                "period": 60
+              },
+              "type": "ratelimit"
+            },
+            {
+              "database_id": "c41a1ab7-dffa-4c5d-a213-25f1bb6c78c5",
+              "id": "c41a1ab7-dffa-4c5d-a213-25f1bb6c78c5",
+              "name": "DB",
+              "type": "d1"
+            },
+            {
+              "allowed_sender_addresses": [
+                "login@auth.norulo.com"
+              ],
+              "name": "EMAIL",
+              "type": "send_email"
+            },
+            {
+              "class_name": "EmailAdmission",
+              "name": "EMAIL_ADMISSION",
+              "namespace_id": "6588312f00f74840a37463e72a2d75eb",
+              "type": "durable_object_namespace"
+            },
+            {
+              "name": "NORULO_ALLOWED_ORIGINS",
+              "text": "https://norulo.com",
+              "type": "plain_text"
+            },
+            {
+              "name": "NORULO_APP_URL",
+              "text": "https://norulo.com",
+              "type": "plain_text"
+            },
+            {
+              "name": "NORULO_COOKIE_SAME_SITE",
+              "text": "None",
+              "type": "plain_text"
+            },
+            {
+              "name": "NORULO_CREEM_API_BASE_URL",
+              "text": "https://api.creem.io",
+              "type": "plain_text"
+            },
+            {
+              "name": "NORULO_CREEM_API_KEY",
+              "type": "secret_text"
+            },
+            {
+              "name": "NORULO_CREEM_PRODUCT_IDS_JSON",
+              "text": "{\"pro\":{\"month\":\"prod_1epM6PhPRtYV9kBpdYW10O\",\"year\":\"prod_1sjSCiHtaGv7Ayv1gdC0G0\"},\"max\":{\"month\":\"prod_2HxOZvntzCz5nswEIv4L4K\",\"year\":\"prod_FjgOMROB94ZJDIopXdcRn\"}}",
+              "type": "plain_text"
+            },
+            {
+              "name": "NORULO_CREEM_WEBHOOK_SECRET",
+              "type": "secret_text"
+            },
+            {
+              "name": "NORULO_D1_ACCESS_ENABLED",
+              "text": "1",
+              "type": "plain_text"
+            },
+            {
+              "name": "NORULO_EMAIL_AUTH_ENABLED",
+              "text": "1",
+              "type": "plain_text"
+            },
+            {
+              "name": "NORULO_EMAIL_CODE_SECRET",
+              "type": "secret_text"
+            },
+            {
+              "name": "NORULO_EMAIL_FROM",
+              "text": "login@auth.norulo.com",
+              "type": "plain_text"
+            },
+            {
+              "name": "NORULO_GITHUB_APP_SLUG",
+              "text": "norulo",
+              "type": "plain_text"
+            },
+            {
+              "name": "NORULO_GITHUB_CALLBACK_URL",
+              "text": "https://norulo.com/api/auth/github/callback",
+              "type": "plain_text"
+            },
+            {
+              "name": "NORULO_GITHUB_CLIENT_ID",
+              "text": "Iv23li78ZPeUgSxJkLUj",
+              "type": "plain_text"
+            },
+            {
+              "name": "NORULO_GITHUB_CLIENT_SECRET",
+              "type": "secret_text"
+            },
+            {
+              "name": "NORULO_GITHUB_TOKEN_KEY",
+              "type": "secret_text"
+            },
+            {
+              "name": "NORULO_JEV_SUGGESTIONS_ENABLED",
+              "text": "1",
+              "type": "plain_text"
+            },
+            {
+              "name": "NORULO_JEV_SUGGESTIONS_EVALUATED",
+              "text": "1",
+              "type": "plain_text"
+            },
+            {
+              "name": "NORULO_MODE",
+              "text": "production",
+              "type": "plain_text"
+            },
+            {
+              "name": "NORULO_PLAN_LIMITS_JSON",
+              "text": "{\"free\":{\"projects\":3,\"records\":300,\"writesPerMinute\":10,\"writesPerMonth\":1000,\"jevMonthlyBudgetUsd\":\"0.00\"},\"pro\":{\"projects\":20,\"records\":20000,\"writesPerMinute\":60,\"writesPerMonth\":10000,\"jevMonthlyBudgetUsd\":\"3.00\"},\"max\":{\"projects\":100,\"records\":200000,\"writesPerMinute\":60,\"writesPerMonth\":10000,\"jevMonthlyBudgetUsd\":\"12.00\"}}",
+              "type": "plain_text"
+            },
+            {
+              "name": "NORULO_PREVIEW_BUSINESS_CLEAR_ID",
+              "text": "",
+              "type": "plain_text"
+            },
+            {
+              "name": "NORULO_PREVIEW_BUSINESS_CLEAR_MANIFEST",
+              "text": "",
+              "type": "plain_text"
+            },
+            {
+              "name": "NORULO_PREVIEW_SCHEMA_V11_UPGRADE_ENABLED",
+              "text": "0",
+              "type": "plain_text"
+            },
+            {
+              "name": "NORULO_RECURRING_EXPENSES_ENABLED",
+              "text": "1",
+              "type": "plain_text"
+            },
+            {
+              "class_name": "RecurringScheduler",
+              "name": "RECURRING_SCHEDULER",
+              "namespace_id": "b3f41def1906481e9c72662debf4b505",
+              "type": "durable_object_namespace"
+            },
+            {
+              "name": "TYPESAFE_API_KEY",
+              "type": "secret_text"
+            }
+          ]
+        },
+        "domains": [
+          {
+            "hostname": "api.norulo.com",
+            "service": "norulo-server-production",
+            "environment": "production",
+            "enabled": true,
+            "previews_enabled": false
+          }
+        ],
+        "subdomain": {
+          "enabled": false,
+          "previews_enabled": false
+        },
+        "version_annotations": {
+          "workers/message": "Jev calls and lifetime Free trials; source ad63c4d790215cabb41911faaffc06d73ee864e8",
+          "workers/triggered_by": "version_upload"
+        },
+        "script_runtime": {
+          "migration_tag": "norulo-recurring-scheduler-v1",
+          "compatibility_date": "2026-09-23",
+          "compatibility_flags": [
+            "python_workers"
+          ],
+          "usage_model": "standard",
+          "limits": {
+            "cpu_ms": 300000,
+            "subrequests": 9000
+          }
+        }
+      }
+    }
+  }
+}

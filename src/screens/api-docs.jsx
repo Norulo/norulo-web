@@ -6,9 +6,10 @@ import { agentMarkdown } from "./api-agent.js";
 import { ApiDocsCopyButton } from "./api-docs-copy-button.jsx";
 import { API_GUIDE_COPY } from "../locales/api-guide.js";
 import { AGENT_GUIDE } from "../locales/agent-guide.js";
+import { DOCS_NAV_COPY } from "../locales/docs-nav.js";
 import { AgentSetupGuide, agentSetupMarkdown } from "./agent-setup.jsx";
+import { DocsCode, DocsSideNav } from "./docs-layout.jsx";
 import { env } from "../config/env.js";
-import { I } from "../icons.jsx";
 import { T, useLang } from "../i18n.jsx";
 import { screenLinkProps } from "../lib/navigation.js";
 import { PublicFooter, PublicHeader } from "./public-layout.jsx";
@@ -25,19 +26,6 @@ function baseUrl() {
 function apiUrl(path, base) {
   // A same-origin /api base is the Web proxy prefix; Server still expects /api/v1.
   return `${base}/${path.replace(/^\/+/, "")}`;
-}
-
-function DocsCode({ title, children }) {
-  return (
-    <div className="docs-code">
-      <div className="docs-code-h">
-        <span>
-          <I.Terminal size={12} /> {title}
-        </span>
-      </div>
-      <pre>{children}</pre>
-    </div>
-  );
 }
 
 const PROJECT_CREATION =
@@ -183,26 +171,47 @@ export function ApiDocsScreen({ go, auth }) {
     `  -H 'If-Match: "7"'`,
     "  --data '{}'",
   ].join(" \\\n");
-  const nav = [
-    ["overview", "Overview"],
-    ["agent-setup", AGENT_GUIDE.title[0]],
-    ["quickstart", "Quickstart: save your first expense"],
-    ["environments", "Environments and request URLs"],
-    ["authentication", "Authentication"],
-    ["permissions", "Scopes, roles and ledger boundaries"],
-    ["projects", "Projects"],
-    ["writes", "Editing, retries, pagination and money"],
-    ["project-management", "Project and category management"],
-    ["recurring", "Project and shared recurring expenses"],
-    ["members", "Invitations and member management"],
-    ["activity", "Operation history"],
-    ["expense-retention", API_GUIDE_COPY.retentionTitle[0]],
-    ["reference", "Complete API reference"],
-    ["filters", "Filters and writes"],
-    ["max-assistance", "Automatic Jev assistance"],
-    ["jev-settings", "Jev settings"],
-    ["expense-review", "Review saved expenses"],
-    ["troubleshooting", "Error responses and recovery"],
+  // Groups follow the page order so the current-section marker moves steadily.
+  const navGroups = [
+    [
+      "getStarted",
+      [
+        ["overview", "Overview"],
+        ["agent-setup", AGENT_GUIDE.title[0]],
+        ["quickstart", "Quickstart: save your first expense"],
+        ["environments", "Environments and request URLs"],
+        ["authentication", "Authentication"],
+        ["permissions", "Scopes, roles and ledger boundaries"],
+      ],
+    ],
+    [
+      "guides",
+      [
+        ["projects", "Projects"],
+        ["writes", "Editing, retries, pagination and money"],
+        ["project-management", "Project and category management"],
+        ["recurring", "Project and shared recurring expenses"],
+        ["members", "Invitations and member management"],
+        ["activity", "Operation history"],
+        ["expense-retention", API_GUIDE_COPY.retentionTitle[0]],
+        ["filters", "Filters and writes"],
+      ],
+    ],
+    [
+      "jev",
+      [
+        ["max-assistance", "Automatic Jev assistance"],
+        ["jev-settings", "Jev settings"],
+        ["expense-review", "Review saved expenses"],
+      ],
+    ],
+    [
+      "reference",
+      [
+        ["troubleshooting", "Error responses and recovery"],
+        ["reference", "Complete API reference"],
+      ],
+    ],
   ];
   function selectCopyMode(mode) {
     if (copyRequestRef.current) return;
@@ -238,27 +247,28 @@ export function ApiDocsScreen({ go, auth }) {
     <div className="landing fade-in product-api-docs">
       <PublicHeader go={go} current="api" auth={auth} />
       <div className="docs-shell">
-        <aside className="docs-side">
-          <div className="docs-side-g">
-            <div className="docs-side-h">API</div>
-            {nav.map(([id, label]) => (
-              <a key={id} className="docs-side-i" href={`#${id}`}>
-                {T(
-                  label,
-                  id === "agent-setup" ? AGENT_GUIDE.title[1] : label === "Complete API reference"
-                    ? {
-                        zh: "完整 API 参考",
-                        ja: "API リファレンス全体",
-                        ko: "전체 API 참조",
-                        fr: "Référence API complète",
-                        es: "Referencia completa de la API",
-                      }
-                    : Object.values(API_GUIDE_COPY).find(([english]) => english === label)?.[1]
-                )}
-              </a>
-            ))}
-          </div>
-        </aside>
+        <DocsSideNav
+          label={T(...DOCS_NAV_COPY.apiSections)}
+          groups={navGroups.map(([key, items]) => ({
+            key,
+            label: key === "jev" ? "Jev" : T(...DOCS_NAV_COPY[key]),
+            items: items.map(([id, label]) => ({
+              id,
+              label: T(
+                label,
+                id === "agent-setup" ? AGENT_GUIDE.title[1] : label === "Complete API reference"
+                  ? {
+                      zh: "完整 API 参考",
+                      ja: "API リファレンス全体",
+                      ko: "전체 API 참조",
+                      fr: "Référence API complète",
+                      es: "Referencia completa de la API",
+                    }
+                  : Object.values(API_GUIDE_COPY).find(([english]) => english === label)?.[1]
+              ),
+            })),
+          }))}
+        />
         <main id="main-content" tabIndex={-1} className="docs-main">
           <div className="docs-crumbs">
             <a className="auth-link" {...screenLinkProps(go, "landing")}>
@@ -369,15 +379,6 @@ export function ApiDocsScreen({ go, auth }) {
               "expense-retention",
             ]}
           />
-          <h2 id="jev-settings" className="docs-h2">
-            {T("Jev settings", "Jev 设置")}
-          </h2>
-          <p>
-            {T(
-              ACCOUNT_JEV,
-              "GET 和 PATCH /api/v1/account/jev 需要 Cookie 会话，操作当前登录账户自己账本的偏好，与工作区选择无关。API 密钥不能使用这些接口。响应包含 enabled、revision、eligible、available 和 monthlyBudgetUsd。enabled 是已保存偏好；available 还要求 Pro 或 Max 权益有效且运行时可用。PATCH 仅接受 {enabled: boolean}，并须使用偏好版本传入 If-Match；Free 账户不能写入。412 冲突后须先主动 GET，再由用户重新选择。这些接口不会运行模型检查、修改支出或重置已使用额度。共享账本成员继承各自账本 Owner 的偏好；模型关闭时，付费账本仍可进行本地疑似重复检查。 即使保存的偏好为开启，Free 仍不能运行模型检查；重新使用需要有效的 Pro 或 Max 套餐。"
-            )}
-          </p>
           <h2 id="filters" className="docs-h2">
             {T("Filters and writes", "筛选与写入")}
           </h2>
@@ -429,6 +430,15 @@ export function ApiDocsScreen({ go, auth }) {
           >
             {createExample}
           </DocsCode>
+          <h2 id="jev-settings" className="docs-h2">
+            {T("Jev settings", "Jev 设置")}
+          </h2>
+          <p>
+            {T(
+              ACCOUNT_JEV,
+              "GET 和 PATCH /api/v1/account/jev 需要 Cookie 会话，操作当前登录账户自己账本的偏好，与工作区选择无关。API 密钥不能使用这些接口。响应包含 enabled、revision、eligible、available 和 monthlyBudgetUsd。enabled 是已保存偏好；available 还要求 Pro 或 Max 权益有效且运行时可用。PATCH 仅接受 {enabled: boolean}，并须使用偏好版本传入 If-Match；Free 账户不能写入。412 冲突后须先主动 GET，再由用户重新选择。这些接口不会运行模型检查、修改支出或重置已使用额度。共享账本成员继承各自账本 Owner 的偏好；模型关闭时，付费账本仍可进行本地疑似重复检查。 即使保存的偏好为开启，Free 仍不能运行模型检查；重新使用需要有效的 Pro 或 Max 套餐。"
+            )}
+          </p>
           <h2 id="expense-review" className="docs-h2">
             {T("Review saved expenses", "检查已保存支出")}
           </h2>

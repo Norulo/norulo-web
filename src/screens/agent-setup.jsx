@@ -1,5 +1,6 @@
 import { T } from "../i18n.jsx";
 import { AGENT_GUIDE } from "../locales/agent-guide.js";
+import { DocsCode } from "./docs-layout.jsx";
 
 export const agentEnvironmentExample = [
   "# Bash: run in the environment your Coding Agent will inherit.",
@@ -29,7 +30,8 @@ export function AgentSetupGuide() {
     <section className="docs-section docs-agent-setup" aria-labelledby="agent-setup">
       <h2 id="agent-setup" className="docs-h2">{T(...AGENT_GUIDE.title)}</h2>
       <p>{T(...AGENT_GUIDE.intro)}</p>
-      <ol className="docs-agent-steps">
+      {/* The explicit role keeps list semantics with custom step markers. */}
+      <ol className="docs-agent-steps" role="list">
         {AGENT_GUIDE.steps.map((step) => (
           <li key={step.title[0]}>
             <h3>{T(...step.title)}</h3>
@@ -38,7 +40,7 @@ export function AgentSetupGuide() {
           </li>
         ))}
       </ol>
-      <div className="docs-code"><pre>{agentEnvironmentExample}</pre></div>
+      <DocsCode>{agentEnvironmentExample}</DocsCode>
       <h3>{T(...AGENT_GUIDE.modelTitle)}</h3>
       <p>{T(...AGENT_GUIDE.model)}</p>
       <h3>{T(...AGENT_GUIDE.promptTitle)}</h3>

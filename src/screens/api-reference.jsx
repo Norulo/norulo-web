@@ -1,5 +1,6 @@
 import { useState } from "react";
 import apiContract from "../data/api-contract.json";
+import { Icon } from "../icons.jsx";
 import { T, useLang } from "../i18n.jsx";
 
 const METHODS = new Set(["get", "post", "put", "patch", "delete", "head", "options", "trace"]);
@@ -465,11 +466,16 @@ function Endpoint({ entry, document }) {
       }}
     >
       <summary className="docs-endpoint-card-h">
-        <span className="docs-method">{method}</span>
-        <code>{path}</code>
-        <span className="api-reference-disclosure" aria-hidden="true">
-          {open ? "−" : "+"}
+        <span className="docs-method" data-method={method}>
+          {method}
         </span>
+        <code>{path}</code>
+        <Icon
+          className="api-reference-disclosure"
+          d="m6 9 6 6 6-6"
+          size={16}
+          aria-hidden="true"
+        />
       </summary>
       {open && (
         <div className="api-reference-content">
@@ -587,11 +593,13 @@ export function ApiReference({ contract = apiContract }) {
         {copy("reference")}
       </h2>
       <p>{copy("introduction")}</p>
-      <p>
+      <p className="api-reference-meta">
         <a className="auth-link" href="/openapi/ledger-v1.json" download="norulo-ledger-v1.json">
           {copy("download")}
         </a>{" "}
-        · OpenAPI {contract.openapi} · v{contract.info?.version}
+        <span>
+          · OpenAPI {contract.openapi} · v{contract.info?.version}
+        </span>
       </p>
       {[...groups.entries()].map(([name, entries]) => (
         <section key={name} className="api-reference-group">

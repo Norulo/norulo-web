@@ -1,5 +1,6 @@
 import { T } from "../i18n.jsx";
 import { API_GUIDE_COPY } from "../locales/api-guide.js";
+import { DocsCode } from "./docs-layout.jsx";
 
 const text = (key) => T(API_GUIDE_COPY[key][0], API_GUIDE_COPY[key][1]);
 const code = (title, value) => ({ title, code: value });
@@ -180,7 +181,7 @@ export function ApiIntegrationGuide({ base, ids }) {
       {section.blocks.map((block, index) => block.text ? <p key={index}>{text(block.text)}</p> : block.rows ? (
         <div key={index} className="docs-table">{block.rows.map(([label, key]) => <div key={label} className="docs-table-r"><b>{label}</b><span>{text(key)}</span></div>)}</div>
       ) : (
-        <div key={index} className="docs-code"><div className="docs-code-h"><span>{text(block.title)}</span></div><pre>{block.code}</pre></div>
+        <DocsCode key={index} title={text(block.title)}>{block.code}</DocsCode>
       ))}
     </section>
   ));

@@ -6,7 +6,9 @@ import { screenLinkProps } from "../lib/navigation.js";
 import { DOCS_GUIDE } from "../locales/docs-guide.js";
 import { AGENT_GUIDE } from "../locales/agent-guide.js";
 import { EXPENSE_CAPACITY_COPY } from "../locales/expense-capacity.js";
+import { DOCS_NAV_COPY } from "../locales/docs-nav.js";
 import { AgentSetupGuide } from "./agent-setup.jsx";
+import { DocsSideNav } from "./docs-layout.jsx";
 import { PublicFooter, PublicHeader } from "./public-layout.jsx";
 
 const SECTIONS = [
@@ -93,6 +95,21 @@ const SECTIONS = [
   },
 ];
 
+// Sidebar groups follow the page order so the current-section marker moves
+// steadily down the list.
+const NAV_GROUPS = [
+  ["getStarted", ["agent-setup", "sign-in"]],
+  ["projects", ["connect", "project-settings", "categories", "project-removal"]],
+  ["expenses", ["expenses", "recurring", "expense-retention"]],
+  ["jev", ["max-assistance", "jev-settings", "expense-review"]],
+  ["reportsAccess", ["reports", "activity", "keys", "members"]],
+];
+
+function sectionTitle(id) {
+  if (id === "agent-setup") return T(...AGENT_GUIDE.title);
+  return T(...SECTIONS.find((section) => section.id === id).title);
+}
+
 export function DocsScreen({ go, auth }) {
   useLang();
   useEffect(() => {
@@ -105,17 +122,14 @@ export function DocsScreen({ go, auth }) {
     <div className="landing fade-in">
       <PublicHeader go={go} current="docs" auth={auth} />
       <div className="docs-shell">
-        <aside className="docs-side">
-          <div className="docs-side-g">
-            <div className="docs-side-h">{T("Docs", "文档")}</div>
-            <a className="docs-side-i" href="#agent-setup">{T(...AGENT_GUIDE.title)}</a>
-            {SECTIONS.map((section) => (
-              <a key={section.id} className="docs-side-i" href={`#${section.id}`}>
-                {T(...section.title)}
-              </a>
-            ))}
-          </div>
-        </aside>
+        <DocsSideNav
+          label={T(...DOCS_NAV_COPY.docsSections)}
+          groups={NAV_GROUPS.map(([key, ids]) => ({
+            key,
+            label: key === "jev" ? "Jev" : T(...DOCS_NAV_COPY[key]),
+            items: ids.map((id) => ({ id, label: sectionTitle(id) })),
+          }))}
+        />
         <main id="main-content" tabIndex={-1} className="docs-main">
           <div className="docs-crumbs">
             <a className="auth-link" {...screenLinkProps(go, "landing")}>

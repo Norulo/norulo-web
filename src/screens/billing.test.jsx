@@ -226,7 +226,7 @@ describe("BillingScreen", () => {
           .getAllByRole("definition")
           .map((n) => n.textContent)
       ).toEqual(["449", "1,000"]);
-      expect(region).toHaveTextContent("Remaining calls: 551");
+      expect(region).not.toHaveTextContent("Remaining calls");
       expect(region).not.toHaveTextContent(/USD|\$/);
       const meter = within(region).getByRole("meter", { name: "Jev calls" });
       expect(meter).toHaveAttribute("value", "449");
@@ -236,7 +236,7 @@ describe("BillingScreen", () => {
     }
   );
 
-  it("shows Free’s one-time 20 trials and remaining count", async () => {
+  it("shows Free’s one-time 20 trials with used and total counts", async () => {
     noruloApi.billing.getPlan.mockResolvedValue(
       withJevUsage("free", {
         month: null,
@@ -252,7 +252,7 @@ describe("BillingScreen", () => {
     render(<BillingScreen go={vi.fn()} navigate={vi.fn()} />);
     const region = await screen.findByRole("region", { name: "Jev usage" });
     expect(region).toHaveTextContent("One-time trial");
-    expect(region).toHaveTextContent("Remaining calls: 13");
+    expect(region).not.toHaveTextContent("Remaining calls");
     expect(
       within(region)
         .getAllByRole("definition")

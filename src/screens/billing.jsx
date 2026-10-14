@@ -500,10 +500,6 @@ function BillingJevUsage({ usage, lang }) {
                     </dd>
                   </div>
                 </dl>
-                <p className="muted">
-                  {usageText("jevRemaining")}:{" "}
-                  <FinancialValue value={number(metric.remainingCalls)} />
-                </p>
                 <BillingUsageMeter
                   used={metric.usedCalls}
                   limit={metric.limitCalls}

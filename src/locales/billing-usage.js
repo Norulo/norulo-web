@@ -27,16 +27,6 @@ export const BILLING_USAGE_COPY = {
       es: "Prueba única",
     },
   ],
-  jevRemaining: [
-    "Remaining calls",
-    {
-      zh: "剩余次数",
-      ja: "残り回数",
-      ko: "남은 횟수",
-      fr: "Appels restants",
-      es: "Llamadas restantes",
-    },
-  ],
   jevPolicy: [
     "Each admitted model attempt uses one call, including failures. Members and API keys share the Owner’s calls. Free’s 20 trials are one-time and never reset. Paid calls reset each UTC calendar month without rollover, including annual subscriptions. Refresh usage to update.",
     {

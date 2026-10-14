@@ -71,12 +71,15 @@ const forbiddenCopy = [
   "上限に到達",
   "上限超過",
   "남음",
+  "남은 횟수",
   "한도 도달",
   "한도 초과",
   "Restant",
+  "Appels restants",
   "Limite atteinte",
   "Dépassement de la limite",
   "Restante",
+  "Llamadas restantes",
   "Límite alcanzado",
   "Exceso sobre el límite",
 ];
@@ -397,7 +400,7 @@ async function measure(page, profile, lang, theme, usage, name, kind = "ledger")
   const keys = kind === "jev" ? ["jevAllowance"] : ["projects", "expenseRecords"];
   assert.equal(measured.rows.length, keys.length, `Missing usage articles: ${details}`);
   assert.equal(measured.meters, keys.length, `Missing or unexpected usage graphics: ${details}`);
-  for (const phrase of kind === "jev" ? [] : forbiddenCopy)
+  for (const phrase of forbiddenCopy)
     assert(
       !measured.text.includes(phrase),
       `Calculated capacity copy remains (${phrase}): ${details}`

@@ -35,7 +35,7 @@ const harness = vi.hoisted(() => ({
 vi.mock("./screens/ledger.jsx", async () => {
   const { useEffect, useState } = await import("react");
   const { Topbar } = await import("./shell.jsx");
-  function ScopedLedger({ api, workspace, mode, projectId, go }) {
+  function ScopedLedger({ api, workspace, mode, projectId, go, onReloadAccess }) {
     const [record, setRecord] = useState("");
     const [failure, setFailure] = useState("");
     const [draft, setDraft] = useState("");
@@ -59,6 +59,9 @@ vi.mock("./screens/ledger.jsx", async () => {
         <Topbar go={go} breadcrumbs={[{ label: "Projects" }]} />
         <h1>Projects</h1>
         <p>Scope: {workspace.id}</p>
+        <button type="button" onClick={onReloadAccess}>
+          Reload ledger access
+        </button>
         {mode !== "projects" && (
           <section id="recurring-plans">
             <article data-recurring-rule-id="rule-one">Recurring target: {mode}</article>
@@ -1292,6 +1295,7 @@ it("remounts protected state and aborts old reads when the actual ledger picker 
   });
   expect(screen.queryByText("Late Alice private data")).not.toBeInTheDocument();
   expect(harness.apis.team.projects).toHaveBeenCalledTimes(1);
+  expect(ledgerApi.workspaces).toHaveBeenCalledTimes(1);
 });
 
 it("ignores a late membership invalidation from the previous ledger instead of clearing a new ledger's draft", async () => {
@@ -1754,11 +1758,23 @@ it.each(["route", "ledger", "account"])(
       fireEvent.change(screen.getByRole("combobox", { name: "Select ledger" }), {
         target: { value: "alice" },
       });
+      await screen.findByText("Personal project");
+      expect(window.location.pathname).toBe("/projects");
+      act(() => {
+        window.history.pushState({}, "", "/members");
+        window.dispatchEvent(new PopStateEvent("popstate"));
+      });
       const ownToggle = await screen.findByRole("button", { name: "Invite member", exact: true });
       await waitFor(() => expect(ownToggle).toBeEnabled());
       expect(ownToggle).toHaveAttribute("aria-expanded", "false");
       fireEvent.change(screen.getByRole("combobox", { name: "Select ledger" }), {
         target: { value: "team" },
+      });
+      await screen.findByText("Team project");
+      expect(window.location.pathname).toBe("/projects");
+      act(() => {
+        window.history.pushState({}, "", "/members");
+        window.dispatchEvent(new PopStateEvent("popstate"));
       });
     } else {
       noruloApi.auth.getSession.mockResolvedValue({
@@ -1918,30 +1934,198 @@ it("clears the previous account's visible requests and notification while the ne
   expect(screen.queryByRole("button", { name: "Review request" })).not.toBeInTheDocument();
 });
 
-it("treats an inaccessible old project ID in a newly selected ledger as one resource error", async () => {
-  window.history.replaceState({}, "", "/projects/prj_alice");
-  authenticatedLedgers();
-  harness.enabled = true;
-  harness.apis.alice = { project: vi.fn().mockResolvedValue({ name: "Alice-only project" }) };
-  harness.apis.team = {
-    project: vi
-      .fn()
-      .mockRejectedValue(
+it.each([
+  [team, personal, "team_only"],
+  [personal, team, "alice_only"],
+])(
+  "replaces %s's private project route with the selected ledger's project list",
+  async (previousLedger, nextLedger, projectId) => {
+    window.history.replaceState({}, "", `/projects/${projectId}?tab=expenses#recurring-plans`);
+    authenticatedLedgers([previousLedger, nextLedger]);
+    harness.enabled = true;
+    const oldProject = pending();
+    const nextProjectName = `${nextLedger.name} project`;
+    harness.apis[previousLedger.id] = { project: vi.fn().mockReturnValue(oldProject.promise) };
+    harness.apis[nextLedger.id] = {
+      project: vi.fn().mockRejectedValue(
         Object.assign(new Error("Project unavailable"), { status: 404, code: "PROJECT_NOT_FOUND" })
       ),
+      projects: vi.fn().mockResolvedValue({ items: [{ name: nextProjectName }] }),
+    };
+    render(<App />);
+    const oldDraft = await screen.findByLabelText("Unsaved scope draft");
+    fireEvent.change(oldDraft, { target: { value: `${previousLedger.name} private edit` } });
+    const oldSignal = harness.apis[previousLedger.id].project.mock.calls[0][1].signal;
+    expect(harness.apis[previousLedger.id].project).toHaveBeenCalledExactlyOnceWith(
+      projectId,
+      expect.objectContaining({ signal: oldSignal })
+    );
+    const historyLength = window.history.length;
+    const replace = vi.spyOn(window.history, "replaceState");
+    const push = vi.spyOn(window.history, "pushState");
+    fireEvent.change(screen.getByRole("combobox", { name: "Select ledger" }), {
+      target: { value: nextLedger.id },
+    });
+
+    expect(await screen.findByText(nextProjectName)).toBeVisible();
+    expect(screen.getByRole("combobox", { name: "Select ledger" })).toHaveValue(nextLedger.id);
+    expect(oldSignal.aborted).toBe(true);
+    expect(oldDraft).not.toBeInTheDocument();
+    expect(screen.getByLabelText("Unsaved scope draft")).toHaveValue("");
+    expect(harness.apis[nextLedger.id].project).not.toHaveBeenCalled();
+    expect(harness.apis[nextLedger.id].projects).toHaveBeenCalledExactlyOnceWith(
+      {},
+      expect.objectContaining({ signal: expect.any(AbortSignal) })
+    );
+    expect(window.location.pathname).toBe("/projects");
+    expect(window.location.search).toBe("");
+    expect(window.location.hash).toBe("");
+    expect(window.history.length).toBe(historyLength);
+    expect(replace).toHaveBeenCalledExactlyOnceWith({ screen: "ledgerProjects" }, "", "/projects");
+    expect(push).not.toHaveBeenCalled();
+
+    await act(async () => oldProject.resolve({ name: "Late old-ledger private project" }));
+    expect(screen.queryByText("Late old-ledger private project")).not.toBeInTheDocument();
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+    expect(screen.getByText(nextProjectName)).toBeVisible();
+    expect(harness.apis[nextLedger.id].project).not.toHaveBeenCalled();
+  }
+);
+
+it.each(["/shared?filter=mine#recurring-plans", "/projects?filter=mine#old-project"])(
+  "clears the previous ledger's route and URL state when switching from %s",
+  async (path) => {
+    window.history.replaceState({}, "", path);
+    authenticatedLedgers();
+    harness.enabled = true;
+    harness.apis.alice = {
+      projects: vi.fn().mockResolvedValue({ items: [{ name: "Alice ledger record" }] }),
+    };
+    harness.apis.team = {
+      projects: vi.fn().mockResolvedValue({ items: [{ name: "Team project list" }] }),
+      project: vi.fn(),
+    };
+    render(<App />);
+    await screen.findByText("Alice ledger record");
+    const oldDraft = screen.getByLabelText("Unsaved scope draft");
+    fireEvent.change(oldDraft, { target: { value: "Previous ledger draft" } });
+    const oldSignal = harness.apis.alice.projects.mock.calls[0][1].signal;
+    const historyLength = window.history.length;
+    const replace = vi.spyOn(window.history, "replaceState");
+    const push = vi.spyOn(window.history, "pushState");
+    fireEvent.change(screen.getByRole("combobox", { name: "Select ledger" }), {
+      target: { value: "team" },
+    });
+
+    expect(await screen.findByText("Team project list")).toBeVisible();
+    expect(screen.getByRole("combobox", { name: "Select ledger" })).toHaveValue("team");
+    expect(oldDraft).not.toBeInTheDocument();
+    expect(oldSignal.aborted).toBe(true);
+    expect(screen.getByLabelText("Unsaved scope draft")).toHaveValue("");
+    expect(screen.queryByText("Alice ledger record")).not.toBeInTheDocument();
+    expect(screen.queryByText("Recurring target: shared")).not.toBeInTheDocument();
+    expect(harness.apis.team.projects).toHaveBeenCalledTimes(1);
+    expect(harness.apis.team.project).not.toHaveBeenCalled();
+    expect(window.location.pathname).toBe("/projects");
+    expect(window.location.search).toBe("");
+    expect(window.location.hash).toBe("");
+    expect(window.history.length).toBe(historyLength);
+    expect(window.history.state).toEqual({ screen: "ledgerProjects" });
+    expect(replace).toHaveBeenCalledExactlyOnceWith({ screen: "ledgerProjects" }, "", "/projects");
+    expect(push).not.toHaveBeenCalled();
+  }
+);
+
+it.each(["access invalidation", "explicit access reload"])(
+  "returns to Projects when %s falls back from a revoked ledger's project",
+  async (trigger) => {
+    window.history.replaceState({}, "", "/projects/team_only?tab=expenses#recurring-plans");
+    authenticatedLedgers([team, personal]);
+    ledgerApi.workspaces
+      .mockResolvedValueOnce({ items: [team, personal] })
+      .mockResolvedValue({ items: [personal] });
+    harness.enabled = true;
+    const oldProject = pending();
+    harness.apis.team = { project: vi.fn().mockReturnValue(oldProject.promise) };
+    harness.apis.alice = {
+      projects: vi.fn().mockResolvedValue({ items: [{ name: "Accessible personal project" }] }),
+      project: vi.fn(),
+    };
+    render(<App />);
+    const oldDraft = await screen.findByLabelText("Unsaved scope draft");
+    fireEvent.change(oldDraft, { target: { value: "Revoked team project edit" } });
+    const oldSignal = harness.apis.team.project.mock.calls[0][1].signal;
+    const historyLength = window.history.length;
+    const replace = vi.spyOn(window.history, "replaceState");
+    const push = vi.spyOn(window.history, "pushState");
+    if (trigger === "access invalidation") {
+      const notify = harness.captures.find((item) => item.id === "team").notify;
+      await act(async () => notify(
+        Object.assign(new Error("Membership changed"), {
+          status: 403,
+          code: "WORKSPACE_MEMBERSHIP_CHANGED",
+        })
+      ));
+    } else {
+      fireEvent.click(screen.getByRole("button", { name: "Reload ledger access" }));
+    }
+
+    expect(await screen.findByText("Accessible personal project")).toBeVisible();
+    expect(screen.getByRole("combobox", { name: "Select ledger" })).toHaveValue("alice");
+    expect(screen.queryByRole("option", { name: /Team ledger/ })).not.toBeInTheDocument();
+    expect(oldSignal.aborted).toBe(true);
+    expect(oldDraft).not.toBeInTheDocument();
+    expect(screen.getByLabelText("Unsaved scope draft")).toHaveValue("");
+    expect(harness.apis.alice.project).not.toHaveBeenCalled();
+    expect(harness.apis.alice.projects).toHaveBeenCalledTimes(1);
+    expect(window.location.pathname).toBe("/projects");
+    expect(window.location.search).toBe("");
+    expect(window.location.hash).toBe("");
+    expect(window.history.length).toBe(historyLength);
+    expect(replace).toHaveBeenCalledExactlyOnceWith({ screen: "ledgerProjects" }, "", "/projects");
+    expect(push).not.toHaveBeenCalled();
+
+    await act(async () => oldProject.resolve({ name: "Late revoked team project" }));
+    expect(screen.queryByText("Late revoked team project")).not.toBeInTheDocument();
+    expect(screen.getByText("Accessible personal project")).toBeVisible();
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+    expect(harness.apis.alice.project).not.toHaveBeenCalled();
+  }
+);
+
+it("keeps the current project and its draft when the ledger picker selects the same ledger", async () => {
+  const path = "/projects/alice_only?tab=expenses#recurring-plans";
+  window.history.replaceState({}, "", path);
+  authenticatedLedgers();
+  harness.enabled = true;
+  harness.apis.alice = {
+    project: vi.fn().mockResolvedValue({ name: "Alice-only project" }),
+    projects: vi.fn(),
   };
+  harness.apis.team = { project: vi.fn(), projects: vi.fn() };
   render(<App />);
   await screen.findByText("Alice-only project");
-  fireEvent.change(screen.getByLabelText("Unsaved scope draft"), {
-    target: { value: "Alice-only edit" },
-  });
+  const draft = screen.getByLabelText("Unsaved scope draft");
+  fireEvent.change(draft, { target: { value: "Keep this project edit" } });
+  const signal = harness.apis.alice.project.mock.calls[0][1].signal;
+  const historyLength = window.history.length;
+  const replace = vi.spyOn(window.history, "replaceState");
+  const push = vi.spyOn(window.history, "pushState");
   fireEvent.change(screen.getByRole("combobox", { name: "Select ledger" }), {
-    target: { value: "team" },
+    target: { value: "alice" },
   });
-  expect(await screen.findByRole("alert")).toHaveTextContent("PROJECT_NOT_FOUND");
-  expect(screen.queryByText("Alice-only project")).not.toBeInTheDocument();
-  expect(screen.getByLabelText("Unsaved scope draft")).toHaveValue("");
-  expect(window.location.pathname).toBe("/projects/prj_alice");
-  expect(harness.apis.team.project).toHaveBeenCalledTimes(1);
+
+  expect(screen.getByLabelText("Unsaved scope draft")).toBe(draft);
+  expect(draft).toHaveValue("Keep this project edit");
+  expect(screen.getByText("Alice-only project")).toBeVisible();
+  expect(signal.aborted).toBe(false);
+  expect(harness.apis.alice.project).toHaveBeenCalledTimes(1);
+  expect(harness.apis.alice.projects).not.toHaveBeenCalled();
+  expect(harness.apis.team.project).not.toHaveBeenCalled();
+  expect(harness.apis.team.projects).not.toHaveBeenCalled();
   expect(ledgerApi.workspaces).toHaveBeenCalledTimes(1);
+  expect(`${window.location.pathname}${window.location.search}${window.location.hash}`).toBe(path);
+  expect(window.history.length).toBe(historyLength);
+  expect(replace).not.toHaveBeenCalled();
+  expect(push).not.toHaveBeenCalled();
 });

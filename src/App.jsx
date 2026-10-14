@@ -221,6 +221,20 @@ export function App() {
   }, []);
   const selectedWorkspaceRef = useRef("");
   const workspaceIdentityRef = useRef("");
+  const resetChangedWorkspaceProject = useCallback((previousId, nextId) => {
+    if (
+      !previousId ||
+      previousId === nextId ||
+      screenFromPath(window.location.pathname) !== "ledgerProject"
+    )
+      return;
+    // Access refreshes can also move us to another ledger after membership
+    // loss. Drop the old project route before rendering that ledger's view.
+    replaceAutomaticScreenPath("ledgerProjects");
+    setScreen("ledgerProjects");
+    setRouteVersion((value) => value + 1);
+    window.scrollTo({ top: 0 });
+  }, []);
   const workspaceReloading = useRef(false);
   const softWorkspaceRefresh = useRef(false);
   const workspaceContext = JSON.stringify([
@@ -314,6 +328,7 @@ export function App() {
           throw new Error("Ledger access could not be loaded.");
         const wanted = selectedWorkspaceRef.current;
         const selected = items.find((item) => item.id === wanted) || items[0];
+        resetChangedWorkspaceProject(wanted, selected.id);
         selectedWorkspaceRef.current = selected.id;
         setWorkspaceState({ identity, status: "ready", items, selectedId: selected.id, error: "" });
         // A changed role/revision remounts the protected view. Its initial read
@@ -342,7 +357,7 @@ export function App() {
         setAccessRefreshing(false);
       });
     return refresh.promise;
-  }, [workspaceScope, workspace, identity, accessSignature]);
+  }, [workspaceScope, workspace, identity, accessSignature, resetChangedWorkspaceProject]);
   const refreshCurrentAccess = useRef(onReloadAccess);
   refreshCurrentAccess.current = onReloadAccess;
   useEffect(() => {
@@ -402,6 +417,7 @@ export function App() {
         const wanted =
           workspaceIdentityRef.current === identity ? selectedWorkspaceRef.current : "";
         const selectedId = items.some((item) => item.id === wanted) ? wanted : items[0].id;
+        resetChangedWorkspaceProject(wanted, selectedId);
         selectedWorkspaceRef.current = selectedId;
         setWorkspaceState({ identity, status: "ready", items, selectedId, error: "" });
         workspaceReloading.current = false;
@@ -419,7 +435,14 @@ export function App() {
         }
       });
     return () => controller.abort();
-  }, [auth.status, auth.authenticated, identity, scopedScreen, workspaceRefresh]);
+  }, [
+    auth.status,
+    auth.authenticated,
+    identity,
+    scopedScreen,
+    workspaceRefresh,
+    resetChangedWorkspaceProject,
+  ]);
   const screenKey = PUBLIC_SCREENS.has(screen)
     ? screen
     : `${screen}:${identity}:${routeVersion}:${scopedScreen ? accessSignature : "account"}`;
@@ -592,11 +615,11 @@ export function App() {
     accessRefreshing,
   ]);
 
-  const go = useCallback((nextScreen, params = {}) => {
+  const go = useCallback((nextScreen, params = {}, { replace = false } = {}) => {
     if (pageOperationRef.current === currentScreenKeyRef.current) return;
     const path = pathFromScreen(nextScreen, params);
     const historyState = { screen: nextScreen };
-    if (window.location.pathname !== path) {
+    if (!replace && window.location.pathname !== path) {
       window.history.pushState(historyState, "", path);
     } else {
       window.history.replaceState(historyState, "", path);
@@ -605,6 +628,31 @@ export function App() {
     setRouteVersion((value) => value + 1);
     window.scrollTo({ top: 0 });
   }, []);
+
+  const onSelectWorkspace = useCallback(
+    (selectedId) => {
+      if (
+        pageOperationRef.current === currentScreenKeyRef.current ||
+        screenRootRef.current?.querySelector('.topbar [aria-disabled="true"]') ||
+        workspaceState.identity !== identity ||
+        workspaceState.status !== "ready" ||
+        selectedId === selectedWorkspaceRef.current ||
+        !workspaceState.items.some((item) => item.id === selectedId)
+      )
+        return;
+      selectWorkspace(selectedId);
+      // Detail routes and URL state belong to the previous ledger. Replace
+      // that entry so Back does not immediately reopen it in the new ledger.
+      if (
+        screen !== "ledgerProjects" ||
+        window.location.pathname !== pathFromScreen("ledgerProjects") ||
+        window.location.search ||
+        window.location.hash
+      )
+        go("ledgerProjects", {}, { replace: true });
+    },
+    [identity, workspaceState, screen, selectWorkspace, go]
+  );
 
   useEffect(() => {
     const onPopState = () => {
@@ -1427,7 +1475,7 @@ export function App() {
             <WorkspaceContext.Provider
               value={
                 scopedScreen && workspace
-                  ? { items: workspaceState.items, workspace, onSelect: selectWorkspace }
+                  ? { items: workspaceState.items, workspace, onSelect: onSelectWorkspace }
                   : null
               }
             >

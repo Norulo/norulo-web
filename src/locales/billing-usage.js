@@ -1,24 +1,50 @@
 export const BILLING_USAGE_COPY = {
   jevTitle: [
     "Jev usage",
-    { zh: "Jev 用量", ja: "Jev の使用量", ko: "Jev 사용량", fr: "Utilisation de Jev", es: "Uso de Jev" },
+    {
+      zh: "Jev 用量",
+      ja: "Jev の使用量",
+      ko: "Jev 사용량",
+      fr: "Utilisation de Jev",
+      es: "Uso de Jev",
+    },
   ],
   jevAllowance: [
-    "Jev assistance allowance",
-    { zh: "Jev 辅助额度", ja: "Jev アシスト利用枠", ko: "Jev 지원 한도", fr: "Allocation d’assistance Jev", es: "Asignación de asistencia Jev" },
+    "Jev calls",
+    { zh: "Jev 次数", ja: "Jev の回数", ko: "Jev 횟수", fr: "Appels Jev", es: "Llamadas Jev" },
   ],
   jevMonth: [
     "UTC month",
     { zh: "UTC 月份", ja: "UTC の月", ko: "UTC 월", fr: "Mois UTC", es: "Mes UTC" },
   ],
-  jevPolicy: [
-    "Used tracks the allowance reserved for model calls, not the provider’s actual invoice. This is for the ledger you own. The allowance resets each UTC calendar month without rollover, including annual subscriptions. Use Refresh usage to update these values.",
+  jevTrial: [
+    "One-time trial",
     {
-      zh: "已使用额度按模型调用的保守预留计算，并非服务商实际账单。这里显示你拥有的账本用量。额度按 UTC 自然月重置，不结转，年订阅也一样。点击“刷新用量”可更新数值。",
-      ja: "使用量はモデル呼び出しに予約した利用枠であり、プロバイダーの実際の請求額ではありません。あなたが所有する帳簿の使用量です。年額契約も含め、枠は UTC の暦月ごとにリセットされ、繰り越されません。「使用量を更新」で数値を更新できます。",
-      ko: "사용량은 모델 호출을 위해 보수적으로 예약한 한도이며 공급자의 실제 청구액이 아닙니다. 본인이 소유한 장부의 사용량입니다. 연간 구독도 한도는 UTC 달력 월마다 초기화되며 이월되지 않습니다. 사용량 새로고침으로 값을 갱신하세요.",
-      fr: "L’utilisation correspond au quota réservé pour les appels au modèle, pas à la facture réelle du fournisseur. Elle concerne le registre dont vous êtes propriétaire. Le quota est réinitialisé chaque mois civil UTC sans report, y compris pour les abonnements annuels. Utilisez Actualiser l’utilisation pour mettre à jour ces valeurs.",
-      es: "El uso refleja el cupo reservado para las llamadas al modelo, no la factura real del proveedor. Corresponde al libro que posees. El cupo se restablece cada mes natural UTC sin acumulación, también en las suscripciones anuales. Usa Actualizar uso para actualizar estos valores.",
+      zh: "一次性试用",
+      ja: "一度限りの試用",
+      ko: "일회성 체험",
+      fr: "Essai unique",
+      es: "Prueba única",
+    },
+  ],
+  jevRemaining: [
+    "Remaining calls",
+    {
+      zh: "剩余次数",
+      ja: "残り回数",
+      ko: "남은 횟수",
+      fr: "Appels restants",
+      es: "Llamadas restantes",
+    },
+  ],
+  jevPolicy: [
+    "Each admitted model attempt uses one call, including failures. Members and API keys share the Owner’s calls. Free’s 20 trials are one-time and never reset. Paid calls reset each UTC calendar month without rollover, including annual subscriptions. Refresh usage to update.",
+    {
+      zh: "每次获准的模型尝试（包括失败）消耗 1 次。成员与 API 密钥共用 Owner 的次数。Free 的 20 次为一次性试用，不重置；付费次数按 UTC 自然月重置、不结转，年订阅也一样。点击“刷新用量”更新。",
+      ja: "失敗も含む許可されたモデル試行ごとに1回を消費します。メンバーと API キーは Owner の回数を共有します。Free の20回は一度限りでリセットされません。有料の回数は年額契約も UTC 暦月ごとにリセットされ、繰り越しません。使用量を更新してください。",
+      ko: "실패를 포함한 허용된 모델 시도마다 1회를 사용합니다. 구성원과 API 키는 Owner의 횟수를 공유합니다. Free의 20회는 일회성이며 초기화되지 않습니다. 유료 횟수는 연간 구독도 UTC 월마다 초기화되며 이월되지 않습니다. 사용량을 새로고침하세요.",
+      fr: "Chaque tentative admise, même échouée, utilise un appel partagé entre Owner, membres et clés API. Les 20 essais Free sont uniques et ne se renouvellent jamais. Les appels payants se réinitialisent chaque mois UTC sans report, même en annuel. Actualisez l’utilisation.",
+      es: "Cada intento admitido, incluso fallido, consume una llamada compartida entre Owner, miembros y claves API. Las 20 pruebas Free son únicas y nunca se renuevan. Las llamadas de pago se restablecen cada mes UTC sin acumulación, también en anual. Actualiza el uso.",
     },
   ],
   title: [

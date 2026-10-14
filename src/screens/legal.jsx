@@ -161,16 +161,16 @@ export function PrivacyScreen({ go, auth }) {
         </p>
         <p>
           {T(
-            "Pro and Max automatically use Jev during expense saves when enabled, available and within the plan allowance, for categorization and advice on project or shared expenses. Expense data sent to the model consists of the submitted purpose and note when saving, or the saved purpose and note of expenses you explicitly select and start reviewing, plus allowed active category IDs and names. Jev returns only predefined choices and confidence scores; the interface displays the checks using fixed wording. Norulo checks possible duplicates in its own service using a bounded authorized expense lookup; text from other candidate historical expenses is not sent to the model. Repository code and stored GitHub and API key tokens are excluded from model input. Do not enter secrets in purpose, notes or category names, as those fields may be sent to the model. Explicit amounts, currencies, targets and categories are preserved; uncertain categorization requires you to choose a category.",
-            "Pro 和 Max 在模型已启用、可用且套餐额度内，会在保存支出时自动使用 Jev 分类，并提供项目或公共支出归属建议。发送给模型的支出数据包括保存时提交的用途和备注，或你主动选中并开始检查的已保存支出的用途和备注，以及获准的有效类别 ID 和名称。Jev 只返回预定义选项和置信评分，界面用固定文案展示检查结果。Norulo 在自身服务内通过有限的已授权支出查询检查疑似重复记录，不向模型发送其他历史重复候选记录的文字。仓库代码、已保存的 GitHub 令牌及 API 密钥令牌不纳入模型输入。请勿在用途、备注或类别名称中填写秘密信息，这些字段可能发送给模型。明确填写的金额、币种、目标和类别会保留；无法可靠分类时需要你选择类别。"
+            "Free trials and Pro/Max calls automatically use Jev during expense saves when enabled, available and within the Owner’s call allowance, for categorization and advice on project or shared expenses. Expense data sent to the model consists of the submitted purpose and note when saving, or the saved purpose and note of expenses you explicitly select and start reviewing, plus allowed active category IDs and names. Jev returns only predefined choices and confidence scores; the interface displays the checks using fixed wording. Norulo checks possible duplicates in its own service using a bounded authorized expense lookup; text from other candidate historical expenses is not sent to the model. Repository code and stored GitHub and API key tokens are excluded from model input. Do not enter secrets in purpose, notes or category names, as those fields may be sent to the model. Explicit amounts, currencies, targets and categories are preserved; uncertain categorization requires you to choose a category.",
+            "Free 试用与 Pro/Max 次数在模型已启用、可用且 Owner 次数充足时，会在保存支出时自动使用 Jev 分类，并提供项目或公共支出归属建议。发送给模型的支出数据包括保存时提交的用途和备注，或你主动选中并开始检查的已保存支出的用途和备注，以及获准的有效类别 ID 和名称。Jev 只返回预定义选项和置信评分，界面用固定文案展示检查结果。Norulo 在自身服务内通过有限的已授权支出查询检查疑似重复记录，不向模型发送其他历史重复候选记录的文字。仓库代码、已保存的 GitHub 令牌及 API 密钥令牌不纳入模型输入。请勿在用途、备注或类别名称中填写秘密信息，这些字段可能发送给模型。明确填写的金额、币种、目标和类别会保留；无法可靠分类时需要你选择类别。"
           )}
         </p>
       </Section>
       <Section id="sharing" title={sections[3].title}>
         <p>
           {T(
-            "Cloudflare hosts the web app, API and data storage, and delivers verification emails using your email address and one-time code. GitHub provides optional sign-in and repository authorization. Creem processes platform payments, and TypeSafe processes Jev expense assistance for Pro and Max when enabled and available. These providers process the data needed for their functions under their own applicable terms and privacy policies. We do not sell your personal data or repository code.",
-            "Cloudflare 托管 Web 应用、API 和数据存储，并使用你的邮箱地址和一次性验证码发送验证邮件。GitHub 提供可选的登录与仓库授权。Creem 处理平台支付，TypeSafe 在已启用且可用时提供 Pro 和 Max 的 Jev 支出辅助。这些提供方会根据各自适用的条款与隐私政策处理其功能所需数据。我们不出售个人数据或仓库代码。"
+            "Cloudflare hosts the web app, API and data storage, and delivers verification emails using your email address and one-time code. GitHub provides optional sign-in and repository authorization. Creem processes platform payments, and TypeSafe processes Jev expense assistance for Free trials, Pro and Max when enabled and available. These providers process the data needed for their functions under their own applicable terms and privacy policies. We do not sell your personal data or repository code.",
+            "Cloudflare 托管 Web 应用、API 和数据存储，并使用你的邮箱地址和一次性验证码发送验证邮件。GitHub 提供可选的登录与仓库授权。Creem 处理平台支付，TypeSafe 在已启用且可用时提供 Free 试用、Pro 和 Max 的 Jev 支出辅助。这些提供方会根据各自适用的条款与隐私政策处理其功能所需数据。我们不出售个人数据或仓库代码。"
           )}
         </p>
         <p>
@@ -256,8 +256,8 @@ export function TermsScreen({ go, auth }) {
       <Section id="service" title={sections[0].title}>
         <p>
           {T(
-            "Norulo lets developers and teams record, report and export project expenses and shared costs across projects. Projects can be created without linking a GitHub repository. Pro and Max include automatic expense assistance when enabled, available and within the plan allowance. Reports keep currencies separate and do not perform exchange-rate conversion. Review saved entries and model suggestions; Norulo does not provide accounting, tax or investment advice.",
-            "Norulo 帮助开发者与团队记录、汇总和导出项目支出及跨项目公共费用。创建项目无需关联 GitHub 仓库。Pro 和 Max 在模型已启用、可用且套餐额度内提供自动支出辅助。报表按币种分别汇总，不进行汇率换算。请核对保存的记录与模型建议；Norulo 不提供会计、税务或投资建议。"
+            "Norulo lets developers and teams record, report and export project expenses and shared costs across projects. Projects can be created without linking a GitHub repository. Free trials and paid plans include automatic expense assistance when enabled, available and within the Owner’s call allowance. Reports keep currencies separate and do not perform exchange-rate conversion. Review saved entries and model suggestions; Norulo does not provide accounting, tax or investment advice.",
+            "Norulo 帮助开发者与团队记录、汇总和导出项目支出及跨项目公共费用。创建项目无需关联 GitHub 仓库。Free 试用与 Pro/Max 次数在模型已启用、可用且 Owner 次数充足时提供自动支出辅助。报表按币种分别汇总，不进行汇率换算。请核对保存的记录与模型建议；Norulo 不提供会计、税务或投资建议。"
           )}
         </p>
       </Section>
@@ -300,8 +300,8 @@ export function TermsScreen({ go, auth }) {
       <Section id="content" title={sections[4].title}>
         <p>
           {T(
-            "You retain ownership of your ledger entries and other customer content, and allow Norulo to store and process them to provide and secure the service as described in the Privacy Policy. Only enter data you are entitled to use and share. After a join request is approved, all existing and future projects, categories, expenses, reports and CSV exports in that ledger become accessible according to the member's role. Removing access cannot recall exported copies. Automatic Jev assistance on Pro and Max runs as part of your expense write; it does not create expenses during reads or change explicit choices. You can separately start checks of saved expenses, with predefined choices and any returned confidence scores shown in fixed interface wording. Review results do not change records; you must confirm corrections through Edit.",
-            "你保留账目和其他客户内容的所有权，并允许 Norulo 按隐私政策说明存储和处理这些内容，以提供和保护服务。仅录入你有权使用与共享的数据。加入申请获批后，该账本全部现有及未来的项目、分类、支出、报表和 CSV 导出会按成员角色开放访问。撤销访问无法收回已经导出的副本。Pro 和 Max 的 Jev 自动辅助随支出写入运行，不会在读取时新增支出或改动明确选择。你也可以主动开始检查已保存支出，预定义选项和返回的置信评分会以界面固定文案展示。检查结果不会修改记录，纠正内容须由你通过编辑确认。"
+            "You retain ownership of your ledger entries and other customer content, and allow Norulo to store and process them to provide and secure the service as described in the Privacy Policy. Only enter data you are entitled to use and share. After a join request is approved, all existing and future projects, categories, expenses, reports and CSV exports in that ledger become accessible according to the member's role. Removing access cannot recall exported copies. Automatic Jev assistance for Free trials and paid plans runs as part of your expense write; it does not create expenses during reads or change explicit choices. You can separately start checks of saved expenses, with predefined choices and any returned confidence scores shown in fixed interface wording. Review results do not change records; you must confirm corrections through Edit.",
+            "你保留账目和其他客户内容的所有权，并允许 Norulo 按隐私政策说明存储和处理这些内容，以提供和保护服务。仅录入你有权使用与共享的数据。加入申请获批后，该账本全部现有及未来的项目、分类、支出、报表和 CSV 导出会按成员角色开放访问。撤销访问无法收回已经导出的副本。Free 试用、Free 试用、Pro 和 Max 的 Jev 自动辅助随支出写入运行，不会在读取时新增支出或改动明确选择。你也可以主动开始检查已保存支出，预定义选项和返回的置信评分会以界面固定文案展示。检查结果不会修改记录，纠正内容须由你通过编辑确认。"
           )}
         </p>
       </Section>

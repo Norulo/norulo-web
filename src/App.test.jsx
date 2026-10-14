@@ -26,7 +26,12 @@ vi.mock("./api/norulo.js", () => ({
     integrations: { list: vi.fn(), getGitHubAuthorizeUrl: vi.fn() },
   },
 }));
-const harness = vi.hoisted(() => ({ enabled: false, apis: {}, captures: [], authorizationRevisions: [] }));
+const harness = vi.hoisted(() => ({
+  enabled: false,
+  apis: {},
+  captures: [],
+  authorizationRevisions: [],
+}));
 vi.mock("./screens/ledger.jsx", async () => {
   const { useEffect, useState } = await import("react");
   const { Topbar } = await import("./shell.jsx");
@@ -108,6 +113,9 @@ beforeEach(() => {
     eligible: true,
     available: true,
     monthlyBudgetUsd: "3",
+    monthlyCalls: 1089,
+    trialCalls: 0,
+    period: "utc-calendar-month",
   });
   noruloApi.auth.requestEmailCode.mockResolvedValue({
     challengeId: "email_challenge",
@@ -175,7 +183,8 @@ it.each([
   window.history.replaceState({}, "", path);
   noruloApi.auth.getSession.mockResolvedValue({ authenticated, user: { id: "alice" } });
   render(<App />);
-  await screen.findByRole("heading", { name: title });
+  // Cold lazy route imports can exceed the default one-second DOM wait under CI load.
+  await screen.findByRole("heading", { name: title }, { timeout: 10000 });
   const main = screen.getByRole("main");
   const skip = screen.getByRole("link", { name: "Skip to content" });
   expect(main.tagName).toBe("MAIN");
@@ -203,29 +212,34 @@ it("establishes GitHub renewal from the confirmed account and clears it on unmou
   expect(scope.controller.signal.aborted).toBe(true);
 });
 
-it.each(["redirecting", "verified"])("handles %s repository authorization continuation without refreshing during navigation", async (status) => {
-  window.history.replaceState({}, "", "/projects?repoAuth=1");
-  noruloApi.auth.getSession.mockResolvedValue({ authenticated: true, user: { id: "alice" } });
-  const completion = pending();
-  const authorize = vi.spyOn(await import("./lib/auth.js"), "connectGitHubRepositories")
-    .mockReturnValueOnce(completion.promise);
-  const view = render(<App />);
-  await screen.findByRole("heading", { name: "Projects" });
-  expect(authorize).toHaveBeenCalledOnce();
-  const signal = authorize.mock.calls[0][0].signal;
-  expect(signal.aborted).toBe(false);
-  expect(window.location.search).toBe("");
-  await act(async () => completion.resolve(status === "redirecting" ? { status } : undefined));
-  expect(harness.authorizationRevisions.at(-1)).toBe(status === "redirecting" ? 0 : 1);
-  view.unmount();
-  expect(signal.aborted).toBe(true);
-});
+it.each(["redirecting", "verified"])(
+  "handles %s repository authorization continuation without refreshing during navigation",
+  async (status) => {
+    window.history.replaceState({}, "", "/projects?repoAuth=1");
+    noruloApi.auth.getSession.mockResolvedValue({ authenticated: true, user: { id: "alice" } });
+    const completion = pending();
+    const authorize = vi
+      .spyOn(await import("./lib/auth.js"), "connectGitHubRepositories")
+      .mockReturnValueOnce(completion.promise);
+    const view = render(<App />);
+    await screen.findByRole("heading", { name: "Projects" });
+    expect(authorize).toHaveBeenCalledOnce();
+    const signal = authorize.mock.calls[0][0].signal;
+    expect(signal.aborted).toBe(false);
+    expect(window.location.search).toBe("");
+    await act(async () => completion.resolve(status === "redirecting" ? { status } : undefined));
+    expect(harness.authorizationRevisions.at(-1)).toBe(status === "redirecting" ? 0 : 1);
+    view.unmount();
+    expect(signal.aborted).toBe(true);
+  }
+);
 
 it("discards authorization continuation after leaving its page", async () => {
   window.history.replaceState({}, "", "/projects?repoAuth=1");
   noruloApi.auth.getSession.mockResolvedValue({ authenticated: true, user: { id: "alice" } });
   const completion = pending();
-  const authorize = vi.spyOn(await import("./lib/auth.js"), "connectGitHubRepositories")
+  const authorize = vi
+    .spyOn(await import("./lib/auth.js"), "connectGitHubRepositories")
     .mockReturnValueOnce(completion.promise);
   const view = render(<App />);
   await screen.findByRole("heading", { name: "Projects" });
@@ -654,7 +668,9 @@ it("immediately confirms a protected 401 and removes private state without a foc
   window.history.replaceState({}, "", "/projects");
   authenticatedLedgers([personal]);
   harness.enabled = true;
-  harness.apis.alice = { projects: vi.fn().mockResolvedValue({ items: [{ name: "Private project" }] }) };
+  harness.apis.alice = {
+    projects: vi.fn().mockResolvedValue({ items: [{ name: "Private project" }] }),
+  };
   render(<App />);
   const draft = await screen.findByLabelText("Unsaved scope draft");
   fireEvent.change(draft, { target: { value: "Private draft" } });
@@ -676,32 +692,41 @@ it("immediately confirms a protected 401 and removes private state without a foc
   expect(ledgerApi.workspaces).toHaveBeenCalledTimes(1);
 });
 
-it.each(["network", "unauthenticated"])("handles a %s session recheck after a protected 401 without replaying reads", async (failure) => {
-  window.history.replaceState({}, "", "/projects");
-  authenticatedLedgers([personal]);
-  harness.enabled = true;
-  harness.apis.alice = { projects: vi.fn().mockResolvedValue({ items: [{ name: "Private project" }] }) };
-  render(<App />);
-  const draft = await screen.findByLabelText("Unsaved scope draft");
-  fireEvent.change(draft, { target: { value: "Private draft" } });
-  const initialScope = captureRequestSessionScope();
-  noruloApi.auth.getSession.mockRejectedValueOnce(failure === "network"
-    ? new TypeError("Failed to fetch")
-    : Object.assign(new Error("Unauthenticated"), { status: 401 }));
-  act(() => requestSessionRecheck(initialScope));
-  await waitFor(() => expect(noruloApi.auth.getSession).toHaveBeenCalledTimes(2));
-  if (failure === "network") {
-    await waitFor(() => expect(screen.getByLabelText("Unsaved scope draft")).toHaveValue("Private draft"));
-    expect(window.location.pathname).toBe("/projects");
-    expect(captureRequestSessionScope()).toBe(initialScope);
-  } else {
-    await waitFor(() => expect(window.location.pathname).toBe("/login"));
-    expect(screen.queryByLabelText("Unsaved scope draft")).not.toBeInTheDocument();
-    expect(captureRequestSessionScope()).toBeNull();
+it.each(["network", "unauthenticated"])(
+  "handles a %s session recheck after a protected 401 without replaying reads",
+  async (failure) => {
+    window.history.replaceState({}, "", "/projects");
+    authenticatedLedgers([personal]);
+    harness.enabled = true;
+    harness.apis.alice = {
+      projects: vi.fn().mockResolvedValue({ items: [{ name: "Private project" }] }),
+    };
+    render(<App />);
+    const draft = await screen.findByLabelText("Unsaved scope draft");
+    fireEvent.change(draft, { target: { value: "Private draft" } });
+    const initialScope = captureRequestSessionScope();
+    noruloApi.auth.getSession.mockRejectedValueOnce(
+      failure === "network"
+        ? new TypeError("Failed to fetch")
+        : Object.assign(new Error("Unauthenticated"), { status: 401 })
+    );
+    act(() => requestSessionRecheck(initialScope));
+    await waitFor(() => expect(noruloApi.auth.getSession).toHaveBeenCalledTimes(2));
+    if (failure === "network") {
+      await waitFor(() =>
+        expect(screen.getByLabelText("Unsaved scope draft")).toHaveValue("Private draft")
+      );
+      expect(window.location.pathname).toBe("/projects");
+      expect(captureRequestSessionScope()).toBe(initialScope);
+    } else {
+      await waitFor(() => expect(window.location.pathname).toBe("/login"));
+      expect(screen.queryByLabelText("Unsaved scope draft")).not.toBeInTheDocument();
+      expect(captureRequestSessionScope()).toBeNull();
+    }
+    expect(harness.apis.alice.projects).toHaveBeenCalledTimes(1);
+    expect(ledgerApi.workspaces).toHaveBeenCalledTimes(1);
   }
-  expect(harness.apis.alice.projects).toHaveBeenCalledTimes(1);
-  expect(ledgerApi.workspaces).toHaveBeenCalledTimes(1);
-});
+);
 
 it("supersedes a pending focus check when protected data reports an expired session", async () => {
   window.history.replaceState({}, "", "/projects");
@@ -709,7 +734,9 @@ it("supersedes a pending focus check when protected data reports an expired sess
   render(<App />);
   await screen.findByRole("heading", { name: "Projects" });
   const focus = pending();
-  noruloApi.auth.getSession.mockReturnValueOnce(focus.promise).mockResolvedValueOnce({ authenticated: false });
+  noruloApi.auth.getSession
+    .mockReturnValueOnce(focus.promise)
+    .mockResolvedValueOnce({ authenticated: false });
   act(() => window.dispatchEvent(new Event("focus")));
   const focusSignal = noruloApi.auth.getSession.mock.calls[1][0].signal;
   act(() => requestSessionRecheck(captureRequestSessionScope()));

@@ -5,11 +5,16 @@ import { createDateLayoutFixture, WORKSPACE_ID } from "./date-layout-fixtures.mj
 // or any write to a Server. Reuse the contract-backed ledger/date DTOs.
 export const MOBILE_VERIFIED_EMAIL =
   "verified.account.for.project.and.shared.expense.records@development.and.infrastructure.operations.example.com";
-export const MOBILE_ACCOUNT_NAME = "LongReadableAccountNameForProjectAndSharedExpenseOwnership".repeat(2);
+export const MOBILE_ACCOUNT_NAME =
+  "LongReadableAccountNameForProjectAndSharedExpenseOwnership".repeat(2);
 export const MOBILE_NORMAL_EMAIL = "taylor@example.com";
 export const MOBILE_NORMAL_NAME = "Taylor";
 
-export function createMobileLayoutFixture({ baseURL, accountOnboarding = false, accountIdentity = "long" }) {
+export function createMobileLayoutFixture({
+  baseURL,
+  accountOnboarding = false,
+  accountIdentity = "long",
+}) {
   const base = new URL(baseURL);
   // Include self-hosted fonts and each visited screen's lazy CSS in the same
   // finite request allowance used by the multi-screen date checker.
@@ -70,8 +75,7 @@ export function createMobileLayoutFixture({ baseURL, accountOnboarding = false, 
           providers: ["email"],
         },
       };
-    if (accountOnboarding && path === "/api/v1/projects")
-      return { items: [], nextCursor: null };
+    if (accountOnboarding && path === "/api/v1/projects") return { items: [], nextCursor: null };
     if (path === "/api/v1/workspace-invitation-requests")
       return { items: longInbox ? inbox : [], hasMore: false };
     if (path === "/api/v1/recurring-expense-notifications")
@@ -110,6 +114,9 @@ export function createMobileLayoutFixture({ baseURL, accountOnboarding = false, 
         eligible: false,
         available: false,
         monthlyBudgetUsd: "0.00",
+        monthlyCalls: 0,
+        trialCalls: 20,
+        period: "lifetime",
         revision: 1,
       };
     if (path === "/api/v1/account/expense-retention")
@@ -182,7 +189,10 @@ export function createMobileLayoutFixture({ baseURL, accountOnboarding = false, 
           for (const key of url.searchParams.keys()) {
             assert.equal(key, "limit", "Unexpected empty Projects query");
             assert.equal(url.searchParams.getAll(key).length, 1, "Duplicate Projects query");
-            assert(/^(?:[1-9][0-9]?|100)$/.test(url.searchParams.get(key)), "Invalid Projects limit");
+            assert(
+              /^(?:[1-9][0-9]?|100)$/.test(url.searchParams.get(key)),
+              "Invalid Projects limit"
+            );
           }
         } else assert.equal(url.search, "", `Unexpected extra-fixture query: ${record.path}`);
         if (

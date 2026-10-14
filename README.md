@@ -126,7 +126,7 @@ Spending overview displays each currency's total beside its project / Shared
 Pool composition for a selected month or inclusive date range. Money stays
 exact, currencies stay separate, and the chart's readable legend shows both
 amounts and shares. Billing uses the same flat visual hierarchy for Projects,
-Expense records and paid Jev, with larger Used values and quieter allowances.
+Expense records and Jev calls, with larger Used values and quieter allowances.
 The presentation references Vercel Usage, Linear Insights and shadcn / Tremor
 chart patterns while retaining Norulo's theme and existing data contracts.
 Run `npm run test:overview-layout -- --browser=chromium` after building for

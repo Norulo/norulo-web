@@ -38,19 +38,19 @@ const PROJECT_STATE =
   'Standalone responses have githubRepoId: null, githubRepoIds: [], repositories: [] and githubAccess: "not_linked". Active standalone projects can record expenses under the usual role, scope and plan limits.';
 
 const MAX_ASSISTANCE =
-  "For ledgers on the Owner's effective Pro or Max plan, regular expense creation and editing automatically receive Jev assistance while the model is available and within the ledger's monthly allowance. No separate suggestion request or suggestions:use scope is needed; expenses:write and the normal target restrictions apply.";
+  "Jev assists expense saves in Web and REST API when enabled, available and within the Owner’s call allowance: Free 20 one-time trials, Pro 1,089/month, Max 4,358/month. Members and API keys share it. Automatic categorization only selects a confident active category; explicit category, target, amount and currency stay unchanged. Otherwise choose a category and retry. Recurring setup supports Automatic; background posting reuses the saved category. Ordinary writes need no suggestions:use scope. Normal expenses:write and target permissions apply.";
 const CATEGORY_BEHAVIOR =
-  "On POST /api/v1/expenses and PATCH /api/v1/expenses/{id}, categoryId may be omitted for automatic categorization when the ledger Owner's effective Pro or Max plan, model availability and allowance permit it. Explicit category, target, amount and currency are preserved. If no category can be selected confidently, 422 CATEGORY_REQUIRED leaves the expense unsaved; choose a category and retry. Creates use a new Idempotency-Key. Retry edits with If-Match using the loaded revision; reload explicitly after a revision conflict. Recurring schedule creation and complete edits support the same gated category omission; background posting reuses the saved category. Free ledgers require an explicit category.";
+  "On POST/PATCH /api/v1/expenses, omit categoryId for Automatic while the Owner has Jev calls and enabled, available Jev. Free shares 20 one-time trials; Pro and Max have monthly calls. Explicit category, target, amount and currency stay unchanged. If no confident category is found, 422 CATEGORY_REQUIRED leaves input unsaved; choose a category and retry. Creates need a new Idempotency-Key; edits need the loaded If-Match revision and explicit reload after conflict. Recurring setup supports the same option; background posting uses the saved category.";
 const ASSISTANCE_RESPONSE =
   "Successful writes return the expense with an assistance object: status, categorySource (jev or user), suggestions and optional reason/modelVersion/questionVersion. Duplicate advice never blocks saving. Identical create requests with the same Idempotency-Key return the cached result without another model call. Reads do not invoke Jev.";
 const EXPENSE_REVIEW =
-  "POST /api/v1/expenses/{id}/review checks one saved expense with an empty JSON body {} and If-Match for its loaded revision. It requires expenses:write and the usual ledger role and target authority, with the Owner's effective Pro or Max plan. It shares the monthly Jev allowance used by expense saves, without a daily attempt cap. Reviews never change expenses or their revision, and never automatically apply a category or target. Requests are explicit and are not retried automatically; review does not use Idempotency-Key replay.";
+  "POST /api/v1/expenses/{id}/review requires {}, If-Match of the loaded revision, expenses:write and normal role/target authority. Expense review loads up to 100 filtered expenses separately from the normal page. Only Start review sends one check at a time. Model checks share the Owner’s Free lifetime trial or paid monthly calls; each admitted attempt consumes one call, including failures. Stop ends queued work without refunding started checks. Reviews never edit expenses or advance revisions. Local duplicate checks remain available for paid ledgers with Jev off. Uncertain or unavailable is not a clear result; Edit reloads saved values without applying advice. No automatic retries or Idempotency-Key replay.";
 const REVIEW_RESPONSE =
   "A review returns expenseId, revision, questionVersion, modelVersion, optional suggestionId and checks. Category and target checks use checked, issue, uncertain or unavailable, with current values and optional suggested values and confidence. Jev returns only predefined choices and scores. Optional reason values are fixed codes: disabled, provider_unavailable, no_categories or invalid_context. Duplicate checks use local rules on other expenses with the same authorized target, occurredOn date, currency and exact amount. Purpose does not need to match. The duplicate status is checked or issue; an issue may include candidate {id, revision}, without expense details. Local duplicate checks can remain available when the model is unavailable. Uncertain or unavailable does not mean a clear result. To edit, first GET the current expense with expenses:read, then explicitly PATCH it with expenses:write and the fresh If-Match revision.";
 const EXACT_TOTALS =
   "Single expense amountMinor values are safe integers. Aggregate amountMinor totals are numbers up to 9007199254740991 and exact decimal integer strings above that boundary; parse large totals with BigInt or decimal arithmetic.";
 const ACCOUNT_JEV =
-  "GET and PATCH /api/v1/account/jev require a cookie session and operate on the signed-in account's own ledger preference, independently of workspace selection. API keys cannot use these endpoints. The response contains enabled, revision, eligible, available and monthlyBudgetUsd. enabled is the stored preference; available also requires an effective Pro or Max plan and runtime availability. PATCH accepts only {enabled: boolean} and requires If-Match with the preference revision; Free accounts cannot write. A 412 conflict requires an explicit GET before another user choice. These endpoints do not run model checks, change expenses or reset used allowance. Shared ledger members inherit their ledger Owner's preference; paid local duplicate checks remain possible when model checks are off. Free cannot run model checks even if its saved preference is On; an effective Pro or Max plan is required to use them again.";
+  "GET/PATCH /api/v1/account/jev use the signed-in cookie account’s own preference; workspace selection and API keys grant no access to another Owner’s settings. Free can also toggle Jev. Responses expose enabled, revision, eligible, available, monthlyCalls, trialCalls and period; monthlyBudgetUsd is deprecated compatibility data. PATCH accepts only {enabled: boolean} and requires If-Match with the preference revision. After 412, explicitly GET before another choice. No model checks, expense changes or call refunds occur. Members inherit the ledger Owner’s preference.";
 
 function markdown(base, example, createExample, projectExample, reviewExample) {
   return [
@@ -256,15 +256,17 @@ export function ApiDocsScreen({ go, auth }) {
               id,
               label: T(
                 label,
-                id === "agent-setup" ? AGENT_GUIDE.title[1] : label === "Complete API reference"
-                  ? {
-                      zh: "完整 API 参考",
-                      ja: "API リファレンス全体",
-                      ko: "전체 API 참조",
-                      fr: "Référence API complète",
-                      es: "Referencia completa de la API",
-                    }
-                  : Object.values(API_GUIDE_COPY).find(([english]) => english === label)?.[1]
+                id === "agent-setup"
+                  ? AGENT_GUIDE.title[1]
+                  : label === "Complete API reference"
+                    ? {
+                        zh: "完整 API 参考",
+                        ja: "API リファレンス全体",
+                        ko: "전체 API 참조",
+                        fr: "Référence API complète",
+                        es: "Referencia completa de la API",
+                      }
+                    : Object.values(API_GUIDE_COPY).find(([english]) => english === label)?.[1]
               ),
             })),
           }))}
@@ -407,13 +409,13 @@ export function ApiDocsScreen({ go, auth }) {
           <p>
             {T(
               MAX_ASSISTANCE,
-              "账本所有者的 Pro 或 Max 权益有效时，在模型可用且账本月度额度内，正常创建和编辑支出即可自动享受 Jev 辅助。无需另发建议请求或授予 suggestions:use 权限；使用 expenses:write 和正常目标权限即可。"
+              "Jev 开启、可用且账本 Owner 的次数充足时，网页及 REST API 保存支出可使用辅助：Free 一次性试用 20 次，Pro 每月 1,089 次，Max 每月 4,358 次，成员及 API 密钥共用。自动分类只选择有把握的启用类别；明确填写的类别、目标、金额和币种保持不变，否则请选择类别重试。周期计划设置支持自动分类，后台生成沿用保存的类别。普通写入无需 suggestions:use，仍须具备 expenses:write 和目标权限。"
             )}
           </p>
           <p>
             {T(
               CATEGORY_BEHAVIOR,
-              "POST /api/v1/expenses 和 PATCH /api/v1/expenses/{id} 时，账本所有者的 Pro 或 Max 权益有效、模型可用且额度允许，则可省略 categoryId 进行自动分类。明确填写的类别、目标、金额和币种会保留。无法有把握地选出类别时返回 422 CATEGORY_REQUIRED，支出尚未保存；请选择类别后重试。新增支出使用新的 Idempotency-Key；编辑重试使用已加载版本的 If-Match，发生版本冲突后须主动重新加载。周期计划的创建和完整编辑同样支持受权益与额度限制的类别省略；后台生成沿用保存的类别。Free 账本必须明确填写类别。"
+              "POST/PATCH /api/v1/expenses 可在 Owner 有次数且 Jev 开启、可用时省略 categoryId 自动分类。Free 共享一次性 20 次试用，Pro 和 Max 使用月度次数。明确的类别、目标、金额及币种不变；无法确定类别时返回 422 CATEGORY_REQUIRED，输入不保存，请手动选类别重试。创建须使用新的 Idempotency-Key；编辑须带当前版本 If-Match，冲突后主动重读。周期计划设置支持相同选项，后台生成沿用保存类别。"
             )}
           </p>
           <p>
@@ -436,7 +438,7 @@ export function ApiDocsScreen({ go, auth }) {
           <p>
             {T(
               ACCOUNT_JEV,
-              "GET 和 PATCH /api/v1/account/jev 需要 Cookie 会话，操作当前登录账户自己账本的偏好，与工作区选择无关。API 密钥不能使用这些接口。响应包含 enabled、revision、eligible、available 和 monthlyBudgetUsd。enabled 是已保存偏好；available 还要求 Pro 或 Max 权益有效且运行时可用。PATCH 仅接受 {enabled: boolean}，并须使用偏好版本传入 If-Match；Free 账户不能写入。412 冲突后须先主动 GET，再由用户重新选择。这些接口不会运行模型检查、修改支出或重置已使用额度。共享账本成员继承各自账本 Owner 的偏好；模型关闭时，付费账本仍可进行本地疑似重复检查。 即使保存的偏好为开启，Free 仍不能运行模型检查；重新使用需要有效的 Pro 或 Max 套餐。"
+              "GET/PATCH /api/v1/account/jev 使用 Cookie 登录账户自己的偏好；选中工作区或 API 密钥不能访问其他 Owner 的设置。Free 也可开关 Jev。响应提供 enabled、revision、eligible、available、monthlyCalls、trialCalls 和 period；monthlyBudgetUsd 仅为已弃用的兼容字段。PATCH 只接受 {enabled: boolean}，须用偏好 revision 传入 If-Match；412 后先主动 GET 再选择。接口不调用模型、不修改支出、不退还次数，成员继承账本 Owner 的偏好。"
             )}
           </p>
           <h2 id="expense-review" className="docs-h2">
@@ -445,7 +447,7 @@ export function ApiDocsScreen({ go, auth }) {
           <p>
             {T(
               EXPENSE_REVIEW,
-              "POST /api/v1/expenses/{id}/review 使用空 JSON 请求体 {} 和已加载版本的 If-Match 检查一笔已保存支出。需要 expenses:write、当前账本角色和目标权限，以及所有者有效的 Pro 或 Max 套餐。检查与支出保存共用月度 Jev 额度，不设每日尝试次数上限。巡检不会修改支出或版本，也不会自动套用类别或目标。请求必须主动发起，不会自动重试；巡检不使用 Idempotency-Key 重放。"
+              "支出巡检单独加载最多 100 条符合筛选的记录，只有开始巡检才逐条发送检查。模型检查共享 Owner 的 Free 一次性试用或付费月度次数，每次获准尝试（包括失败）消耗 1 次；停止不退还已开始的检查。巡检不修改支出或版本；付费账本关闭 Jev 后仍有本地重复检查。不确定或不可用不代表无问题；编辑重新加载原值，不自动应用建议。API 巡检需 {}、当前版本的 If-Match、expenses:write 及角色/目标权限，不自动重试或使用幂等回放。"
             )}
           </p>
           <p>

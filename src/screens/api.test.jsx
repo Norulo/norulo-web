@@ -107,7 +107,7 @@ describe("API screens", () => {
       expect(markdown).toContain("Automatic Jev assistance");
       expect(markdown).toContain("## Review saved expenses");
       expect(markdown).toContain("### POST /api/v1/expenses/{id}/review");
-      expect(markdown).toContain("an empty JSON body {} and If-Match");
+      expect(markdown).toContain("requires {}, If-Match of the loaded revision");
       expect(markdown).toContain("Jev returns only predefined choices and scores");
       expect(markdown).toContain("CATEGORY_REQUIRED");
       expect(markdown).toContain("### POST /api/v1/categories/{id}/remove");
@@ -132,7 +132,9 @@ describe("API screens", () => {
     try {
       render(<ApiDocsScreen go={vi.fn()} auth={{ authenticated: true }} />);
       expect(screen.getByText(`${window.location.origin}/api`)).toBeInTheDocument();
-      const examples = screen.getAllByText(/curl.*api\/v1\/expenses/).filter(example => example.textContent.startsWith("curl "));
+      const examples = screen
+        .getAllByText(/curl.*api\/v1\/expenses/)
+        .filter((example) => example.textContent.startsWith("curl "));
       expect(examples).toHaveLength(3);
       for (const example of examples)
         expect(example).toHaveTextContent(`${window.location.origin}/api/api/v1/expenses`);
@@ -164,21 +166,17 @@ describe("API screens", () => {
     render(<ApiDocsScreen go={vi.fn()} auth={{ authenticated: true }} />);
     expect(screen.getByRole("heading", { name: "Automatic Jev assistance" })).toBeInTheDocument();
     expect(
-      screen.getByText(/No separate suggestion request or suggestions:use scope/i)
-    ).toBeInTheDocument();
-    const categoryBehavior = screen.getByText(/On POST \/api\/v1\/expenses and PATCH/);
-    expect(categoryBehavior).toHaveTextContent(
-      "POST /api/v1/expenses and PATCH /api/v1/expenses/{id}"
-    );
-    expect(categoryBehavior).toHaveTextContent("Owner's effective Pro or Max plan");
-    expect(categoryBehavior).toHaveTextContent("Creates use a new Idempotency-Key");
-    expect(categoryBehavior).toHaveTextContent(
-      "Retry edits with If-Match using the loaded revision"
-    );
-    expect(categoryBehavior).toHaveTextContent("reload explicitly after a revision conflict");
-    expect(categoryBehavior).toHaveTextContent(
-      "Recurring schedule creation and complete edits support the same gated category omission"
-    );
+      screen.getByText(/Normal expenses:write and target permissions apply/)
+    ).toHaveTextContent("no suggestions:use");
+    const categoryBehavior = screen.getByText(/On POST\/PATCH \/api\/v1\/expenses/);
+    for (const phrase of [
+      "Free shares 20 one-time trials",
+      "new Idempotency-Key",
+      "loaded If-Match revision",
+      "explicit reload after conflict",
+      "Recurring setup supports the same option",
+    ])
+      expect(categoryBehavior).toHaveTextContent(phrase);
     expect(screen.getByText(/categorySource/)).toBeInTheDocument();
     expect(screen.getByText(/curl.*POST.*\/api\/v1\/expenses'/)).toHaveTextContent(
       "Idempotency-Key"
@@ -191,13 +189,14 @@ describe("API screens", () => {
       "id",
       "expense-review"
     );
-    const request = screen.getByText(/checks one saved expense with an empty JSON body/i);
-    expect(request).toHaveTextContent("expenses:write");
-    expect(request).toHaveTextContent("Owner's effective Pro or Max plan");
-    expect(request).toHaveTextContent("monthly Jev allowance used by expense saves, without a daily attempt cap");
-    expect(request).toHaveTextContent("Reviews never change expenses or their revision");
-    expect(request).toHaveTextContent("are not retried automatically");
-    expect(request).toHaveTextContent("review does not use Idempotency-Key replay");
+    const request = screen.getByText(/POST \/api\/v1\/expenses\/\{id\}\/review requires/);
+    for (const phrase of [
+      "expenses:write",
+      "Free lifetime trial or paid monthly calls",
+      "never edit expenses or advance revisions",
+      "No automatic retries or Idempotency-Key replay",
+    ])
+      expect(request).toHaveTextContent(phrase);
     const response = screen.getByText(/A review returns expenseId/i);
     expect(response).toHaveTextContent("checked, issue, uncertain or unavailable");
     expect(response).toHaveTextContent("optional suggested values and confidence");
@@ -205,7 +204,9 @@ describe("API screens", () => {
     expect(response).toHaveTextContent(
       "fixed codes: disabled, provider_unavailable, no_categories or invalid_context"
     );
-    expect(response).toHaveTextContent("same authorized target, occurredOn date, currency and exact amount");
+    expect(response).toHaveTextContent(
+      "same authorized target, occurredOn date, currency and exact amount"
+    );
     expect(response).toHaveTextContent("Purpose does not need to match");
     expect(response).toHaveTextContent("candidate {id, revision}, without expense details");
     expect(response).toHaveTextContent(
@@ -276,7 +277,10 @@ describe("API screens", () => {
   it("loads another key page only on request and blocks overlapping reads and writes", async () => {
     const second = deferredPromise();
     noruloApi.apiKeys.list
-      .mockResolvedValueOnce({ items: [{ id: "key_1", name: "First page key" }], nextCursor: "cursor_1" })
+      .mockResolvedValueOnce({
+        items: [{ id: "key_1", name: "First page key" }],
+        nextCursor: "cursor_1",
+      })
       .mockReturnValueOnce(second.promise);
     render(<ApiKeysScreen go={vi.fn()} workspace={workspaceFixture("wsp_team")} />);
     expect(await screen.findByText("First page key")).toBeVisible();
@@ -293,10 +297,15 @@ describe("API screens", () => {
     expect(noruloApi.apiKeys.create).not.toHaveBeenCalled();
     expect(screen.getByText("First page key")).toBeVisible();
     expect(more).toBeDisabled();
-    await act(async () => second.resolve({
-      items: [{ id: "key_1", name: "Duplicate key" }, { id: "key_2", name: "Second page key" }],
-      nextCursor: null,
-    }));
+    await act(async () =>
+      second.resolve({
+        items: [
+          { id: "key_1", name: "Duplicate key" },
+          { id: "key_2", name: "Second page key" },
+        ],
+        nextCursor: null,
+      })
+    );
     expect(screen.getByText("First page key")).toBeVisible();
     expect(screen.getByText("Second page key")).toBeVisible();
     expect(screen.queryByText("Duplicate key")).not.toBeInTheDocument();
@@ -306,9 +315,15 @@ describe("API screens", () => {
 
   it("keeps loaded key rows after a next-page failure and only retries explicitly", async () => {
     noruloApi.apiKeys.list
-      .mockResolvedValueOnce({ apiKeys: [{ id: "key_1", name: "Loaded key" }], nextCursor: "cursor_1" })
+      .mockResolvedValueOnce({
+        apiKeys: [{ id: "key_1", name: "Loaded key" }],
+        nextCursor: "cursor_1",
+      })
       .mockRejectedValueOnce(new Error("Next page unavailable"))
-      .mockResolvedValueOnce({ apiKeys: [{ id: "key_2", name: "Recovered key" }], nextCursor: null });
+      .mockResolvedValueOnce({
+        apiKeys: [{ id: "key_2", name: "Recovered key" }],
+        nextCursor: null,
+      });
     render(<ApiKeysScreen go={vi.fn()} />);
     fireEvent.click(await screen.findByRole("button", { name: "Load more" }));
     await waitFor(() => expect(screen.getByRole("button", { name: "Load more" })).toBeEnabled());
@@ -326,7 +341,10 @@ describe("API screens", () => {
     { items: [{ id: "key_1", name: "Rejected page key" }], nextCursor: "cursor_2" },
   ])("blocks key pagination that does not advance and requires a reload: %j", async (page) => {
     noruloApi.apiKeys.list
-      .mockResolvedValueOnce({ items: [{ id: "key_1", name: "Loaded key" }], nextCursor: "cursor_1" })
+      .mockResolvedValueOnce({
+        items: [{ id: "key_1", name: "Loaded key" }],
+        nextCursor: "cursor_1",
+      })
       .mockResolvedValueOnce(page);
     render(<ApiKeysScreen go={vi.fn()} />);
     fireEvent.click(await screen.findByRole("button", { name: "Load more" }));
@@ -338,41 +356,62 @@ describe("API screens", () => {
   });
 
   it.each([{}, { items: [], nextCursor: "invalid?cursor" }])(
-    "does not turn malformed key pages into successful empty results: %j", async (page) => {
+    "does not turn malformed key pages into successful empty results: %j",
+    async (page) => {
       noruloApi.apiKeys.list.mockResolvedValueOnce(page);
       render(<ApiKeysScreen go={vi.fn()} />);
-      expect(await screen.findByRole("heading", { name: "API keys are unavailable" })).toBeVisible();
+      expect(
+        await screen.findByRole("heading", { name: "API keys are unavailable" })
+      ).toBeVisible();
       expect(screen.queryByText("No API keys have been created yet.")).not.toBeInTheDocument();
       expect(noruloApi.apiKeys.list).toHaveBeenCalledOnce();
     }
   );
 
-  it.each([
-    workspaceFixture("wsp_other"),
-    workspaceFixture("wsp_team", { memberRevision: 4 }),
-  ])("aborts and discards a next key page after its access scope changes: %j", async (workspace) => {
-    const oldPage = deferredPromise();
-    noruloApi.apiKeys.list
-      .mockResolvedValueOnce({ items: [{ id: "key_1", name: "Old ledger key" }], nextCursor: "cursor_1" })
-      .mockReturnValueOnce(oldPage.promise)
-      .mockResolvedValueOnce({ items: [{ id: "key_current", name: "Current ledger key" }], nextCursor: null });
-    const view = render(<ApiKeysScreen go={vi.fn()} workspace={workspaceFixture("wsp_team")} />);
-    fireEvent.click(await screen.findByRole("button", { name: "Load more" }));
-    const signal = noruloApi.apiKeys.list.mock.calls[1][1].signal;
-    view.rerender(<NotificationProvider><ApiKeysScreen go={vi.fn()} workspace={workspace} /></NotificationProvider>);
-    expect(signal.aborted).toBe(true);
-    expect(await screen.findByText("Current ledger key")).toBeVisible();
-    await act(async () => oldPage.resolve({ items: [{ id: "key_private", name: "Old scope secret" }], nextCursor: "cursor_2" }));
-    expect(screen.queryByText("Old scope secret")).not.toBeInTheDocument();
-    expect(screen.queryByText("Old ledger key")).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Load more" })).not.toBeInTheDocument();
-    expect(noruloApi.apiKeys.list).toHaveBeenCalledTimes(3);
-  });
+  it.each([workspaceFixture("wsp_other"), workspaceFixture("wsp_team", { memberRevision: 4 })])(
+    "aborts and discards a next key page after its access scope changes: %j",
+    async (workspace) => {
+      const oldPage = deferredPromise();
+      noruloApi.apiKeys.list
+        .mockResolvedValueOnce({
+          items: [{ id: "key_1", name: "Old ledger key" }],
+          nextCursor: "cursor_1",
+        })
+        .mockReturnValueOnce(oldPage.promise)
+        .mockResolvedValueOnce({
+          items: [{ id: "key_current", name: "Current ledger key" }],
+          nextCursor: null,
+        });
+      const view = render(<ApiKeysScreen go={vi.fn()} workspace={workspaceFixture("wsp_team")} />);
+      fireEvent.click(await screen.findByRole("button", { name: "Load more" }));
+      const signal = noruloApi.apiKeys.list.mock.calls[1][1].signal;
+      view.rerender(
+        <NotificationProvider>
+          <ApiKeysScreen go={vi.fn()} workspace={workspace} />
+        </NotificationProvider>
+      );
+      expect(signal.aborted).toBe(true);
+      expect(await screen.findByText("Current ledger key")).toBeVisible();
+      await act(async () =>
+        oldPage.resolve({
+          items: [{ id: "key_private", name: "Old scope secret" }],
+          nextCursor: "cursor_2",
+        })
+      );
+      expect(screen.queryByText("Old scope secret")).not.toBeInTheDocument();
+      expect(screen.queryByText("Old ledger key")).not.toBeInTheDocument();
+      expect(screen.queryByRole("button", { name: "Load more" })).not.toBeInTheDocument();
+      expect(noruloApi.apiKeys.list).toHaveBeenCalledTimes(3);
+    }
+  );
 
   it("aborts an unfinished next key page on unmount", async () => {
     const pending = deferredPromise();
     noruloApi.apiKeys.list
-      .mockResolvedValueOnce({ items: [{ id: "key_1", name: "Loaded key" }], nextCursor: "cursor_1" })
+      .mockResolvedValueOnce({
+        items: [{ id: "key_1", name: "Loaded key" }],
+        nextCursor: "cursor_1",
+      })
       .mockReturnValueOnce(pending.promise);
     const view = render(<ApiKeysScreen go={vi.fn()} />);
     fireEvent.click(await screen.findByRole("button", { name: "Load more" }));
@@ -931,10 +970,12 @@ describe("API screens", () => {
     expect(restrict).toBeDisabled();
     await user.click(memberWrite);
     await user.click(screen.getByRole("button", { name: "Create key" }));
-    expect(noruloApi.apiKeys.create).toHaveBeenCalledWith(expect.objectContaining({
-      scopes: expect.arrayContaining(["members:read", "members:write"]),
-      restrictions: { shared: false },
-    }));
+    expect(noruloApi.apiKeys.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        scopes: expect.arrayContaining(["members:read", "members:write"]),
+        restrictions: { shared: false },
+      })
+    );
     expect(projects).not.toHaveBeenCalled();
   });
 
@@ -952,10 +993,16 @@ describe("API screens", () => {
 
   it("requires actual member-management capability as well as a server scope", async () => {
     noruloApi.apiKeys.list.mockResolvedValue({ apiKeys: [] });
-    render(<ApiKeysScreen go={vi.fn()} workspace={workspaceFixture("wsp_editor", {
-      role: "editor", scopes: [...readScopes, "members:read", "members:write"],
-      permissions: { manageMembers: false },
-    })} />);
+    render(
+      <ApiKeysScreen
+        go={vi.fn()}
+        workspace={workspaceFixture("wsp_editor", {
+          role: "editor",
+          scopes: [...readScopes, "members:read", "members:write"],
+          permissions: { manageMembers: false },
+        })}
+      />
+    );
     expect(await screen.findByRole("checkbox", { name: /Read members/ })).toBeEnabled();
     expect(screen.queryByRole("checkbox", { name: /Manage members/ })).not.toBeInTheDocument();
   });
@@ -1125,9 +1172,7 @@ describe("API screens", () => {
     const first = deferredPromise();
     const second = deferredPromise();
     noruloApi.apiKeys.list.mockResolvedValue({ apiKeys: [] });
-    noruloApi.apiKeys.create
-      .mockReturnValueOnce(first.promise)
-      .mockReturnValueOnce(second.promise);
+    noruloApi.apiKeys.create.mockReturnValueOnce(first.promise).mockReturnValueOnce(second.promise);
     const view = render(<ApiKeysScreen go={vi.fn()} workspace={workspaceFixture("wsp_a")} />);
     fireEvent.submit((await screen.findByRole("button", { name: "Create key" })).closest("form"));
     view.rerender(
@@ -1240,9 +1285,7 @@ describe("API screens", () => {
     const access = deferredPromise();
     const keys = deferredPromise();
     const onReloadAccess = vi.fn().mockReturnValue(access.promise);
-    noruloApi.apiKeys.list
-      .mockResolvedValueOnce({ apiKeys: [] })
-      .mockReturnValueOnce(keys.promise);
+    noruloApi.apiKeys.list.mockResolvedValueOnce({ apiKeys: [] }).mockReturnValueOnce(keys.promise);
     render(
       <ApiKeysScreen
         go={vi.fn()}

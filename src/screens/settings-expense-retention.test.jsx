@@ -37,6 +37,9 @@ const jev = {
   eligible: true,
   available: false,
   monthlyBudgetUsd: "3",
+  monthlyCalls: 1089,
+  trialCalls: 0,
+  period: "utc-calendar-month",
 };
 const switchName = "Automatically remove the oldest expense at capacity";
 
@@ -50,7 +53,8 @@ function deferred() {
 }
 
 function renderSettings(props = {}) {
-  const go = vi.fn(), onSelect = vi.fn();
+  const go = vi.fn(),
+    onSelect = vi.fn();
   const shared = { id: "other_owner", name: "Other owner's ledger", role: "viewer" };
   const view = render(
     <WorkspaceContext.Provider
@@ -82,7 +86,10 @@ describe("personal expense capacity preference", () => {
     });
     noruloApi.account.getJev.mockResolvedValue(jev);
     noruloApi.account.updateJev.mockResolvedValue({
-      ...jev, enabled: true, available: true, revision: 8,
+      ...jev,
+      enabled: true,
+      available: true,
+      revision: 8,
     });
     noruloApi.account.getExpenseRetention.mockResolvedValue(off);
     noruloApi.account.updateExpenseRetention.mockResolvedValue(on);
@@ -97,20 +104,27 @@ describe("personal expense capacity preference", () => {
     ["Free", false, "0"],
     ["Pro", true, "3"],
     ["Max", true, "5"],
-  ])("loads the server default Off and permits an explicit choice on %s", async (_plan, eligible, monthlyBudgetUsd) => {
-    noruloApi.account.getJev.mockResolvedValue({ ...jev, eligible, monthlyBudgetUsd });
-    renderSettings();
-    const control = await readySwitch();
-    expect(control).not.toBeChecked();
-    expect(screen.getByRole("combobox", { name: "Select ledger" })).toHaveValue("other_owner");
-    expect(noruloApi.account.getExpenseRetention).toHaveBeenCalledWith({ signal: expect.any(AbortSignal) });
-    expect(noruloApi.account.updateExpenseRetention).not.toHaveBeenCalled();
-    noruloApi.account.getExpenseRetention.mockResolvedValue(on);
-    fireEvent.click(control);
-    await waitFor(() => expect(control).toBeChecked());
-    await waitFor(() => expect(control).toBeEnabled());
-    expect(noruloApi.account.updateExpenseRetention).toHaveBeenCalledWith(1, true, { signal: expect.any(AbortSignal) });
-  });
+  ])(
+    "loads the server default Off and permits an explicit choice on %s",
+    async (_plan, eligible, monthlyBudgetUsd) => {
+      noruloApi.account.getJev.mockResolvedValue({ ...jev, eligible, monthlyBudgetUsd });
+      renderSettings();
+      const control = await readySwitch();
+      expect(control).not.toBeChecked();
+      expect(screen.getByRole("combobox", { name: "Select ledger" })).toHaveValue("other_owner");
+      expect(noruloApi.account.getExpenseRetention).toHaveBeenCalledWith({
+        signal: expect.any(AbortSignal),
+      });
+      expect(noruloApi.account.updateExpenseRetention).not.toHaveBeenCalled();
+      noruloApi.account.getExpenseRetention.mockResolvedValue(on);
+      fireEvent.click(control);
+      await waitFor(() => expect(control).toBeChecked());
+      await waitFor(() => expect(control).toBeEnabled());
+      expect(noruloApi.account.updateExpenseRetention).toHaveBeenCalledWith(1, true, {
+        signal: expect.any(AbortSignal),
+      });
+    }
+  );
 
   it("renders a saved On preference and sends the current revision when turning it Off", async () => {
     const savedOff = { ...off, revision: 3 };
@@ -123,16 +137,24 @@ describe("personal expense capacity preference", () => {
     fireEvent.click(control);
     await waitFor(() => expect(control).toBeEnabled());
     expect(control).not.toBeChecked();
-    expect(noruloApi.account.updateExpenseRetention).toHaveBeenCalledWith(2, false, { signal: expect.any(AbortSignal) });
+    expect(noruloApi.account.updateExpenseRetention).toHaveBeenCalledWith(2, false, {
+      signal: expect.any(AbortSignal),
+    });
   });
 
   it("keeps the confirmed value and one Settings mutation guard through PATCH and the required GET", async () => {
-    const write = deferred(), refresh = deferred(), onOperationBusy = vi.fn();
+    const write = deferred(),
+      refresh = deferred(),
+      onOperationBusy = vi.fn();
     noruloApi.account.updateExpenseRetention.mockReturnValueOnce(write.promise);
-    noruloApi.account.getExpenseRetention.mockResolvedValueOnce(off).mockReturnValueOnce(refresh.promise);
+    noruloApi.account.getExpenseRetention
+      .mockResolvedValueOnce(off)
+      .mockReturnValueOnce(refresh.promise);
     const { go, onSelect } = renderSettings({ onOperationBusy });
     const control = await readySwitch();
-    fireEvent.change(screen.getByRole("textbox", { name: "Email" }), { target: { value: "new@example.com" } });
+    fireEvent.change(screen.getByRole("textbox", { name: "Email" }), {
+      target: { value: "new@example.com" },
+    });
     act(() => {
       fireEvent.click(control);
       fireEvent.click(control);
@@ -177,7 +199,8 @@ describe("personal expense capacity preference", () => {
   });
 
   it("cannot start a retention write while a Jev write and its required refresh hold the guard", async () => {
-    const write = deferred(), refresh = deferred();
+    const write = deferred(),
+      refresh = deferred();
     const jevOn = { ...jev, enabled: true, available: true, revision: 8 };
     noruloApi.account.updateJev.mockReturnValueOnce(write.promise);
     noruloApi.account.getJev.mockResolvedValueOnce(jev).mockReturnValueOnce(refresh.promise);
@@ -208,7 +231,9 @@ describe("personal expense capacity preference", () => {
 
   it("requires manual Reload after 412 and uses the newly read revision without retrying the write", async () => {
     noruloApi.account.updateExpenseRetention
-      .mockRejectedValueOnce(new ApiError("conflict", { status: 412, payload: { code: "PRECONDITION_FAILED" } }))
+      .mockRejectedValueOnce(
+        new ApiError("conflict", { status: 412, payload: { code: "PRECONDITION_FAILED" } })
+      )
       .mockResolvedValueOnce({ ...on, revision: 5 });
     noruloApi.account.getExpenseRetention
       .mockResolvedValueOnce(off)
@@ -217,7 +242,9 @@ describe("personal expense capacity preference", () => {
     renderSettings();
     const control = await readySwitch();
     fireEvent.click(control);
-    expect(await screen.findByRole("alert")).toHaveTextContent("Expense retention settings changed elsewhere. Reload and choose again.");
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "Expense retention settings changed elsewhere. Reload and choose again."
+    );
     expect(control).not.toBeChecked();
     expect(control).toBeDisabled();
     expect(noruloApi.account.getExpenseRetention).toHaveBeenCalledTimes(1);
@@ -230,7 +257,9 @@ describe("personal expense capacity preference", () => {
     fireEvent.click(control);
     await waitFor(() => expect(control).toBeEnabled());
     expect(control).toBeChecked();
-    expect(noruloApi.account.updateExpenseRetention).toHaveBeenLastCalledWith(4, true, { signal: expect.any(AbortSignal) });
+    expect(noruloApi.account.updateExpenseRetention).toHaveBeenLastCalledWith(4, true, {
+      signal: expect.any(AbortSignal),
+    });
   });
 
   it("retains Off after a failed write and requires an explicit Reload", async () => {
@@ -238,7 +267,9 @@ describe("personal expense capacity preference", () => {
     renderSettings();
     const control = await readySwitch();
     fireEvent.click(control);
-    expect(await screen.findByRole("alert")).toHaveTextContent("Expense retention settings could not be saved. Reload before trying again.");
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "Expense retention settings could not be saved. Reload before trying again."
+    );
     expect(control).not.toBeChecked();
     expect(control).toBeDisabled();
     expect(noruloApi.account.getExpenseRetention).toHaveBeenCalledTimes(1);
@@ -253,16 +284,21 @@ describe("personal expense capacity preference", () => {
     { ...on, revision: 1 },
     { ...on, revision: 3 },
     { ...off, revision: 2 },
-  ])("does not accept a write response with an unconfirmed revision or choice %#", async (payload) => {
-    noruloApi.account.updateExpenseRetention.mockResolvedValueOnce(payload);
-    renderSettings();
-    const control = await readySwitch();
-    fireEvent.click(control);
-    expect(await screen.findByRole("alert")).toHaveTextContent("Expense retention settings could not be saved");
-    expect(control).not.toBeChecked();
-    expect(control).toBeDisabled();
-    expect(noruloApi.account.getExpenseRetention).toHaveBeenCalledTimes(1);
-  });
+  ])(
+    "does not accept a write response with an unconfirmed revision or choice %#",
+    async (payload) => {
+      noruloApi.account.updateExpenseRetention.mockResolvedValueOnce(payload);
+      renderSettings();
+      const control = await readySwitch();
+      fireEvent.click(control);
+      expect(await screen.findByRole("alert")).toHaveTextContent(
+        "Expense retention settings could not be saved"
+      );
+      expect(control).not.toBeChecked();
+      expect(control).toBeDisabled();
+      expect(noruloApi.account.getExpenseRetention).toHaveBeenCalledTimes(1);
+    }
+  );
 
   it("keeps the accepted server preference after refresh failure and blocks another write until Reload", async () => {
     noruloApi.account.getExpenseRetention
@@ -272,7 +308,9 @@ describe("personal expense capacity preference", () => {
     renderSettings();
     const control = await readySwitch();
     fireEvent.click(control);
-    expect(await screen.findByRole("alert")).toHaveTextContent("Expense retention preference was saved, but current status could not be refreshed. Reload before changing it again.");
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "Expense retention preference was saved, but current status could not be refreshed. Reload before changing it again."
+    );
     expect(control).toBeChecked();
     expect(control).toBeDisabled();
     expect(screen.getByRole("button", { name: "Reload" })).toBeEnabled();
@@ -292,9 +330,13 @@ describe("personal expense capacity preference", () => {
     fireEvent.click(control);
     expect(noruloApi.account.updateExpenseRetention).not.toHaveBeenCalled();
     await act(async () => read.reject(new Error("read unavailable")));
-    expect(await screen.findByRole("alert")).toHaveTextContent("Expense retention settings could not be loaded. Reload to try again.");
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "Expense retention settings could not be loaded. Reload to try again."
+    );
     expect(control).toBeDisabled();
-    expect(screen.getByText("Expense retention settings are unavailable until reloaded.")).toBeInTheDocument();
+    expect(
+      screen.getByText("Expense retention settings are unavailable until reloaded.")
+    ).toBeInTheDocument();
     expect(noruloApi.account.updateExpenseRetention).not.toHaveBeenCalled();
   });
 
@@ -305,7 +347,9 @@ describe("personal expense capacity preference", () => {
   ])("fails closed on an invalid expense retention DTO %#", async (payload) => {
     noruloApi.account.getExpenseRetention.mockResolvedValueOnce(payload);
     renderSettings();
-    expect(await screen.findByRole("alert")).toHaveTextContent("Expense retention settings could not be loaded");
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "Expense retention settings could not be loaded"
+    );
     expect(screen.getByRole("switch", { name: switchName })).toBeDisabled();
     expect(noruloApi.account.updateExpenseRetention).not.toHaveBeenCalled();
   });
@@ -322,7 +366,8 @@ describe("personal expense capacity preference", () => {
   });
 
   it("aborts an unmounted write and ignores its late success after another account is mounted", async () => {
-    const write = deferred(), onOperationBusy = vi.fn();
+    const write = deferred(),
+      onOperationBusy = vi.fn();
     noruloApi.account.updateExpenseRetention.mockReturnValueOnce(write.promise);
     const first = renderSettings({ onOperationBusy });
     fireEvent.click(await readySwitch());
@@ -330,7 +375,10 @@ describe("personal expense capacity preference", () => {
     first.unmount();
     expect(signal.aborted).toBe(true);
     expect(onOperationBusy).toHaveBeenLastCalledWith(false);
-    noruloApi.auth.getSession.mockResolvedValue({ ...account, user: { ...account.user, id: "actor_2" } });
+    noruloApi.auth.getSession.mockResolvedValue({
+      ...account,
+      user: { ...account.user, id: "actor_2" },
+    });
     renderSettings();
     const current = await readySwitch();
     expect(current).not.toBeChecked();
@@ -347,7 +395,10 @@ describe("personal expense capacity preference", () => {
     const signal = noruloApi.account.getExpenseRetention.mock.calls[0][0].signal;
     first.unmount();
     expect(signal.aborted).toBe(true);
-    noruloApi.auth.getSession.mockResolvedValue({ ...account, user: { ...account.user, id: "actor_2" } });
+    noruloApi.auth.getSession.mockResolvedValue({
+      ...account,
+      user: { ...account.user, id: "actor_2" },
+    });
     noruloApi.account.getExpenseRetention.mockResolvedValue(on);
     renderSettings();
     const current = await readySwitch();
@@ -359,14 +410,19 @@ describe("personal expense capacity preference", () => {
 
   it("aborts the required refresh on unmount and ignores the old account's response", async () => {
     const refresh = deferred();
-    noruloApi.account.getExpenseRetention.mockResolvedValueOnce(off).mockReturnValueOnce(refresh.promise);
+    noruloApi.account.getExpenseRetention
+      .mockResolvedValueOnce(off)
+      .mockReturnValueOnce(refresh.promise);
     const first = renderSettings();
     fireEvent.click(await readySwitch());
     await waitFor(() => expect(noruloApi.account.getExpenseRetention).toHaveBeenCalledTimes(2));
     const signal = noruloApi.account.getExpenseRetention.mock.calls[1][0].signal;
     first.unmount();
     expect(signal.aborted).toBe(true);
-    noruloApi.auth.getSession.mockResolvedValue({ ...account, user: { ...account.user, id: "actor_2" } });
+    noruloApi.auth.getSession.mockResolvedValue({
+      ...account,
+      user: { ...account.user, id: "actor_2" },
+    });
     noruloApi.account.getExpenseRetention.mockResolvedValue(off);
     renderSettings();
     const current = await readySwitch();
@@ -387,24 +443,69 @@ describe("personal expense capacity preference", () => {
   });
 
   it.each([
-    ["en", "Expense capacity", switchName, "Off by default", "Removed expenses cannot be restored", "Selecting another owner's ledger does not change this setting"],
-    ["zh", "支出容量", "满额时自动移除最旧支出", "默认关闭", "已移除的支出无法恢复", "选择其他所有者的账本不会改变此设置"],
-    ["ja", "支出の容量", "上限に達したら最も古い支出を自動削除", "初期設定はオフ", "削除した支出は復元できません", "他の所有者の帳簿を選択しても、この設定は変わりません"],
-    ["ko", "지출 용량", "한도에 도달하면 가장 오래된 지출 자동 제거", "기본값은 꺼짐", "제거된 지출은 복원할 수 없습니다", "다른 소유자의 장부를 선택해도 이 설정은 바뀌지 않습니다"],
-    ["fr", "Capacité des dépenses", "Supprimer automatiquement la dépense la plus ancienne à la limite", "Désactivé par défaut", "Les dépenses supprimées ne peuvent pas être restaurées", "Choisir le registre d’un autre propriétaire ne modifie pas ce réglage"],
-    ["es", "Capacidad de gastos", "Eliminar automáticamente el gasto más antiguo al alcanzar el límite", "Desactivado por defecto", "Los gastos eliminados no se pueden restaurar", "Seleccionar el libro de otro propietario no cambia este ajuste"],
-  ])("provides accessible localized ownership and irreversible-removal guidance in %s", async (locale, title, label, defaultOff, irreversible, scope) => {
-    await setLang(locale);
-    renderSettings();
-    await screen.findByText("Personal account");
-    const panel = screen.getByRole("region", { name: title });
-    expect(within(panel).getByRole("heading", { name: title })).toBeInTheDocument();
-    const control = within(panel).getByRole("switch", { name: label });
-    expect(control).toBeEnabled();
-    expect(control).not.toBeChecked();
-    expect(control).toHaveAccessibleDescription(new RegExp(defaultOff));
-    expect(control).toHaveAccessibleDescription(new RegExp(irreversible));
-    expect(panel).toHaveTextContent(scope);
-    expect(noruloApi.account.updateExpenseRetention).not.toHaveBeenCalled();
-  });
+    [
+      "en",
+      "Expense capacity",
+      switchName,
+      "Off by default",
+      "Removed expenses cannot be restored",
+      "Selecting another owner's ledger does not change this setting",
+    ],
+    [
+      "zh",
+      "支出容量",
+      "满额时自动移除最旧支出",
+      "默认关闭",
+      "已移除的支出无法恢复",
+      "选择其他所有者的账本不会改变此设置",
+    ],
+    [
+      "ja",
+      "支出の容量",
+      "上限に達したら最も古い支出を自動削除",
+      "初期設定はオフ",
+      "削除した支出は復元できません",
+      "他の所有者の帳簿を選択しても、この設定は変わりません",
+    ],
+    [
+      "ko",
+      "지출 용량",
+      "한도에 도달하면 가장 오래된 지출 자동 제거",
+      "기본값은 꺼짐",
+      "제거된 지출은 복원할 수 없습니다",
+      "다른 소유자의 장부를 선택해도 이 설정은 바뀌지 않습니다",
+    ],
+    [
+      "fr",
+      "Capacité des dépenses",
+      "Supprimer automatiquement la dépense la plus ancienne à la limite",
+      "Désactivé par défaut",
+      "Les dépenses supprimées ne peuvent pas être restaurées",
+      "Choisir le registre d’un autre propriétaire ne modifie pas ce réglage",
+    ],
+    [
+      "es",
+      "Capacidad de gastos",
+      "Eliminar automáticamente el gasto más antiguo al alcanzar el límite",
+      "Desactivado por defecto",
+      "Los gastos eliminados no se pueden restaurar",
+      "Seleccionar el libro de otro propietario no cambia este ajuste",
+    ],
+  ])(
+    "provides accessible localized ownership and irreversible-removal guidance in %s",
+    async (locale, title, label, defaultOff, irreversible, scope) => {
+      await setLang(locale);
+      renderSettings();
+      await screen.findByText("Personal account");
+      const panel = screen.getByRole("region", { name: title });
+      expect(within(panel).getByRole("heading", { name: title })).toBeInTheDocument();
+      const control = within(panel).getByRole("switch", { name: label });
+      expect(control).toBeEnabled();
+      expect(control).not.toBeChecked();
+      expect(control).toHaveAccessibleDescription(new RegExp(defaultOff));
+      expect(control).toHaveAccessibleDescription(new RegExp(irreversible));
+      expect(panel).toHaveTextContent(scope);
+      expect(noruloApi.account.updateExpenseRetention).not.toHaveBeenCalled();
+    }
+  );
 });

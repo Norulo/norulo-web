@@ -1,3 +1,4 @@
+import { jevAllowance } from "../lib/jev-allowance.js";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { noruloApi } from "../api/norulo.js";
 import { ConfirmDialog } from "../components/confirm-dialog.jsx";
@@ -418,30 +419,22 @@ function jevUsageMetric(usage) {
   if (typeof usage?.workspaceId !== "string" || !usage.workspaceId.trim()) return null;
   const metric = usage.jev;
   if (
-    metric?.currency !== "USD" ||
-    typeof metric.month !== "string" ||
-    !/^[0-9]{4}-(?:0[1-9]|1[0-2])$/.test(metric.month) ||
-    !Number.isSafeInteger(metric.usedMicrousd) ||
-    metric.usedMicrousd < 0 ||
-    !Number.isSafeInteger(metric.limitMicrousd) ||
-    metric.limitMicrousd < 0
+    !Number.isSafeInteger(metric?.usedCalls) ||
+    metric.usedCalls < 0 ||
+    !Number.isSafeInteger(metric.limitCalls) ||
+    metric.limitCalls < 0 ||
+    !Number.isSafeInteger(metric.remainingCalls) ||
+    metric.remainingCalls < 0 ||
+    metric.remainingCalls !== Math.max(0, metric.limitCalls - metric.usedCalls) ||
+    !(
+      (metric.period === "lifetime" && metric.month === null) ||
+      (metric.period === "utc-calendar-month" &&
+        typeof metric.month === "string" &&
+        /^[0-9]{4}-(?:0[1-9]|1[0-2])$/.test(metric.month))
+    )
   )
     return null;
   return metric;
-}
-
-function jevUsageAmount(microusd, lang) {
-  // Split exact micro-USD integers before formatting; division through Number
-  // could lose the last reserved micro-dollar on large, otherwise safe values.
-  const micros = BigInt(microusd);
-  const whole = new Intl.NumberFormat(lang).format(micros / 1000000n);
-  const fraction = String(micros % 1000000n)
-    .padStart(6, "0")
-    .replace(/0{1,4}$/, "");
-  const separator = new Intl.NumberFormat(lang)
-    .formatToParts(0.1)
-    .find((part) => part.type === "decimal").value;
-  return `USD ${whole}${separator}${fraction}`;
 }
 
 function BillingUsageMeter({ used, limit, titleId, usedLabel, totalLabel }) {
@@ -462,6 +455,7 @@ function BillingUsageMeter({ used, limit, titleId, usedLabel, totalLabel }) {
 
 function BillingJevUsage({ usage, lang }) {
   const metric = jevUsageMetric(usage);
+  const number = (value) => new Intl.NumberFormat(lang).format(value);
   return (
     <section
       className="panel section-split billing-jev-section"
@@ -473,53 +467,57 @@ function BillingJevUsage({ usage, lang }) {
         </div>
         {metric && (
           <p className="muted billing-usage-meta">
-            {usageText("jevMonth")}: <time>{metric.month}</time>
+            {metric.period === "lifetime" ? (
+              usageText("jevTrial")
+            ) : (
+              <>
+                {usageText("jevMonth")}: <time>{metric.month}</time>
+              </>
+            )}
           </p>
         )}
       </div>
       <div className="section-body billing-usage-body">
-      <div className="billing-usage-grid">
-        <article className="billing-usage-row" aria-labelledby="billing-jev-allowance-title">
-          <div className="billing-usage-label">
-            <I.Activity size={18} aria-hidden="true" />
-            <h3 id="billing-jev-allowance-title">{usageText("jevAllowance")}</h3>
-          </div>
-          {metric ? (
-            <>
-              <dl className="billing-usage-values">
-                <div className="billing-usage-used">
-                  <dt>{usageText("used")}</dt>
-                  <dd>
-                    <FinancialValue
-                      currency="USD"
-                      value={jevUsageAmount(metric.usedMicrousd, lang)}
-                    />
-                  </dd>
-                </div>
-                <div className="billing-usage-total">
-                  <dt>{usageText("total")}</dt>
-                  <dd>
-                    <FinancialValue
-                      currency="USD"
-                      value={jevUsageAmount(metric.limitMicrousd, lang)}
-                    />
-                  </dd>
-                </div>
-              </dl>
-              <BillingUsageMeter
-                used={metric.usedMicrousd}
-                limit={metric.limitMicrousd}
-                titleId="billing-jev-allowance-title"
-                usedLabel={jevUsageAmount(metric.usedMicrousd, lang)}
-                totalLabel={jevUsageAmount(metric.limitMicrousd, lang)}
-              />
-            </>
-          ) : (
-            <p className="muted">{usageText("unavailable")}</p>
-          )}
-        </article>
-      </div>
-      <p className="muted billing-usage-policy">{usageText("jevPolicy")}</p>
+        <div className="billing-usage-grid">
+          <article className="billing-usage-row" aria-labelledby="billing-jev-allowance-title">
+            <div className="billing-usage-label">
+              <I.Activity size={18} aria-hidden="true" />
+              <h3 id="billing-jev-allowance-title">{usageText("jevAllowance")}</h3>
+            </div>
+            {metric ? (
+              <>
+                <dl className="billing-usage-values">
+                  <div className="billing-usage-used">
+                    <dt>{usageText("used")}</dt>
+                    <dd>
+                      <FinancialValue value={number(metric.usedCalls)} />
+                    </dd>
+                  </div>
+                  <div className="billing-usage-total">
+                    <dt>{usageText("total")}</dt>
+                    <dd>
+                      <FinancialValue value={number(metric.limitCalls)} />
+                    </dd>
+                  </div>
+                </dl>
+                <p className="muted">
+                  {usageText("jevRemaining")}:{" "}
+                  <FinancialValue value={number(metric.remainingCalls)} />
+                </p>
+                <BillingUsageMeter
+                  used={metric.usedCalls}
+                  limit={metric.limitCalls}
+                  titleId="billing-jev-allowance-title"
+                  usedLabel={number(metric.usedCalls)}
+                  totalLabel={number(metric.limitCalls)}
+                />
+              </>
+            ) : (
+              <p className="muted">{usageText("unavailable")}</p>
+            )}
+          </article>
+        </div>
+        <p className="muted billing-usage-policy">{usageText("jevPolicy")}</p>
       </div>
     </section>
   );
@@ -542,53 +540,53 @@ function BillingUsage({ usage, lang, busy, onRefresh }) {
         <p className="muted billing-usage-meta">{usageText("scope")}</p>
       </div>
       <div className="section-body billing-usage-body">
-      <div className="billing-usage-grid">
-        {["projects", "expenseRecords"].map((key) => {
-          const metric = usageMetric(usage, key);
-          const label = usageText(key);
-          const titleId = `billing-usage-${key}`;
-          return (
-            <article className="billing-usage-row" key={key} aria-labelledby={titleId}>
-              <div className="billing-usage-label">
-                {key === "projects" ? (
-                  <I.Folder size={18} aria-hidden="true" />
+        <div className="billing-usage-grid">
+          {["projects", "expenseRecords"].map((key) => {
+            const metric = usageMetric(usage, key);
+            const label = usageText(key);
+            const titleId = `billing-usage-${key}`;
+            return (
+              <article className="billing-usage-row" key={key} aria-labelledby={titleId}>
+                <div className="billing-usage-label">
+                  {key === "projects" ? (
+                    <I.Folder size={18} aria-hidden="true" />
+                  ) : (
+                    <I.FileCode size={18} aria-hidden="true" />
+                  )}
+                  <h3 id={titleId}>{label}</h3>
+                </div>
+                {metric ? (
+                  <>
+                    <dl className="billing-usage-values">
+                      <div className="billing-usage-used">
+                        <dt>{usageText("used")}</dt>
+                        <dd>
+                          <FinancialValue value={number(metric.used)} />
+                        </dd>
+                      </div>
+                      <div className="billing-usage-total">
+                        <dt>{usageText("total")}</dt>
+                        <dd>
+                          <FinancialValue value={number(metric.limit)} />
+                        </dd>
+                      </div>
+                    </dl>
+                    <BillingUsageMeter
+                      used={metric.used}
+                      limit={metric.limit}
+                      titleId={titleId}
+                      usedLabel={number(metric.used)}
+                      totalLabel={number(metric.limit)}
+                    />
+                  </>
                 ) : (
-                  <I.FileCode size={18} aria-hidden="true" />
+                  <p className="muted">{usageText("unavailable")}</p>
                 )}
-                <h3 id={titleId}>{label}</h3>
-              </div>
-              {metric ? (
-                <>
-                  <dl className="billing-usage-values">
-                    <div className="billing-usage-used">
-                      <dt>{usageText("used")}</dt>
-                      <dd>
-                        <FinancialValue value={number(metric.used)} />
-                      </dd>
-                    </div>
-                    <div className="billing-usage-total">
-                      <dt>{usageText("total")}</dt>
-                      <dd>
-                        <FinancialValue value={number(metric.limit)} />
-                      </dd>
-                    </div>
-                  </dl>
-                  <BillingUsageMeter
-                    used={metric.used}
-                    limit={metric.limit}
-                    titleId={titleId}
-                    usedLabel={number(metric.used)}
-                    totalLabel={number(metric.limit)}
-                  />
-                </>
-              ) : (
-                <p className="muted">{usageText("unavailable")}</p>
-              )}
-            </article>
-          );
-        })}
-      </div>
-      <p className="muted billing-usage-policy">{usageText("retention")}</p>
+              </article>
+            );
+          })}
+        </div>
+        <p className="muted billing-usage-policy">{usageText("retention")}</p>
       </div>
     </section>
   );
@@ -616,27 +614,27 @@ function BillingSkeleton() {
           <SkeletonLine className="sk-line sk-w-70" />
         </div>
         <div className="section-body billing-usage-body">
-        <div className="billing-usage-grid">
-          {["projects", "expenses"].map((key) => (
-            <div className="billing-usage-row" key={key}>
-              <SkeletonLine className="sk-line sk-w-26" />
-              <dl className="billing-usage-values">
-                {["used", "total"].map((field) => (
-                  <div key={field} className={`billing-usage-${field}`}>
-                    <dt>
-                      <SkeletonLine className="sk-line sk-w-70" />
-                    </dt>
-                    <dd>
-                      <SkeletonLine
-                        className={`sk-line sk-w-52 ${field === "used" ? "sk-h-40" : "sk-h-28"}`}
-                      />
-                    </dd>
-                  </div>
-                ))}
-              </dl>
-            </div>
-          ))}
-        </div>
+          <div className="billing-usage-grid">
+            {["projects", "expenses"].map((key) => (
+              <div className="billing-usage-row" key={key}>
+                <SkeletonLine className="sk-line sk-w-26" />
+                <dl className="billing-usage-values">
+                  {["used", "total"].map((field) => (
+                    <div key={field} className={`billing-usage-${field}`}>
+                      <dt>
+                        <SkeletonLine className="sk-line sk-w-70" />
+                      </dt>
+                      <dd>
+                        <SkeletonLine
+                          className={`sk-line sk-w-52 ${field === "used" ? "sk-h-40" : "sk-h-28"}`}
+                        />
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -645,17 +643,17 @@ function BillingSkeleton() {
           <SkeletonLine className="sk-line sk-w-52 sk-h-16" />
         </div>
         <div className="section-body">
-        <div className="sub-record-list">
-          {Array.from({ length: 3 }, (_, index) => (
-            <div className="sub-record-row skeleton-row" key={`billing-record-skeleton-${index}`}>
-              <div className="sub-record-main">
-                <SkeletonLine className="sk-line sk-w-42 sk-h-16" />
-                <SkeletonLine className="sk-line sk-w-56" />
+          <div className="sub-record-list">
+            {Array.from({ length: 3 }, (_, index) => (
+              <div className="sub-record-row skeleton-row" key={`billing-record-skeleton-${index}`}>
+                <div className="sub-record-main">
+                  <SkeletonLine className="sk-line sk-w-42 sk-h-16" />
+                  <SkeletonLine className="sk-line sk-w-56" />
+                </div>
+                <SkeletonLine className="sk-line sk-w-16 sk-h-20" />
               </div>
-              <SkeletonLine className="sk-line sk-w-16 sk-h-20" />
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>
@@ -739,7 +737,8 @@ export function BillingScreen({ go, navigate = (url) => window.location.assign(u
       if (!mountedRef.current) return;
       setPlan(payload);
     } catch (err) {
-      if (mountedRef.current) setError(requestErrorText(err, T("Unable to load billing.", "无法加载账单。")));
+      if (mountedRef.current)
+        setError(requestErrorText(err, T("Unable to load billing.", "无法加载账单。")));
     } finally {
       billingReadRef.current = false;
       if (mountedRef.current) setLoading(false);
@@ -847,7 +846,8 @@ export function BillingScreen({ go, navigate = (url) => window.location.assign(u
       if (!mountedRef.current) return;
       setChangeDraft(null);
     } catch (err) {
-      if (mountedRef.current) setError(requestErrorText(err, T("Unable to change subscription.", "无法更改订阅。")));
+      if (mountedRef.current)
+        setError(requestErrorText(err, T("Unable to change subscription.", "无法更改订阅。")));
     } finally {
       if (billingMutationRef.current === actionKey) billingMutationRef.current = "";
       if (mountedRef.current) {
@@ -924,7 +924,8 @@ export function BillingScreen({ go, navigate = (url) => window.location.assign(u
       }));
       await refreshBillingPlan();
     } catch (err) {
-      if (mountedRef.current) setError(requestErrorText(err, T("Unable to cancel subscription.", "无法取消订阅。")));
+      if (mountedRef.current)
+        setError(requestErrorText(err, T("Unable to cancel subscription.", "无法取消订阅。")));
     } finally {
       if (billingMutationRef.current === actionKey) billingMutationRef.current = "";
       if (mountedRef.current) {
@@ -974,7 +975,8 @@ export function BillingScreen({ go, navigate = (url) => window.location.assign(u
       }));
       await refreshBillingPlan();
     } catch (err) {
-      if (mountedRef.current) setError(requestErrorText(err, T("Unable to resume subscription.", "无法恢复订阅。")));
+      if (mountedRef.current)
+        setError(requestErrorText(err, T("Unable to resume subscription.", "无法恢复订阅。")));
     } finally {
       if (billingMutationRef.current === actionKey) billingMutationRef.current = "";
       if (mountedRef.current) {
@@ -1037,99 +1039,105 @@ export function BillingScreen({ go, navigate = (url) => window.location.assign(u
                   <section className="panel section-split billing-plan-section">
                     <h2>{T("Plan", "Plan")}</h2>
                     <div className="section-body">
-                    <div className="billing-summary">
-                      <div className="billing-summary-main">
-                        <div>
-                          <b>{planName(currentPlan) || T("Free", "免费")}</b>
-                          <div className="muted">
-                            {accountStatus} -{" "}
-                            {activePaid
-                              ? T(
-                                  `Billed ${subscriptionInterval}`,
-                                  `按 ${subscriptionInterval} 计费`
-                                )
-                              : T("Upgrade from Pricing", "前往价格页升级")}
+                      <div className="billing-summary">
+                        <div className="billing-summary-main">
+                          <div>
+                            <b>{planName(currentPlan) || T("Free", "免费")}</b>
+                            <div className="muted">
+                              {accountStatus} -{" "}
+                              {activePaid
+                                ? T(
+                                    `Billed ${subscriptionInterval}`,
+                                    `按 ${subscriptionInterval} 计费`
+                                  )
+                                : T("Upgrade from Pricing", "前往价格页升级")}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                      {activePaid && (
-                        <div className="billing-actions">
-                          {alternatePaidPlans.map((paidPlan) => (
-                            <button
-                              key={paidPlan.id}
-                              className="btn primary"
-                              disabled={!billingEnabled || paymentPending || Boolean(pendingAction)}
-                              onClick={() =>
-                                requestSubscriptionChange({
-                                  targetPlan: paidPlan.id,
-                                  targetInterval: subscriptionInterval,
-                                })
-                              }
-                            >
-                              {pendingAction ===
-                                `change-${paidPlan.id}-${subscriptionInterval}` && (
-                                <span className="spin">
-                                  <I.Refresh size={14} />
-                                </span>
+                        {activePaid && (
+                          <div className="billing-actions">
+                            {alternatePaidPlans.map((paidPlan) => (
+                              <button
+                                key={paidPlan.id}
+                                className="btn primary"
+                                disabled={
+                                  !billingEnabled || paymentPending || Boolean(pendingAction)
+                                }
+                                onClick={() =>
+                                  requestSubscriptionChange({
+                                    targetPlan: paidPlan.id,
+                                    targetInterval: subscriptionInterval,
+                                  })
+                                }
+                              >
+                                {pendingAction ===
+                                  `change-${paidPlan.id}-${subscriptionInterval}` && (
+                                  <span className="spin">
+                                    <I.Refresh size={14} />
+                                  </span>
+                                )}
+                                <I.Trend size={14} />{" "}
+                                {T(
+                                  `Switch to ${planLabel(paidPlan)}`,
+                                  `切换到 ${planLabel(paidPlan)}`
+                                )}
+                              </button>
+                            ))}
+                            {subscriptionInterval === "month" &&
+                              !cancellationScheduled &&
+                              priceFor(currentPlan, "year")?.configured && (
+                                <button
+                                  className="btn"
+                                  disabled={
+                                    !billingEnabled || paymentPending || Boolean(pendingAction)
+                                  }
+                                  onClick={() =>
+                                    requestSubscriptionChange({ targetInterval: "year" })
+                                  }
+                                >
+                                  {pendingAction === `change-${account.plan}-year` && (
+                                    <span className="spin">
+                                      <I.Refresh size={14} />
+                                    </span>
+                                  )}
+                                  <I.Package size={14} /> {T("Switch to yearly", "切换为按年")}
+                                </button>
                               )}
-                              <I.Trend size={14} />{" "}
-                              {T(
-                                `Switch to ${planLabel(paidPlan)}`,
-                                `切换到 ${planLabel(paidPlan)}`
-                              )}
-                            </button>
-                          ))}
-                          {subscriptionInterval === "month" &&
-                            !cancellationScheduled &&
-                            priceFor(currentPlan, "year")?.configured && (
+                            {cancellationScheduled ? (
                               <button
                                 className="btn"
                                 disabled={
                                   !billingEnabled || paymentPending || Boolean(pendingAction)
                                 }
-                                onClick={() =>
-                                  requestSubscriptionChange({ targetInterval: "year" })
-                                }
+                                onClick={resumeSubscription}
                               >
-                                {pendingAction === `change-${account.plan}-year` && (
+                                {pendingAction === "resume" && (
                                   <span className="spin">
                                     <I.Refresh size={14} />
                                   </span>
                                 )}
-                                <I.Package size={14} /> {T("Switch to yearly", "切换为按年")}
+                                <I.Refresh size={14} /> {T("Resume renewal", "Resume renewal")}
+                              </button>
+                            ) : (
+                              <button
+                                className="btn"
+                                disabled={
+                                  !billingEnabled || paymentPending || Boolean(pendingAction)
+                                }
+                                onClick={requestCancelSubscription}
+                                aria-busy={pendingAction === "cancel"}
+                              >
+                                {pendingAction === "cancel" && (
+                                  <span className="spin">
+                                    <I.Refresh size={14} />
+                                  </span>
+                                )}
+                                <I.X size={14} /> {T("Cancel renewal", "取消续订")}
                               </button>
                             )}
-                          {cancellationScheduled ? (
-                            <button
-                              className="btn"
-                              disabled={!billingEnabled || paymentPending || Boolean(pendingAction)}
-                              onClick={resumeSubscription}
-                            >
-                              {pendingAction === "resume" && (
-                                <span className="spin">
-                                  <I.Refresh size={14} />
-                                </span>
-                              )}
-                              <I.Refresh size={14} /> {T("Resume renewal", "Resume renewal")}
-                            </button>
-                          ) : (
-                            <button
-                              className="btn"
-                              disabled={!billingEnabled || paymentPending || Boolean(pendingAction)}
-                              onClick={requestCancelSubscription}
-                              aria-busy={pendingAction === "cancel"}
-                            >
-                              {pendingAction === "cancel" && (
-                                <span className="spin">
-                                  <I.Refresh size={14} />
-                                </span>
-                              )}
-                              <I.X size={14} /> {T("Cancel renewal", "取消续订")}
-                            </button>
-                          )}
-                        </div>
-                      )}
-                    </div>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </section>
 
@@ -1140,7 +1148,7 @@ export function BillingScreen({ go, navigate = (url) => window.location.assign(u
                       busy={loading || writing}
                       onRefresh={loadBillingPlan}
                     />
-                    {["pro", "max"].includes(account.plan) && (
+                    {["free", "pro", "max"].includes(account.plan) && (
                       <BillingJevUsage usage={plan?.ledgerUsage} lang={lang} />
                     )}
                   </div>
@@ -1175,55 +1183,55 @@ export function BillingScreen({ go, navigate = (url) => window.location.assign(u
                     <section className="panel section-split">
                       <h2>{T("Subscription activity", "订阅动态")}</h2>
                       <div className="section-body">
-                      <div className="sub-record-list">
-                        {visibleSubscriptions.map((record, index) => (
-                          <div
-                            className="sub-record-row"
-                            key={`${subscriptionRecordKey(record)}-${
-                              activityPageIndex * SUBSCRIPTION_ACTIVITY_PAGE_SIZE + index
-                            }`}
-                          >
-                            <div className="sub-record-main">
-                              <b>{subscriptionRecordTitle(record)}</b>
-                              <div className="muted">{subscriptionRecordMeta(record)}</div>
-                              <div className="muted">{subscriptionEventText(record)}</div>
+                        <div className="sub-record-list">
+                          {visibleSubscriptions.map((record, index) => (
+                            <div
+                              className="sub-record-row"
+                              key={`${subscriptionRecordKey(record)}-${
+                                activityPageIndex * SUBSCRIPTION_ACTIVITY_PAGE_SIZE + index
+                              }`}
+                            >
+                              <div className="sub-record-main">
+                                <b>{subscriptionRecordTitle(record)}</b>
+                                <div className="muted">{subscriptionRecordMeta(record)}</div>
+                                <div className="muted">{subscriptionEventText(record)}</div>
+                              </div>
+                              <span className="tag">{record?.plan || account.plan || "free"}</span>
                             </div>
-                            <span className="tag">{record?.plan || account.plan || "free"}</span>
-                          </div>
-                        ))}
-                      </div>
-                      {activityPageCount > 1 && (
-                        <nav
-                          className="billing-activity-pagination panel-actions"
-                          aria-label={T("Subscription activity pagination")}
-                        >
-                          <button
-                            className="btn"
-                            type="button"
-                            disabled={activityPageIndex === 0}
-                            onClick={() => showActivityPage(activityPageIndex - 1)}
+                          ))}
+                        </div>
+                        {activityPageCount > 1 && (
+                          <nav
+                            className="billing-activity-pagination panel-actions"
+                            aria-label={T("Subscription activity pagination")}
                           >
-                            {T("Previous")}
-                          </button>
-                          <span
-                            className="billing-activity-page"
-                            aria-live="polite"
-                            aria-atomic="true"
-                          >
-                            {T("Page {page} of {count}")
-                              .replace("{page}", String(activityPageIndex + 1))
-                              .replace("{count}", String(activityPageCount))}
-                          </span>
-                          <button
-                            className="btn"
-                            type="button"
-                            disabled={activityPageIndex >= activityPageCount - 1}
-                            onClick={() => showActivityPage(activityPageIndex + 1)}
-                          >
-                            {T("Next")}
-                          </button>
-                        </nav>
-                      )}
+                            <button
+                              className="btn"
+                              type="button"
+                              disabled={activityPageIndex === 0}
+                              onClick={() => showActivityPage(activityPageIndex - 1)}
+                            >
+                              {T("Previous")}
+                            </button>
+                            <span
+                              className="billing-activity-page"
+                              aria-live="polite"
+                              aria-atomic="true"
+                            >
+                              {T("Page {page} of {count}")
+                                .replace("{page}", String(activityPageIndex + 1))
+                                .replace("{count}", String(activityPageCount))}
+                            </span>
+                            <button
+                              className="btn"
+                              type="button"
+                              disabled={activityPageIndex >= activityPageCount - 1}
+                              onClick={() => showActivityPage(activityPageIndex + 1)}
+                            >
+                              {T("Next")}
+                            </button>
+                          </nav>
+                        )}
                       </div>
                     </section>
                   )}
@@ -1531,8 +1539,8 @@ export function PricingScreen({
             <p className="muted">{usageText("policy")}</p>
             <p className="muted">
               {T(
-                "The monthly Jev allowance covers model assistance, has no cash value, and cannot pay expenses or subscription charges.",
-                "Jev 月度额度用于模型辅助，没有现金价值，不能用于支付支出或订阅费用。"
+                "Free includes 20 one-time Jev trial calls. Pro and Max calls reset each UTC month, including annual subscriptions, without rollover.",
+                "Free 提供一次性 20 次 Jev 试用。Pro 和 Max 的次数按 UTC 自然月重置，年订阅也一样，不结转。"
               )}
             </p>
             {!billingEnabled && (
@@ -1566,12 +1574,7 @@ function PlanCard({ plan, price, interval, active, featured, cta }) {
     Number.isSafeInteger(limits?.expenseRecords) && limits.expenseRecords > 0
       ? limits.expenseRecords
       : null;
-  const jevBudget =
-    jev?.eligible === true &&
-    typeof jev.monthlyBudgetUsd === "string" &&
-    /^\d+(?:\.\d{1,6})?$/.test(jev.monthlyBudgetUsd)
-      ? jev.monthlyBudgetUsd
-      : null;
+  const allowance = jev?.eligible === true ? jevAllowance(jev) : null;
   return (
     <div className={"pricing-card" + (featured ? " featured" : "")}>
       {featured && <div className="pricing-badge">{planLabel(plan)}</div>}
@@ -1630,7 +1633,7 @@ function PlanCard({ plan, price, interval, active, featured, cta }) {
             <I.Check size={13} /> {T("Jev: not included", "不含 Jev")}
           </li>
         )}
-        {!loading && jevBudget !== null && (
+        {!loading && allowance !== null && (
           <>
             <li>
               <I.Check size={13} />{" "}
@@ -1647,22 +1650,30 @@ function PlanCard({ plan, price, interval, active, featured, cta }) {
               <I.Check size={13} />
               <span>
                 {T("Jev assistance allowance", "Jev 辅助额度")}:{" "}
-                <FinancialValue value={`$${jevBudget}`} /> / {T("month", "月")}
+                <FinancialValue value={allowance.calls.toLocaleString("en-US")} />{" "}
+                {T("calls", "次")} ·{" "}
+                {allowance.period === "lifetime"
+                  ? T("One-time trial", "一次性试用")
+                  : T("per month", "每月")}
               </span>
             </li>
             <li>
               <I.Check size={13} />{" "}
               {jev.available === true
-                ? T("Monthly UTC budget · no rollover", "UTC 自然月预算 · 不结转")
+                ? allowance.period === "lifetime"
+                  ? T("One-time trial · no reset", "一次性试用 · 不重置")
+                  : T("Monthly UTC calls · no rollover", "UTC 自然月次数 · 不结转")
                 : T("Activation pending · no rollover", "待启用 · 不结转")}
             </li>
-            <li>
-              <I.Check size={13} />{" "}
-              {T(
-                "Annual subscriptions keep the same monthly Jev budget",
-                "年订阅也按同样的月度 Jev 预算计算"
-              )}
-            </li>
+            {allowance.period === "utc-calendar-month" && (
+              <li>
+                <I.Check size={13} />{" "}
+                {T(
+                  "Annual subscriptions keep the same monthly Jev calls",
+                  "年订阅也按同样的月度 Jev 预算计算"
+                )}
+              </li>
+            )}
           </>
         )}
         <li>

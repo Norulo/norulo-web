@@ -74,7 +74,16 @@ function fixture({
   const api = {
     me: vi.fn().mockResolvedValue({
       workspace,
-      entitlements: { jev: { eligible, available, monthlyBudgetUsd: "3.00" } },
+      entitlements: {
+        jev: {
+          eligible,
+          available,
+          monthlyBudgetUsd: "3.00",
+          monthlyCalls: 1089,
+          trialCalls: 0,
+          period: "utc-calendar-month",
+        },
+      },
     }),
     project: vi.fn().mockResolvedValue(project),
     projects: vi.fn().mockResolvedValue({ items: [project], nextCursor: null }),
@@ -145,22 +154,25 @@ describe("explicit inspection of selected saved expenses", () => {
       expect(f.api.me).toHaveBeenCalledExactlyOnceWith({ signal: expect.any(AbortSignal) });
       expect(f.api.reviewExpense).not.toHaveBeenCalled();
       expect(f.api.expenses).toHaveBeenCalledTimes(2);
-      const query = mode === "project"
-        ? { target: "project", projectId: "prj_review" }
-        : { target: "shared" };
+      const query =
+        mode === "project" ? { target: "project", projectId: "prj_review" } : { target: "shared" };
       expect(f.api.expenses).toHaveBeenNthCalledWith(
-        1, { ...query, limit: 10 },
+        1,
+        { ...query, limit: 10 },
         expect.objectContaining({ signal: expect.any(AbortSignal) })
       );
       expect(f.api.expenses).toHaveBeenNthCalledWith(
-        2, { ...query, limit: 100 },
+        2,
+        { ...query, limit: 100 },
         expect.objectContaining({ signal: expect.any(AbortSignal) })
       );
       expect(within(dialog).getByText("Selected: 100 / 100")).toBeVisible();
       expect(within(dialog).getAllByRole("checkbox")).toHaveLength(100);
       expect(within(dialog).getByRole("checkbox", { name: "Review Hosting 10" })).toBeChecked();
       expect(within(dialog).getByRole("checkbox", { name: "Review Hosting 99" })).toBeChecked();
-      expect(within(dialog).queryByRole("checkbox", { name: "Review Hosting 100" })).not.toBeInTheDocument();
+      expect(
+        within(dialog).queryByRole("checkbox", { name: "Review Hosting 100" })
+      ).not.toBeInTheDocument();
       const last = within(dialog).getByRole("checkbox", { name: "Review Hosting 99" });
       await user.click(last);
       expect(within(dialog).getByText("Selected: 99 / 100")).toBeVisible();
@@ -172,7 +184,9 @@ describe("explicit inspection of selected saved expenses", () => {
           .filter((item) => item.checked)
       ).toHaveLength(100);
       expect(
-        within(dialog).getByText("The first 100 matching expenses are loaded for review. Other history is not included.")
+        within(dialog).getByText(
+          "The first 100 matching expenses are loaded for review. Other history is not included."
+        )
       ).toBeVisible();
       expect(document.querySelector(".ledger-screen").inert).toBe(true);
       await user.keyboard("{Escape}");
@@ -190,7 +204,9 @@ describe("explicit inspection of selected saved expenses", () => {
     await screen.findByRole("heading", { name: "Hosting 0" });
     fireEvent.click(screen.getByRole("button", { name: /^Filters/ }));
     fireEvent.change(screen.getByLabelText("From date"), { target: { value: "2026-10-01" } });
-    await waitFor(() => expect(screen.getByRole("button", { name: "Next", exact: true })).toBeEnabled());
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: "Next", exact: true })).toBeEnabled()
+    );
     fireEvent.click(screen.getByRole("button", { name: "Next", exact: true }));
     await screen.findByRole("heading", { name: "Hosting 10" });
     const before = f.api.expenses.mock.calls.length;
@@ -198,7 +214,9 @@ describe("explicit inspection of selected saved expenses", () => {
     await waitFor(() => expect(opener).toBeEnabled());
     fireEvent.click(opener);
     const dialog = await screen.findByRole("dialog");
-    await waitFor(() => expect(within(dialog).getByRole("button", { name: "Start review" })).toBeEnabled());
+    await waitFor(() =>
+      expect(within(dialog).getByRole("button", { name: "Start review" })).toBeEnabled()
+    );
     expect(f.api.expenses).toHaveBeenLastCalledWith(
       { target: "shared", from: "2026-10-01", limit: 100 },
       expect.objectContaining({ signal: expect.any(AbortSignal) })
@@ -240,30 +258,35 @@ describe("explicit inspection of selected saved expenses", () => {
     await waitFor(() => expect(screen.getByRole("button", { name: "Start review" })).toBeEnabled());
   });
 
-  it.each([401, 403, 500])("handles a selection read failure %s without model requests", async (status) => {
-    const f = fixture();
-    const failure = new ApiError("Selection unavailable", {
-      status,
-      payload: { error: { code: status === 500 ? "UNAVAILABLE" : "WORKSPACE_FORBIDDEN" } },
-    });
-    const list = f.api.expenses.getMockImplementation();
-    f.api.expenses.mockImplementation((query, options) =>
-      query.limit === 100 ? Promise.reject(failure) : list(query, options)
-    );
-    const { dialog } = await open(f, false);
-    if (status === 500) {
-      expect(await within(dialog).findByRole("alert")).toHaveTextContent("Expenses could not be loaded for review.");
-      expect(within(dialog).getByRole("button", { name: "Start review" })).toBeDisabled();
-      expect(within(dialog).queryByRole("checkbox")).not.toBeInTheDocument();
-      expect(f.onAccessChanged).not.toHaveBeenCalled();
-    } else {
-      await waitFor(() => expect(f.onAccessChanged).toHaveBeenCalledWith(failure));
-      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
-      expect(screen.queryByRole("heading", { name: "Hosting 0" })).not.toBeInTheDocument();
+  it.each([401, 403, 500])(
+    "handles a selection read failure %s without model requests",
+    async (status) => {
+      const f = fixture();
+      const failure = new ApiError("Selection unavailable", {
+        status,
+        payload: { error: { code: status === 500 ? "UNAVAILABLE" : "WORKSPACE_FORBIDDEN" } },
+      });
+      const list = f.api.expenses.getMockImplementation();
+      f.api.expenses.mockImplementation((query, options) =>
+        query.limit === 100 ? Promise.reject(failure) : list(query, options)
+      );
+      const { dialog } = await open(f, false);
+      if (status === 500) {
+        expect(await within(dialog).findByRole("alert")).toHaveTextContent(
+          "Expenses could not be loaded for review."
+        );
+        expect(within(dialog).getByRole("button", { name: "Start review" })).toBeDisabled();
+        expect(within(dialog).queryByRole("checkbox")).not.toBeInTheDocument();
+        expect(f.onAccessChanged).not.toHaveBeenCalled();
+      } else {
+        await waitFor(() => expect(f.onAccessChanged).toHaveBeenCalledWith(failure));
+        expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+        expect(screen.queryByRole("heading", { name: "Hosting 0" })).not.toBeInTheDocument();
+      }
+      expect(f.api.reviewExpense).not.toHaveBeenCalled();
+      expect(f.api.expenses).toHaveBeenCalledTimes(2);
     }
-    expect(f.api.reviewExpense).not.toHaveBeenCalled();
-    expect(f.api.expenses).toHaveBeenCalledTimes(2);
-  });
+  );
 
   it.each(["workspace", "role"])("discards a late selection after a %s change", async (change) => {
     const f = fixture({ count: 101 });
@@ -286,7 +309,8 @@ describe("explicit inspection of selected saved expenses", () => {
     expect(screen.queryByText("Hosting 99")).not.toBeInTheDocument();
     expect(f.api.reviewExpense).not.toHaveBeenCalled();
     expect(fresh.api.reviewExpense).not.toHaveBeenCalled();
-    if (change === "role") expect(screen.queryByRole("button", { name: "Expense review" })).not.toBeInTheDocument();
+    if (change === "role")
+      expect(screen.queryByRole("button", { name: "Expense review" })).not.toBeInTheDocument();
   });
 
   it.each(["too-many", "wrong-target", "duplicate-id", "invalid-revision", "missing-items"])(
@@ -295,7 +319,8 @@ describe("explicit inspection of selected saved expenses", () => {
       const f = fixture({ count: 101 });
       const page = { items: f.expenses.slice(0, 100), nextCursor: "more" };
       if (kind === "too-many") page.items = f.expenses;
-      if (kind === "wrong-target") page.items[0] = { ...page.items[0], target: { kind: "project", projectId: "prj_other" } };
+      if (kind === "wrong-target")
+        page.items[0] = { ...page.items[0], target: { kind: "project", projectId: "prj_other" } };
       if (kind === "duplicate-id") page.items[1] = page.items[0];
       if (kind === "invalid-revision") page.items[0] = { ...page.items[0], revision: 0 };
       if (kind === "missing-items") delete page.items;
@@ -304,7 +329,9 @@ describe("explicit inspection of selected saved expenses", () => {
         query.limit === 100 ? Promise.resolve(page) : list(query, options)
       );
       const { dialog } = await open(f, false);
-      expect(await within(dialog).findByRole("alert")).toHaveTextContent("Expenses could not be loaded for review.");
+      expect(await within(dialog).findByRole("alert")).toHaveTextContent(
+        "Expenses could not be loaded for review."
+      );
       expect(within(dialog).getByRole("button", { name: "Start review" })).toBeDisabled();
       expect(within(dialog).queryByRole("checkbox")).not.toBeInTheDocument();
       expect(f.api.reviewExpense).not.toHaveBeenCalled();
@@ -322,16 +349,10 @@ describe("explicit inspection of selected saved expenses", () => {
     fireEvent.click(screen.getByRole("button", { name: "Expense review" }));
     const dialog = screen.getByRole("dialog", { name: "Expense review" });
     await waitFor(() =>
-      expect(
-        within(dialog).getByRole("button", { name: "Start review" }),
-      ).toBeEnabled(),
+      expect(within(dialog).getByRole("button", { name: "Start review" })).toBeEnabled()
     );
-    fireEvent.click(
-      within(dialog).getByRole("button", { name: "Start review" }),
-    );
-    expect(
-      await within(dialog).findByText("Current: Hosting (Removed)"),
-    ).toBeInTheDocument();
+    fireEvent.click(within(dialog).getByRole("button", { name: "Start review" }));
+    expect(await within(dialog).findByText("Current: Hosting (Removed)")).toBeInTheDocument();
     expect(f.api.updateExpense).not.toHaveBeenCalled();
     expect(f.api.createExpense).not.toHaveBeenCalled();
   });
@@ -607,7 +628,7 @@ describe("explicit inspection of selected saved expenses", () => {
       expect(f.api.updateExpense).not.toHaveBeenCalled();
       const message =
         code === "JEV_BUDGET_LIMIT"
-          ? "Monthly Jev budget reached. Continue manually."
+          ? "Jev calls used up. Continue manually."
           : "This expense could not be reviewed. Start a new review to try again.";
       expect(within(dialog).getAllByText(message)).toHaveLength(2);
       expect(dialog.textContent).not.toContain("Daily Jev allowance");

@@ -1,6 +1,6 @@
 # Norulo Web
 
-## 2026-10-14 paid plan allowances
+## 2026-10-14 Jev calls and paid plan allowances
 
 Default Max capacity is 200,000 retained expenses with a $12/month Jev allowance;
 Pro stays at 20,000 expenses and $3/month. Projects remain 3 / 20 / 100.
@@ -8,6 +8,14 @@ Always render current Server entitlements and verified Creem prices. The checked
 live prices are Pro $4.99/month or $49.99/year and Max $12.99/month or
 $129.99/year. Annual billing keeps the monthly Jev allowance and no rollover.
 Keep six-language guidance and both generated public API artifacts aligned.
+
+
+Jev is displayed and enforced by calls: Free 20 once per Owner lifetime, Pro
+1,089 per UTC month, Max 4,358 per UTC month. Members/API keys share the Owner
+pool. Billing shows used/total/remaining calls, never a dollar balance. v15
+adds a constrained lifetime trial column; old paid reservation data is retained.
+Annual plans keep monthly calls. Plan changes, preference toggles and deletion
+never renew Free trials. Old USD API fields are deprecated compatibility data.
 
 ## 2026-10-14 Free expense capacity
 

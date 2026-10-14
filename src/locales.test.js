@@ -16,32 +16,67 @@ import { LEDGER_SCREEN_PHRASES } from "./locales/ledger-screen.js";
 import { LEDGER_SCOPE_PHRASES } from "./locales/ledger-scopes.js";
 import { LEDGER_SUMMARY_PHRASES } from "./locales/ledger-summary.js";
 
-const BASE_PHRASES = { zh: ZH_PHRASES, ja: JA_PHRASES, ko: KO_PHRASES, fr: FR_PHRASES, es: ES_PHRASES };
+const BASE_PHRASES = {
+  zh: ZH_PHRASES,
+  ja: JA_PHRASES,
+  ko: KO_PHRASES,
+  fr: FR_PHRASES,
+  es: ES_PHRASES,
+};
 const SOURCE_DIRECTORY = dirname(fileURLToPath(import.meta.url));
-const sources = ["screens", "components"].flatMap((directory) => {
-  const directoryPath = join(SOURCE_DIRECTORY, directory);
-  return readdirSync(directoryPath)
-    .filter((name) => /\.(js|jsx)$/.test(name) && !name.includes(".test."))
-    .map((name) => readFileSync(join(directoryPath, name), "utf8"));
-}).concat(["App.jsx", "shell.jsx"].map((name) => readFileSync(join(SOURCE_DIRECTORY, name), "utf8")));
+const sources = ["screens", "components"]
+  .flatMap((directory) => {
+    const directoryPath = join(SOURCE_DIRECTORY, directory);
+    return readdirSync(directoryPath)
+      .filter((name) => /\.(js|jsx)$/.test(name) && !name.includes(".test."))
+      .map((name) => readFileSync(join(directoryPath, name), "utf8"));
+  })
+  .concat(
+    ["App.jsx", "shell.jsx"].map((name) => readFileSync(join(SOURCE_DIRECTORY, name), "utf8"))
+  );
 // Cover literal copy used by current screens; interpolated provider/user data
 // keeps its deliberate English fallback and is exercised separately below.
-const CURRENT_COPY = [...new Set(sources.flatMap((source) =>
-  [...source.matchAll(/\bT\(\s*("(?:\\.|[^"\\])*")/g)].map((match) => JSON.parse(match[1]))))];
+const CURRENT_COPY = [
+  ...new Set(
+    sources.flatMap((source) =>
+      [...source.matchAll(/\bT\(\s*("(?:\\.|[^"\\])*")/g)].map((match) => JSON.parse(match[1]))
+    )
+  ),
+];
 
 const LEDGER_COPY = [
-  "Projects", "Project", "Project expenses", "Shared expense pool", "Ledger overview", "Totals by currency",
-  "Expense total", "Repositories / organization",
-  "Each currency has its own scale.", "Use arrow keys to inspect values.", "Some report amounts are unavailable.",
-  "From date", "Export CSV", "Automatic", "Save expense", "Automatic Jev assistance",
-  "Jev selected the category", "This expense may duplicate an existing entry. Review your records.",
+  "Projects",
+  "Project",
+  "Project expenses",
+  "Shared expense pool",
+  "Ledger overview",
+  "Totals by currency",
+  "Expense total",
+  "Repositories / organization",
+  "Each currency has its own scale.",
+  "Use arrow keys to inspect values.",
+  "Some report amounts are unavailable.",
+  "From date",
+  "Export CSV",
+  "Automatic",
+  "Save expense",
+  "Automatic Jev assistance",
+  "Jev selected the category",
+  "This expense may duplicate an existing entry. Review your records.",
   "Choose a category to finish saving. Your draft is still here.",
-  "Automatic Jev assistance when saving expenses", "Automatic categorization and expense advice · Web + REST API",
-  "Annual subscriptions keep the same monthly Jev budget", "Monthly UTC budget · no rollover",
-  "Awaiting payment confirmation", "Subscription confirmed", "Refresh billing", "less per year",
+  "Automatic Jev assistance when saving expenses",
+  "Automatic categorization and expense advice · Web + REST API",
+  "Annual subscriptions keep the same monthly Jev calls",
+  "Monthly UTC budget · no rollover",
+  "Awaiting payment confirmation",
+  "Subscription confirmed",
+  "Refresh billing",
+  "less per year",
   "Your recorded expenses remain available when GitHub access changes.",
-  "Project expense tracking for developers and teams", "Record project and shared expenses.",
-  "No repositories linked", "Jev assistance allowance",
+  "Project expense tracking for developers and teams",
+  "Record project and shared expenses.",
+  "No repositories linked",
+  "Jev assistance allowance",
 ];
 
 const PROJECT_LINKS_AND_RECURRING_COPY = [
@@ -135,47 +170,76 @@ describe("ledger locale copy", () => {
         expect(translated.trim(), `${locale}: ${english}`).not.toBe("");
         expect(translated, `${locale}: ${english}`).not.toBe(english);
         expect(T(english), `${locale}: ${english}`).toBe(translated);
-        expect([...translated.matchAll(/\{[^{}]+\}/g)].map(([token]) => token).sort())
-          .toEqual([...english.matchAll(/\{[^{}]+\}/g)].map(([token]) => token).sort());
+        expect([...translated.matchAll(/\{[^{}]+\}/g)].map(([token]) => token).sort()).toEqual(
+          [...english.matchAll(/\{[^{}]+\}/g)].map(([token]) => token).sort()
+        );
       }
       expect(T("{count} recurring schedules").replace("{count}", "3")).toContain("3");
     });
     it(`${locale} covers current screen, documentation and legal source keys`, async () => {
       await setLang(locale);
-      const phrases = { ...BASE_PHRASES[locale], ...LEDGER_PHRASES[locale],
-        ...LEDGER_LONG_PHRASES[locale], ...LEDGER_UI_PHRASES[locale],
-        ...LEDGER_SCOPE_PHRASES[locale], ...LEDGER_SCREEN_PHRASES[locale],
-        ...LEDGER_SUMMARY_PHRASES[locale] };
-      for (const english of [...CURRENT_COPY, ...API_KEY_SCOPES.flatMap(scope => [scope.labelEn, scope.descEn])]) {
+      const phrases = {
+        ...BASE_PHRASES[locale],
+        ...LEDGER_PHRASES[locale],
+        ...LEDGER_LONG_PHRASES[locale],
+        ...LEDGER_UI_PHRASES[locale],
+        ...LEDGER_SCOPE_PHRASES[locale],
+        ...LEDGER_SCREEN_PHRASES[locale],
+        ...LEDGER_SUMMARY_PHRASES[locale],
+      };
+      for (const english of [
+        ...CURRENT_COPY,
+        ...API_KEY_SCOPES.flatMap((scope) => [scope.labelEn, scope.descEn]),
+      ]) {
         expect(Object.hasOwn(phrases, english), `${locale}: ${english}`).toBe(true);
         const translated = phrases[english];
         expect(translated.trim(), `${locale}: ${english}`).not.toBe("");
         expect(T(english)).toBe(translated);
       }
-      expect(T("Contact contact@norulo.com with privacy or security questions.")).not.toMatch(/^Contact /);
+      expect(T("Contact contact@norulo.com with privacy or security questions.")).not.toMatch(
+        /^Contact /
+      );
       expect(T("For questions, contact contact@norulo.com.")).not.toMatch(/^For questions/);
-      const rights = T("Contact privacy@example.com to request access, export, correction or deletion of account data. We may verify your identity and consider applicable law and other ledger members' rights before acting. You can export authorized expenses as CSV, manage members and GitHub access according to your permissions, and revoke your API keys in the product.");
+      const rights = T(
+        "Contact privacy@example.com to request access, export, correction or deletion of account data. We may verify your identity and consider applicable law and other ledger members' rights before acting. You can export authorized expenses as CSV, manage members and GitHub access according to your permissions, and revoke your API keys in the product."
+      );
       expect(rights).not.toMatch(/^Contact /);
       expect(rights).toContain("privacy@example.com");
     });
     it(`${locale} distinguishes selected review input from other historical candidate text`, async () => {
       await setLang(locale);
       const privacyKey = Object.keys(LEDGER_LONG_PHRASES[locale]).find((key) =>
-        key.startsWith("Pro and Max automatically use Jev during expense saves")
+        key.startsWith("Free trials and Pro/Max calls automatically use Jev during expense saves")
       );
       expect(privacyKey).toBeTypeOf("string");
       const disclosure = T(privacyKey);
       for (const phrase of {
         zh: ["主动选中并开始检查", "预定义选项和置信评分", "其他历史重复候选记录的文字"],
-        ja: ["明示的に選択してチェックを開始した保存済み支出", "定義済みの選択肢と信頼度スコア", "他の過去の重複候補のテキスト"],
-        ko: ["직접 선택하고 점검을 시작한 저장된 지출", "미리 정해진 선택지와 신뢰도 점수", "다른 과거 중복 후보 기록의 텍스트"],
-        fr: ["sélectionnez et dont vous démarrez explicitement la vérification", "choix prédéfinis et des scores de confiance", "autres dépenses historiques candidates aux doublons"],
-        es: ["selecciones y cuya comprobación inicies expresamente", "opciones predefinidas y puntuaciones de confianza", "otros gastos históricos candidatos a duplicados"],
+        ja: [
+          "明示的に選択してチェックを開始した保存済み支出",
+          "定義済みの選択肢と信頼度スコア",
+          "他の過去の重複候補のテキスト",
+        ],
+        ko: [
+          "직접 선택하고 점검을 시작한 저장된 지출",
+          "미리 정해진 선택지와 신뢰도 점수",
+          "다른 과거 중복 후보 기록의 텍스트",
+        ],
+        fr: [
+          "sélectionnez et dont vous démarrez explicitement la vérification",
+          "choix prédéfinis et des scores de confiance",
+          "autres dépenses historiques candidates aux doublons",
+        ],
+        es: [
+          "selecciones y cuya comprobación inicies expresamente",
+          "opciones predefinidas y puntuaciones de confianza",
+          "otros gastos históricos candidatos a duplicados",
+        ],
       }[locale]) {
         expect(disclosure).toContain(phrase);
       }
       const reviewKey = Object.keys(LEDGER_LONG_PHRASES[locale]).find((key) =>
-        key.startsWith("POST /api/v1/expenses/{id}/review checks one saved expense")
+        key.startsWith("POST /api/v1/expenses/{id}/review requires")
       );
       expect(reviewKey).toBeTypeOf("string");
       const request = T(reviewKey);

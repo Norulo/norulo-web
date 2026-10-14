@@ -114,7 +114,10 @@ describe("BillingScreen", () => {
   }
 
   function eventRange(first, last) {
-    return Array.from({ length: last - first + 1 }, (_, index) => `subscription.event_${first + index}`);
+    return Array.from(
+      { length: last - first + 1 },
+      (_, index) => `subscription.event_${first + index}`
+    );
   }
 
   async function subscriptionActivitySection() {
@@ -197,6 +200,10 @@ describe("BillingScreen", () => {
     planId = "pro",
     jev = {
       month: "2026-10",
+      period: "utc-calendar-month",
+      usedCalls: 449,
+      limitCalls: 1089,
+      remainingCalls: 640,
       currency: "USD",
       usedMicrousd: 1234567,
       limitMicrousd: 3000000,
@@ -208,71 +215,60 @@ describe("BillingScreen", () => {
   }
 
   it.each(["pro", "max"])(
-    "shows exact monthly Jev reservations for %s even when assistance is unavailable",
+    "shows monthly Jev counts for %s with no dollar balance",
     async (planId) => {
-      const payload = withJevUsage(planId);
-      payload.plans = payload.plans.map((plan) => ({
-        ...plan,
-        entitlements: { jev: { eligible: plan.id !== "free", available: false } },
-      }));
-      payload.account.interval = "year";
-      noruloApi.billing.getPlan.mockResolvedValue(payload);
+      noruloApi.billing.getPlan.mockResolvedValue(withJevUsage(planId));
       render(<BillingScreen go={vi.fn()} navigate={vi.fn()} />);
       const region = await screen.findByRole("region", { name: "Jev usage" });
       expect(region).toHaveTextContent("UTC month: 2026-10");
       expect(
         within(region)
-          .getAllByRole("term")
-          .map((node) => node.textContent)
-      ).toEqual(["Used", "Total allowance"]);
-      expect(
-        within(region)
           .getAllByRole("definition")
-          .map((node) => node.textContent)
-      ).toEqual(["USD 1.234567", "USD 3.00"]);
-      expect(region).toHaveTextContent("not the provider’s actual invoice");
-      expect(region).toHaveTextContent("without rollover, including annual subscriptions");
-      expect(region).not.toHaveTextContent(/Remaining|Over limit|Daily/);
-      const meter = within(region).getByRole("meter", { name: "Jev assistance allowance" });
-      expect(meter).toHaveAttribute("value", "1234567");
-      expect(meter).toHaveAttribute("max", "3000000");
-      expect(meter).toHaveAttribute(
-        "aria-valuetext",
-        "Used: USD 1.234567; Total allowance: USD 3.00"
-      );
+          .map((n) => n.textContent)
+      ).toEqual(["449", "1,089"]);
+      expect(region).toHaveTextContent("Remaining calls: 640");
+      expect(region).not.toHaveTextContent(/USD|\$/);
+      const meter = within(region).getByRole("meter", { name: "Jev calls" });
+      expect(meter).toHaveAttribute("value", "449");
+      expect(meter).toHaveAttribute("max", "1089");
+      expect(meter).toHaveAttribute("aria-valuetext", "Used: 449; Total allowance: 1,089");
       expect(noruloApi.billing.getPlan).toHaveBeenCalledOnce();
     }
   );
 
-  it.each([0, 1])(
-    "keeps %i micro-USD reservations with zero allowance exact and omits an undefined ratio",
-    async (usedMicrousd) => {
-      noruloApi.billing.getPlan.mockResolvedValue(
-        withJevUsage("pro", {
-          month: "2026-10",
-          currency: "USD",
-          usedMicrousd,
-          limitMicrousd: 0,
-        })
-      );
-      render(<BillingScreen go={vi.fn()} navigate={vi.fn()} />);
-      const region = await screen.findByRole("region", { name: "Jev usage" });
-      expect(
-        within(region)
-          .getAllByRole("definition")
-          .map((node) => node.textContent)
-      ).toEqual([usedMicrousd === 0 ? "USD 0.00" : "USD 0.000001", "USD 0.00"]);
-      expect(within(region).queryByRole("meter")).not.toBeInTheDocument();
-    }
-  );
+  it("shows Free’s one-time 20 trials and remaining count", async () => {
+    noruloApi.billing.getPlan.mockResolvedValue(
+      withJevUsage("free", {
+        month: null,
+        period: "lifetime",
+        usedCalls: 7,
+        limitCalls: 20,
+        remainingCalls: 13,
+        currency: "USD",
+        usedMicrousd: 0,
+        limitMicrousd: 0,
+      })
+    );
+    render(<BillingScreen go={vi.fn()} navigate={vi.fn()} />);
+    const region = await screen.findByRole("region", { name: "Jev usage" });
+    expect(region).toHaveTextContent("One-time trial");
+    expect(region).toHaveTextContent("Remaining calls: 13");
+    expect(
+      within(region)
+        .getAllByRole("definition")
+        .map((n) => n.textContent)
+    ).toEqual(["7", "20"]);
+    expect(region).not.toHaveTextContent(/USD|UTC month|\$/);
+  });
 
-  it("does not round a safe-integer reservation or hide usage above a changed allowance", async () => {
+  it("keeps safe integer counts exact above a lowered allowance", async () => {
     noruloApi.billing.getPlan.mockResolvedValue(
       withJevUsage("max", {
         month: "2026-10",
-        currency: "USD",
-        usedMicrousd: Number.MAX_SAFE_INTEGER,
-        limitMicrousd: 4250001,
+        period: "utc-calendar-month",
+        usedCalls: Number.MAX_SAFE_INTEGER,
+        limitCalls: 4358,
+        remainingCalls: 0,
       })
     );
     render(<BillingScreen go={vi.fn()} navigate={vi.fn()} />);
@@ -280,49 +276,35 @@ describe("BillingScreen", () => {
     expect(
       within(region)
         .getAllByRole("definition")
-        .map((node) => node.textContent)
-    ).toEqual(["USD 9,007,199,254.740991", "USD 4.250001"]);
-    const meter = within(region).getByRole("meter", { name: "Jev assistance allowance" });
-    expect(meter).toHaveAttribute("value", "4250001");
-    expect(meter).toHaveAttribute("max", "4250001");
-    expect(meter).toHaveAttribute(
-      "aria-valuetext",
-      "Used: USD 9,007,199,254.740991; Total allowance: USD 4.250001"
-    );
+        .map((n) => n.textContent)
+    ).toEqual(["9,007,199,254,740,991", "4,358"]);
+    expect(within(region).getByRole("meter")).toHaveAttribute("value", "4358");
   });
 
   it.each([
     null,
-    { month: "2026-10", currency: "USD", usedMicrousd: null, limitMicrousd: 3000000 },
-    { month: "2026-10", currency: "USD", usedMicrousd: "0", limitMicrousd: 3000000 },
-    { month: "2026-10", currency: "USD", usedMicrousd: 1.5, limitMicrousd: 3000000 },
-    {
-      month: "2026-10",
-      currency: "USD",
-      usedMicrousd: Number.MAX_SAFE_INTEGER + 1,
-      limitMicrousd: 3000000,
-    },
-    { month: "2026-10", currency: "USD", usedMicrousd: -1, limitMicrousd: 3000000 },
-    { month: "2026-10", currency: "USD", usedMicrousd: 0 },
-    { month: "2026-10", currency: "USD", usedMicrousd: 0, limitMicrousd: -1 },
-    { month: "2026-13", currency: "USD", usedMicrousd: 0, limitMicrousd: 3000000 },
-    { month: "2026-10", currency: "EUR", usedMicrousd: 0, limitMicrousd: 3000000 },
-  ])("shows unavailable for unknown or invalid paid Jev usage: %j", async (jev) => {
-    noruloApi.billing.getPlan.mockResolvedValue(withJevUsage("pro", jev));
+    {},
+    { usedCalls: "0" },
+    { usedCalls: -1 },
+    { usedCalls: 1.5 },
+    { usedCalls: Number.MAX_SAFE_INTEGER + 1 },
+    { limitCalls: -1 },
+    { remainingCalls: 2 },
+    { period: "daily" },
+    { month: "2026-13" },
+    { period: "lifetime", month: "2026-10" },
+  ])("shows unavailable for malformed count usage %j", async (invalid) => {
+    const normal = withJevUsage().ledgerUsage.jev;
+    noruloApi.billing.getPlan.mockResolvedValue(
+      withJevUsage(
+        "pro",
+        invalid === null || Object.keys(invalid).length === 0 ? invalid : { ...normal, ...invalid }
+      )
+    );
     render(<BillingScreen go={vi.fn()} navigate={vi.fn()} />);
     const region = await screen.findByRole("region", { name: "Jev usage" });
-    expect(within(region).getByText("Usage unavailable")).toBeInTheDocument();
+    expect(region).toHaveTextContent("Usage unavailable");
     expect(within(region).queryByRole("definition")).not.toBeInTheDocument();
-    expect(within(region).queryByRole("meter")).not.toBeInTheDocument();
-    expect(region).not.toHaveTextContent("USD 0.00");
-    expect(noruloApi.billing.getPlan).toHaveBeenCalledOnce();
-  });
-
-  it("does not display paid Jev usage for a Free account", async () => {
-    noruloApi.billing.getPlan.mockResolvedValue(withJevUsage("free"));
-    render(<BillingScreen go={vi.fn()} navigate={vi.fn()} />);
-    await screen.findByRole("region", { name: "Ledger usage" });
-    expect(screen.queryByRole("region", { name: "Jev usage" })).not.toBeInTheDocument();
   });
 
   it("refreshes Jev values only with the existing manual usage read", async () => {
@@ -336,17 +318,17 @@ describe("BillingScreen", () => {
     expect(noruloApi.billing.getPlan).toHaveBeenCalledOnce();
     await user.click(screen.getByRole("button", { name: "Refresh usage" }));
     const refreshed = await screen.findByRole("region", { name: "Jev usage" });
-    expect(refreshed).toHaveTextContent("USD 1.234567");
+    expect(refreshed).toHaveTextContent("449");
     expect(noruloApi.billing.getPlan).toHaveBeenCalledTimes(2);
   });
 
   it.each([
-    ["en", "Jev usage", "UTC month", "1.234567", "without rollover"],
-    ["zh", "Jev 用量", "UTC 月份", "1.234567", "不结转"],
-    ["ja", "Jev の使用量", "UTC の月", "1.234567", "繰り越されません"],
-    ["ko", "Jev 사용량", "UTC 월", "1.234567", "이월되지 않습니다"],
-    ["fr", "Utilisation de Jev", "Mois UTC", "1,234567", "sans report"],
-    ["es", "Uso de Jev", "Mes UTC", "1,234567", "sin acumulación"],
+    ["en", "Jev usage", "UTC month", "449", "without rollover"],
+    ["zh", "Jev 用量", "UTC 月份", "449", "不结转"],
+    ["ja", "Jev の使用量", "UTC の月", "449", "繰り越しません"],
+    ["ko", "Jev 사용량", "UTC 월", "449", "이월되지 않습니다"],
+    ["fr", "Utilisation de Jev", "Mois UTC", "449", "sans report"],
+    ["es", "Uso de Jev", "Mes UTC", "449", "sin acumulación"],
   ])(
     "localizes Jev usage and its monthly policy in %s",
     async (lang, title, month, amount, rollover) => {
@@ -355,7 +337,7 @@ describe("BillingScreen", () => {
       render(<BillingScreen go={vi.fn()} navigate={vi.fn()} />);
       const region = await screen.findByRole("region", { name: title });
       expect(region).toHaveTextContent(`${month}: 2026-10`);
-      expect(region).toHaveTextContent(`USD ${amount}`);
+      expect(region).toHaveTextContent(amount);
       expect(region).toHaveTextContent(rollover);
       if (lang !== "en") expect(region).not.toHaveTextContent("Jev usage");
     }
@@ -385,9 +367,7 @@ describe("BillingScreen", () => {
       }
       expect(region).not.toHaveTextContent(/Remaining|Over limit by|Limit reached/);
       expect(region).toHaveTextContent("ledger you own, even when another ledger is selected");
-      expect(region).toHaveTextContent(
-        "Archived projects still count toward the project limit"
-      );
+      expect(region).toHaveTextContent("Archived projects still count toward the project limit");
       expect(region).toHaveTextContent("Removing a project frees its project slot");
       expect(region).toHaveTextContent(
         "Removing an expense manually or automatically frees its place"
@@ -402,9 +382,7 @@ describe("BillingScreen", () => {
   it("reads current project capacity when Billing is reopened after a project removal", async () => {
     const currentUsage = deferred();
     noruloApi.billing.getPlan
-      .mockResolvedValueOnce(
-        withUsage("free", { used: 3, limit: 3 }, { used: 8, limit: 100 })
-      )
+      .mockResolvedValueOnce(withUsage("free", { used: 3, limit: 3 }, { used: 8, limit: 100 }))
       .mockReturnValueOnce(currentUsage.promise);
     const firstVisit = render(<BillingScreen go={vi.fn()} navigate={vi.fn()} />);
     expectUsageValues(
@@ -419,9 +397,7 @@ describe("BillingScreen", () => {
     expect(noruloApi.billing.getPlan).toHaveBeenCalledTimes(2);
     expect(screen.queryByRole("region", { name: "Ledger usage" })).not.toBeInTheDocument();
     await act(async () => {
-      currentUsage.resolve(
-        withUsage("free", { used: 2, limit: 3 }, { used: 6, limit: 100 })
-      );
+      currentUsage.resolve(withUsage("free", { used: 2, limit: 3 }, { used: 6, limit: 100 }));
     });
     const region = await screen.findByRole("region", { name: "Ledger usage" });
     expectUsageValues(region, "Projects", 2, 3);
@@ -497,9 +473,7 @@ describe("BillingScreen", () => {
     ["unsafe total", { used: 8, limit: Number.MAX_SAFE_INTEGER + 1 }],
     ["string total", { used: 8, limit: "100" }],
   ])("keeps %s unavailable rather than coercing capacity", async (_case, metric) => {
-    noruloApi.billing.getPlan.mockResolvedValue(
-      withUsage("free", metric, { used: 8, limit: 100 })
-    );
+    noruloApi.billing.getPlan.mockResolvedValue(withUsage("free", metric, { used: 8, limit: 100 }));
     render(<BillingScreen go={vi.fn()} navigate={vi.fn()} />);
     const region = await screen.findByRole("region", { name: "Ledger usage" });
     const projects = within(region).getByRole("article", { name: "Projects" });
@@ -561,7 +535,17 @@ describe("BillingScreen", () => {
       "does not reset each month",
       "Removing a project frees its project slot",
     ],
-    ["zh", "账本用量", "项目", "支出记录", "已使用", "总额度", "刷新用量", "容量不会每月重置", "移除项目会释放其项目名额"],
+    [
+      "zh",
+      "账本用量",
+      "项目",
+      "支出记录",
+      "已使用",
+      "总额度",
+      "刷新用量",
+      "容量不会每月重置",
+      "移除项目会释放其项目名额",
+    ],
     [
       "ja",
       "帳簿の使用量",
@@ -1289,7 +1273,10 @@ describe("BillingScreen", () => {
 
       await screen.findByText("Free is available. Paid subscriptions are not open yet.");
       const free = screen.getByRole("heading", { name: "Free" }).closest(".pricing-card");
-      expect(within(free).getByRole("link", { name: freeAction })).toHaveAttribute("href", freeHref);
+      expect(within(free).getByRole("link", { name: freeAction })).toHaveAttribute(
+        "href",
+        freeHref
+      );
       expect(free).toHaveTextContent("$0");
       expect(free).toHaveTextContent("Projects: 3");
       expect(free).toHaveTextContent("Expense records: 300");
@@ -1328,8 +1315,12 @@ describe("BillingScreen", () => {
     const usage = await screen.findByRole("region", { name: "Ledger usage" });
     expectUsageValues(usage, "Projects", 1, 3);
     expectUsageValues(usage, "Expense records", 7, 100);
-    expect(screen.getByText("Free is available. Paid subscriptions are not open yet.")).toBeInTheDocument();
-    expect(screen.queryByRole("region", { name: "Jev usage" })).not.toBeInTheDocument();
+    expect(
+      screen.getByText("Free is available. Paid subscriptions are not open yet.")
+    ).toBeInTheDocument();
+    expect(screen.getByRole("region", { name: "Jev usage" })).toHaveTextContent(
+      "Usage unavailable"
+    );
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
     expect(noruloApi.billing.createCheckoutSession).not.toHaveBeenCalled();
   });
@@ -1507,17 +1498,33 @@ describe("BillingScreen", () => {
       ...billingCatalog,
       plans: [...billingCatalog.plans, maxPlan].map((plan) => ({
         ...plan,
-        prices: plan.id === "free" ? plan.prices : {
-          month: { amount: plan.id === "pro" ? "4.99" : "12.99", currency: "USD", interval: "month", configured: true },
-          year: { amount: plan.id === "pro" ? "49.99" : "129.99", currency: "USD", interval: "year", configured: true },
-        },
+        prices:
+          plan.id === "free"
+            ? plan.prices
+            : {
+                month: {
+                  amount: plan.id === "pro" ? "4.99" : "12.99",
+                  currency: "USD",
+                  interval: "month",
+                  configured: true,
+                },
+                year: {
+                  amount: plan.id === "pro" ? "49.99" : "129.99",
+                  currency: "USD",
+                  interval: "year",
+                  configured: true,
+                },
+              },
         entitlements: {
           limits: {
             projects: plan.id === "free" ? 3 : plan.id === "max" ? 100 : 20,
             expenseRecords: plan.id === "free" ? 300 : plan.id === "max" ? 200000 : 20000,
           },
           jev: {
-            eligible: plan.id === "pro" || plan.id === "max",
+            eligible: true,
+            monthlyCalls: plan.id === "max" ? 4358 : plan.id === "pro" ? 1089 : 0,
+            trialCalls: plan.id === "free" ? 20 : 0,
+            period: plan.id === "free" ? "lifetime" : "utc-calendar-month",
             available: false,
             monthlyBudgetUsd: plan.id === "max" ? "12.00" : plan.id === "pro" ? "3.00" : "0.00",
             rollover: false,
@@ -1543,17 +1550,16 @@ describe("BillingScreen", () => {
         /Removing expenses manually or automatically, or removing their project, frees expense capacity/i
       )
     ).toBeInTheDocument();
-    expect(
-      screen.getByText(/monthly Jev allowance covers model assistance, has no cash value/i)
-    ).toBeInTheDocument();
+    expect(screen.getByText(/Free includes 20 one-time Jev trial calls/i)).toBeInTheDocument();
     expect(
       screen.getAllByText(/Jev assistance allowance:/).map((node) => node.textContent)
     ).toEqual([
-      "Jev assistance allowance: $3.00 / month",
-      "Jev assistance allowance: $12.00 / month",
+      "Jev assistance allowance: 20 calls · One-time trial",
+      "Jev assistance allowance: 1,089 calls · per month",
+      "Jev assistance allowance: 4,358 calls · per month",
     ]);
-    expect(screen.getAllByText("Activation pending · no rollover")).toHaveLength(2);
-    expect(screen.getAllByText("Jev: not included")).toHaveLength(1);
+    expect(screen.getAllByText("Activation pending · no rollover")).toHaveLength(3);
+    expect(screen.queryByText("Jev: not included")).not.toBeInTheDocument();
     expect(screen.getByText("$4.99")).toBeInTheDocument();
     expect(screen.getByText("$12.99")).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: /yearly/i }));
@@ -1564,8 +1570,9 @@ describe("BillingScreen", () => {
     expect(
       screen.getAllByText(/Jev assistance allowance:/).map((node) => node.textContent)
     ).toEqual([
-      "Jev assistance allowance: $3.00 / month",
-      "Jev assistance allowance: $12.00 / month",
+      "Jev assistance allowance: 20 calls · One-time trial",
+      "Jev assistance allowance: 1,089 calls · per month",
+      "Jev assistance allowance: 4,358 calls · per month",
     ]);
     expect(noruloApi.billing.getPlan).toHaveBeenCalledTimes(1);
     expect(noruloApi.billing.createCheckoutSession).not.toHaveBeenCalled();
@@ -1579,13 +1586,27 @@ describe("BillingScreen", () => {
         {
           ...billingCatalog.plans[1],
           entitlements: {
-            jev: { eligible: true, available: true, monthlyBudgetUsd: "1.234567" },
+            jev: {
+              eligible: true,
+              available: true,
+              monthlyBudgetUsd: "1.234567",
+              monthlyCalls: 448,
+              trialCalls: 0,
+              period: "utc-calendar-month",
+            },
           },
         },
         {
           ...maxPlan,
           entitlements: {
-            jev: { eligible: true, available: false, monthlyBudgetUsd: "4.25" },
+            jev: {
+              eligible: true,
+              available: false,
+              monthlyBudgetUsd: "4.25",
+              monthlyCalls: 1543,
+              trialCalls: 0,
+              period: "utc-calendar-month",
+            },
           },
         },
       ],
@@ -1595,12 +1616,12 @@ describe("BillingScreen", () => {
     await screen.findAllByText(/Jev assistance allowance:/);
     const pro = screen.getByRole("heading", { name: "Norulo Pro" }).closest(".pricing-card");
     const max = screen.getByRole("heading", { name: "Norulo Max" }).closest(".pricing-card");
-    expect(pro).toHaveTextContent("Jev assistance allowance: $1.234567 / month");
-    expect(pro).toHaveTextContent("Monthly UTC budget · no rollover");
+    expect(pro).toHaveTextContent("Jev assistance allowance: 448 calls · per month");
+    expect(pro).toHaveTextContent("Monthly UTC calls · no rollover");
     expect(pro).not.toHaveTextContent("Activation pending");
-    expect(max).toHaveTextContent("Jev assistance allowance: $4.25 / month");
+    expect(max).toHaveTextContent("Jev assistance allowance: 1,543 calls · per month");
     expect(max).toHaveTextContent("Activation pending · no rollover");
-    expect(max).not.toHaveTextContent("Monthly UTC budget");
+    expect(max).not.toHaveTextContent("Monthly UTC calls");
     expect(noruloApi.billing.getPlan).toHaveBeenCalledTimes(1);
   });
 
@@ -1609,7 +1630,16 @@ describe("BillingScreen", () => {
     { jev: { eligible: true, available: true } },
     { jev: { eligible: true, available: true, monthlyBudgetUsd: 3 } },
     { jev: { eligible: true, available: true, monthlyBudgetUsd: "3e0" } },
-    { jev: { eligible: false, available: true, monthlyBudgetUsd: "3.00" } },
+    {
+      jev: {
+        eligible: false,
+        available: true,
+        monthlyBudgetUsd: "3.00",
+        monthlyCalls: 1089,
+        trialCalls: 0,
+        period: "utc-calendar-month",
+      },
+    },
   ])(
     "does not invent a Pro Jev allowance from absent or invalid entitlements: %j",
     async (entitlements) => {
@@ -1625,7 +1655,7 @@ describe("BillingScreen", () => {
       expect(
         screen.queryByText("Automatic Jev assistance when saving expenses")
       ).not.toBeInTheDocument();
-      expect(screen.queryByText("Monthly UTC budget · no rollover")).not.toBeInTheDocument();
+      expect(screen.queryByText("Monthly UTC calls · no rollover")).not.toBeInTheDocument();
       expect(screen.queryByText("Activation pending · no rollover")).not.toBeInTheDocument();
     }
   );
@@ -1725,11 +1755,11 @@ describe("BillingScreen", () => {
 
     expect(noruloApi.billing.changeSubscriptionInterval).not.toHaveBeenCalled();
     const dialog = await screen.findByRole("dialog", { name: "Switch to yearly billing" });
-    expect(within(dialog).getAllByRole("term").map((term) => term.textContent)).toEqual([
-      "Current plan",
-      "New plan",
-      "You save",
-    ]);
+    expect(
+      within(dialog)
+        .getAllByRole("term")
+        .map((term) => term.textContent)
+    ).toEqual(["Current plan", "New plan", "You save"]);
     const [current, target, saving] = within(dialog).getAllByRole("definition");
     expect(current).toHaveTextContent("Norulo Pro $29 per month");
     expect(target).toHaveTextContent("Norulo Pro $290 per year");
@@ -1906,11 +1936,11 @@ describe("BillingScreen", () => {
 
     expect(noruloApi.billing.changeSubscriptionInterval).not.toHaveBeenCalled();
     const dialog = await screen.findByRole("dialog", { name: "Upgrade to Norulo Max" });
-    expect(within(dialog).getAllByRole("term").map((term) => term.textContent)).toEqual([
-      "Current plan",
-      "New plan",
-      "Price difference",
-    ]);
+    expect(
+      within(dialog)
+        .getAllByRole("term")
+        .map((term) => term.textContent)
+    ).toEqual(["Current plan", "New plan", "Price difference"]);
     const [current, target, difference] = within(dialog).getAllByRole("definition");
     expect(current).toHaveTextContent("Norulo Pro $29 per month");
     expect(target).toHaveTextContent("Norulo Max $49 per month");
@@ -1955,10 +1985,11 @@ describe("BillingScreen", () => {
     await user.click(await screen.findByRole("button", { name: /switch to max/i }));
 
     const dialog = screen.getByRole("dialog", { name: "Upgrade to Norulo Max" });
-    expect(within(dialog).getAllByRole("term").map((term) => term.textContent)).toEqual([
-      "Current plan",
-      "New plan",
-    ]);
+    expect(
+      within(dialog)
+        .getAllByRole("term")
+        .map((term) => term.textContent)
+    ).toEqual(["Current plan", "New plan"]);
     expect(within(dialog).getAllByRole("definition")[1]).toHaveTextContent(
       "Norulo Max EUR 49 per month"
     );
@@ -1970,12 +2001,36 @@ describe("BillingScreen", () => {
   });
 
   it.each([
-    ["en", "Switch to MAX", "Upgrade to Norulo Max", "Subscription activity pagination", "Page 1 of 3"],
+    [
+      "en",
+      "Switch to MAX",
+      "Upgrade to Norulo Max",
+      "Subscription activity pagination",
+      "Page 1 of 3",
+    ],
     ["zh", "切换到 MAX", "升级到 Norulo Max", "订阅动态分页", "第 1 页，共 3 页"],
-    ["ja", "MAX に切り替え", "Norulo Max にアップグレード", "サブスクリプション履歴のページ移動", "1 / 3 ページ"],
+    [
+      "ja",
+      "MAX に切り替え",
+      "Norulo Max にアップグレード",
+      "サブスクリプション履歴のページ移動",
+      "1 / 3 ページ",
+    ],
     ["ko", "MAX로 전환", "Norulo Max(으)로 업그레이드", "구독 활동 페이지 탐색", "1 / 3페이지"],
-    ["fr", "Passer à MAX", "Passer à Norulo Max", "Pagination de l’activité d’abonnement", "Page 1 sur 3"],
-    ["es", "Cambiar a MAX", "Mejorar a Norulo Max", "Paginación de la actividad de suscripción", "Página 1 de 3"],
+    [
+      "fr",
+      "Passer à MAX",
+      "Passer à Norulo Max",
+      "Pagination de l’activité d’abonnement",
+      "Page 1 sur 3",
+    ],
+    [
+      "es",
+      "Cambiar a MAX",
+      "Mejorar a Norulo Max",
+      "Paginación de la actividad de suscripción",
+      "Página 1 de 3",
+    ],
   ])(
     "localizes the upgrade confirmation and activity pages in %s",
     async (lang, opener, title, paginationName, pageText) => {
@@ -2558,8 +2613,9 @@ describe("BillingScreen", () => {
     await user.click(screen.getByRole("button", { name: "Refresh usage" }));
     const refreshed = await subscriptionActivitySection();
     await waitFor(() => expect(refreshed.events()).toEqual(eventRange(1, 5)));
-    expect(screen.getByRole("navigation", { name: "Subscription activity pagination" }))
-      .toHaveTextContent("Page 1 of 3");
+    expect(
+      screen.getByRole("navigation", { name: "Subscription activity pagination" })
+    ).toHaveTextContent("Page 1 of 3");
     expect(noruloApi.billing.getPlan).toHaveBeenCalledTimes(2);
   });
 

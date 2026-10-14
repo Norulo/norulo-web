@@ -53,9 +53,14 @@ describe("noruloApi current product endpoints", () => {
     const first = { id: "key_1" };
     const page = { items: [first], apiKeys: [first], nextCursor: "cursor_1" };
     request.mockResolvedValueOnce(page);
-    await expect(noruloApi.apiKeys.list({ workspaceId: "owner" }, {
-      signal: controller.signal,
-    })).resolves.toBe(page);
+    await expect(
+      noruloApi.apiKeys.list(
+        { workspaceId: "owner" },
+        {
+          signal: controller.signal,
+        }
+      )
+    ).resolves.toBe(page);
     expect(request).toHaveBeenNthCalledWith(1, "/api-keys?workspaceId=owner", {
       signal: controller.signal,
     });
@@ -65,9 +70,12 @@ describe("noruloApi current product endpoints", () => {
   it("loads an explicitly requested key page with its ledger selector and signal", async () => {
     const controller = new AbortController();
     request.mockResolvedValue({ items: [{ id: "key_2" }], nextCursor: null });
-    await noruloApi.apiKeys.list({ workspaceId: "owner", cursor: "cursor_1" }, {
-      signal: controller.signal,
-    });
+    await noruloApi.apiKeys.list(
+      { workspaceId: "owner", cursor: "cursor_1" },
+      {
+        signal: controller.signal,
+      }
+    );
     expect(request).toHaveBeenCalledWith("/api-keys?workspaceId=owner&cursor=cursor_1", {
       signal: controller.signal,
     });
@@ -77,8 +85,9 @@ describe("noruloApi current product endpoints", () => {
   it("does not request a key page after its lifecycle is aborted", async () => {
     const controller = new AbortController();
     controller.abort();
-    await expect(noruloApi.apiKeys.list({}, { signal: controller.signal }))
-      .rejects.toMatchObject({ name: "AbortError" });
+    await expect(noruloApi.apiKeys.list({}, { signal: controller.signal })).rejects.toMatchObject({
+      name: "AbortError",
+    });
     expect(request).not.toHaveBeenCalled();
   });
 
@@ -111,6 +120,9 @@ describe("noruloApi current product endpoints", () => {
       eligible: true,
       available: false,
       monthlyBudgetUsd: "3",
+      monthlyCalls: 1089,
+      trialCalls: 0,
+      period: "utc-calendar-month",
     };
     request.mockResolvedValueOnce(preference);
     const controller = new AbortController();

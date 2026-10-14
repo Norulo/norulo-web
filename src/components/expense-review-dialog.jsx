@@ -1,3 +1,4 @@
+import { jevAllowance } from "../lib/jev-allowance.js";
 import { useEffect, useId, useRef, useState } from "react";
 import { FinancialValue } from "./financial-value.jsx";
 import { useModalFocus } from "../lib/modal-focus.js";
@@ -77,15 +78,9 @@ function reviewRecords(page, target) {
 function reviewError(failure) {
   const code = failure?.code || failure?.payload?.error?.code;
   if (code === "JEV_BUDGET_LIMIT")
-    return T(
-      "Monthly Jev budget reached. Continue manually.",
-      "本月 Jev 预算已用完，请继续手工记账。"
-    );
+    return T("Jev calls used up. Continue manually.", "Jev 次数已用完，请继续手工记账。");
   if (code === "JEV_PLAN_REQUIRED" || code === "MAX_REQUIRED")
-    return T(
-      "Jev assistance requires the ledger Owner's Pro or Max plan.",
-      "Jev 辅助需要账本所有者的 Pro 或 Max 套餐。"
-    );
+    return T("Jev assistance is unavailable for this ledger.", "此账本的 Jev 辅助暂不可用。");
   if (failure?.status === 412)
     return T(
       "This expense changed. Reload it before reviewing again.",
@@ -265,9 +260,7 @@ export function ExpenseReviewDialog({
   const [error, setError] = useState("");
   const eligible = profile?.entitlements?.jev?.eligible === true;
   const available = profile?.entitlements?.jev?.available === true;
-  const budget = profile?.entitlements?.jev?.monthlyBudgetUsd;
-  const budgetText =
-    typeof budget === "string" && /^\d+(?:\.\d{1,6})?$/.test(budget) ? budget : null;
+  const allowance = jevAllowance(profile?.entitlements?.jev);
 
   const stop = () => {
     const run = runRef.current;
@@ -531,8 +524,8 @@ export function ExpenseReviewDialog({
             </p>
             <p>
               {T(
-                "Only Start review sends inspection requests. The monthly Jev allowance applies; stopping cannot refund an already-started check.",
-                "只有点击「开始巡检」才会发送巡检请求。巡检使用 Jev 月度额度，停止不能退还已开始检查的消耗。"
+                "Only Start review sends requests. Each admitted model attempt uses one Jev call; stopping does not refund a started check.",
+                "只有点击「开始巡检」才会发送请求。每次获准的模型调用消耗 1 次 Jev；停止不会退还已开始的检查。"
               )}
             </p>
             <p>
@@ -541,10 +534,14 @@ export function ExpenseReviewDialog({
                 "所选账目已保存的用途、备注及启用类别名称可能发送给 Jev，其他疑似重复记录的文字不会发送。请勿包含秘密信息。"
               )}
             </p>
-            {budgetText && (
+            {allowance && (
               <p>
                 {T("Jev assistance allowance", "Jev 辅助额度")}:{" "}
-                <FinancialValue value={`USD ${budgetText}`} currency="USD" /> / {T("month", "月")}
+                <FinancialValue value={allowance.calls.toLocaleString("en-US")} />{" "}
+                {T("calls", "次")} ·{" "}
+                {allowance.period === "lifetime"
+                  ? T("One-time trial", "一次性试用")
+                  : T("per month", "每月")}
               </p>
             )}
           </div>
@@ -581,8 +578,8 @@ export function ExpenseReviewDialog({
                     "Jev 类别与归属检查暂不可用，仍可在本地检查疑似重复记录。"
                   )
                 : T(
-                    "Jev assistance requires the ledger Owner's Pro or Max plan.",
-                    "Jev 辅助需要账本所有者的 Pro 或 Max 套餐。"
+                    "Jev assistance is unavailable for this ledger.",
+                    "此账本的 Jev 辅助暂不可用。"
                   )}
             </p>
           )}

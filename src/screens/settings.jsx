@@ -1,3 +1,4 @@
+import { jevAllowance } from "../lib/jev-allowance.js";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { noruloApi } from "../api/norulo.js";
 import { GitHubInstallationsList } from "../components/github-installations.jsx";
@@ -51,8 +52,7 @@ function validJevSettings(value) {
     typeof value.eligible === "boolean" &&
     typeof value.available === "boolean" &&
     (!value.available || (value.eligible && value.enabled)) &&
-    typeof value.monthlyBudgetUsd === "string" &&
-    /^\d+(?:\.\d+)?$/.test(value.monthlyBudgetUsd)
+    jevAllowance(value) !== null
   );
 }
 
@@ -140,8 +140,8 @@ export function SettingsScreen({ go, onSessionUpdated, onOperationBusy }) {
     setError(
       [sessionResult, integrationsResult]
         .filter((result) => result.status === "rejected")
-        .map(
-          (result) => requestErrorText(result.reason, T("Account data unavailable.", "账户数据暂不可用。"))
+        .map((result) =>
+          requestErrorText(result.reason, T("Account data unavailable.", "账户数据暂不可用。"))
         )
         .concat(
           jevConfirmed
@@ -157,8 +157,10 @@ export function SettingsScreen({ go, onSessionUpdated, onOperationBusy }) {
         .concat(
           integrationsResult.status === "fulfilled" && integrationsResult.value?.githubRefreshError
             ? [
-                requestErrorText(integrationsResult.value.githubRefreshError,
-                  T("GitHub access unavailable.")),
+                requestErrorText(
+                  integrationsResult.value.githubRefreshError,
+                  T("GitHub access unavailable.")
+                ),
               ]
             : []
         )
@@ -212,16 +214,20 @@ export function SettingsScreen({ go, onSessionUpdated, onOperationBusy }) {
     };
     githubActionRef.current = operation;
     actionRef.current = true;
-    operation.controller.signal.addEventListener("abort", () => {
-      if (githubActionRef.current !== operation) return;
-      githubActionRef.current = null;
-      actionRef.current = false;
-      if (mountedRef.current) {
-        onOperationBusyRef.current?.(false);
-        setBusy(false);
-        setManagingInstallationId("");
-      }
-    }, { once: true });
+    operation.controller.signal.addEventListener(
+      "abort",
+      () => {
+        if (githubActionRef.current !== operation) return;
+        githubActionRef.current = null;
+        actionRef.current = false;
+        if (mountedRef.current) {
+          onOperationBusyRef.current?.(false);
+          setBusy(false);
+          setManagingInstallationId("");
+        }
+      },
+      { once: true }
+    );
     setBusy(true);
     setManagingInstallationId(installationId);
     setError("");
@@ -248,8 +254,7 @@ export function SettingsScreen({ go, onSessionUpdated, onOperationBusy }) {
         setGithubClosedNotice({ identity: operation.identity, outcome });
     } catch (failure) {
       if (live()) {
-        if (failure?.code === "GITHUB_REAUTHORIZATION_REQUIRED")
-          setGithubReconnectRequired(true);
+        if (failure?.code === "GITHUB_REAUTHORIZATION_REQUIRED") setGithubReconnectRequired(true);
         setError(
           failure?.code === "GITHUB_REAUTHORIZATION_REQUIRED"
             ? T("Reconnect your GitHub account before checking repository access.")
@@ -282,7 +287,8 @@ export function SettingsScreen({ go, onSessionUpdated, onOperationBusy }) {
     try {
       await signOut();
     } catch (failure) {
-      if (mountedRef.current) setError(requestErrorText(failure, T("Request failed. Please retry.")));
+      if (mountedRef.current)
+        setError(requestErrorText(failure, T("Request failed. Please retry.")));
     } finally {
       actionRef.current = false;
       onOperationBusyRef.current?.(false);
@@ -348,13 +354,9 @@ export function SettingsScreen({ go, onSessionUpdated, onOperationBusy }) {
       sessionRef.current?.user?.id === identity;
     let accepted = false;
     try {
-      const confirmed = await noruloApi.account.updateExpenseRetention(
-        current.revision,
-        enabled,
-        {
-          signal: operation.controller.signal,
-        }
-      );
+      const confirmed = await noruloApi.account.updateExpenseRetention(current.revision, enabled, {
+        signal: operation.controller.signal,
+      });
       if (!live()) return;
       if (
         !validExpenseRetention(confirmed) ||
@@ -464,7 +466,7 @@ export function SettingsScreen({ go, onSessionUpdated, onOperationBusy }) {
                 "Jev 设置已在其他位置更改，请重新加载后再选择。"
               )
             : failure?.code === "JEV_PLAN_REQUIRED"
-              ? T("Jev settings require Pro or Max.", "Jev 设置需要 Pro 或 Max 权益。")
+              ? T("Jev settings are unavailable.", "Jev 设置暂不可用。")
               : T(
                   "Jev settings could not be saved. Reload before trying again.",
                   "无法保存 Jev 设置，请重新加载后再试。"
@@ -516,8 +518,7 @@ export function SettingsScreen({ go, onSessionUpdated, onOperationBusy }) {
   const canConnectGitHub = session?.authenticated && user?.id;
   const githubReady = canConnectGitHub && githubIntegrationReady(integrations);
   const githubProvider = Array.isArray(user?.providers) && user.providers.includes("github");
-  const needsGitHubAccount =
-    canConnectGitHub && Array.isArray(user?.providers) && !githubProvider;
+  const needsGitHubAccount = canConnectGitHub && Array.isArray(user?.providers) && !githubProvider;
   const emailProvider = Array.isArray(user?.providers) && user.providers.includes("email");
   const loginEmail = emailProvider && user?.emailVerified === true ? user.email : null;
   const canLinkEmail =
@@ -566,7 +567,10 @@ export function SettingsScreen({ go, onSessionUpdated, onOperationBusy }) {
               {error}
             </div>
           )}
-          <section className="panel section-split settings-section settings-profile-panel" aria-label={T("Profile", "个人资料")}>
+          <section
+            className="panel section-split settings-section settings-profile-panel"
+            aria-label={T("Profile", "个人资料")}
+          >
             <h2>{T("Profile", "个人资料")}</h2>
             <div className="section-body settings-section-body">
               {session ? (
@@ -592,12 +596,17 @@ export function SettingsScreen({ go, onSessionUpdated, onOperationBusy }) {
               )}
             </div>
           </section>
-          <section className="panel section-split settings-section settings-sign-in-panel" aria-label={T("Sign-in methods", "登录方式")}>
+          <section
+            className="panel section-split settings-section settings-sign-in-panel"
+            aria-label={T("Sign-in methods", "登录方式")}
+          >
             <h2>{T("Sign-in methods", "登录方式")}</h2>
             <div className="section-body settings-section-body">
               <div className="settings-sign-in-methods">
                 {loading && (
-                  <p className="muted settings-sign-in-description">{T("Loading...", "正在加载...")}</p>
+                  <p className="muted settings-sign-in-description">
+                    {T("Loading...", "正在加载...")}
+                  </p>
                 )}
                 {canConnectGitHub && (
                   <div className="panel-actions">
@@ -606,7 +615,11 @@ export function SettingsScreen({ go, onSessionUpdated, onOperationBusy }) {
                       disabled={controlsDisabled}
                       onClick={() =>
                         runGitHubAction((signal) =>
-                          startGitHubLogin({ intent: "link", redirectTo: window.location.href, signal })
+                          startGitHubLogin({
+                            intent: "link",
+                            redirectTo: window.location.href,
+                            signal,
+                          })
                         )
                       }
                     >
@@ -635,7 +648,10 @@ export function SettingsScreen({ go, onSessionUpdated, onOperationBusy }) {
                       </div>
                     </div>
                     <p className="muted settings-sign-in-description">
-                      {T("Use email codes to sign in to this account.", "使用邮箱验证码登录此账户。")}
+                      {T(
+                        "Use email codes to sign in to this account.",
+                        "使用邮箱验证码登录此账户。"
+                      )}
                     </p>
                   </div>
                 ) : canLinkEmail ? (
@@ -664,7 +680,10 @@ export function SettingsScreen({ go, onSessionUpdated, onOperationBusy }) {
               </div>
             </div>
           </section>
-          <section className="panel section-split settings-section settings-retention-panel" aria-label={retentionText("title")}>
+          <section
+            className="panel section-split settings-section settings-retention-panel"
+            aria-label={retentionText("title")}
+          >
             <h2>{retentionText("title")}</h2>
             <div className="section-body settings-section-body">
               <p className="muted">{retentionText("scope")}</p>
@@ -704,7 +723,10 @@ export function SettingsScreen({ go, onSessionUpdated, onOperationBusy }) {
               )}
             </div>
           </section>
-          <section className="panel section-split settings-section settings-jev-panel" aria-label={T("Jev settings", "Jev 设置")}>
+          <section
+            className="panel section-split settings-section settings-jev-panel"
+            aria-label={T("Jev settings", "Jev 设置")}
+          >
             <h2>{T("Jev settings", "Jev 设置")}</h2>
             <div className="section-body settings-section-body">
               <p className="muted" id={jevDescriptionId} ref={jevDescriptionRef} tabIndex={0}>
@@ -739,7 +761,7 @@ export function SettingsScreen({ go, onSessionUpdated, onOperationBusy }) {
               ) : !jevSettings.eligible ? (
                 <>
                   <p className="muted">
-                    {T("Jev settings require Pro or Max.", "Jev 设置需要 Pro 或 Max 权益。")}
+                    {T("Jev settings are unavailable.", "Jev 设置暂不可用。")}
                   </p>
                   <div className="panel-actions">
                     <button
@@ -772,8 +794,11 @@ export function SettingsScreen({ go, onSessionUpdated, onOperationBusy }) {
                           )}
                   </p>
                   <p className="muted settings-jev-budget">
-                    {T("Monthly model allowance (USD)", "月度模型额度（美元）")}:{" "}
-                    {jevSettings.monthlyBudgetUsd}
+                    {T("Jev calls", "Jev 次数")}:{" "}
+                    {jevAllowance(jevSettings)?.calls.toLocaleString("en-US")} {T("calls", "次")} ·{" "}
+                    {jevSettings.period === "lifetime"
+                      ? T("One-time trial", "一次性试用")
+                      : T("per month", "每月")}
                   </p>
                 </>
               )}
@@ -785,7 +810,10 @@ export function SettingsScreen({ go, onSessionUpdated, onOperationBusy }) {
               </p>
             </div>
           </section>
-          <section className="panel section-split settings-section settings-github-panel" aria-label={T("GitHub access", "GitHub 授权")}>
+          <section
+            className="panel section-split settings-section settings-github-panel"
+            aria-label={T("GitHub access", "GitHub 授权")}
+          >
             <h2>{T("GitHub access", "GitHub 授权")}</h2>
             <div className="section-body settings-section-body">
               {canConnectGitHub && githubReconnectRequired ? (
@@ -812,13 +840,16 @@ export function SettingsScreen({ go, onSessionUpdated, onOperationBusy }) {
                 </p>
               ) : needsGitHubAccount ? (
                 <p className="muted">
-                  {T("Connect your GitHub account in Sign-in methods before authorizing repositories.", {
-                    zh: "请先在「登录方式」中连接 GitHub 账户，再授权仓库。",
-                    ja: "リポジトリを認可する前に、ログイン方法で GitHub アカウントを接続してください。",
-                    ko: "저장소를 승인하기 전에 로그인 방식에서 GitHub 계정을 연결하세요.",
-                    fr: "Connectez votre compte GitHub dans les méthodes de connexion avant d’autoriser des dépôts.",
-                    es: "Conecta tu cuenta de GitHub en los métodos de inicio de sesión antes de autorizar repositorios.",
-                  })}
+                  {T(
+                    "Connect your GitHub account in Sign-in methods before authorizing repositories.",
+                    {
+                      zh: "请先在「登录方式」中连接 GitHub 账户，再授权仓库。",
+                      ja: "リポジトリを認可する前に、ログイン方法で GitHub アカウントを接続してください。",
+                      ko: "저장소를 승인하기 전에 로그인 방식에서 GitHub 계정을 연결하세요.",
+                      fr: "Connectez votre compte GitHub dans les méthodes de connexion avant d’autoriser des dépôts.",
+                      es: "Conecta tu cuenta de GitHub en los métodos de inicio de sesión antes de autorizar repositorios.",
+                    }
+                  )}
                 </p>
               ) : (
                 <>
@@ -860,7 +891,10 @@ export function SettingsScreen({ go, onSessionUpdated, onOperationBusy }) {
                       disabled={controlsDisabled}
                       onClick={() =>
                         runGitHubAction((signal) =>
-                          connectGitHubRepositories({ ...(github?.connected ? { add: true } : {}), signal })
+                          connectGitHubRepositories({
+                            ...(github?.connected ? { add: true } : {}),
+                            signal,
+                          })
                         )
                       }
                     >
@@ -883,7 +917,8 @@ export function SettingsScreen({ go, onSessionUpdated, onOperationBusy }) {
                           runGitHubAction(
                             (signal) =>
                               manageGitHubInstallation(installationId, {
-                                githubIdentityId: installation?.manage?.githubIdentityId || undefined,
+                                githubIdentityId:
+                                  installation?.manage?.githubIdentityId || undefined,
                                 redirectTo: window.location.href,
                                 signal,
                               }),

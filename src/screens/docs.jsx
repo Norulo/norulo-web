@@ -50,24 +50,24 @@ const SECTIONS = [
     id: "max-assistance",
     title: ["Automatic Jev assistance", "Jev 自动辅助"],
     text: [
-      "With the ledger Owner's effective Pro or Max plan, Jev automatically assists when you save an expense in the web app or REST API, while the model is available and within the ledger's allowance. Default monthly model allowances are $3 for Pro and $12 for Max; your displayed server-provided allowance applies. For new or edited ordinary expenses, select Automatic to leave the category blank, or choose a category yourself. Editing keeps the original category unless you choose Automatic or another category. Explicit category, project or shared target, amount and currency stay unchanged. If no category can be selected confidently, the expense is not saved; choose a category and retry. Recurring schedule creation and complete edits offer the same Automatic category option; background posting reuses the saved category. Possible duplicates appear as advice after saving.",
-      "账本所有者的 Pro 或 Max 权益有效、模型可用且账本额度允许时，Web 应用或 REST API 保存支出会自动使用 Jev 辅助。默认月度模型额度为 Pro 3 美元、Max 12 美元；实际以服务端提供并展示的额度为准。普通支出的新增和编辑都可主动选择“自动分类”以留空类别，也可自行选择类别。编辑默认保留原类别，除非你选择“自动分类”或其他类别。明确填写的类别、项目或公共池目标、金额和币种会保持不变。无法有把握地选出类别时，支出不会保存；请选择类别后重试。周期计划的创建和完整编辑同样支持自动分类；后台生成沿用保存的类别。疑似重复记录会在保存后以提示呈现。",
+      "Jev assists expense saves in Web and REST API when enabled, available and within the Owner’s call allowance: Free 20 one-time trials, Pro 1,089/month, Max 4,358/month. Members and API keys share it. Automatic categorization only selects a confident active category; explicit category, target, amount and currency stay unchanged. Otherwise choose a category and retry. Recurring setup supports Automatic; background posting reuses the saved category. Ordinary writes need no suggestions:use scope.",
+      "Jev 开启、可用且账本 Owner 的次数充足时，网页及 REST API 保存支出可使用辅助：Free 一次性试用 20 次，Pro 每月 1,089 次，Max 每月 4,358 次，成员及 API 密钥共用。自动分类只选择有把握的启用类别；明确填写的类别、目标、金额和币种保持不变，否则请选择类别重试。周期计划设置支持自动分类，后台生成沿用保存的类别。普通写入无需 suggestions:use，仍须具备 expenses:write 和目标权限。",
     ],
   },
   {
     id: "jev-settings",
     title: ["Jev settings", "Jev 设置"],
     text: [
-      "In Settings, Pro and Max account owners can enable or disable Jev for their own ledger and its shared members. The preference belongs to your account, regardless of the selected shared ledger; that ledger follows its own Owner's preference. Free accounts display a disabled Off switch. Turning Jev off stops model choices and scores without changing saved expenses, resetting used allowance or removing paid local duplicate checks. A saved On preference stays On when the service is temporarily unavailable. Changes are confirmed by the server; after a conflict or refresh failure, reload explicitly before choosing again. Free cannot run model checks even if its saved preference is On; an effective Pro or Max plan is required to use them again.",
-      "在设置中，Pro 和 Max 账户所有者可以为自己的账本及其共享成员启用或关闭 Jev。偏好属于你的账户，与当前选中的共享账本无关；共享账本遵循其自身 Owner 的偏好。Free 账户显示禁用的关闭开关。关闭 Jev 会停止模型选项和评分，不会修改已保存支出、重置已使用额度，也不会移除付费账本的本地疑似重复检查。服务暂不可用时，已保存的开启偏好仍保持开启。改动由服务端确认；发生冲突或刷新失败后，请手动重新加载再选择。 即使保存的偏好为开启，Free 仍不能运行模型检查；重新使用需要有效的 Pro 或 Max 套餐。",
+      "Free, Pro and Max owners can enable or disable Jev for their own ledger and members in Settings. The selected shared ledger follows its own Owner’s preference. Turning Jev off, changing plans or changing months never renews Free’s one-time 20 trials. Turning it off preserves expenses and consumed calls; paid local duplicate checks remain available. A saved On preference remains On during service unavailability. Reload after a conflict or refresh failure before choosing again.",
+      "Free、Pro 和 Max 所有者均可在设置中为自己的账本及成员开关 Jev。选中的共享账本遵循其 Owner 的偏好。关闭 Jev、换套餐或换月都不会重新发放 Free 一次性 20 次试用。关闭不会修改支出或退还次数，付费账本仍可进行本地疑似重复检查。服务暂不可用时，保存的开启偏好保持开启；冲突或刷新失败后请重新加载再选择。",
     ],
   },
   {
     id: "expense-review",
     title: ["Review saved expenses", "检查已保存支出"],
     text: [
-      "In project expenses or the shared pool, open Expense review to load up to 100 expenses matching the current filters, separately from the ten-record expense page. Opening the dialog does not run Jev; only Start review sends requests, one record at a time. Stop ends the remaining queue; requests already started may still consume allowance. Reviews share the ledger Owner's effective Pro or Max monthly allowance. Model checks use predefined choices and any returned confidence scores; the interface uses fixed wording. Possible duplicates are checked locally, even when model checks are disabled or unavailable. Checks never change saved records. Edit reloads the current expense and opens its saved values without applying the results. Uncertain or unavailable checks do not mean a clear result.",
-      "在项目支出或公共池中打开“账目巡检”，单独读取符合当前筛选条件的最多 100 笔支出，不改变每页 10 条的普通列表。打开对话框不会运行 Jev，只有点击“开始巡检”才逐笔发送请求。“停止巡检”会结束剩余队列，已经发出的请求仍可能消耗额度。巡检共同使用账本所有者有效 Pro 或 Max 套餐的月度额度。模型检查使用预定义选项及返回的置信评分，界面用固定文案展示；即使模型检查已停用或不可用，疑似重复仍可由本地规则检查。巡检不会修改已保存记录。点击编辑会重新读取该笔支出并打开当前保存值，不会套用巡检结果。不确定或不可用的检查不代表没有问题。",
+      "Expense review loads up to 100 filtered expenses separately from the normal page. Only Start review sends one check at a time. Model checks share the Owner’s Free lifetime trial or paid monthly calls; each admitted attempt consumes one call, including failures. Stop ends queued work without refunding started checks. Reviews never edit expenses or advance revisions. Local duplicate checks remain available for paid ledgers with Jev off. Uncertain or unavailable is not a clear result; Edit reloads saved values without applying advice.",
+      "支出巡检单独加载最多 100 条符合筛选的记录，只有开始巡检才逐条发送检查。模型检查共享 Owner 的 Free 一次性试用或付费月度次数，每次获准尝试（包括失败）消耗 1 次；停止不退还已开始的检查。巡检不修改支出或版本；付费账本关闭 Jev 后仍有本地重复检查。不确定或不可用不代表无问题；编辑重新加载原值，不自动应用建议。API 巡检需 {}、当前版本的 If-Match、expenses:write 及角色/目标权限，不自动重试或使用幂等回放。",
     ],
   },
   {

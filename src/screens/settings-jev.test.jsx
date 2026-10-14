@@ -29,7 +29,16 @@ const account = {
   authenticated: true,
   user: { id: "actor_1", name: "Personal account", providers: ["github"] },
 };
-const on = { enabled: true, revision: 7, eligible: true, available: true, monthlyBudgetUsd: "3" };
+const on = {
+  enabled: true,
+  revision: 7,
+  eligible: true,
+  available: true,
+  monthlyBudgetUsd: "3",
+  monthlyCalls: 1089,
+  trialCalls: 0,
+  period: "utc-calendar-month",
+};
 const off = { ...on, enabled: false, available: false, revision: 8 };
 function deferred() {
   let resolve, reject;
@@ -82,7 +91,7 @@ describe("personal Jev preference", () => {
     renderSettings();
     expect(await readySwitch()).toBeChecked();
     expect(screen.getByText(/your own ledger and its shared members/)).toBeInTheDocument();
-    expect(screen.getByText(/Monthly model allowance/)).toHaveTextContent("3");
+    expect(screen.getByText(/Jev calls/)).toHaveTextContent("1,089");
     expect(noruloApi.account.getJev).toHaveBeenCalledWith({ signal: expect.any(AbortSignal) });
     expect(noruloApi.account.updateJev).not.toHaveBeenCalled();
   });
@@ -92,15 +101,38 @@ describe("personal Jev preference", () => {
       ...on,
       available: false,
       monthlyBudgetUsd: "5.000000",
+      monthlyCalls: 1816,
+      trialCalls: 0,
+      period: "utc-calendar-month",
     });
     renderSettings();
     expect(await readySwitch()).toBeChecked();
     expect(screen.getByRole("status")).toHaveTextContent("Your saved preference is on");
-    expect(screen.getByText(/Monthly model allowance/)).toHaveTextContent("5.000000");
+    expect(screen.getByText(/Jev calls/)).toHaveTextContent("1,816");
   });
 
   it.each([true, false])(
-    "renders Free as effectively Off without modifying stored enabled=%s",
+    "allows Free to control its lifetime trials with enabled=%s",
+    async (enabled) => {
+      noruloApi.account.getJev.mockResolvedValue({
+        ...on,
+        enabled,
+        available: enabled,
+        monthlyCalls: 0,
+        trialCalls: 20,
+        period: "lifetime",
+      });
+      renderSettings();
+      const control = await readySwitch();
+      expect(control).toBeEnabled();
+      expect(control.checked).toBe(enabled);
+      expect(screen.getByText(/Jev calls/)).toHaveTextContent("20 calls · One-time trial");
+      expect(noruloApi.account.updateJev).not.toHaveBeenCalled();
+    }
+  );
+
+  it.each([true, false])(
+    "renders unavailable entitlement as effectively Off without modifying stored enabled=%s",
     async (enabled) => {
       noruloApi.account.getJev.mockResolvedValue({
         ...on,
@@ -246,7 +278,7 @@ describe("personal Jev preference", () => {
     { ...on, revision: 0 },
     { ...on, revision: Number.MAX_SAFE_INTEGER + 1 },
     { ...on, enabled: "true" },
-    { ...on, monthlyBudgetUsd: "NaN" },
+    { ...on, monthlyCalls: "NaN" },
     { ...on, eligible: false, available: true },
   ])("fails closed on an invalid account preference DTO %#", async (payload) => {
     noruloApi.account.getJev.mockResolvedValue(payload);
@@ -284,7 +316,7 @@ describe("personal Jev preference", () => {
       await screen.findByRole("alert");
       expect(control).toBeDisabled();
       expect(control).not.toBeChecked();
-      expect(screen.queryByText(/Monthly model allowance/)).not.toBeInTheDocument();
+      expect(screen.queryByText(/Jev calls/)).not.toBeInTheDocument();
       expect(noruloApi.account.getJev).toHaveBeenCalledTimes(1);
       expect(noruloApi.account.updateJev).toHaveBeenCalledTimes(1);
       expect(screen.getByRole("button", { name: "Reload" })).toBeEnabled();
@@ -305,7 +337,13 @@ describe("personal Jev preference", () => {
       ...account,
       user: { ...account.user, id: "actor_2" },
     });
-    noruloApi.account.getJev.mockResolvedValue({ ...on, monthlyBudgetUsd: "5" });
+    noruloApi.account.getJev.mockResolvedValue({
+      ...on,
+      monthlyBudgetUsd: "5",
+      monthlyCalls: 1816,
+      trialCalls: 0,
+      period: "utc-calendar-month",
+    });
     renderSettings();
     expect(await readySwitch()).toBeChecked();
     await act(async () => write.resolve(off));
@@ -324,12 +362,19 @@ describe("personal Jev preference", () => {
       ...account,
       user: { ...account.user, id: "actor_2" },
     });
-    noruloApi.account.getJev.mockResolvedValue({ ...on, revision: 10, monthlyBudgetUsd: "5" });
+    noruloApi.account.getJev.mockResolvedValue({
+      ...on,
+      revision: 10,
+      monthlyBudgetUsd: "5",
+      monthlyCalls: 1816,
+      trialCalls: 0,
+      period: "utc-calendar-month",
+    });
     renderSettings();
     expect(await readySwitch()).toBeChecked();
     await act(async () => oldRead.resolve({ ...off, eligible: false }));
     expect(screen.getByRole("switch", { name: "Enable Jev" })).toBeChecked();
-    expect(screen.getByText(/Monthly model allowance/)).toHaveTextContent("5");
+    expect(screen.getByText(/Jev calls/)).toHaveTextContent("1,816");
     expect(screen.queryByRole("button", { name: "View plans" })).not.toBeInTheDocument();
   });
 

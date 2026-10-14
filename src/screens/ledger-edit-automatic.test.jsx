@@ -334,7 +334,7 @@ describe("Automatic categorization while editing ordinary expenses", () => {
       await screen.findByRole("option", { name: "Automatic" });
       fireEvent.click(screen.getByRole("button", { name: "Save expense" }));
       expect(await screen.findByRole("alert")).toHaveTextContent(
-        "Jev assistance requires the ledger Owner's Pro or Max plan."
+        "Jev assistance is unavailable for this ledger."
       );
     }
   );

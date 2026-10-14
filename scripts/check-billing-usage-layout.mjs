@@ -34,7 +34,17 @@ const normalUsage = {
   workspaceId: ownerId,
   projects: { used: 3, limit: 100 },
   expenseRecords: { used: 0, limit: 200000 },
-  jev: { month: "2026-10", currency: "USD", usedMicrousd: 1234567, limitMicrousd: 12000000 },
+  jev: {
+    month: "2026-10",
+    period: "utc-calendar-month",
+    usedCalls: 449,
+    limitCalls: 4358,
+    remainingCalls: 3909,
+  },
+};
+const freeUsage = {
+  ...normalUsage,
+  jev: { month: null, period: "lifetime", usedCalls: 7, limitCalls: 20, remainingCalls: 13 },
 };
 const stressUsage = {
   workspaceId: ownerId,
@@ -44,9 +54,10 @@ const stressUsage = {
   expenseRecords: { used: Number.MAX_SAFE_INTEGER, limit: Number.MAX_SAFE_INTEGER, remaining: 999 },
   jev: {
     month: "2026-10",
-    currency: "USD",
-    usedMicrousd: Number.MAX_SAFE_INTEGER,
-    limitMicrousd: 4250001,
+    period: "utc-calendar-month",
+    usedCalls: Number.MAX_SAFE_INTEGER,
+    limitCalls: 4358,
+    remainingCalls: 0,
   },
 };
 const forbiddenCopy = [
@@ -144,7 +155,11 @@ function createFixture() {
             },
           },
         ],
-        account: { status: "trialing", plan: "max", interval: "month" },
+        account: {
+          status: usage === freeUsage ? "none" : "trialing",
+          plan: usage === freeUsage ? "free" : "max",
+          interval: "month",
+        },
         ledgerUsage: usage,
       };
     return undefined;
@@ -153,6 +168,9 @@ function createFixture() {
     requests,
     stress() {
       usage = stressUsage;
+    },
+    trial() {
+      usage = freeUsage;
     },
     async handle(route) {
       const request = route.request();
@@ -379,7 +397,7 @@ async function measure(page, profile, lang, theme, usage, name, kind = "ledger")
   const keys = kind === "jev" ? ["jevAllowance"] : ["projects", "expenseRecords"];
   assert.equal(measured.rows.length, keys.length, `Missing usage articles: ${details}`);
   assert.equal(measured.meters, keys.length, `Missing or unexpected usage graphics: ${details}`);
-  for (const phrase of forbiddenCopy)
+  for (const phrase of kind === "jev" ? [] : forbiddenCopy)
     assert(
       !measured.text.includes(phrase),
       `Calculated capacity copy remains (${phrase}): ${details}`
@@ -398,8 +416,8 @@ async function measure(page, profile, lang, theme, usage, name, kind = "ledger")
     assert(row.scrollWidth <= row.clientWidth + tolerance, `Article overflow: ${details}`);
     const used = row.groups[0];
     const total = row.groups[1];
-    const usedAmount = kind === "jev" ? usage.jev.usedMicrousd : usage[key].used;
-    const allowance = kind === "jev" ? usage.jev.limitMicrousd : usage[key].limit;
+    const usedAmount = kind === "jev" ? usage.jev.usedCalls : usage[key].used;
+    const allowance = kind === "jev" ? usage.jev.limitCalls : usage[key].limit;
     assert(row.meter, `Missing native usage meter: ${details}`);
     assert.equal(row.meter.min, 0, details);
     assert.equal(row.meter.max, allowance, details);
@@ -423,28 +441,17 @@ async function measure(page, profile, lang, theme, usage, name, kind = "ledger")
     assert.equal(total.className, "billing-usage-total", details);
     assert.equal(used.label, copy("used", lang), details);
     assert.equal(total.label, copy("total", lang), details);
-    const exactUsd = (micros) => {
-      const integer = BigInt(micros);
-      const whole = new Intl.NumberFormat(lang).format(integer / 1000000n);
-      const fraction = String(integer % 1000000n)
-        .padStart(6, "0")
-        .replace(/0{1,4}$/, "");
-      const separator = new Intl.NumberFormat(lang)
-        .formatToParts(0.1)
-        .find((part) => part.type === "decimal").value;
-      return `USD ${whole}${separator}${fraction}`;
-    };
     assert.equal(
       used.value,
       kind === "jev"
-        ? exactUsd(usage.jev.usedMicrousd)
+        ? new Intl.NumberFormat(lang).format(usage.jev.usedCalls)
         : new Intl.NumberFormat(lang).format(usage[key].used),
       `Inexact used value: ${details}`
     );
     assert.equal(
       total.value,
       kind === "jev"
-        ? exactUsd(usage.jev.limitMicrousd)
+        ? new Intl.NumberFormat(lang).format(usage.jev.limitCalls)
         : new Intl.NumberFormat(lang).format(usage[key].limit),
       `Inexact total value: ${details}`
     );
@@ -491,7 +498,15 @@ async function measure(page, profile, lang, theme, usage, name, kind = "ledger")
     }
   }
   if (kind === "jev") {
-    assert(measured.text.includes(`${copy("jevMonth", lang)}: ${usage.jev.month}`), details);
+    assert(
+      measured.text.includes(
+        usage.jev.period === "lifetime"
+          ? copy("jevTrial", lang)
+          : `${copy("jevMonth", lang)}: ${usage.jev.month}`
+      ),
+      details
+    );
+    assert(!measured.text.includes("USD"), `Dollar balance remains: ${details}`);
     assert(measured.text.includes(copy("jevPolicy", lang)), details);
   } else
     assert(
@@ -664,7 +679,15 @@ try {
                 await measure(page, profile, lang, theme, stressUsage, "max-safe-integers", "jev")
               );
             }
-            fixture.assertClean(profile.width === 320 ? 2 : 1);
+            if (profile.width === 320) {
+              fixture.trial();
+              await page.getByRole("button", { name: copy("refresh", lang), exact: true }).click();
+              await page.locator(".billing-skeleton").waitFor({ state: "detached" });
+              report.states.push(
+                await measure(page, profile, lang, theme, freeUsage, "free-lifetime-trial", "jev")
+              );
+            }
+            fixture.assertClean(profile.width === 320 ? 3 : 1);
             assert.deepEqual(
               errors,
               [],

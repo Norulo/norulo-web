@@ -11,50 +11,50 @@ describe("Jev preference product contract", () => {
     [
       "en",
       "Jev settings",
-      "The preference belongs to your account",
-      "GET and PATCH /api/v1/account/jev",
-      "API keys cannot use these endpoints",
-      "Free cannot run model checks even if its saved preference is On",
+      "Free, Pro and Max owners",
+      "GET/PATCH /api/v1/account/jev",
+      "Free can also toggle Jev",
+      "one-time 20 trials",
     ],
     [
       "zh",
       "Jev 设置",
-      "偏好属于你的账户",
-      "GET 和 PATCH /api/v1/account/jev",
-      "API 密钥不能使用这些接口",
-      "即使保存的偏好为开启，Free 仍不能运行模型检查",
+      "Free、Pro 和 Max",
+      "GET/PATCH /api/v1/account/jev",
+      "Free 也可开关 Jev",
+      "一次性 20 次试用",
     ],
     [
       "ja",
       "Jev 設定",
-      "設定は現在選択している共有台帳",
-      "GET と PATCH /api/v1/account/jev",
-      "API キーでは利用できません",
-      "保存済みの設定が On でも Free ではモデルチェックを実行できません",
+      "Free・Pro・Max",
+      "GET/PATCH /api/v1/account/jev",
+      "Free も切り替え可能",
+      "一度限り20回",
     ],
     [
       "ko",
       "Jev 설정",
-      "환경설정은 현재 선택한 공유 장부",
-      "GET 및 PATCH /api/v1/account/jev",
-      "API 키로 사용할 수 없습니다",
-      "저장된 설정이 On이어도 Free는 모델 검사를 실행할 수 없습니다",
+      "Free·Pro·Max",
+      "GET/PATCH /api/v1/account/jev",
+      "Free도 전환",
+      "일회성 20회",
     ],
     [
       "fr",
       "Paramètres Jev",
-      "La préférence appartient à votre compte",
-      "GET et PATCH /api/v1/account/jev",
-      "Les clés API ne peuvent pas les utiliser",
-      "Free ne peut pas exécuter de contrôles du modèle",
+      "Les Owners Free, Pro et Max",
+      "GET/PATCH /api/v1/account/jev",
+      "Free peut aussi",
+      "20 essais uniques",
     ],
     [
       "es",
       "Configuración de Jev",
-      "La preferencia pertenece a tu cuenta",
-      "GET y PATCH /api/v1/account/jev",
-      "Las claves API no pueden utilizarlos",
-      "Free no puede ejecutar comprobaciones del modelo",
+      "Los Owners Free, Pro y Max",
+      "GET/PATCH /api/v1/account/jev",
+      "Free también",
+      "20 pruebas únicas",
     ],
   ])(
     "explains the account switch and cookie-only revision contract in %s",
@@ -72,7 +72,8 @@ describe("Jev preference product contract", () => {
         (_, node) => node.tagName === "P" && node.textContent.startsWith(api)
       );
       expect(contract).toHaveTextContent(auth);
-      expect(contract).toHaveTextContent(freeGate);
+      expect(contract).toHaveTextContent("monthlyCalls");
+      expect(contract).toHaveTextContent("trialCalls");
       expect(contract).toHaveTextContent("If-Match");
       expect(contract).toHaveTextContent("412");
       expect(contract).toHaveTextContent("monthlyBudgetUsd");

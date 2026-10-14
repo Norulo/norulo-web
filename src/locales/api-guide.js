@@ -1,5 +1,8 @@
 // Source-backed integration guidance in all supported languages.
+import { EXPENSE_CAPACITY_COPY } from "./expense-capacity.js";
+
 export const API_GUIDE_COPY = {
+  defaultLimits: EXPENSE_CAPACITY_COPY.defaults,
   quickstart: [
     "Quickstart: save your first expense",
     {

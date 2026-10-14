@@ -140,6 +140,7 @@ export function agentMarkdown(base, contract = apiContract) {
     "- Owner/Admin manage projects and categories; Owner/Admin/Editor write expenses and recurring rules; Viewer reads. Only the actual Owner can delete a project.",
     "- Keys bind to one ledger; X-Norulo-Workspace cannot switch it. Cookie clients select a ledger with that header; CSV links can use workspaceId. Conflicting selectors fail.",
     "- GET /api/v1/me returns workspace, scopes, entitlements and ledgerUsage. Use current Owner allowances; do not hardcode plan capacity or assume the actor's personal plan applies.",
+    "- Default retained expense capacity per ledger Owner: Free 300, Pro 20,000, Max 100,000. Projects, shared-pool costs and posted recurring expenses share this capacity, including archived projects. The response's current configured allowance is authoritative; capacity is separate from per-request pagination and write-rate limits.",
     "- Governance requires members:write, a whole-ledger key without projectIds, and Owner/Admin authority. Owner manages Admins; Admin manages Editors/Viewers. Only the original inviter approves/rejects applicants with the request revision. Membership does not grant GitHub access.",
     "- Key creation/revocation (/api-keys), account preferences (/api/v1/account/*), invitation preview/accept and GitHub refresh require the user's cookie session; Bearer keys cannot perform them. Cookie writes require a trusted app Origin. Billing is separate from recorded expenses.",
     "",

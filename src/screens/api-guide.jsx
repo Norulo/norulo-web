@@ -169,7 +169,7 @@ export function integrationSections(base) {
     { id: "troubleshooting", title: "troubleshooting", blocks: [paragraph("errors"),
       code("errorExample", '{"error":{"code":"CATEGORY_REQUIRED"}}'),
       { rows: [["401", "error401"], ["403", "error403"], ["409", "error409"], ["412 / 428", "error412"], ["422", "error422"], ["429", "error429"], ["502 / 503", "error503"]] },
-      paragraph("limits") ]},
+      paragraph("limits"), paragraph("defaultLimits") ]},
   ];
 }
 

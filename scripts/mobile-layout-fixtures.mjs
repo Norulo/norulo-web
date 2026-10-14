@@ -133,7 +133,7 @@ export function createMobileLayoutFixture({ baseURL, accountOnboarding = false, 
         ledgerUsage: {
           workspaceId: WORKSPACE_ID,
           projects: { used: 1, limit: 3 },
-          expenseRecords: { used: 2, limit: 100 },
+          expenseRecords: { used: 2, limit: 300 },
         },
       };
     return undefined;

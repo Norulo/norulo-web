@@ -110,7 +110,7 @@ then verify saved records. Agent copy explains ledger/project/shared-pool/catego
 relationships and how to reuse or create resources before recording expenses.
 Receipt extraction happens in the external agent; REST accepts structured JSON.
 
-Default limits are Free **3 projects / 100 expense records**, Pro **20 / 20,000**,
+Default limits are Free **3 projects / 300 expense records**, Pro **20 / 20,000**,
 and Max **100 / 100,000**. Billing renders the Server's configured limits and
 personal-ledger Used / Total allowance as exact figures with accessible native
 meters for every plan.
@@ -225,7 +225,7 @@ collections limited to 64 entries each. These are scheduler bounds, not a daily
 D1 write budget or a guarantee of thousands of records for one Owner.
 
 Actual Owner commercial allowances still apply, including Free 10 writes/minute
-and 100 records, and Pro 60 writes/minute. A known minute-quota denial releases
+and 300 records, and Pro 60 writes/minute. A known minute-quota denial releases
 its lane and continues next minute without SQL heartbeats. Financial uncertainty
 stops the affected Owner; an unresolved transport/completion outcome stops new
 Root work after already-started siblings finish. Owner calls have a 120-second

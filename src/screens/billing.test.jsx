@@ -110,7 +110,7 @@ describe("BillingScreen", () => {
         entitlements: {
           limits: {
             projects: plan.id === "free" ? 3 : plan.id === "pro" ? 20 : 100,
-            expenseRecords: plan.id === "free" ? 100 : plan.id === "pro" ? 20000 : 100000,
+            expenseRecords: plan.id === "free" ? 300 : plan.id === "pro" ? 20000 : 100000,
           },
           jev: {
             eligible: plan.id !== "free",
@@ -332,7 +332,7 @@ describe("BillingScreen", () => {
   );
 
   it.each([
-    ["free", 2, 3, 79, 100],
+    ["free", 2, 3, 79, 300],
     ["pro", 12, 20, 1200, 20000],
     ["max", 50, 100, 64567, 100000],
   ])(
@@ -1262,7 +1262,7 @@ describe("BillingScreen", () => {
       expect(within(free).getByRole("link", { name: freeAction })).toHaveAttribute("href", freeHref);
       expect(free).toHaveTextContent("$0");
       expect(free).toHaveTextContent("Projects: 3");
-      expect(free).toHaveTextContent("Expense records: 100");
+      expect(free).toHaveTextContent("Expense records: 300");
       expect(free).toHaveTextContent("Jev: not included");
       expect(free).not.toHaveTextContent("Jev assistance allowance");
 
@@ -1480,7 +1480,7 @@ describe("BillingScreen", () => {
         entitlements: {
           limits: {
             projects: plan.id === "free" ? 3 : plan.id === "max" ? 100 : 20,
-            expenseRecords: plan.id === "free" ? 100 : plan.id === "max" ? 100000 : 20000,
+            expenseRecords: plan.id === "free" ? 300 : plan.id === "max" ? 100000 : 20000,
           },
           jev: {
             eligible: plan.id === "pro" || plan.id === "max",
@@ -1500,7 +1500,7 @@ describe("BillingScreen", () => {
       "Projects: 100",
     ]);
     expect(screen.getAllByText("Expense records:").map((node) => node.textContent)).toEqual([
-      "Expense records: 100",
+      "Expense records: 300",
       "Expense records: 20,000",
       "Expense records: 100,000",
     ]);

@@ -1,5 +1,12 @@
 # Norulo Web
 
+## 2026-10-14 Free expense capacity
+
+Free defaults to 300 retained expenses per ledger Owner across project/shared
+and posted recurring costs, including archived projects. Use Server-provided
+entitlements and ledgerUsage for actual capacity. Older 100-record release
+evidence is historical; list/review/recurring-rule bounds remain independent.
+
 ## 2026-10-13 expense last source
 
 Expense.lastSource is read-only and contains the last successful creation/edit

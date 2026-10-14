@@ -5,6 +5,7 @@ import { T, useLang } from "../i18n.jsx";
 import { screenLinkProps } from "../lib/navigation.js";
 import { DOCS_GUIDE } from "../locales/docs-guide.js";
 import { AGENT_GUIDE } from "../locales/agent-guide.js";
+import { EXPENSE_CAPACITY_COPY } from "../locales/expense-capacity.js";
 import { AgentSetupGuide } from "./agent-setup.jsx";
 import { PublicFooter, PublicHeader } from "./public-layout.jsx";
 
@@ -148,6 +149,7 @@ export function DocsScreen({ go, auth }) {
               <h2 id={section.id} className="docs-h2">
                 {T(...section.title)}
               </h2>
+              {section.id === "expense-retention" && <p>{T(...EXPENSE_CAPACITY_COPY.defaults)}</p>}
               <p>{T(...section.text)}</p>
               {section.detail && <p>{T(...section.detail)}</p>}
               {section.id === "keys" && (

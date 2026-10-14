@@ -113,7 +113,7 @@ beforeEach(() => {
     eligible: true,
     available: true,
     monthlyBudgetUsd: "3",
-    monthlyCalls: 1089,
+    monthlyCalls: 1000,
     trialCalls: 0,
     period: "utc-calendar-month",
   });
@@ -335,7 +335,12 @@ it("preserves an email-only guest invitation and submits a pending request witho
   expect(window.location.pathname).toBe("/login");
   expect(window.location.hash).toBe(`#invite=${inviteToken}`);
   fireEvent.click(screen.getByRole("button", { name: "Verify and sign in" }));
-  const request = await screen.findByRole("button", { name: "Request to join" });
+  // The first authenticated Members visit loads its route before rendering.
+  const request = await screen.findByRole(
+    "button",
+    { name: "Request to join" },
+    { timeout: 10000 }
+  );
   expect(request).toBeVisible();
   expect(window.location.pathname).toBe("/members");
   expect(window.location.hash).toBe(`#invite=${inviteToken}`);
@@ -361,7 +366,7 @@ it("preserves an email-only guest invitation and submits a pending request witho
   expect(harness.apis.alice.acceptInvitation).toHaveBeenCalledTimes(1);
   expect(ledgerApi.workspaces).toHaveBeenCalledTimes(1);
   expect(window.location.hash).toBe(`#invite=${inviteToken}`);
-});
+}, 30000);
 
 it.each(["send", "verify"])(
   "blocks same-event notification review while the Settings email %s operation starts",

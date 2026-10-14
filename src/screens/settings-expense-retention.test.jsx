@@ -37,7 +37,7 @@ const jev = {
   eligible: true,
   available: false,
   monthlyBudgetUsd: "3",
-  monthlyCalls: 1089,
+  monthlyCalls: 1000,
   trialCalls: 0,
   period: "utc-calendar-month",
 };

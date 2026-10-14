@@ -79,7 +79,7 @@ function fixture({
           eligible,
           available,
           monthlyBudgetUsd: "3.00",
-          monthlyCalls: 1089,
+          monthlyCalls: 1000,
           trialCalls: 0,
           period: "utc-calendar-month",
         },

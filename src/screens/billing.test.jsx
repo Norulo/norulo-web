@@ -202,8 +202,8 @@ describe("BillingScreen", () => {
       month: "2026-10",
       period: "utc-calendar-month",
       usedCalls: 449,
-      limitCalls: 1089,
-      remainingCalls: 640,
+      limitCalls: 1000,
+      remainingCalls: 551,
       currency: "USD",
       usedMicrousd: 1234567,
       limitMicrousd: 3000000,
@@ -225,13 +225,13 @@ describe("BillingScreen", () => {
         within(region)
           .getAllByRole("definition")
           .map((n) => n.textContent)
-      ).toEqual(["449", "1,089"]);
-      expect(region).toHaveTextContent("Remaining calls: 640");
+      ).toEqual(["449", "1,000"]);
+      expect(region).toHaveTextContent("Remaining calls: 551");
       expect(region).not.toHaveTextContent(/USD|\$/);
       const meter = within(region).getByRole("meter", { name: "Jev calls" });
       expect(meter).toHaveAttribute("value", "449");
-      expect(meter).toHaveAttribute("max", "1089");
-      expect(meter).toHaveAttribute("aria-valuetext", "Used: 449; Total allowance: 1,089");
+      expect(meter).toHaveAttribute("max", "1000");
+      expect(meter).toHaveAttribute("aria-valuetext", "Used: 449; Total allowance: 1,000");
       expect(noruloApi.billing.getPlan).toHaveBeenCalledOnce();
     }
   );
@@ -267,7 +267,7 @@ describe("BillingScreen", () => {
         month: "2026-10",
         period: "utc-calendar-month",
         usedCalls: Number.MAX_SAFE_INTEGER,
-        limitCalls: 4358,
+        limitCalls: 4000,
         remainingCalls: 0,
       })
     );
@@ -277,8 +277,8 @@ describe("BillingScreen", () => {
       within(region)
         .getAllByRole("definition")
         .map((n) => n.textContent)
-    ).toEqual(["9,007,199,254,740,991", "4,358"]);
-    expect(within(region).getByRole("meter")).toHaveAttribute("value", "4358");
+    ).toEqual(["9,007,199,254,740,991", "4,000"]);
+    expect(within(region).getByRole("meter")).toHaveAttribute("value", "4000");
   });
 
   it.each([
@@ -1522,7 +1522,7 @@ describe("BillingScreen", () => {
           },
           jev: {
             eligible: true,
-            monthlyCalls: plan.id === "max" ? 4358 : plan.id === "pro" ? 1089 : 0,
+            monthlyCalls: plan.id === "max" ? 4000 : plan.id === "pro" ? 1000 : 0,
             trialCalls: plan.id === "free" ? 20 : 0,
             period: plan.id === "free" ? "lifetime" : "utc-calendar-month",
             available: false,
@@ -1555,8 +1555,8 @@ describe("BillingScreen", () => {
       screen.getAllByText(/Jev assistance allowance:/).map((node) => node.textContent)
     ).toEqual([
       "Jev assistance allowance: 20 calls · One-time trial",
-      "Jev assistance allowance: 1,089 calls · per month",
-      "Jev assistance allowance: 4,358 calls · per month",
+      "Jev assistance allowance: 1,000 calls · per month",
+      "Jev assistance allowance: 4,000 calls · per month",
     ]);
     expect(screen.getAllByText("Activation pending · no rollover")).toHaveLength(3);
     expect(screen.queryByText("Jev: not included")).not.toBeInTheDocument();
@@ -1571,8 +1571,8 @@ describe("BillingScreen", () => {
       screen.getAllByText(/Jev assistance allowance:/).map((node) => node.textContent)
     ).toEqual([
       "Jev assistance allowance: 20 calls · One-time trial",
-      "Jev assistance allowance: 1,089 calls · per month",
-      "Jev assistance allowance: 4,358 calls · per month",
+      "Jev assistance allowance: 1,000 calls · per month",
+      "Jev assistance allowance: 4,000 calls · per month",
     ]);
     expect(noruloApi.billing.getPlan).toHaveBeenCalledTimes(1);
     expect(noruloApi.billing.createCheckoutSession).not.toHaveBeenCalled();
@@ -1635,7 +1635,7 @@ describe("BillingScreen", () => {
         eligible: false,
         available: true,
         monthlyBudgetUsd: "3.00",
-        monthlyCalls: 1089,
+        monthlyCalls: 1000,
         trialCalls: 0,
         period: "utc-calendar-month",
       },

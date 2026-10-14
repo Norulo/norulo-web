@@ -35,7 +35,7 @@ const on = {
   eligible: true,
   available: true,
   monthlyBudgetUsd: "3",
-  monthlyCalls: 1089,
+  monthlyCalls: 1000,
   trialCalls: 0,
   period: "utc-calendar-month",
 };
@@ -91,7 +91,7 @@ describe("personal Jev preference", () => {
     renderSettings();
     expect(await readySwitch()).toBeChecked();
     expect(screen.getByText(/your own ledger and its shared members/)).toBeInTheDocument();
-    expect(screen.getByText(/Jev calls/)).toHaveTextContent("1,089");
+    expect(screen.getByText(/Jev calls/)).toHaveTextContent("1,000");
     expect(noruloApi.account.getJev).toHaveBeenCalledWith({ signal: expect.any(AbortSignal) });
     expect(noruloApi.account.updateJev).not.toHaveBeenCalled();
   });

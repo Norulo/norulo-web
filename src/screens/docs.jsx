@@ -50,8 +50,8 @@ const SECTIONS = [
     id: "max-assistance",
     title: ["Automatic Jev assistance", "Jev 自动辅助"],
     text: [
-      "Jev assists expense saves in Web and REST API when enabled, available and within the Owner’s call allowance: Free 20 one-time trials, Pro 1,089/month, Max 4,358/month. Members and API keys share it. Automatic categorization only selects a confident active category; explicit category, target, amount and currency stay unchanged. Otherwise choose a category and retry. Recurring setup supports Automatic; background posting reuses the saved category. Ordinary writes need no suggestions:use scope.",
-      "Jev 开启、可用且账本 Owner 的次数充足时，网页及 REST API 保存支出可使用辅助：Free 一次性试用 20 次，Pro 每月 1,089 次，Max 每月 4,358 次，成员及 API 密钥共用。自动分类只选择有把握的启用类别；明确填写的类别、目标、金额和币种保持不变，否则请选择类别重试。周期计划设置支持自动分类，后台生成沿用保存的类别。普通写入无需 suggestions:use，仍须具备 expenses:write 和目标权限。",
+      "Jev assists expense saves in Web and REST API when enabled, available and within the Owner’s call allowance: Free 20 one-time trials, Pro 1,000/month, Max 4,000/month. Members and API keys share it. Automatic categorization only selects a confident active category; explicit category, target, amount and currency stay unchanged. Otherwise choose a category and retry. Recurring setup supports Automatic; background posting reuses the saved category. Ordinary writes need no suggestions:use scope.",
+      "Jev 开启、可用且账本 Owner 的次数充足时，网页及 REST API 保存支出可使用辅助：Free 一次性试用 20 次，Pro 每月 1,000 次，Max 每月 4,000 次，成员及 API 密钥共用。自动分类只选择有把握的启用类别；明确填写的类别、目标、金额和币种保持不变，否则请选择类别重试。周期计划设置支持自动分类，后台生成沿用保存的类别。普通写入无需 suggestions:use，仍须具备 expenses:write 和目标权限。",
     ],
   },
   {

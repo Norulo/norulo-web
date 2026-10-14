@@ -11,7 +11,7 @@ Keep six-language guidance and both generated public API artifacts aligned.
 
 
 Jev is displayed and enforced by calls: Free 20 once per Owner lifetime, Pro
-1,089 per UTC month, Max 4,358 per UTC month. Members/API keys share the Owner
+1,000 per UTC month, Max 4,000 per UTC month. Members/API keys share the Owner
 pool. Billing shows used/total/remaining calls, never a dollar balance. v15
 adds a constrained lifetime trial column; old paid reservation data is retained.
 Annual plans keep monthly calls. Plan changes, preference toggles and deletion

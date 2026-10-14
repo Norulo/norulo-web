@@ -3476,7 +3476,7 @@
         ],
         "operationId": "suggestExpense",
         "x-norulo-scope": "suggestions:use",
-        "description": "Advanced draft advice only; ordinary expense writes already attempt Free trial or paid assistance without this endpoint or its scope. Never writes an expense. Disabled unless evaluated and enabled. Shares the ledger Owner's call allowance with automatic assistance and review, irrespective of the actor's personal plan. Defaults are Free 20 one-time lifetime trials, Pro 1089/month, Max 4358/month. Paid calls reset by UTC calendar month even on annual subscriptions, without rollover. Each admitted model attempt consumes one call including failures; disabling Jev or changing plans never renews Free trials.",
+        "description": "Advanced draft advice only; ordinary expense writes already attempt Free trial or paid assistance without this endpoint or its scope. Never writes an expense. Disabled unless evaluated and enabled. Shares the ledger Owner's call allowance with automatic assistance and review, irrespective of the actor's personal plan. Defaults are Free 20 one-time lifetime trials, Pro 1000/month, Max 4000/month. Paid calls reset by UTC calendar month even on annual subscriptions, without rollover. Each admitted model attempt consumes one call including failures; disabling Jev or changing plans never renews Free trials.",
         "requestBody": {
           "required": true,
           "content": {
@@ -5303,7 +5303,7 @@
             "type": "integer",
             "minimum": 0,
             "maximum": 9007199254740991,
-            "description": "Current count allowance; Free 20 lifetime trials, Pro 1089/month, Max 4358/month by default"
+            "description": "Current count allowance; Free 20 lifetime trials, Pro 1000/month, Max 4000/month by default"
           },
           "remainingCalls": {
             "type": "integer",
@@ -7622,5 +7622,5 @@
       }
     }
   },
-  "x-norulo-source-sha256": "a5c1d36f0bc4f43fb3c5b02b9c6139931a442a69071cfb6acc6a5bda700fd018"
+  "x-norulo-source-sha256": "abf64d17b896e5a129813de9adfacde0e539edbbc0b37f60e53fce4e3dab9f21"
 }

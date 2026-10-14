@@ -159,8 +159,8 @@ describe("product Docs", () => {
     expect(assistance).toHaveTextContent("Web and REST API");
     for (const phrase of [
       "Free 20 one-time trials",
-      "Pro 1,089/month",
-      "Max 4,358/month",
+      "Pro 1,000/month",
+      "Max 4,000/month",
       "Members and API keys share",
       "confident active category",
       "explicit category, target, amount and currency stay unchanged",

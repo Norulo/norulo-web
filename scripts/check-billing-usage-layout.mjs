@@ -38,8 +38,8 @@ const normalUsage = {
     month: "2026-10",
     period: "utc-calendar-month",
     usedCalls: 449,
-    limitCalls: 4358,
-    remainingCalls: 3909,
+    limitCalls: 4000,
+    remainingCalls: 3551,
   },
 };
 const freeUsage = {
@@ -56,7 +56,7 @@ const stressUsage = {
     month: "2026-10",
     period: "utc-calendar-month",
     usedCalls: Number.MAX_SAFE_INTEGER,
-    limitCalls: 4358,
+    limitCalls: 4000,
     remainingCalls: 0,
   },
 };

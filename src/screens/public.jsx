@@ -12,6 +12,8 @@ import { requestErrorText } from "../lib/request-error.js";
 import { screenLinkProps } from "../lib/navigation.js";
 import { PublicFooter, PublicHeader } from "./public-layout.jsx";
 import { AGENT_GUIDE } from "../locales/agent-guide.js";
+import { LANDING_COPY } from "../locales/landing.js";
+import { FinancialValue } from "../components/financial-value.jsx";
 
 export function GitHubOAuthFailureScreen({ code }) {
   useLang();
@@ -145,6 +147,121 @@ function getRepositoryAuthErrorMessage(error) {
   return getAuthErrorMessage(error);
 }
 
+// Illustrative rows for the homepage example ledger; amounts are exact strings.
+const EXAMPLE_EXPENSES = [
+  { date: "2026-10-02", purpose: "hosting", project: true, currency: "USD", amount: "USD 24.00" },
+  { date: "2026-10-05", purpose: "domain", project: false, currency: "USD", amount: "USD 12.00" },
+  { date: "2026-10-08", purpose: "design", project: true, currency: "EUR", amount: "EUR 49.00" },
+  { date: "2026-10-12", purpose: "ci", project: false, currency: "USD", amount: "USD 8.00" },
+];
+const EXAMPLE_TOTALS = [
+  ["USD", "USD 44.00"],
+  ["EUR", "EUR 49.00"],
+];
+
+function landingFeatures() {
+  return [
+    {
+      h: T("Create projects", "创建项目"),
+      p: T(
+        "Start with a project name. Optionally link up to 30 authorized GitHub repositories.",
+        "为项目起个名字即可开始，也可关联最多 30 个已授权 GitHub 仓库。"
+      ),
+    },
+    {
+      h: T("Record project expenses", "记录项目支出"),
+      p: T(
+        "Save amount, currency, date, category and purpose for each project cost.",
+        "为每笔项目成本保存金额、币种、日期、类别和用途。"
+      ),
+    },
+    {
+      h: T("Record shared expenses", "记录公共支出"),
+      p: T(
+        "Keep costs used across projects in one shared pool, counted once.",
+        "跨项目支出放入公共池，只计一次。"
+      ),
+    },
+    {
+      h: T("Review category reports", "查看类别报表"),
+      p: T("See where costs occur by category and date.", "按类别和日期查看成本分布。"),
+    },
+    {
+      h: T("Compare currencies separately", "逐币查看汇总"),
+      p: T(
+        "View totals separately for each currency. Norulo does not convert currencies.",
+        "按币种分别查看汇总，Norulo 不进行货币转换。"
+      ),
+    },
+    {
+      h: T("Control API access", "控制 API 访问"),
+      p: T(
+        "Use scoped API keys with project and shared-pool restrictions.",
+        "使用受权限、项目和公共池限制的 API 密钥。"
+      ),
+    },
+  ];
+}
+
+function ExampleLedger() {
+  return (
+    <section className="lp-preview" aria-labelledby="lp-preview-title">
+      <div className="lp-preview-card">
+        <div className="lp-preview-bar">
+          <span className="lp-preview-kicker" id="lp-preview-title">
+            {T(...LANDING_COPY.example)}
+          </span>
+          <span className="lp-preview-url">norulo.com / projects</span>
+        </div>
+        <div className="lp-preview-body">
+          <div className="lp-preview-list">
+            <div className="lp-preview-h">{T("Expenses")}</div>
+            <ul>
+              {EXAMPLE_EXPENSES.map((row) => (
+                <li key={row.date} className="lp-preview-expense">
+                  <time className="lp-preview-date" dateTime={row.date}>
+                    {row.date}
+                  </time>
+                  <span className="lp-preview-purpose">{T(...LANDING_COPY[row.purpose])}</span>
+                  <span
+                    className={
+                      "lp-preview-target" + (row.project ? "" : " lp-preview-target-shared")
+                    }
+                  >
+                    {row.project ? T(...LANDING_COPY.project) : T("Shared pool")}
+                  </span>
+                  <FinancialValue
+                    className="lp-preview-amount"
+                    currency={row.currency}
+                    value={row.amount}
+                  />
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="lp-preview-totals">
+            <div className="lp-preview-h">{T("Totals by currency")}</div>
+            <ul>
+              {EXAMPLE_TOTALS.map(([currency, value]) => (
+                <li key={currency}>
+                  <FinancialValue currency={currency} value={value} />
+                </li>
+              ))}
+            </ul>
+            <p>{T(...LANDING_COPY.separate)}</p>
+          </div>
+        </div>
+        <p className="lp-preview-note">
+          {T(
+            "Every expense stays with its project or the shared pool.",
+            "每笔支出均归于一个项目或公共池。"
+          )}
+        </p>
+      </div>
+    </section>
+  );
+}
+
 export function LandingScreen({ go, auth }) {
   useLang();
   const checkingSession = auth?.status === "checking";
@@ -164,13 +281,22 @@ export function LandingScreen({ go, auth }) {
   ) : (
     <I.Mail />
   );
+  const primaryAction = checkingSession ? (
+    <button className="btn primary lg" type="button" disabled>
+      {primaryActionIcon} {primaryActionLabel}
+    </button>
+  ) : (
+    <a className="btn primary lg" {...screenLinkProps(go, primaryActionTarget)}>
+      {primaryActionIcon} {primaryActionLabel}
+    </a>
+  );
   return (
     <div className="landing fade-in">
       <PublicHeader go={go} current="landing" auth={auth} />
       <main id="main-content" tabIndex={-1}>
         <section className="lp-hero" aria-labelledby="lp-title">
-          <div className="lp-eyebrow">
-            <span>NORULO / 01</span>
+          <div className="lp-hero-tag">
+            <span className="dot lp-hero-dot" />
             <span>
               {T(
                 "Project expense tracking for developers and teams",
@@ -192,15 +318,7 @@ export function LandingScreen({ go, auth }) {
             )}
           </p>
           <div className="lp-cta">
-            {checkingSession ? (
-              <button className="btn primary lg" type="button" disabled>
-                {primaryActionIcon} {primaryActionLabel}
-              </button>
-            ) : (
-              <a className="btn primary lg" {...screenLinkProps(go, primaryActionTarget)}>
-                {primaryActionIcon} {primaryActionLabel}
-              </a>
-            )}
+            {primaryAction}
             {!checkingSession && !signedIn && (
               <a className="btn lg" {...screenLinkProps(go, "pricing")}>
                 {T("See pricing", "查看价格")}
@@ -211,167 +329,26 @@ export function LandingScreen({ go, auth }) {
                 <I.ArrowL /> {T("Sign out", "退出登录")}
               </button>
             )}
-            <a className="btn lg" href="/developers/docs#agent-setup">
-              <I.Code /> {T(...AGENT_GUIDE.startLink)}
-            </a>
-          </div>
-          <div className="lp-agent">
-            <h2>{T(...AGENT_GUIDE.landingTitle)}</h2>
-            <p>{T(...AGENT_GUIDE.landingText)}</p>
-            <a className="auth-link" href="/developers/api#overview">{T(...AGENT_GUIDE.steps[0].label)}</a>
-          </div>
-          <div className="lp-meta">
-            <span>
-              <I.Check size={12} /> {T("Named projects", "独立项目")}
-            </span>
-            <span>
-              <I.Check size={12} /> {T("Shared expense pool", "公共支出池")}
-            </span>
-            <span>
-              <I.Check size={12} /> {T("Date and category reports", "日期与类别报表")}
-            </span>
-            <span>
-              <I.Check size={12} /> {T("Per-currency totals", "逐币汇总")}
-            </span>
           </div>
         </section>
 
-        <section className="lp-preview">
-          <div className="lp-preview-card">
-            <div className="lp-preview-bar">
-              <span className="lp-preview-kicker">{T("WORKSPACE / PREVIEW", "工作台 / 预览")}</span>
-              <div className="lp-preview-url">norulo.com / projects</div>
-            </div>
-            <div className="lp-preview-body">
-              <div className="lp-preview-side">
-                {[
-                  T("Overview", "总览"),
-                  T("Projects", "项目"),
-                  T("Shared pool", "公共池"),
-                  T("Categories", "类别"),
-                ].map((item, index) => (
-                  <div key={item} className={"lp-preview-side-i" + (index === 1 ? " active" : "")}>
-                    {item}
-                  </div>
-                ))}
-              </div>
-              <div className="lp-preview-main">
-                <div className="lp-preview-row">
-                  <div className="lp-preview-stat">
-                    <b>
-                      <I.GitPull size={18} />
-                    </b>
-                    <span>{T("Projects", "项目")}</span>
-                  </div>
-                  <div className="lp-preview-stat">
-                    <b>
-                      <I.Layers size={18} />
-                    </b>
-                    <span>{T("Shared", "公共池")}</span>
-                  </div>
-                  <div className="lp-preview-stat">
-                    <b className="lp-preview-stat-accent">
-                      <I.Bug size={18} />
-                    </b>
-                    <span>{T("Categories", "类别")}</span>
-                  </div>
-                  <div className="lp-preview-stat">
-                    <b>
-                      <I.Shield size={18} />
-                    </b>
-                    <span>{T("Reports", "报表")}</span>
-                  </div>
-                </div>
-                <div className="lp-preview-expenses">
-                  <div className="lp-preview-expense">
-                    <span className="sev sev-info">
-                      <span className="dot lp-preview-status-dot" />
-                      {T("saved", "已保存")}
-                    </span>
-                    <div className="lp-preview-expense-t">
-                      {T(
-                        "Every expense stays with its project or the shared pool.",
-                        "每笔支出均归于一个项目或公共池。"
-                      )}
-                    </div>
-                    <span className="lp-preview-expense-f">
-                      {T("Project + shared costs", "项目 + 公共支出")}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
+        <ExampleLedger />
 
         <section className="lp-capabilities" aria-labelledby="lp-capabilities-title">
           <div className="lp-section-head">
-            <div className="lp-section-index">PROCESS / 02</div>
-            <div>
-              <h2 id="lp-capabilities-title">
-                {T("How Norulo organizes costs.", "Norulo 如何整理成本。")}
-              </h2>
-              <p>
-                {T(
-                  "Create a project, record expenses, then use the same filters for detail and reports.",
-                  "创建项目、记录支出，再用相同条件筛选明细和报表。"
-                )}
-              </p>
-            </div>
+            <h2 id="lp-capabilities-title">
+              {T("How Norulo organizes costs.", "Norulo 如何整理成本。")}
+            </h2>
+            <p>
+              {T(
+                "Create a project, record expenses, then use the same filters for detail and reports.",
+                "创建项目、记录支出，再用相同条件筛选明细和报表。"
+              )}
+            </p>
           </div>
           <div className="lp-features">
-            {[
-              {
-                i: <I.Layers />,
-                h: T("Create projects", "创建项目"),
-                p: T(
-                  "Start with a project name. Optionally link up to 30 authorized GitHub repositories.",
-                  "为项目起个名字即可开始，也可关联最多 30 个已授权 GitHub 仓库。"
-                ),
-              },
-              {
-                i: <I.Bug />,
-                h: T("Record project expenses", "记录项目支出"),
-                p: T(
-                  "Save amount, currency, date, category and purpose for each project cost.",
-                  "为每笔项目成本保存金额、币种、日期、类别和用途。"
-                ),
-              },
-              {
-                i: <I.Terminal />,
-                h: T("Record shared expenses", "记录公共支出"),
-                p: T(
-                  "Keep costs used across projects in one shared pool, counted once.",
-                  "跨项目支出放入公共池，只计一次。"
-                ),
-              },
-              {
-                i: <I.Shield />,
-                h: T("Review category reports", "查看类别报表"),
-                p: T("See where costs occur by category and date.", "按类别和日期查看成本分布。"),
-              },
-              {
-                i: <I.FileCode />,
-                h: T("Compare currencies separately", "逐币查看汇总"),
-                p: T(
-                  "View totals separately for each currency. Norulo does not convert currencies.",
-                  "按币种分别查看汇总，Norulo 不进行货币转换。"
-                ),
-              },
-              {
-                i: <I.Code />,
-                h: T("Control API access", "控制 API 访问"),
-                p: T(
-                  "Use scoped API keys with project and shared-pool restrictions.",
-                  "使用受权限、项目和公共池限制的 API 密钥。"
-                ),
-              },
-            ].map((feature, index) => (
+            {landingFeatures().map((feature) => (
               <article key={feature.h} className="lp-feat">
-                <div className="lp-feat-top">
-                  <span className="lp-feat-n">{String(index + 1).padStart(2, "0")}</span>
-                  <div className="lp-feat-i">{feature.i}</div>
-                </div>
                 <h3>{feature.h}</h3>
                 <p>{feature.p}</p>
               </article>
@@ -379,26 +356,32 @@ export function LandingScreen({ go, auth }) {
           </div>
         </section>
 
-        <section className="lp-cta-band" aria-labelledby="lp-cta-title">
-          <div>
-            <div className="lp-section-index">START / 03</div>
-            <h2 id="lp-cta-title">
-              {checkingSession
-                ? T("Restoring your account.", "正在恢复你的账户。")
-                : signedIn
-                  ? T("Continue from your account.", "从你的账户继续。")
-                  : T("Bring your project costs into view.", "让项目成本清晰可见。")}
-            </h2>
+        <section className="lp-agent" aria-labelledby="lp-agent-title">
+          <div className="lp-agent-panel">
+            <div>
+              <h2 id="lp-agent-title">{T(...AGENT_GUIDE.landingTitle)}</h2>
+              <p>{T(...AGENT_GUIDE.landingText)}</p>
+            </div>
+            <div className="lp-agent-actions">
+              <a className="btn lg" href="/developers/docs#agent-setup">
+                <I.Code /> {T(...AGENT_GUIDE.startLink)}
+              </a>
+              <a className="auth-link" href="/developers/api#overview">
+                {T(...AGENT_GUIDE.steps[0].label)}
+              </a>
+            </div>
           </div>
-          {checkingSession ? (
-            <button className="btn primary lg" type="button" disabled>
-              {primaryActionIcon} {primaryActionLabel}
-            </button>
-          ) : (
-            <a className="btn primary lg" {...screenLinkProps(go, primaryActionTarget)}>
-              {primaryActionIcon} {primaryActionLabel}
-            </a>
-          )}
+        </section>
+
+        <section className="lp-cta-band" aria-labelledby="lp-cta-title">
+          <h2 id="lp-cta-title">
+            {checkingSession
+              ? T("Restoring your account.", "正在恢复你的账户。")
+              : signedIn
+                ? T("Continue from your account.", "从你的账户继续。")
+                : T("Bring your project costs into view.", "让项目成本清晰可见。")}
+          </h2>
+          {primaryAction}
         </section>
       </main>
       <PublicFooter go={go} current="landing" />

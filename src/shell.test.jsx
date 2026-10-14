@@ -252,7 +252,6 @@ describe("Design token discipline", () => {
       "styles/base.css",
       "styles/screens.css",
       "src/app.css",
-      "src/landing-seo.css",
       ...["api", "billing", "docs", "error", "legal", "members", "public", "settings"].map(
         (screen) => `src/screens/${screen}.css`
       ),

@@ -1,0 +1,246 @@
+{
+  "verifiedAtUTC": "2026-10-14T14:21:54.824652+00:00",
+  "sourceCommit": "166e0136bbd6d853ecc3613287125c277c6c26b1",
+  "trafficPercent": 100,
+  "change": "Jev Billing usage shows Used, Total allowance and the native meter, matching Projects and Expense records. The Remaining calls row and its six translations are removed.",
+  "publicChecks": [
+    {
+      "url": "https://norulo.com/",
+      "status": 200,
+      "passed": true,
+      "entryReferencesMatchBuild": true
+    },
+    {
+      "url": "https://norulo.com/billing",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "url": "https://norulo.com/api/health",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "url": "https://norulo.com/api/api/v1/me",
+      "status": 401,
+      "passed": true
+    }
+  ],
+  "assets": [
+    {
+      "url": "https://norulo.com/assets/billing-DtrMY5w3.js",
+      "status": 200,
+      "passed": true,
+      "matchesBuildBytes": true,
+      "sha256": "3a0638a6a96beaea34e29c43603946bbed5917086703f20970097268eac92644",
+      "remainingCallsCopyAbsentInSixLanguages": true
+    },
+    {
+      "url": "https://norulo.com/assets/billing-B-bNCL4w.css",
+      "status": 200,
+      "passed": true,
+      "matchesBuildBytes": true,
+      "sha256": "09aa6a80e90de7e897ec3d2bd1eaacbd953c5dcc0a85ba8811907820463e9cec"
+    },
+    {
+      "url": "https://norulo.com/assets/index-BW_6gJbH.js",
+      "status": 200,
+      "passed": true,
+      "matchesBuildBytes": true,
+      "sha256": "5f75b82e4d2dd62dd4f9c83b0b5cfd4c6b44de2385253ef15cb372811920d820"
+    },
+    {
+      "url": "https://norulo.com/assets/index-CyL2mzIf.css",
+      "status": 200,
+      "passed": true,
+      "matchesBuildBytes": true,
+      "sha256": "2acea59c41106e8eedb9048503a32542b66d6a787929ee079d186d4592934fdb"
+    },
+    {
+      "url": "https://norulo.com/assets/vendor-CHwUWPSh.js",
+      "status": 200,
+      "passed": true,
+      "matchesBuildBytes": true,
+      "sha256": "bb88671736f2acdd1ab57aa4ca82fd7fa055a58dc8bf06a9a3f41f49dcb355e1"
+    },
+    {
+      "url": "https://norulo.com/assets/vendor-react-9XhioiGP.js",
+      "status": 200,
+      "passed": true,
+      "matchesBuildBytes": true,
+      "sha256": "109ae04dfb036b92515ae052411c426365e48876c4b00de7f1d7a289e0e6ef75"
+    }
+  ],
+  "validation": {
+    "dependencies": "npm ci with committed lockfile and writable workspace cache",
+    "lint": "passed",
+    "fullTests": {
+      "status": "passed",
+      "source": "GitHub CI",
+      "url": "https://github.com/Norulo/norulo-web/actions/runs/38579058390",
+      "runId": 38579058390,
+      "sourceCommit": "166e0136bbd6d853ecc3613287125c277c6c26b1",
+      "nodeVersion": "22.23.1",
+      "testFilesPassed": 91,
+      "testsPassed": 1936,
+      "durationSeconds": 80.81
+    },
+    "productionBuild": "passed",
+    "offlineWorkerCheck": "passed",
+    "layout": {
+      "engine": "Chromium 143.0.7499.4",
+      "contexts": 24,
+      "states": 84,
+      "languages": [
+        "en",
+        "zh",
+        "ja",
+        "ko",
+        "fr",
+        "es"
+      ],
+      "widths": [
+        1906,
+        1024,
+        390,
+        320
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "status": "passed",
+      "scope": "Local bounded GET-only fixtures; browser viewport and touch emulation.",
+      "limitations": [
+        "Local WebKit system libraries unavailable; CI installed browser dependencies and passed its WebKit date/mobile checks. No physical iPad/iPhone acceptance."
+      ],
+      "firstAttempt": "One 10-second cold Billing-page wait failed during concurrent full-suite work; the complete unchanged build rerun passed."
+    },
+    "focusedRegression": {
+      "ledger": {
+        "passed": 2,
+        "originalAssertionsPreserved": true
+      },
+      "billingDisplayAndLocales": {
+        "passed": 9,
+        "scope": "Final-source paid/Free display assertions and all six locales passed."
+      },
+      "billingMalformed": {
+        "passed": 11,
+        "originalAssertionsPreserved": true
+      },
+      "app": {
+        "passed": 2,
+        "originalAssertionsPreserved": true
+      },
+      "temporaryRunner": "Ignored work/ config only: 10-second async DOM waits, single worker and 30-second per-test bound for App and malformed Billing reruns. No tracked test harness or product changes.",
+      "recurringDates": {
+        "passed": 5,
+        "failed": 1,
+        "total": 6,
+        "scope": "Project initial heading wait still timed out locally; all six original cases passed in the final-source CI full suite. No source or assertion changes."
+      }
+    },
+    "dryRun": "passed",
+    "ci": {
+      "conclusion": "success",
+      "createdAt": "2026-10-14T14:16:34Z",
+      "updatedAt": "2026-10-14T14:31:57Z",
+      "jobs": [
+        {
+          "name": "test",
+          "conclusion": "success",
+          "steps": [
+            {
+              "name": "Set up job",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+              "conclusion": "success"
+            },
+            {
+              "name": "Install dependencies",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run checks",
+              "conclusion": "success"
+            },
+            {
+              "name": "Build browser-check assets",
+              "conclusion": "success"
+            },
+            {
+              "name": "Install browser engines",
+              "conclusion": "success"
+            },
+            {
+              "name": "Check date-field layouts across browser engines",
+              "conclusion": "success"
+            },
+            {
+              "name": "Check phone and tablet layouts in Chromium and WebKit",
+              "conclusion": "success"
+            },
+            {
+              "name": "Check Billing usage layouts",
+              "conclusion": "success"
+            },
+            {
+              "name": "Check spending overview composition layouts",
+              "conclusion": "success"
+            },
+            {
+              "name": "Check currency picker interactions and layouts",
+              "conclusion": "success"
+            },
+            {
+              "name": "Check Projects layout and accessibility",
+              "conclusion": "success"
+            },
+            {
+              "name": "Check repository picker interactions and layouts",
+              "conclusion": "success"
+            },
+            {
+              "name": "Upload browser validation evidence",
+              "conclusion": "success"
+            },
+            {
+              "name": "Audit production dependencies",
+              "conclusion": "success"
+            },
+            {
+              "name": "Check Cloudflare worker syntax",
+              "conclusion": "success"
+            },
+            {
+              "name": "Post Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+              "conclusion": "success"
+            },
+            {
+              "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+              "conclusion": "success"
+            },
+            {
+              "name": "Complete job",
+              "conclusion": "success"
+            }
+          ]
+        }
+      ]
+    },
+    "localFullRun": {
+      "nodeVersion": "24.19.0",
+      "status": "stopped after exact-source CI completed successfully",
+      "scope": "Local attempts encountered asynchronous DOM waits and per-test timeouts under concurrent validation load; no overall local-suite pass is claimed. Exact-source CI passed every case without changing assertions."
+    }
+  },
+  "scope": "Frontend-only production deployment. No Server deployment, migration, SQL API call, authenticated business write or provider invocation.",
+  "productionVerified": true
+}

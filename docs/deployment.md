@@ -1,3 +1,34 @@
+# Jev usage display release, 2026-10-14
+
+Jev Billing usage now shows Used, Total allowance and the native usage meter,
+matching Projects and Expense records. The Remaining calls row and its six
+translations are removed. Source `166e0136bbd6d853ecc3613287125c277c6c26b1`
+was pushed to main and deployed at 100% production traffic.
+Server entitlements, response validation and call accounting are unchanged.
+Later release-evidence commits change only documentation.
+
+[Exact-source CI](https://github.com/Norulo/norulo-web/actions/runs/38579058390)
+passed all 1,936 tests in 91 files, lint, browser checks, production dependency
+audit and Worker syntax checks on Node 22.23.1. Local production build, offline
+Worker checks and deployment dry-run also passed. Chromium passed all 84 Billing
+layout states in 24 contexts across six languages, light/dark themes and
+1906/1024/390/320px widths. A cold page-loading timeout in the initial browser
+attempt was resolved by a full rerun of the unchanged build.
+
+The slower local Node 24 full run encountered asynchronous waits and per-test
+timeouts and was stopped once exact-source CI passed every case without assertion
+changes. Focused display, locale, malformed-usage, Ledger and App rechecks also
+passed. Temporary longer DOM waits were confined to ignored runner files. Local
+WebKit libraries are unavailable; CI installed its browser dependencies and
+passed the WebKit date/mobile checks. These fixtures do not establish physical
+iPad acceptance.
+
+Four anonymous production GET checks passed and six deployed build assets match
+byte-for-byte, including the Billing bundle with all six Remaining translations
+absent. Actual settings, bindings and custom domains are preserved. No Server
+deployment, migration, SQL API call or authenticated business write was needed.
+See [release evidence](validation/jev-usage-display-production-2026-10-14.json).
+
 # Integrated rounded Jev release, 2026-10-14
 
 The final frontend includes the concurrently published ledger navigation fix

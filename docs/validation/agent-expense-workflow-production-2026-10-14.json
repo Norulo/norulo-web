@@ -1,0 +1,80 @@
+{
+  "verifiedAtUTC": "2026-10-14T05:55:21.159386+00:00",
+  "sourceCommit": "63661ab",
+  "worker": "norulo-web",
+  "version": "ddb03f56-c864-4a9f-b31f-32a43ba3856f",
+  "trafficPercent": 100,
+  "serverVersionPreserved": "624d697a-a208-4aee-8000-87bd1f5a8a72",
+  "configurationPreserved": true,
+  "checks": [
+    {
+      "url": "https://norulo.com/",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "url": "https://norulo.com/developers/docs",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "url": "https://norulo.com/developers/api",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "url": "https://norulo.com/api/health",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "url": "https://norulo.com/api/api/v1/me",
+      "status": 401,
+      "passed": true
+    },
+    {
+      "url": "https://norulo.com/assets/index-CBQcCWdK.js",
+      "status": 200,
+      "passed": true,
+      "byteIdentical": true,
+      "sha256": "c1e0b494177db37790299ea36b81d3a7ce27d16010a21026e2649532d101b6c7"
+    },
+    {
+      "url": "https://norulo.com/assets/index-DLSr3_IM.css",
+      "status": 200,
+      "passed": true,
+      "byteIdentical": true,
+      "sha256": "bec88b752b24d5455e3963a1d7b3170920d36b117ed36b99fc3a6b1151f0bf4b"
+    },
+    {
+      "url": "https://norulo.com/assets/api-docs-B51nogVQ.js",
+      "status": 200,
+      "passed": true,
+      "byteIdentical": true,
+      "sha256": "bb793e2c221c00c5436ec1511e95a9fa6989f8951100f22037a58c78d1c1bd0c"
+    },
+    {
+      "url": "https://norulo.com/assets/docs-C7pT4DCb.js",
+      "status": 200,
+      "passed": true,
+      "byteIdentical": true,
+      "sha256": "8d74140e86f2347bf6ff5841e57fd361f0c4bd4ab38bf42c3170176b52b2dcae"
+    }
+  ],
+  "businessWrites": 0,
+  "SQLAPICalls": 0,
+  "validation": {
+    "webTests": 1905,
+    "finalFocusedTests": 47,
+    "lint": "passed",
+    "build": "passed",
+    "contract": "passed",
+    "offlineWorkerCheck": "passed",
+    "dryRun": "passed",
+    "browserStates": 36,
+    "browserEngines": [
+      "chromium"
+    ],
+    "browserLimitation": "WebKit could not launch because system libraries are missing."
+  }
+}

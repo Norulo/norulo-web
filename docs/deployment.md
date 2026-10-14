@@ -1,5 +1,20 @@
 # Norulo production deployment
 
+The Coding Agent expense workflow was verified on 2026-10-14. Web source
+`63661ab` is deployed as `ddb03f56-c864-4a9f-b31f-32a43ba3856f` at 100% traffic.
+Docs and API open with the five-step setup journey, linked from the homepage
+hero. Copy for Agent now explains product capabilities, ledger/project/shared
+pool/category relationships, empty-ledger initialization, receipt extraction,
+safe credentials, duplicate handling and readback verification.
+
+All 1,905 Web tests and 47 final focused tests passed, with lint, build,
+contract checksum, offline Worker check and dry-run. Chromium passed 36
+six-language desktop/phone page states; WebKit lacked required system libraries.
+Nine anonymous production GETs passed and four build artifacts matched exactly.
+Bindings, public variables, observability, schedule and exposure were retained;
+Server remains `624d697a-a208-4aee-8000-87bd1f5a8a72`. No remote business or
+SQL write was made. See the [workflow release record](validation/agent-expense-workflow-production-2026-10-14.json).
+
 The agent API documentation release was verified on 2026-10-14. Web source
 `d6d8e080e15f66aa8278a39bb3de549f40d46b42` is deployed as version
 `644d0117-7b9b-4117-aaed-38ad2ceb5a0a` with 100% production traffic.

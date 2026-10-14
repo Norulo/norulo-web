@@ -111,7 +111,7 @@ relationships and how to reuse or create resources before recording expenses.
 Receipt extraction happens in the external agent; REST accepts structured JSON.
 
 Default limits are Free **3 projects / 300 expense records**, Pro **20 / 20,000**,
-and Max **100 / 100,000**. Billing renders the Server's configured limits and
+and Max **100 / 200,000**. Billing renders the Server's configured limits and
 personal-ledger Used / Total allowance as exact figures with accessible native
 meters for every plan.
 Project/shared-pool expenses and generated recurring occurrences use the owner's

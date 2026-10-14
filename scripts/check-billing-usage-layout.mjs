@@ -33,8 +33,8 @@ const profiles = [
 const normalUsage = {
   workspaceId: ownerId,
   projects: { used: 3, limit: 100 },
-  expenseRecords: { used: 0, limit: 100000 },
-  jev: { month: "2026-10", currency: "USD", usedMicrousd: 1234567, limitMicrousd: 5000000 },
+  expenseRecords: { used: 0, limit: 200000 },
+  jev: { month: "2026-10", currency: "USD", usedMicrousd: 1234567, limitMicrousd: 12000000 },
 };
 const stressUsage = {
   workspaceId: ownerId,
@@ -139,8 +139,8 @@ function createFixture() {
             name: "Norulo Max",
             entitlements: null,
             prices: {
-              month: { amount: "49", currency: "USD", interval: "month", configured: true },
-              year: { amount: "490", currency: "USD", interval: "year", configured: true },
+              month: { amount: "12.99", currency: "USD", interval: "month", configured: true },
+              year: { amount: "129.99", currency: "USD", interval: "year", configured: true },
             },
           },
         ],

@@ -1,10 +1,10 @@
 export const EXPENSE_CAPACITY_COPY = {
-  defaults: ["Free includes up to 300 expense records per ledger Owner, shared across projects, the shared pool and generated recurring expenses, including archived projects. Pro defaults to 20,000 and Max to 100,000. Read the current configured allowance in Billing; removing an expense frees a place.", {
-    zh: "Free 每位账本 Owner 最多保留 300 条支出，项目、公共池和已生成的周期支出合计计算，也包含归档项目。Pro 默认 20,000 条，Max 默认 100,000 条。当前配置额度以账单页为准；移除支出会释放名额。",
-    ja: "Free は帳簿 Owner ごとに最大 300 件の支出を保持できます。プロジェクト、共有プール、生成済み定期支出の合計で、アーカイブ済みプロジェクトも含みます。Pro は既定 20,000 件、Max は 100,000 件です。現在の設定枠は請求画面で確認でき、支出を削除すると枠が空きます。",
-    ko: "Free는 장부 Owner당 최대 300건의 지출을 보관합니다. 프로젝트, 공유 풀, 생성된 반복 지출을 합산하며 보관된 프로젝트도 포함합니다. Pro 기본 한도는 20,000건, Max는 100,000건입니다. 현재 설정된 한도는 결제 화면에서 확인하고 지출을 제거하면 자리가 비워집니다.",
-    fr: "Free permet de conserver jusqu’à 300 dépenses par Owner, au total entre projets, fonds partagé et dépenses récurrentes générées, y compris les projets archivés. Les limites par défaut sont 20 000 pour Pro et 100 000 pour Max. Consultez la limite configurée dans Facturation ; supprimer une dépense libère une place.",
-    es: "Free permite conservar hasta 300 gastos por Owner del libro, sumando proyectos, fondo compartido y gastos recurrentes generados, incluidos proyectos archivados. Pro ofrece 20.000 y Max 100.000 por defecto. Consulta la asignación configurada en Facturación; eliminar un gasto libera una plaza.",
+  defaults: ["Free includes up to 300 expense records per ledger Owner, shared across projects, the shared pool and generated recurring expenses, including archived projects. Pro defaults to 20,000 and Max to 200,000. Read the current configured allowance in Billing; removing an expense frees a place.", {
+    zh: "Free 每位账本 Owner 最多保留 300 条支出，项目、公共池和已生成的周期支出合计计算，也包含归档项目。Pro 默认 20,000 条，Max 默认 200,000 条。当前配置额度以账单页为准；移除支出会释放名额。",
+    ja: "Free は帳簿 Owner ごとに最大 300 件の支出を保持できます。プロジェクト、共有プール、生成済み定期支出の合計で、アーカイブ済みプロジェクトも含みます。Pro は既定 20,000 件、Max は 200,000 件です。現在の設定枠は請求画面で確認でき、支出を削除すると枠が空きます。",
+    ko: "Free는 장부 Owner당 최대 300건의 지출을 보관합니다. 프로젝트, 공유 풀, 생성된 반복 지출을 합산하며 보관된 프로젝트도 포함합니다. Pro 기본 한도는 20,000건, Max는 200,000건입니다. 현재 설정된 한도는 결제 화면에서 확인하고 지출을 제거하면 자리가 비워집니다.",
+    fr: "Free permet de conserver jusqu’à 300 dépenses par Owner, au total entre projets, fonds partagé et dépenses récurrentes générées, y compris les projets archivés. Les limites par défaut sont 20 000 pour Pro et 200 000 pour Max. Consultez la limite configurée dans Facturation ; supprimer une dépense libère une place.",
+    es: "Free permite conservar hasta 300 gastos por Owner del libro, sumando proyectos, fondo compartido y gastos recurrentes generados, incluidos proyectos archivados. Pro ofrece 20.000 y Max 200.000 por defecto. Consulta la asignación configurada en Facturación; eliminar un gasto libera una plaza.",
   }],
   full: ["Expense record allowance reached. Remove a record, upgrade, or ask the Owner to enable automatic removal of the oldest expense in Settings.", {
     zh: "支出记录已达上限。请移除记录、升级套餐，或由 Owner 在设置中开启自动移除最旧支出。",

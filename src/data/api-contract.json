@@ -2904,7 +2904,7 @@
       "post": {
         "operationId": "reviewExpense",
         "x-norulo-scope": "expenses:write",
-        "description": "Explicit advisory review of one current saved expense, bound to If-Match. The request is an empty object; clients cannot replace saved purpose, note, money, category or target. Requires the ledger Owner's current Pro or Max plan and the actual actor's expense-write and target authority. Jev selects and scores existing category/scope choices; it does not generate explanations or reports. Only this saved record's purpose and note and current active category names enter the model. Categories and target kinds are advice only; no expense, financial audit, recent activity, revision, record count or commercial write allowance is changed. Model attempts share the Pro USD 3 / Max USD 5 per UTC month reservation, without a daily attempt cap; admitted failures remain charged. With no active categories the model can still check target kind. Disabled, failed or invalid model context returns partial checks while the local duplicate rule remains available. That rule finds another current record on the same authorized target with the same expense date, currency and integer minor-unit amount; purpose text need not match. It does not prove ledger-wide uniqueness. Duplicate output contains only ID and revision, including for write-only keys. Saved source, permissions, category and duplicate candidate are freshly rechecked and atomically fenced before results are published; a source changed during review returns 412. There is no automatic apply, target move, money update, retry, batch endpoint or idempotent model replay.",
+        "description": "Explicit advisory review of one current saved expense, bound to If-Match. The request is an empty object; clients cannot replace saved purpose, note, money, category or target. Requires the ledger Owner's current Pro or Max plan and the actual actor's expense-write and target authority. Jev selects and scores existing category/scope choices; it does not generate explanations or reports. Only this saved record's purpose and note and current active category names enter the model. Categories and target kinds are advice only; no expense, financial audit, recent activity, revision, record count or commercial write allowance is changed. Model attempts share the Pro USD 3 / Max USD 12 per UTC month reservation, without a daily attempt cap; admitted failures remain charged. With no active categories the model can still check target kind. Disabled, failed or invalid model context returns partial checks while the local duplicate rule remains available. That rule finds another current record on the same authorized target with the same expense date, currency and integer minor-unit amount; purpose text need not match. It does not prove ledger-wide uniqueness. Duplicate output contains only ID and revision, including for write-only keys. Saved source, permissions, category and duplicate candidate are freshly rechecked and atomically fenced before results are published; a source changed during review returns 412. There is no automatic apply, target move, money update, retry, batch endpoint or idempotent model replay.",
         "parameters": [
           {
             "$ref": "#/components/parameters/IfMatch"
@@ -3475,7 +3475,7 @@
         ],
         "operationId": "suggestExpense",
         "x-norulo-scope": "suggestions:use",
-        "description": "Advanced draft advice only; ordinary expense writes already attempt eligible Pro or Max assistance without this endpoint or its scope. Never writes an expense. Disabled unless evaluated and enabled. Requires the ledger owner's current paid plan, irrespective of the actor's personal plan. Shares the ledger owner's monthly Jev reservation with automatic assistance, without a daily attempt cap; defaults are USD 3 for Pro and USD 5 for Max per UTC calendar month, without rollover.",
+        "description": "Advanced draft advice only; ordinary expense writes already attempt eligible Pro or Max assistance without this endpoint or its scope. Never writes an expense. Disabled unless evaluated and enabled. Requires the ledger owner's current paid plan, irrespective of the actor's personal plan. Shares the ledger owner's monthly Jev reservation with automatic assistance, without a daily attempt cap; defaults are USD 3 for Pro and USD 12 for Max per UTC calendar month, without rollover.",
         "requestBody": {
           "required": true,
           "content": {
@@ -5408,7 +5408,7 @@
               "expenseRecords": {
                 "type": "integer",
                 "minimum": 1,
-                "description": "Current undeleted expenses in Shared pool or nonremoved projects. Default limits are Free 300; Pro 20000; Max 100000. Read the current configured limit from the response."
+                "description": "Current undeleted expenses in Shared pool or nonremoved projects. Default limits are Free 300; Pro 20000; Max 200000. Read the current configured limit from the response."
               },
               "writesPerMinute": {
                 "type": "integer",
@@ -7548,5 +7548,5 @@
       }
     }
   },
-  "x-norulo-source-sha256": "9ccbe937586e8355acaa1b5ebffce3ca0dcd1770292273ca62a300b996a0d67a"
+  "x-norulo-source-sha256": "5adfe56fa070117656072a95e5ab66c5190e22981c1171e8f369818bb001f81c"
 }

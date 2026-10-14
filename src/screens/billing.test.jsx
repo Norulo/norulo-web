@@ -1502,20 +1502,24 @@ describe("BillingScreen", () => {
     expect(screen.getAllByText(/2 months free/i)).toHaveLength(2);
   });
 
-  it("renders Server-provided Pro and Max monthly Jev budgets without inventing availability", async () => {
+  it("renders current provider prices and paid allowances across both billing cadences", async () => {
     noruloApi.billing.getPlan.mockResolvedValue({
       ...billingCatalog,
       plans: [...billingCatalog.plans, maxPlan].map((plan) => ({
         ...plan,
+        prices: plan.id === "free" ? plan.prices : {
+          month: { amount: plan.id === "pro" ? "4.99" : "12.99", currency: "USD", interval: "month", configured: true },
+          year: { amount: plan.id === "pro" ? "49.99" : "129.99", currency: "USD", interval: "year", configured: true },
+        },
         entitlements: {
           limits: {
             projects: plan.id === "free" ? 3 : plan.id === "max" ? 100 : 20,
-            expenseRecords: plan.id === "free" ? 300 : plan.id === "max" ? 100000 : 20000,
+            expenseRecords: plan.id === "free" ? 300 : plan.id === "max" ? 200000 : 20000,
           },
           jev: {
             eligible: plan.id === "pro" || plan.id === "max",
             available: false,
-            monthlyBudgetUsd: plan.id === "max" ? "5.00" : plan.id === "pro" ? "3.00" : "0.00",
+            monthlyBudgetUsd: plan.id === "max" ? "12.00" : plan.id === "pro" ? "3.00" : "0.00",
             rollover: false,
           },
         },
@@ -1532,7 +1536,7 @@ describe("BillingScreen", () => {
     expect(screen.getAllByText("Expense records:").map((node) => node.textContent)).toEqual([
       "Expense records: 300",
       "Expense records: 20,000",
-      "Expense records: 100,000",
+      "Expense records: 200,000",
     ]);
     expect(
       screen.getByText(
@@ -1546,16 +1550,22 @@ describe("BillingScreen", () => {
       screen.getAllByText(/Jev assistance allowance:/).map((node) => node.textContent)
     ).toEqual([
       "Jev assistance allowance: $3.00 / month",
-      "Jev assistance allowance: $5.00 / month",
+      "Jev assistance allowance: $12.00 / month",
     ]);
     expect(screen.getAllByText("Activation pending · no rollover")).toHaveLength(2);
     expect(screen.getAllByText("Jev: not included")).toHaveLength(1);
+    expect(screen.getByText("$4.99")).toBeInTheDocument();
+    expect(screen.getByText("$12.99")).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: /yearly/i }));
+    expect(screen.getByText("$49.99")).toBeInTheDocument();
+    expect(screen.getByText("$129.99")).toBeInTheDocument();
+    expect(screen.getByText("$9.89 less per year")).toBeInTheDocument();
+    expect(screen.getByText("$25.89 less per year")).toBeInTheDocument();
     expect(
       screen.getAllByText(/Jev assistance allowance:/).map((node) => node.textContent)
     ).toEqual([
       "Jev assistance allowance: $3.00 / month",
-      "Jev assistance allowance: $5.00 / month",
+      "Jev assistance allowance: $12.00 / month",
     ]);
     expect(noruloApi.billing.getPlan).toHaveBeenCalledTimes(1);
     expect(noruloApi.billing.createCheckoutSession).not.toHaveBeenCalled();

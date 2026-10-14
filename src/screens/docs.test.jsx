@@ -98,7 +98,7 @@ describe("product Docs", () => {
     expect(screen.getByText(/Jev automatically assists when you save an expense/i)).toHaveTextContent("REST API");
     const assistance = screen.getByText(/leave the category blank/i);
     expect(assistance).toHaveTextContent("Owner's effective Pro or Max plan");
-    expect(assistance).toHaveTextContent("$3 for Pro and $5 for Max");
+    expect(assistance).toHaveTextContent("$3 for Pro and $12 for Max");
     expect(assistance).toHaveTextContent("server-provided allowance applies");
     expect(assistance).toHaveTextContent("Editing keeps the original category unless you choose Automatic");
     expect(assistance).toHaveTextContent("the expense is not saved; choose a category and retry");

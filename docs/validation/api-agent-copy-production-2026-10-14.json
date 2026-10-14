@@ -1,0 +1,471 @@
+{
+  "verifiedAtUTC": "2026-10-14T04:51:20.435596+00:00",
+  "sourceCommit": "d6d8e080e15f66aa8278a39bb3de549f40d46b42",
+  "worker": "norulo-web",
+  "version": "644d0117-7b9b-4117-aaed-38ad2ceb5a0a",
+  "trafficPercent": 100,
+  "serverVersionPreserved": "624d697a-a208-4aee-8000-87bd1f5a8a72",
+  "accountId": "84e421f26c708c0cf437e287eed11fa1",
+  "productionConfigurationPreserved": true,
+  "bindings": [
+    {
+      "name": "ASSETS",
+      "type": "assets"
+    },
+    {
+      "name": "NORULO_API_ORIGIN",
+      "text": "https://api.norulo.com",
+      "type": "plain_text"
+    },
+    {
+      "name": "NORULO_MODE",
+      "text": "production",
+      "type": "plain_text"
+    },
+    {
+      "environment": "production",
+      "name": "NORULO_SERVER",
+      "service": "norulo-server-production",
+      "type": "service"
+    }
+  ],
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1,
+    "redact_query_string": true,
+    "logs": {
+      "enabled": true,
+      "head_sampling_rate": 0.01,
+      "persist": true,
+      "invocation_logs": false
+    },
+    "traces": {
+      "enabled": false,
+      "persist": true,
+      "head_sampling_rate": 1
+    },
+    "issues": {
+      "enabled": true
+    }
+  },
+  "exposure": {
+    "enabled": false,
+    "previews_enabled": false
+  },
+  "domains": [
+    "norulo.com",
+    "www.norulo.com"
+  ],
+  "publication": {
+    "branch": "main",
+    "codePushedBeforeDeploy": true,
+    "productionOnly": true,
+    "publicGETs": 8,
+    "businessWrites": 0,
+    "SQLAPICalls": 0,
+    "automaticRetries": 0,
+    "checks": [
+      {
+        "url": "https://norulo.com/developers/api",
+        "status": 200,
+        "expectedStatus": 200,
+        "passed": true
+      },
+      {
+        "url": "https://norulo.com/assets/api-docs-C3hSFqNf.js",
+        "status": 200,
+        "expectedStatus": 200,
+        "passed": true,
+        "path": "assets/api-docs-C3hSFqNf.js",
+        "sha256": "c294d04392c3a70ee4ca66cffdafaa1a46651a10fcbffe82e95760d2f79269c5",
+        "byteIdentical": true
+      },
+      {
+        "url": "https://norulo.com/assets/docs-CUguD9ks.css",
+        "status": 200,
+        "expectedStatus": 200,
+        "passed": true,
+        "path": "assets/docs-CUguD9ks.css",
+        "sha256": "eb9c5c7e21a229f548b06d0b3e36fe9fc585a9750a08a4d7582fc8d4d3cd9c47",
+        "byteIdentical": true
+      },
+      {
+        "url": "https://norulo.com/assets/index-BdnT1kGy.css",
+        "status": 200,
+        "expectedStatus": 200,
+        "passed": true,
+        "path": "assets/index-BdnT1kGy.css",
+        "sha256": "298b18663f6632726ff7d6946af16712903e5e6dc43221bbc62f0be817db9a46",
+        "byteIdentical": true
+      },
+      {
+        "url": "https://norulo.com/assets/index-DM8Lkzzi.js",
+        "status": 200,
+        "expectedStatus": 200,
+        "passed": true,
+        "path": "assets/index-DM8Lkzzi.js",
+        "sha256": "3a004c0905c7981c617acb02d35bfdc80dbf4dfa58f12c24d1aa9ffefc31865e",
+        "byteIdentical": true
+      },
+      {
+        "url": "https://norulo.com/openapi/ledger-v1.json",
+        "status": 200,
+        "expectedStatus": 200,
+        "passed": true,
+        "path": "openapi/ledger-v1.json",
+        "sha256": "8ed93e9e0e855c07613c0dc5f3e2f8055fd4b638f8953832c96cf9f1e7b2f327",
+        "byteIdentical": true
+      },
+      {
+        "url": "https://norulo.com/api/health",
+        "status": 200,
+        "expectedStatus": 200,
+        "passed": true
+      },
+      {
+        "url": "https://norulo.com/api/api/v1/me",
+        "status": 401,
+        "expectedStatus": 401,
+        "passed": true
+      }
+    ],
+    "publicGETsIncludingDiagnostics": 11,
+    "diagnosticProbes": [
+      {
+        "method": "GET",
+        "url": "https://norulo.com/developers/api",
+        "status": 403,
+        "count": 2,
+        "reason": "Default Python HTTP user agent was rejected with edge error 1010."
+      },
+      {
+        "method": "GET",
+        "url": "https://norulo.com/developers/api",
+        "status": 200,
+        "count": 1,
+        "reason": "Identifying NoruloDeploymentVerification/1.0 user agent accepted; also used for the eight verified public checks."
+      }
+    ],
+    "authenticatedProductionAcceptance": false
+  },
+  "changes": [
+    "API page defaults to Copy for Agent; the split-button dropdown selects Copy for Agent or the existing Copy Page export.",
+    "Agent Markdown derives all 42 Bearer-accessible operations, scopes, parameters, request/response schemas and validation constraints from the shared contract; common schemas are deduplicated.",
+    "Concise rules retain authentication, role/target boundaries, exact money, pagination, CAS/idempotency, recurring, governance, category and recovery behavior.",
+    "Preserves selectable Markdown recovery, pending-request guards, six-language controls and keyboard access; popup stays within desktop/phone viewport bounds."
+  ],
+  "validation": {
+    "lint": "passed",
+    "webTests": 1903,
+    "webTestFiles": 90,
+    "fullSuiteDurationSeconds": 102.36,
+    "finalFocusedApiTests": 38,
+    "build": "passed",
+    "contractChecksumCheck": "passed",
+    "contractSourceSHA256Prefix": "1800a28faa90",
+    "offlineWorkerConfig": "passed",
+    "wranglerDryRun": "passed",
+    "uploadedWorkerPayloadMatchesDryRun": true,
+    "workerSHA256": "a0f8477d17411ae2db2989a2c7ed8963f4919ad6fe0144d779f0fffe2147aa7a",
+    "browserProfiles": 24,
+    "browserStates": 144,
+    "engines": [
+      "chromium",
+      "webkit"
+    ],
+    "browser": [
+      {
+        "engine": "chromium",
+        "lang": "en",
+        "width": 1440,
+        "theme": "light",
+        "passed": true,
+        "states": 6,
+        "agentCharacters": 41034,
+        "fullPageCharacters": 959834,
+        "external": 0,
+        "writes": 0
+      },
+      {
+        "engine": "chromium",
+        "lang": "en",
+        "width": 320,
+        "theme": "dark",
+        "passed": true,
+        "states": 6,
+        "agentCharacters": 41034,
+        "fullPageCharacters": 959834,
+        "external": 0,
+        "writes": 0
+      },
+      {
+        "engine": "chromium",
+        "lang": "zh",
+        "width": 1440,
+        "theme": "light",
+        "passed": true,
+        "states": 6,
+        "agentCharacters": 41034,
+        "fullPageCharacters": 948393,
+        "external": 0,
+        "writes": 0
+      },
+      {
+        "engine": "chromium",
+        "lang": "zh",
+        "width": 320,
+        "theme": "dark",
+        "passed": true,
+        "states": 6,
+        "agentCharacters": 41034,
+        "fullPageCharacters": 948393,
+        "external": 0,
+        "writes": 0
+      },
+      {
+        "engine": "chromium",
+        "lang": "ja",
+        "width": 1440,
+        "theme": "light",
+        "passed": true,
+        "states": 6,
+        "agentCharacters": 41034,
+        "fullPageCharacters": 950817,
+        "external": 0,
+        "writes": 0
+      },
+      {
+        "engine": "chromium",
+        "lang": "ja",
+        "width": 320,
+        "theme": "dark",
+        "passed": true,
+        "states": 6,
+        "agentCharacters": 41034,
+        "fullPageCharacters": 950817,
+        "external": 0,
+        "writes": 0
+      },
+      {
+        "engine": "chromium",
+        "lang": "ko",
+        "width": 1440,
+        "theme": "light",
+        "passed": true,
+        "states": 6,
+        "agentCharacters": 41034,
+        "fullPageCharacters": 951708,
+        "external": 0,
+        "writes": 0
+      },
+      {
+        "engine": "chromium",
+        "lang": "ko",
+        "width": 320,
+        "theme": "dark",
+        "passed": true,
+        "states": 6,
+        "agentCharacters": 41034,
+        "fullPageCharacters": 951708,
+        "external": 0,
+        "writes": 0
+      },
+      {
+        "engine": "chromium",
+        "lang": "fr",
+        "width": 1440,
+        "theme": "light",
+        "passed": true,
+        "states": 6,
+        "agentCharacters": 41034,
+        "fullPageCharacters": 961839,
+        "external": 0,
+        "writes": 0
+      },
+      {
+        "engine": "chromium",
+        "lang": "fr",
+        "width": 320,
+        "theme": "dark",
+        "passed": true,
+        "states": 6,
+        "agentCharacters": 41034,
+        "fullPageCharacters": 961839,
+        "external": 0,
+        "writes": 0
+      },
+      {
+        "engine": "chromium",
+        "lang": "es",
+        "width": 1440,
+        "theme": "light",
+        "passed": true,
+        "states": 6,
+        "agentCharacters": 41034,
+        "fullPageCharacters": 961058,
+        "external": 0,
+        "writes": 0
+      },
+      {
+        "engine": "chromium",
+        "lang": "es",
+        "width": 320,
+        "theme": "dark",
+        "passed": true,
+        "states": 6,
+        "agentCharacters": 41034,
+        "fullPageCharacters": 961058,
+        "external": 0,
+        "writes": 0
+      },
+      {
+        "engine": "webkit",
+        "lang": "en",
+        "width": 1440,
+        "theme": "light",
+        "passed": true,
+        "states": 6,
+        "agentCharacters": 41034,
+        "fullPageCharacters": 959834,
+        "external": 0,
+        "writes": 0
+      },
+      {
+        "engine": "webkit",
+        "lang": "en",
+        "width": 320,
+        "theme": "dark",
+        "passed": true,
+        "states": 6,
+        "agentCharacters": 41034,
+        "fullPageCharacters": 959834,
+        "external": 0,
+        "writes": 0
+      },
+      {
+        "engine": "webkit",
+        "lang": "zh",
+        "width": 1440,
+        "theme": "light",
+        "passed": true,
+        "states": 6,
+        "agentCharacters": 41034,
+        "fullPageCharacters": 948393,
+        "external": 0,
+        "writes": 0
+      },
+      {
+        "engine": "webkit",
+        "lang": "zh",
+        "width": 320,
+        "theme": "dark",
+        "passed": true,
+        "states": 6,
+        "agentCharacters": 41034,
+        "fullPageCharacters": 948393,
+        "external": 0,
+        "writes": 0
+      },
+      {
+        "engine": "webkit",
+        "lang": "ja",
+        "width": 1440,
+        "theme": "light",
+        "passed": true,
+        "states": 6,
+        "agentCharacters": 41034,
+        "fullPageCharacters": 950817,
+        "external": 0,
+        "writes": 0
+      },
+      {
+        "engine": "webkit",
+        "lang": "ja",
+        "width": 320,
+        "theme": "dark",
+        "passed": true,
+        "states": 6,
+        "agentCharacters": 41034,
+        "fullPageCharacters": 950817,
+        "external": 0,
+        "writes": 0
+      },
+      {
+        "engine": "webkit",
+        "lang": "ko",
+        "width": 1440,
+        "theme": "light",
+        "passed": true,
+        "states": 6,
+        "agentCharacters": 41034,
+        "fullPageCharacters": 951708,
+        "external": 0,
+        "writes": 0
+      },
+      {
+        "engine": "webkit",
+        "lang": "ko",
+        "width": 320,
+        "theme": "dark",
+        "passed": true,
+        "states": 6,
+        "agentCharacters": 41034,
+        "fullPageCharacters": 951708,
+        "external": 0,
+        "writes": 0
+      },
+      {
+        "engine": "webkit",
+        "lang": "fr",
+        "width": 1440,
+        "theme": "light",
+        "passed": true,
+        "states": 6,
+        "agentCharacters": 41034,
+        "fullPageCharacters": 961839,
+        "external": 0,
+        "writes": 0
+      },
+      {
+        "engine": "webkit",
+        "lang": "fr",
+        "width": 320,
+        "theme": "dark",
+        "passed": true,
+        "states": 6,
+        "agentCharacters": 41034,
+        "fullPageCharacters": 961839,
+        "external": 0,
+        "writes": 0
+      },
+      {
+        "engine": "webkit",
+        "lang": "es",
+        "width": 1440,
+        "theme": "light",
+        "passed": true,
+        "states": 6,
+        "agentCharacters": 41034,
+        "fullPageCharacters": 961058,
+        "external": 0,
+        "writes": 0
+      },
+      {
+        "engine": "webkit",
+        "lang": "es",
+        "width": 320,
+        "theme": "dark",
+        "passed": true,
+        "states": 6,
+        "agentCharacters": 41034,
+        "fullPageCharacters": 961058,
+        "external": 0,
+        "writes": 0
+      }
+    ],
+    "firefoxLimitation": "Firefox launch stalled on this host and was terminated; no Firefox validation is claimed.",
+    "englishAgentCharacters": 41034,
+    "englishPageCharacters": 959834,
+    "characterReductionPercent": 95.72
+  }
+}

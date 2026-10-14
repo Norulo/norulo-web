@@ -1,5 +1,24 @@
 # Norulo production deployment
 
+The agent API documentation release was verified on 2026-10-14. Web source
+`d6d8e080e15f66aa8278a39bb3de549f40d46b42` is deployed as version
+`644d0117-7b9b-4117-aaed-38ad2ceb5a0a` with 100% production traffic.
+The API page defaults to **Copy for Agent**; its split-button menu also selects
+**Copy Page**, retaining the existing complete documentation export. Agent copy
+covers all 42 Bearer endpoints with shared request/response schemas and concise
+integration rules, reducing English export character count by about 96%.
+Both modes preserve selectable Markdown recovery and six-language controls.
+
+All 1,903 tests, lint, production build, contract checksum check, offline Worker
+checks and dry-run passed. The final API-focused suite passed 38 tests. Local
+Chromium/WebKit passed 144 copy/menu/recovery states across 24 six-language
+desktop/phone profiles; Firefox launch stalled on this host. Production readback
+matched the source annotation and five build artifacts byte-for-byte, checked
+the API page, proxied health and anonymous access protection, and retained
+bindings, domains, observability and disabled preview exposure. Server remains
+at `624d697a-a208-4aee-8000-87bd1f5a8a72`. No production business write or SQL API
+call was made. See the [agent API copy release record](validation/api-agent-copy-production-2026-10-14.json).
+
 The repository dropdown release was verified on 2026-10-13. Web source
 `070b9a93627984780f5e8c896854fe3efd5abf44` is deployed as version
 `4559fe15-86b4-4991-b3c3-16cebdca0c4f` with 100% production traffic.

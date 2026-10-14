@@ -106,7 +106,55 @@
 }
 .docs-page-head .btn {
   flex: 0 0 auto;
+}
+.docs-copy {
+  position: relative;
+  flex: 0 0 auto;
+  max-width: 100%;
   margin-top: var(--space-1);
+}
+.docs-copy-buttons {
+  display: flex;
+}
+.docs-copy-buttons .btn {
+  min-height: 44px;
+}
+.docs-copy-buttons .docs-copy-trigger {
+  min-width: 44px;
+  padding-inline: var(--space-2);
+  margin-left: -1px;
+}
+.docs-copy-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + var(--space-1));
+  z-index: 20;
+  min-width: 100%;
+  width: max-content;
+  max-width: calc(100vw - var(--space-8));
+  border: 1px solid var(--border);
+  background: var(--bg-elev);
+  padding: var(--space-1);
+}
+.docs-copy-menu button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: 44px;
+  padding: var(--space-2) var(--space-3);
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: var(--fs-sm);
+  text-align: start;
+  cursor: pointer;
+}
+.docs-copy-menu button:hover,
+.docs-copy-menu button:focus-visible {
+  background: var(--bg-soft);
 }
 .docs-crumbs {
   display: flex;

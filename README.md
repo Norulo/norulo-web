@@ -96,6 +96,13 @@ reference. `scripts/sync-api-contract.py` generates the reference and downloadab
 OpenAPI JSON from Server's `openapi/ledger-v1.yaml`; run it with `--check` after
 contract changes to detect stale copies.
 
+The API page defaults to **Copy for Agent**. Its split-button menu also offers
+**Copy Page**, preserving the full documentation export. The agent version in
+`src/screens/api-agent.js` combines concise integration rules with every
+Bearer-accessible operation and deduplicated request/response schemas from the
+same generated contract. Both exports retain selectable Markdown when clipboard
+access is unavailable; controls and recovery copy support all six UI languages.
+
 Default limits are Free **3 projects / 100 expense records**, Pro **20 / 20,000**,
 and Max **100 / 100,000**. Billing renders the Server's configured limits and
 personal-ledger Used / Total allowance as exact figures with accessible native

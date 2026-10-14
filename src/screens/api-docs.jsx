@@ -2,6 +2,8 @@ import "./docs.css";
 import { useEffect, useId, useRef, useState } from "react";
 import { ApiIntegrationGuide, integrationMarkdown } from "./api-guide.jsx";
 import { ApiReference, referenceMarkdown } from "./api-reference.jsx";
+import { agentMarkdown } from "./api-agent.js";
+import { ApiDocsCopyButton } from "./api-docs-copy-button.jsx";
 import { API_GUIDE_COPY } from "../locales/api-guide.js";
 import { env } from "../config/env.js";
 import { I } from "../icons.jsx";
@@ -133,6 +135,7 @@ function markdown(base, example, createExample, projectExample, reviewExample) {
 export function ApiDocsScreen({ go, auth }) {
   const language = useLang();
   const [copyState, setCopyState] = useState("idle");
+  const [copyMode, setCopyMode] = useState("agent");
   const [manualMarkdown, setManualMarkdown] = useState("");
   const copyRequestRef = useRef(null);
   const manualCopyRef = useRef(null);
@@ -197,11 +200,20 @@ export function ApiDocsScreen({ go, auth }) {
     ["expense-review", "Review saved expenses"],
     ["troubleshooting", "Error responses and recovery"],
   ];
-  async function copyPage() {
+  function selectCopyMode(mode) {
+    if (copyRequestRef.current) return;
+    setCopyMode(mode);
+    setCopyState("idle");
+    setManualMarkdown("");
+  }
+  async function copyDocumentation() {
     if (copyRequestRef.current) return;
     const request = {};
     copyRequestRef.current = request;
-    const content = markdown(base, example, createExample, projectExample, reviewExample);
+    const content =
+      copyMode === "agent"
+        ? agentMarkdown(base)
+        : markdown(base, example, createExample, projectExample, reviewExample);
     setCopyState("pending");
     try {
       if (typeof navigator.clipboard?.writeText !== "function")
@@ -255,24 +267,23 @@ export function ApiDocsScreen({ go, auth }) {
             <h1 id="overview" className="docs-h1">
               {T("Norulo ledger REST API")}
             </h1>
-            <button
-              className="btn sm"
-              type="button"
-              onClick={copyPage}
-              disabled={copyState === "pending"}
-              aria-busy={copyState === "pending"}
-              data-copy-exclude
-            >
-              {copyState === "copied" ? <I.Check size={13} /> : <I.Copy size={13} />}{" "}
-              {copyState === "copied" ? T("Copied", "已复制") : T("Copy Page", "复制页面")}
-            </button>
+            <ApiDocsCopyButton
+              mode={copyMode}
+              onModeChange={selectCopyMode}
+              onCopy={copyDocumentation}
+              copyState={copyState}
+            />
           </div>
           {manualMarkdown && (
             <div className="notice notice-error" data-copy-exclude>
               <p role="alert">
-                {T("Unable to copy this page. Select and copy the Markdown below.")}
+                {copyMode === "page"
+                  ? T("Unable to copy this page. Select and copy the Markdown below.")
+                  : T("Unable to copy agent documentation. Select and copy the Markdown below.")}
               </p>
-              <label htmlFor={manualCopyId}>{T("Page Markdown")}</label>
+              <label htmlFor={manualCopyId}>
+                {copyMode === "page" ? T("Page Markdown") : T("Agent Markdown")}
+              </label>
               <div className="auth-input">
                 <textarea
                   ref={manualCopyRef}

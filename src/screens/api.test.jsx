@@ -96,6 +96,8 @@ describe("API screens", () => {
     Object.defineProperty(navigator, "clipboard", { configurable: true, value: { writeText } });
     try {
       render(<ApiDocsScreen go={vi.fn()} auth={{ authenticated: true }} />);
+      await user.click(screen.getByRole("button", { name: "Copy options" }));
+      await user.click(screen.getByRole("menuitemradio", { name: "Copy Page" }));
       await user.click(screen.getByRole("button", { name: /copy page/i }));
       await waitFor(() => expect(writeText).toHaveBeenCalledTimes(1));
       const markdown = writeText.mock.calls[0][0];

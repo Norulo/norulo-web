@@ -122,10 +122,56 @@ describe("Docs and API sidebars", () => {
     headings.forEach((heading) => heading.remove());
   });
 
-  it("keeps sharp, shadow-free docs surfaces and the shared title scale", () => {
+  it("keeps sharp, shadow-free docs surfaces with an accent bar only on the current section", () => {
     const styles = readFileSync("src/screens/docs.css", "utf8");
     expect(styles).not.toMatch(/border-radius|box-shadow/);
-    expect(styles).toMatch(/\.docs-main\s*{[^}]*max-width:\s*46rem;/);
     expect(styles).toMatch(/\.docs-side-i\[aria-current="location"\]\s*{[^}]*border-left:\s*2px solid var\(--accent\);/);
+  });
+
+  it("keeps the sidebar scrollable while hiding its scrollbar", () => {
+    const styles = readFileSync("src/screens/docs.css", "utf8");
+    expect(styles).toMatch(/^\.docs-side\s*{[^}]*overflow-y:\s*auto;[^}]*scrollbar-width:\s*none;/m);
+    expect(styles).toMatch(/\.docs-side::-webkit-scrollbar\s*{\s*display:\s*none;/);
+    expect(styles).toMatch(/@media \(max-width: 899px\) \{\s*\.docs-side \{[^}]*overflow-x:\s*auto;/);
+  });
+
+  it("aligns the sidebar and content with the public header's inner edges at every width", () => {
+    const styles = readFileSync("src/screens/docs.css", "utf8");
+    const header = readFileSync("src/screens/public.css", "utf8");
+    const rule = (selector) =>
+      styles.match(new RegExp(`^${selector}\\s*\\{(?<body>[^}]*)\\}`, "m"))?.groups?.body;
+    const shell = rule("\\.docs-shell");
+    expect(shell).toMatch(/max-width:\s*1240px;/);
+    expect(shell).toMatch(/padding-left:\s*var\(--space-10\);[\s\S]*padding-right:\s*var\(--space-10\);/);
+    expect(header).toMatch(/^\.lp-top\s*\{[^}]*padding:\s*22px var\(--space-10\);[^}]*max-width:\s*1240px;/m);
+    expect(rule("\\.docs-main")).not.toMatch(/max-width|margin/);
+    // Phone gutters follow the header: 20px through 760px, 16px through 420px.
+    expect(styles).toMatch(
+      /@media \(max-width: 760px\) \{\s*\.docs-shell \{[^}]*padding-left:\s*var\(--space-5\);\s*padding-right:\s*var\(--space-5\);/
+    );
+    expect(header).toMatch(
+      /@media \(max-width: 760px\) \{\s*\.lp-top \{[^}]*padding:\s*var\(--space-4\) var\(--space-5\);/
+    );
+    expect(styles).toMatch(
+      /@media \(max-width: 420px\) \{\s*\.docs-shell \{\s*padding-left:\s*var\(--space-4\);\s*padding-right:\s*var\(--space-4\);/
+    );
+    expect(header).toMatch(
+      /@media \(max-width: 420px\) \{\s*\.lp-top \{\s*padding-right:\s*var\(--space-4\);\s*padding-left:\s*var\(--space-4\);/
+    );
+  });
+
+  it("frames featured boxes with a hairline only", () => {
+    const styles = readFileSync("src/screens/docs.css", "utf8");
+    const rule = (selector) =>
+      styles.match(new RegExp(`^${selector}\\s*\\{(?<body>[^}]*)\\}`, "m"))?.groups?.body;
+    for (const selector of [
+      "\\.docs-agent-setup",
+      "\\.docs-callout",
+      "\\.docs-main \\.docs-agent-setup \\.docs-agent-prompt",
+    ]) {
+      const body = rule(selector);
+      expect(body, selector).toContain("border: 1px solid var(--border);");
+      expect(body, selector).not.toMatch(/background|border-(?:top|left):/);
+    }
   });
 });

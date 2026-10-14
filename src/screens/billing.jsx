@@ -19,6 +19,7 @@ import { PublicFooter, PublicHeader } from "./public-layout.jsx";
 import "./billing.css";
 
 const CHECKOUT_PENDING_TIMEOUT_MS = 15 * 1000;
+const SUBSCRIPTION_ACTIVITY_PAGE_SIZE = 5;
 
 function billingReturnUrl(kind, screen = "billing") {
   const url = new URL(pathFromScreen(screen), window.location.origin);
@@ -41,14 +42,6 @@ function priceLabel(price) {
   if (amount == null) return T("Price unavailable", "价格暂不可用");
   if (amount === 0) return "$0";
   return `${currencySymbol(price.currency)}${amount}`;
-}
-
-function priceLabelWithInterval(plan, interval) {
-  return `${priceLabel(priceFor(plan, interval))}/${intervalUnit(interval)}`;
-}
-
-function intervalUnit(interval) {
-  return interval === "year" ? "year" : "month";
 }
 
 function currencySymbol(currency) {
@@ -103,7 +96,9 @@ function yearlySavingsLabel(plan) {
   return `${moneyLabel(saving, year.currency)} ${T("less per year", "每年节省")}`;
 }
 
-function billingChangeDeltaText(currentPlan, currentInterval, targetPlan, targetInterval) {
+// Listed price difference shown before an upgrade. A cadence switch compares
+// annualized listed prices; incomparable prices leave the amount to Creem.
+function billingChangeDelta(currentPlan, currentInterval, targetPlan, targetInterval) {
   const currentPrice = priceFor(currentPlan, currentInterval);
   const targetPrice = priceFor(targetPlan, targetInterval);
   const currentAmount = priceAmount(currentPrice?.amount);
@@ -112,44 +107,18 @@ function billingChangeDeltaText(currentPlan, currentInterval, targetPlan, target
     currentAmount == null ||
     targetAmount == null ||
     normalizedCurrency(currentPrice) !== normalizedCurrency(targetPrice)
-  ) {
-    return T("Final amount is calculated by Creem.", "Final amount is calculated by Creem.");
-  }
-
-  const currency = normalizedCurrency(targetPrice);
-  if (currentInterval === targetInterval) {
-    const delta = targetAmount - currentAmount;
-    if (delta > 0) {
-      return T(
-        `${moneyLabel(delta, currency)} more per ${intervalUnit(targetInterval)}`,
-        `${moneyLabel(delta, currency)} more per ${intervalUnit(targetInterval)}`
-      );
-    }
-    if (delta < 0) {
-      return T(
-        `${moneyLabel(delta, currency)} less per ${intervalUnit(targetInterval)}`,
-        `${moneyLabel(delta, currency)} less per ${intervalUnit(targetInterval)}`
-      );
-    }
-    return T("No listed price change.", "No listed price change.");
-  }
-
-  const annualDelta =
-    annualizedPriceAmount(targetAmount, targetInterval) -
-    annualizedPriceAmount(currentAmount, currentInterval);
-  if (annualDelta > 0) {
-    return T(
-      `${moneyLabel(annualDelta, currency)} more per year`,
-      `${moneyLabel(annualDelta, currency)} more per year`
-    );
-  }
-  if (annualDelta < 0) {
-    return T(
-      `${moneyLabel(annualDelta, currency)} less per year`,
-      `${moneyLabel(annualDelta, currency)} less per year`
-    );
-  }
-  return T("No listed annual price change.", "No listed annual price change.");
+  )
+    return null;
+  const sameInterval = currentInterval === targetInterval;
+  const amount = sameInterval
+    ? targetAmount - currentAmount
+    : annualizedPriceAmount(targetAmount, targetInterval) -
+      annualizedPriceAmount(currentAmount, currentInterval);
+  return {
+    amount: Math.abs(amount) < 0.000001 ? 0 : amount,
+    currency: normalizedCurrency(targetPrice),
+    interval: sameInterval ? targetInterval : "year",
+  };
 }
 
 function planRank(plan) {
@@ -167,92 +136,132 @@ function subscriptionChangeIsUpgrade(currentPlan, currentInterval, targetPlan, t
   return targetRank === currentRank && currentInterval === "month" && targetInterval === "year";
 }
 
-function billingChangeImpactText() {
-  return T(
-    "Creem may charge the prorated difference immediately. Your plan updates after payment confirmation. Final tax and proration are calculated by Creem.",
-    "Creem 可能立即收取按比例计算的差额。支付确认后，套餐才会更新。最终税费与差额由 Creem 计算。"
-  );
-}
-
-// Localized cadence description for the comparison card.
 function intervalShortLabel(interval) {
   return interval === "year" ? T("per year", "每年") : T("per month", "每月");
 }
 
-function cadenceLabel(interval) {
-  return interval === "year"
-    ? T("Billed once a year", "按年计费，每年一次")
-    : T("Billed every month", "按月计费，每月一次");
+function BillingChangePrice({ plan, interval }) {
+  const price = priceFor(plan, interval);
+  const listed = priceAmount(price?.amount) !== null;
+  return (
+    <span className="billing-change-price">
+      <FinancialValue value={priceLabel(price)} numeric={listed} />
+      {listed && (
+        <>
+          {" "}
+          <span className="billing-change-period">{intervalShortLabel(interval)}</span>
+        </>
+      )}
+    </span>
+  );
 }
 
-// Charge callout for the dialog — derived from the listed delta. Downgrade
-// is no longer a supported flow, so this always shows the upgrade copy:
-// describe a possible provider charge and keep plan activation tied to
-// payment confirmation.
-function chargeCallout(deltaText) {
-  const noPrice =
-    deltaText === T("Final amount is calculated by Creem.", "Final amount is calculated by Creem.");
-  if (noPrice) {
-    return {
-      tone: "neutral",
-      icon: I.Lightbulb,
-      title: T("Final amount is calculated by Creem", "最终金额由 Creem 计算"),
-      body: T(
-        "Creem calculates the final charge and tax. Your plan updates after payment confirmation.",
-        "Creem 计算最终扣款与税费。套餐在支付确认后更新。"
-      ),
-      deltaText,
-      showDelta: false,
-    };
-  }
-  return {
-    tone: "charge",
-    icon: I.Trend,
-    title: T("Possible charge today", "今天可能产生扣款"),
-    body: T(
-      "Creem may charge a prorated difference immediately and may start a new billing cycle. Your plan updates after payment confirmation.",
-      "Creem 可能立即按比例收取差额，并可能开始新的计费周期。支付确认后套餐才会更新。"
-    ),
-    deltaText,
-    showDelta: true,
-  };
-}
-
-// Feature deltas derived from current vs target plan — never hardcoded
-function planFeatureDeltas(currentPlan, targetPlan) {
-  if (!currentPlan || !targetPlan) return [];
-  const rows = [];
-  const currentName = planName(currentPlan);
-  const targetName = planName(targetPlan);
-  if (currentName && targetName && currentName !== targetName) {
-    rows.push({
-      key: "planName",
-      label: T("Plan tier", "套餐等级"),
-      before: currentName,
-      after: targetName,
-    });
-  }
-  return rows;
-}
-
-// Renewal date formatting derived from the account payload
-function formatRenewalDate(value) {
-  if (value == null) return "";
-  if (typeof value === "number") {
-    if (!Number.isFinite(value) || value <= 0) return "";
-    const seconds = value > 1e12 ? Math.trunc(value / 1000) : Math.trunc(value);
-    return formatBillingTimestamp(seconds).split(" ")[0];
-  }
-  const text = String(value).trim();
-  if (!text) return "";
-  const numeric = Number(text);
-  if (Number.isFinite(numeric) && numeric > 0) return formatRenewalDate(numeric);
-  const parsed = new Date(text);
-  if (!Number.isFinite(parsed.getTime())) return "";
-  const yyyy = parsed.getUTCFullYear();
-  const mm = String(parsed.getUTCMonth() + 1).padStart(2, "0");
-  const dd = String(parsed.getUTCDate()).padStart(2, "0");
-  return `${yyyy}-${mm}-${dd}`;
+function BillingChangeDialog({
+  details,
+  dialogRef,
+  closeRef,
+  backdropProps,
+  busy,
+  confirming,
+  onClose,
+  onConfirm,
+}) {
+  const { currentPlan, currentInterval, targetPlan, targetInterval, delta } = details;
+  const title =
+    targetPlan.id === currentPlan.id
+      ? T("Switch to yearly billing")
+      : T("Upgrade to {plan}").replace("{plan}", planName(targetPlan));
+  const saving = delta?.amount < 0;
+  const deltaLabel =
+    delta && `${delta.amount > 0 ? "+" : ""}${moneyLabel(delta.amount, delta.currency)}`;
+  return (
+    <div className="modal-back billing-change-back" {...backdropProps}>
+      <div
+        className="modal billing-change-modal"
+        role="dialog"
+        tabIndex={-1}
+        aria-modal="true"
+        aria-labelledby="billing-change-title"
+        aria-describedby="billing-change-note"
+        ref={dialogRef}
+        onClick={(event) => event.stopPropagation()}
+      >
+        <div className="modal-h">
+          <h3 id="billing-change-title">{title}</h3>
+          <button
+            ref={closeRef}
+            className="btn ghost icon"
+            type="button"
+            aria-label={T("Close billing change confirmation", "Close billing change confirmation")}
+            disabled={busy}
+            onClick={onClose}
+          >
+            <I.X size={14} />
+          </button>
+        </div>
+        <div className="modal-body billing-change-body">
+          <dl className="billing-change-summary">
+            <div className="billing-change-row">
+              <dt>{T("Current plan")}</dt>
+              <dd>
+                <b>{planName(currentPlan)}</b>{" "}
+                <BillingChangePrice plan={currentPlan} interval={currentInterval} />
+              </dd>
+            </div>
+            <div className="billing-change-row billing-change-row-target">
+              <dt>{T("New plan")}</dt>
+              <dd>
+                <b>{planName(targetPlan)}</b>{" "}
+                <BillingChangePrice plan={targetPlan} interval={targetInterval} />
+              </dd>
+            </div>
+            {delta && (
+              <div className="billing-change-row billing-change-row-delta">
+                <dt>{saving ? T("You save") : T("Price difference")}</dt>
+                <dd>
+                  <span className="billing-change-price">
+                    <FinancialValue value={deltaLabel} />{" "}
+                    <span className="billing-change-period">
+                      {intervalShortLabel(delta.interval)}
+                    </span>
+                  </span>
+                </dd>
+              </div>
+            )}
+          </dl>
+          <p className="billing-change-note" id="billing-change-note">
+            {delta
+              ? T(
+                  "Creem may charge the prorated difference immediately. Your plan updates after payment confirmation. Final tax and proration are calculated by Creem.",
+                  "Creem 可能立即收取按比例计算的差额。支付确认后，套餐才会更新。最终税费与差额由 Creem 计算。"
+                )
+              : T(
+                  "Creem calculates the final charge and tax. Your plan updates after payment confirmation.",
+                  "Creem 计算最终扣款与税费。套餐在支付确认后更新。"
+                )}
+          </p>
+        </div>
+        <div className="modal-foot">
+          <button className="btn ghost" type="button" disabled={busy} onClick={onClose}>
+            {T("Cancel", "Cancel")}
+          </button>
+          <button
+            className="btn primary billing-change-confirm"
+            type="button"
+            disabled={busy}
+            onClick={onConfirm}
+          >
+            {confirming && (
+              <span className="spin">
+                <I.Refresh size={14} />
+              </span>
+            )}
+            <I.Check size={14} /> {T("Confirm change", "Confirm change")}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 function subscriptionChangeActionKey(targetPlan, targetInterval) {
@@ -696,6 +705,7 @@ export function BillingScreen({ go, navigate = (url) => window.location.assign(u
   const writing = Boolean(pendingAction);
   const [changeDraft, setChangeDraft] = useState(null);
   const [cancelConfirmationOpen, setCancelConfirmationOpen] = useState(false);
+  const [activityPage, setActivityPage] = useState({ events: null, index: 0 });
   const billingMutationRef = useRef("");
   const billingReadRef = useRef(false);
   const mountedRef = useRef(true);
@@ -764,6 +774,19 @@ export function BillingScreen({ go, navigate = (url) => window.location.assign(u
       priceFor(paidPlan, subscriptionInterval)?.configured &&
       subscriptionChangeIsUpgrade(currentPlan, subscriptionInterval, paidPlan, subscriptionInterval)
   );
+  const activityPageCount = Math.ceil(subscriptions.length / SUBSCRIPTION_ACTIVITY_PAGE_SIZE);
+  // Paging is local to the loaded events (newest first). A fresh Server read
+  // returns a new list and starts again from its newest page.
+  const activityPageIndex =
+    activityPage.events === account.subscriptionEvents
+      ? Math.min(activityPage.index, Math.max(0, activityPageCount - 1))
+      : 0;
+  const visibleSubscriptions = subscriptions.slice(
+    activityPageIndex * SUBSCRIPTION_ACTIVITY_PAGE_SIZE,
+    (activityPageIndex + 1) * SUBSCRIPTION_ACTIVITY_PAGE_SIZE
+  );
+  const showActivityPage = (index) =>
+    setActivityPage({ events: account.subscriptionEvents, index });
   const changeDetails = useMemo(() => {
     if (!changeDraft) return null;
     const targetPlan = paidPlanById[changeDraft.targetPlan] || currentPlan;
@@ -773,31 +796,15 @@ export function BillingScreen({ go, navigate = (url) => window.location.assign(u
     ) {
       return null;
     }
-    const deltaText = billingChangeDeltaText(
-      currentPlan,
-      subscriptionInterval,
-      targetPlan,
-      targetInterval
-    );
     return {
       currentPlan,
       currentInterval: subscriptionInterval,
-      currentPrice: priceLabelWithInterval(currentPlan, subscriptionInterval),
-      currentCadence: cadenceLabel(subscriptionInterval),
-      currentIntervalShort: intervalShortLabel(subscriptionInterval),
       targetPlan,
       targetInterval,
-      targetPrice: priceLabelWithInterval(targetPlan, targetInterval),
-      targetCadence: cadenceLabel(targetInterval),
-      targetIntervalShort: intervalShortLabel(targetInterval),
-      deltaText,
-      impactText: billingChangeImpactText(),
-      callout: chargeCallout(deltaText),
-      featureDeltas: planFeatureDeltas(currentPlan, targetPlan),
-      renewalDate: formatRenewalDate(account.currentPeriodEnd || account.current_period_end),
+      delta: billingChangeDelta(currentPlan, subscriptionInterval, targetPlan, targetInterval),
       actionKey: subscriptionChangeActionKey(targetPlan.id, targetInterval),
     };
-  }, [changeDraft, currentPlan, paidPlanById, subscriptionInterval, account]);
+  }, [changeDraft, currentPlan, paidPlanById, subscriptionInterval]);
 
   const changeSubscription = async ({
     targetPlan = account.plan,
@@ -1169,10 +1176,12 @@ export function BillingScreen({ go, navigate = (url) => window.location.assign(u
                       <h2>{T("Subscription activity", "订阅动态")}</h2>
                       <div className="section-body">
                       <div className="sub-record-list">
-                        {subscriptions.map((record, index) => (
+                        {visibleSubscriptions.map((record, index) => (
                           <div
                             className="sub-record-row"
-                            key={`${subscriptionRecordKey(record)}-${index}`}
+                            key={`${subscriptionRecordKey(record)}-${
+                              activityPageIndex * SUBSCRIPTION_ACTIVITY_PAGE_SIZE + index
+                            }`}
                           >
                             <div className="sub-record-main">
                               <b>{subscriptionRecordTitle(record)}</b>
@@ -1183,6 +1192,38 @@ export function BillingScreen({ go, navigate = (url) => window.location.assign(u
                           </div>
                         ))}
                       </div>
+                      {activityPageCount > 1 && (
+                        <nav
+                          className="billing-activity-pagination panel-actions"
+                          aria-label={T("Subscription activity pagination")}
+                        >
+                          <button
+                            className="btn"
+                            type="button"
+                            disabled={activityPageIndex === 0}
+                            onClick={() => showActivityPage(activityPageIndex - 1)}
+                          >
+                            {T("Previous")}
+                          </button>
+                          <span
+                            className="billing-activity-page"
+                            aria-live="polite"
+                            aria-atomic="true"
+                          >
+                            {T("Page {page} of {count}")
+                              .replace("{page}", String(activityPageIndex + 1))
+                              .replace("{count}", String(activityPageCount))}
+                          </span>
+                          <button
+                            className="btn"
+                            type="button"
+                            disabled={activityPageIndex >= activityPageCount - 1}
+                            onClick={() => showActivityPage(activityPageIndex + 1)}
+                          >
+                            {T("Next")}
+                          </button>
+                        </nav>
+                      )}
                       </div>
                     </section>
                   )}
@@ -1202,190 +1243,16 @@ export function BillingScreen({ go, navigate = (url) => window.location.assign(u
         </ConsoleLayout>
       </div>
       {changeDetails && (
-        <div className="modal-back billing-change-back" {...changeBackdropProps}>
-          <div
-            className="modal billing-change-modal"
-            role="dialog"
-            tabIndex={-1}
-            aria-modal="true"
-            aria-labelledby="billing-change-title"
-            ref={changeDialogRef}
-            onClick={(event) => event.stopPropagation()}
-          >
-            <div className="modal-h billing-change-h">
-              <div>
-                <h3 id="billing-change-title">
-                  <I.Package size={15} /> {T("Confirm billing change", "Confirm billing change")}
-                </h3>
-                <p>
-                  {T(
-                    "Review the plan, cadence, and billing impact before anything changes.",
-                    "在变更前确认套餐、计费周期与扣款影响。"
-                  )}
-                </p>
-              </div>
-              <button
-                ref={changeCloseRef}
-                className="btn ghost icon"
-                type="button"
-                aria-label={T(
-                  "Close billing change confirmation",
-                  "Close billing change confirmation"
-                )}
-                disabled={Boolean(pendingAction)}
-                onClick={closeChangeConfirmation}
-              >
-                <I.X size={14} />
-              </button>
-            </div>
-            <div className="modal-body billing-change-body">
-              <div className="billing-change-direction billing-change-direction-upgrade">
-                {T("Upgrade", "升级")}
-              </div>
-
-              <div className="billing-change-grid">
-                <div className="billing-change-box">
-                  <span>{T("Current", "Current")}</span>
-                  <b>{planName(changeDetails.currentPlan)}</b>
-                  <em className="billing-change-price">
-                    <FinancialValue
-                      value={priceLabel(
-                        priceFor(changeDetails.currentPlan, changeDetails.currentInterval)
-                      )}
-                      numeric={
-                        priceAmount(
-                          priceFor(changeDetails.currentPlan, changeDetails.currentInterval)?.amount
-                        ) !== null
-                      }
-                    />
-                    <span className="billing-change-period">
-                      {changeDetails.currentIntervalShort}
-                    </span>
-                  </em>
-                  <span className="billing-change-cadence">{changeDetails.currentCadence}</span>
-                </div>
-                <I.ArrowR className="billing-change-arrow" size={18} />
-                <div className="billing-change-box billing-change-box-target">
-                  <span>{T("New", "New")}</span>
-                  <b>{planName(changeDetails.targetPlan)}</b>
-                  <em className="billing-change-price">
-                    <FinancialValue
-                      value={priceLabel(
-                        priceFor(changeDetails.targetPlan, changeDetails.targetInterval)
-                      )}
-                      numeric={
-                        priceAmount(
-                          priceFor(changeDetails.targetPlan, changeDetails.targetInterval)?.amount
-                        ) !== null
-                      }
-                    />
-                    <span className="billing-change-period">
-                      {changeDetails.targetIntervalShort}
-                    </span>
-                  </em>
-                  <span className="billing-change-cadence">{changeDetails.targetCadence}</span>
-                </div>
-              </div>
-
-              <div className="billing-change-stats">
-                <div className="billing-change-stat">
-                  <span className="billing-change-stat-label">
-                    <I.Clock size={13} /> {T("Billing cadence", "计费周期")}
-                  </span>
-                  <b>{changeDetails.targetCadence}</b>
-                </div>
-                <div className="billing-change-stat">
-                  <span className="billing-change-stat-label">
-                    <I.Refresh size={13} /> {T("Next renewal", "下次续费")}
-                  </span>
-                  <b>
-                    {changeDetails.renewalDate || T("Calculated at confirmation", "确认时计算")}
-                  </b>
-                </div>
-              </div>
-
-              <div
-                className={`billing-change-callout billing-change-callout-${changeDetails.callout.tone}`}
-              >
-                <span className="billing-change-callout-icon" aria-hidden="true">
-                  <changeDetails.callout.icon size={16} />
-                </span>
-                <div className="billing-change-callout-text">
-                  <b>{changeDetails.callout.title}</b>
-                  <span>{changeDetails.callout.body}</span>
-                  {changeDetails.callout.showDelta && (
-                    <span className="billing-change-callout-delta">
-                      {changeDetails.callout.deltaText}
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              {changeDetails.featureDeltas.length > 0 && (
-                <div className="billing-change-features">
-                  <div className="billing-change-features-h">
-                    <I.Sliders size={13} /> {T("What changes now", "本次变更")}
-                  </div>
-                  <ul className="billing-change-features-list">
-                    {changeDetails.featureDeltas.map((row) => (
-                      <li key={row.key}>
-                        <span className="billing-change-feature-label">{row.label}</span>
-                        <span className="billing-change-feature-pair">
-                          <span className="billing-change-feature-before">{row.before}</span>
-                          <I.ArrowR size={12} className="billing-change-feature-arrow" />
-                          <span className="billing-change-feature-after">{row.after}</span>
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              <div className="billing-change-how">
-                <I.Shield size={14} />
-                <div>
-                  <b>{T("How this works", "变更说明")}</b>
-                  <p>
-                    {T(
-                      "Your plan updates after payment confirmation. Creem calculates any immediate charge and may start a new billing cycle. Review the final amount and renewal details in Creem. You can cancel renewal from Norulo Billing.",
-                      "支付确认后套餐才会更新。Creem 计算可能立即收取的费用，并可能开始新的计费周期。请在 Creem 查看最终金额与续费详情。你可以在 Norulo 账单页取消续订。"
-                    )}
-                  </p>
-                </div>
-              </div>
-
-              <p className="muted billing-change-copy">
-                {T(
-                  "Norulo shows listed plan prices only. Taxes, prorations, credits, and the final charge are calculated by Creem.",
-                  "Norulo shows listed plan prices only. Taxes, prorations, credits, and the final charge are calculated by Creem."
-                )}
-              </p>
-            </div>
-            <div className="modal-foot billing-change-foot">
-              <button
-                className="btn ghost"
-                type="button"
-                disabled={Boolean(pendingAction)}
-                onClick={closeChangeConfirmation}
-              >
-                {T("Cancel", "Cancel")}
-              </button>
-              <button
-                className="btn primary billing-change-confirm"
-                type="button"
-                disabled={Boolean(pendingAction)}
-                onClick={confirmSubscriptionChange}
-              >
-                {pendingAction === changeDetails.actionKey && (
-                  <span className="spin">
-                    <I.Refresh size={14} />
-                  </span>
-                )}
-                <I.Check size={14} /> {T("Confirm change", "Confirm change")}
-              </button>
-            </div>
-          </div>
-        </div>
+        <BillingChangeDialog
+          details={changeDetails}
+          dialogRef={changeDialogRef}
+          closeRef={changeCloseRef}
+          backdropProps={changeBackdropProps}
+          busy={Boolean(pendingAction)}
+          confirming={pendingAction === changeDetails.actionKey}
+          onClose={closeChangeConfirmation}
+          onConfirm={confirmSubscriptionChange}
+        />
       )}
       <ConfirmDialog
         open={cancelConfirmationOpen}

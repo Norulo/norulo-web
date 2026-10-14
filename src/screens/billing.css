@@ -337,340 +337,144 @@
   }
 }
 
+/* Billing change confirmation: one summary of current plan, new plan and the
+   listed difference, followed by a single provider note. */
 .billing-change-modal {
   width: 100%;
-  max-width: 640px;
-  max-height: min(88vh, calc(var(--modal-viewport-height) - 40px));
-  display: flex;
-  flex-direction: column;
-}
-
-.billing-change-modal .modal-h {
-  align-items: flex-start;
-  gap: var(--space-3);
-  flex: 0 0 auto;
-}
-
-.billing-change-modal .modal-h h3 {
-  gap: var(--space-2);
-}
-
-.billing-change-modal .modal-h p {
-  margin: 6px 0 0;
-  color: var(--text-3);
-  font-size: var(--fs-sm);
-  line-height: 1.5;
+  max-width: 520px;
 }
 
 .billing-change-body {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  overflow-y: auto;
-  flex: 1 1 auto;
-  min-height: 0;
-}
-
-.billing-change-foot {
-  flex: 0 0 auto;
-}
-
-.billing-change-direction {
-  align-self: flex-start;
-  padding: var(--space-1) 10px;
-  font-size: var(--fs-xs);
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  border: 1px solid color-mix(in srgb, var(--accent) 50%, var(--border));
-  color: var(--accent);
-  background: color-mix(in srgb, var(--accent) 10%, var(--bg-soft));
-}
-
-.billing-change-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-  gap: 10px;
-  align-items: stretch;
+  gap: var(--space-4);
 }
 
-.billing-change-box {
-  min-width: 0;
-  padding: 14px 14px var(--space-3);
+.billing-change-summary {
+  margin: 0;
   border: 1px solid var(--border);
-  background: var(--bg-soft);
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+  min-width: 0;
 }
 
-.billing-change-box-target {
-  border-color: color-mix(in srgb, var(--accent) 55%, var(--border));
-  background: color-mix(in srgb, var(--accent) 6%, var(--bg-soft));
+.billing-change-row {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-4);
+  min-width: 0;
 }
 
-.billing-change-box > span:first-child {
+.billing-change-row + .billing-change-row {
+  border-top: 1px solid var(--border);
+}
+
+.billing-change-row dt {
   color: var(--text-3);
   font-size: var(--fs-xs);
-  text-transform: uppercase;
+  font-weight: 500;
   letter-spacing: 0.04em;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
 }
 
-.billing-change-box b {
+.billing-change-row dd {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-1) var(--space-4);
+  margin: 0;
+  min-width: 0;
+  color: var(--text-2);
+}
+
+.billing-change-row dd > b {
+  min-width: 0;
   font-size: var(--fs-lg);
   font-weight: 600;
-  min-width: 0;
   overflow-wrap: anywhere;
 }
 
 .billing-change-price {
-  --financial-size: var(--fs-value-row);
+  --financial-size: var(--fs-value-secondary);
   display: inline-flex;
+  flex-wrap: wrap;
   align-items: baseline;
   gap: var(--space-1);
-  color: var(--text);
-  font-size: var(--fs-md);
-  font-weight: 400;
-  font-style: normal;
   min-width: 0;
-  overflow-wrap: anywhere;
+  margin-inline-start: auto;
 }
 
 .billing-change-period {
   color: var(--text-3);
   font-size: var(--fs-sm);
-  font-weight: 400;
 }
 
-.billing-change-cadence {
-  color: var(--text-3);
-  font-size: var(--fs-sm);
-  font-style: normal;
-  text-transform: none;
-  letter-spacing: 0;
-}
-
-.billing-change-arrow {
-  align-self: center;
-  color: var(--text-3);
-}
-
-.billing-change-stats {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 10px;
-}
-
-.billing-change-stat {
-  padding: 10px var(--space-3);
-  border: 1px solid var(--border);
-  background: var(--bg-elev);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-  min-width: 0;
-}
-
-.billing-change-stat-label {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  color: var(--text-3);
-  font-size: var(--fs-xs);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-.billing-change-stat b {
-  font-size: var(--fs-md);
-  font-weight: 600;
-  color: var(--text);
-  min-width: 0;
-  overflow-wrap: anywhere;
-}
-
-.billing-change-callout {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  gap: var(--space-3);
-  align-items: flex-start;
-  padding: 14px 14px;
-  border: 1px solid var(--border);
-  background: var(--bg-elev);
-  color: var(--text-2);
-  font-size: var(--fs-md);
-  line-height: 1.55;
-}
-
-.billing-change-callout-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 30px;
-  height: 30px;
-  border: 1px solid var(--border);
-  background: var(--bg-soft);
-  color: var(--text-2);
-  flex: 0 0 auto;
-}
-
-.billing-change-callout-text {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-  min-width: 0;
-}
-
-.billing-change-callout-text b {
-  font-size: var(--fs-md);
-  font-weight: 600;
-  color: var(--text);
-}
-
-.billing-change-callout-delta {
-  color: var(--text);
-  font-weight: 600;
-  font-size: var(--fs-md);
-  margin-top: 2px;
-}
-
-.billing-change-callout-charge {
+.billing-change-row-target {
   background: color-mix(in srgb, var(--accent) 6%, var(--bg-elev));
-  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
 }
 
-.billing-change-callout-charge .billing-change-callout-icon {
-  background: color-mix(in srgb, var(--accent) 14%, var(--bg-soft));
-  border-color: color-mix(in srgb, var(--accent) 55%, var(--border));
+.billing-change-row-target dt {
   color: var(--accent);
 }
 
-.billing-change-features {
-  border: 1px solid var(--border);
-  background: var(--bg-elev);
-  padding: var(--space-3) 14px;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
+.billing-change-row-target dd {
+  color: var(--text);
 }
 
-.billing-change-features-h {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  color: var(--text-3);
-  font-size: var(--fs-xs);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-.billing-change-features-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
+.billing-change-row-delta {
   display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.billing-change-features-list li {
-  display: flex;
-  align-items: center;
+  flex-wrap: wrap;
+  align-items: baseline;
   justify-content: space-between;
-  gap: 10px;
-  padding: 6px 0;
-  border-bottom: 1px solid var(--border);
+  gap: var(--space-1) var(--space-4);
+  background: var(--bg-soft);
+}
+
+.billing-change-row-delta dt {
+  color: var(--text);
   font-size: var(--fs-md);
-  min-width: 0;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
 }
 
-.billing-change-features-list li:last-child {
-  border-bottom: 0;
+.billing-change-row-delta dd {
+  margin-inline-start: auto;
+  color: var(--text);
 }
 
-.billing-change-feature-label {
+.billing-change-row-delta .billing-change-price {
+  --financial-size: var(--fs-value-row);
+}
+
+.billing-change-note {
+  margin: 0;
   color: var(--text-2);
-  min-width: 0;
+  font-size: var(--fs-sm);
+  line-height: 1.6;
   overflow-wrap: anywhere;
 }
 
-.billing-change-feature-pair {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  min-width: 0;
-}
-
-.billing-change-feature-before {
-  color: var(--text-3);
-  text-decoration: line-through;
-  text-decoration-thickness: 1px;
-}
-
-.billing-change-feature-after {
-  color: var(--text);
-  font-weight: 600;
-}
-
-.billing-change-feature-arrow {
-  color: var(--text-3);
-}
-
-.billing-change-how {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  gap: 10px;
-  align-items: flex-start;
-  padding: var(--space-3);
-  border: 1px solid var(--border);
-  background: var(--bg-soft);
-  color: var(--text-2);
-  font-size: var(--fs-sm);
-  line-height: 1.55;
-}
-
-.billing-change-how > svg {
-  color: var(--text-3);
-  margin-top: 2px;
-}
-
-.billing-change-how b {
-  display: block;
-  color: var(--text);
-  font-size: var(--fs-sm);
-  font-weight: 600;
-  margin-bottom: var(--space-1);
-}
-
-.billing-change-how p {
-  margin: 0;
-}
-
-.billing-change-copy {
-  margin: 0;
-  line-height: 1.55;
-  font-size: var(--fs-sm);
-}
-
 .billing-change-confirm {
-  min-width: 160px;
   justify-content: center;
+}
+
+.billing-activity-pagination {
+  align-self: stretch;
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--border);
+}
+
+.billing-activity-page {
+  min-width: 4.5rem;
+  color: var(--text-3);
+  font-size: var(--fs-md);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
 }
 
 @media (max-width: 640px) {
   .billing-change-modal {
     max-width: 100%;
-    max-height: 92vh;
-  }
-  .billing-change-grid {
-    grid-template-columns: minmax(0, 1fr);
-  }
-  .billing-change-arrow {
-    justify-self: center;
-    transform: rotate(90deg);
-  }
-  .billing-change-stats {
-    grid-template-columns: minmax(0, 1fr);
   }
   .billing-summary {
     flex-direction: column;
@@ -949,13 +753,7 @@
 .pricing-tiers,
 .pricing-card,
 .pricing-tag,
-.pricing-feats,
-.billing-change-callout,
-.billing-change-callout-text,
-.billing-change-features,
-.billing-change-feature-pair,
-.billing-change-features-list li,
-.billing-change-how {
+.pricing-feats {
   min-width: 0;
 }
 
@@ -972,14 +770,8 @@
   }
 }
 
-.billing-change-foot .btn {
-  min-width: 0;
-}
-
 .pricing-tag,
-.pricing-feats li,
-.billing-change-feature-before,
-.billing-change-feature-after {
+.pricing-feats li {
   overflow-wrap: anywhere;
 }
 
@@ -1022,37 +814,12 @@
     padding-left: var(--space-5);
     padding-right: var(--space-5);
   }
-
-  .billing-change-features-list li {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-
-  .billing-change-feature-pair {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: var(--space-1);
-  }
 }
 
 @media (max-width: 520px) {
   .pricing-card {
     padding-left: 18px;
     padding-right: 18px;
-  }
-
-  .billing-change-callout,
-  .billing-change-how {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .billing-change-callout-icon {
-    width: 28px;
-    height: 28px;
-  }
-
-  .billing-change-confirm {
-    min-width: 0;
   }
 }
 

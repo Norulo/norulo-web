@@ -99,6 +99,36 @@ describe("BillingScreen", () => {
     };
   }
 
+  function subscriptionEvents(count, first = 1) {
+    return Array.from({ length: count }, (_, index) => ({
+      provider: "creem",
+      subscriptionId: "sub_1",
+      customerId: "cust_1",
+      status: "active",
+      plan: "pro",
+      interval: "month",
+      eventType: `subscription.event_${first + index}`,
+      eventId: `evt_${first + index}`,
+      eventCreated: 1780963210 - (first + index) * 60,
+    }));
+  }
+
+  function eventRange(first, last) {
+    return Array.from({ length: last - first + 1 }, (_, index) => `subscription.event_${first + index}`);
+  }
+
+  async function subscriptionActivitySection() {
+    const heading = await screen.findByRole("heading", { name: "Subscription activity" });
+    const section = heading.closest("section");
+    return {
+      section,
+      events: () =>
+        within(section)
+          .getAllByText(/^subscription\.event_\d+$/)
+          .map((node) => node.textContent),
+    };
+  }
+
   function withoutPaidSubscriptions() {
     return {
       provider: "disabled",
@@ -792,8 +822,8 @@ describe("BillingScreen", () => {
   it("keeps the billing change confirmation dialog compact on desktop", () => {
     const styles = readFileSync("src/screens/billing.css", "utf8");
 
-    expect(styles).toMatch(/\.billing-change-modal\s*{[^}]*max-width:\s*640px;/s);
-    expect(styles).not.toMatch(/\.billing-change-modal\s*{[^}]*max-width:\s*720px;/s);
+    expect(styles).toMatch(/\.billing-change-modal\s*{[^}]*max-width:\s*520px;/s);
+    expect(styles).not.toMatch(/\.billing-change-modal\s*{[^}]*max-width:\s*(?:640|720)px;/s);
     expect(styles).toMatch(
       /@media\s*\(max-width:\s*640px\)\s*{[\s\S]*\.billing-change-modal\s*{[^}]*max-width:\s*100%;/s
     );
@@ -1684,15 +1714,19 @@ describe("BillingScreen", () => {
     await user.click(await screen.findByRole("button", { name: /switch to yearly/i }));
 
     expect(noruloApi.billing.changeSubscriptionInterval).not.toHaveBeenCalled();
-    const dialog = await screen.findByRole("dialog", { name: /confirm billing change/i });
-    expect(dialog).toHaveTextContent("Norulo Pro");
-    expect(dialog).toHaveTextContent("$29");
-    expect(dialog).toHaveTextContent("$290");
-    expect(dialog).toHaveTextContent("per year");
-    expect(dialog).toHaveTextContent("$58 less per year");
-    expect(dialog).toHaveTextContent(/possible charge today/i);
-    expect(dialog).toHaveTextContent(/Creem may charge a prorated difference/i);
-    expect(dialog).toHaveTextContent(/plan updates after payment confirmation/i);
+    const dialog = await screen.findByRole("dialog", { name: "Switch to yearly billing" });
+    expect(within(dialog).getAllByRole("term").map((term) => term.textContent)).toEqual([
+      "Current plan",
+      "New plan",
+      "You save",
+    ]);
+    const [current, target, saving] = within(dialog).getAllByRole("definition");
+    expect(current).toHaveTextContent("Norulo Pro $29 per month");
+    expect(target).toHaveTextContent("Norulo Pro $290 per year");
+    expect(saving).toHaveTextContent("$58 per year");
+    expect(dialog).toHaveAccessibleDescription(
+      /Creem may charge the prorated difference immediately\. Your plan updates after payment confirmation\./
+    );
     expect(dialog).not.toHaveTextContent(/new plan takes effect immediately/i);
 
     await user.click(screen.getByRole("button", { name: /confirm change/i }));
@@ -1743,9 +1777,9 @@ describe("BillingScreen", () => {
     render(<BillingScreen go={vi.fn()} />);
     const opener = await screen.findByRole("button", { name: /switch to yearly/i });
     await user.click(opener);
-    const dialog = screen.getByRole("dialog", { name: /confirm billing change/i });
+    const dialog = screen.getByRole("dialog", { name: "Switch to yearly billing" });
     const backdrop = dialog.closest(".modal-back");
-    const details = within(dialog).getByText(/Review the plan, cadence/i);
+    const details = within(dialog).getByText(/Creem may charge the prorated difference/i);
     for (const [start, end] of [
       [details, backdrop],
       [backdrop, details],
@@ -1774,7 +1808,7 @@ describe("BillingScreen", () => {
     render(<BillingScreen go={vi.fn()} />);
     await user.click(await screen.findByRole("button", { name: /switch to yearly/i }));
     await user.click(screen.getByRole("button", { name: /confirm change/i }));
-    const dialog = screen.getByRole("dialog", { name: /confirm billing change/i });
+    const dialog = screen.getByRole("dialog", { name: "Switch to yearly billing" });
     await user.click(dialog.closest(".modal-back"));
     await user.keyboard("{Escape}");
     expect(dialog).toBeInTheDocument();
@@ -1861,17 +1895,20 @@ describe("BillingScreen", () => {
     await user.click(await screen.findByRole("button", { name: /switch to max/i }));
 
     expect(noruloApi.billing.changeSubscriptionInterval).not.toHaveBeenCalled();
-    const dialog = await screen.findByRole("dialog", { name: /confirm billing change/i });
-    expect(dialog).toHaveTextContent("Norulo Pro");
-    expect(dialog).toHaveTextContent("Norulo Max");
-    expect(dialog).toHaveTextContent("$29");
-    expect(dialog).toHaveTextContent("$49");
-    expect(dialog).toHaveTextContent("per month");
-    expect(dialog).toHaveTextContent("$20 more per month");
-    expect(dialog).toHaveTextContent(/possible charge today/i);
-    expect(dialog).toHaveTextContent(/Creem may charge a prorated difference/i);
-    expect(dialog).toHaveTextContent(/plan updates after payment confirmation/i);
-    expect(dialog).not.toHaveTextContent(/new plan takes effect immediately/i);
+    const dialog = await screen.findByRole("dialog", { name: "Upgrade to Norulo Max" });
+    expect(within(dialog).getAllByRole("term").map((term) => term.textContent)).toEqual([
+      "Current plan",
+      "New plan",
+      "Price difference",
+    ]);
+    const [current, target, difference] = within(dialog).getAllByRole("definition");
+    expect(current).toHaveTextContent("Norulo Pro $29 per month");
+    expect(target).toHaveTextContent("Norulo Max $49 per month");
+    expect(difference).toHaveTextContent("+$20 per month");
+    expect(dialog).toHaveAccessibleDescription(
+      /Creem may charge the prorated difference immediately\. Your plan updates after payment confirmation\./
+    );
+    expect(dialog).not.toHaveTextContent(/new plan takes effect immediately|next renewal/i);
 
     await user.click(screen.getByRole("button", { name: /confirm change/i }));
 
@@ -1887,6 +1924,78 @@ describe("BillingScreen", () => {
       expect(screen.getAllByText("Norulo Max").length).toBeGreaterThan(0);
     });
   });
+
+  it("leaves an incomparable upgrade amount to Creem without inventing a difference", async () => {
+    noruloApi.billing.getPlan.mockResolvedValue({
+      ...billingCatalog,
+      plans: [
+        ...billingCatalog.plans,
+        {
+          ...maxPlan,
+          prices: {
+            month: { amount: "49", currency: "EUR", interval: "month", configured: true },
+          },
+        },
+      ],
+      account: { status: "active", plan: "pro", interval: "month" },
+    });
+    const user = userEvent.setup();
+    render(<BillingScreen go={vi.fn()} navigate={vi.fn()} />);
+
+    await user.click(await screen.findByRole("button", { name: /switch to max/i }));
+
+    const dialog = screen.getByRole("dialog", { name: "Upgrade to Norulo Max" });
+    expect(within(dialog).getAllByRole("term").map((term) => term.textContent)).toEqual([
+      "Current plan",
+      "New plan",
+    ]);
+    expect(within(dialog).getAllByRole("definition")[1]).toHaveTextContent(
+      "Norulo Max EUR 49 per month"
+    );
+    expect(dialog).toHaveAccessibleDescription(
+      "Creem calculates the final charge and tax. Your plan updates after payment confirmation."
+    );
+    expect(dialog).not.toHaveTextContent(/price difference|you save/i);
+    expect(noruloApi.billing.changeSubscriptionInterval).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ["en", "Switch to MAX", "Upgrade to Norulo Max", "Subscription activity pagination", "Page 1 of 3"],
+    ["zh", "切换到 MAX", "升级到 Norulo Max", "订阅动态分页", "第 1 页，共 3 页"],
+    ["ja", "MAX に切り替え", "Norulo Max にアップグレード", "サブスクリプション履歴のページ移動", "1 / 3 ページ"],
+    ["ko", "MAX로 전환", "Norulo Max(으)로 업그레이드", "구독 활동 페이지 탐색", "1 / 3페이지"],
+    ["fr", "Passer à MAX", "Passer à Norulo Max", "Pagination de l’activité d’abonnement", "Page 1 sur 3"],
+    ["es", "Cambiar a MAX", "Mejorar a Norulo Max", "Paginación de la actividad de suscripción", "Página 1 de 3"],
+  ])(
+    "localizes the upgrade confirmation and activity pages in %s",
+    async (lang, opener, title, paginationName, pageText) => {
+      await setLang(lang);
+      noruloApi.billing.getPlan.mockResolvedValue({
+        ...billingCatalog,
+        plans: [...billingCatalog.plans, maxPlan],
+        account: {
+          status: "active",
+          plan: "pro",
+          interval: "month",
+          subscriptionEvents: subscriptionEvents(11),
+        },
+      });
+      const user = userEvent.setup();
+      render(<BillingScreen go={vi.fn()} navigate={vi.fn()} />);
+
+      expect(await screen.findByRole("navigation", { name: paginationName })).toHaveTextContent(
+        pageText
+      );
+      await user.click(screen.getByRole("button", { name: opener }));
+      const dialog = screen.getByRole("dialog", { name: title });
+      expect(within(dialog).getAllByRole("term")).toHaveLength(3);
+      expect(within(dialog).getAllByRole("definition")[2]).toHaveTextContent("+$20");
+      if (lang !== "en") {
+        expect(dialog).not.toHaveTextContent(/Current plan|New plan|Price difference|per month/);
+        expect(dialog).not.toHaveAccessibleDescription(/Creem may charge/);
+      }
+    }
+  );
 
   it("refreshes the plan and subscription activity after an in-app upgrade", async () => {
     const maxPlan = {
@@ -1986,9 +2095,7 @@ describe("BillingScreen", () => {
     expect((await screen.findAllByText("Norulo Max")).length).toBeGreaterThan(0);
     expect(screen.queryByRole("button", { name: /switch to pro/i })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /switch to monthly/i })).not.toBeInTheDocument();
-    expect(
-      screen.queryByRole("dialog", { name: /confirm billing change/i })
-    ).not.toBeInTheDocument();
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     expect(noruloApi.billing.changeSubscriptionInterval).not.toHaveBeenCalled();
   });
 
@@ -2352,6 +2459,98 @@ describe("BillingScreen", () => {
     );
     expect(screen.queryByText("Subscription activity")).not.toBeInTheDocument();
     expect(screen.queryByText(/checkout\.completed/)).not.toBeInTheDocument();
+  });
+
+  it("pages subscription activity five records at a time", async () => {
+    noruloApi.billing.getPlan.mockResolvedValue({
+      ...billingCatalog,
+      account: {
+        status: "active",
+        plan: "pro",
+        interval: "month",
+        subscriptionEvents: subscriptionEvents(12),
+      },
+    });
+    const user = userEvent.setup();
+    render(<BillingScreen go={vi.fn()} navigate={vi.fn()} />);
+
+    const { section, events } = await subscriptionActivitySection();
+    const pagination = within(section).getByRole("navigation", {
+      name: "Subscription activity pagination",
+    });
+    const previous = within(pagination).getByRole("button", { name: "Previous" });
+    const next = within(pagination).getByRole("button", { name: "Next" });
+    expect(events()).toEqual(eventRange(1, 5));
+    expect(pagination).toHaveTextContent("Page 1 of 3");
+    expect(previous).toBeDisabled();
+    expect(next).toBeEnabled();
+
+    await user.click(next);
+    expect(events()).toEqual(eventRange(6, 10));
+    expect(pagination).toHaveTextContent("Page 2 of 3");
+    expect(previous).toBeEnabled();
+
+    await user.click(next);
+    expect(events()).toEqual(eventRange(11, 12));
+    expect(pagination).toHaveTextContent("Page 3 of 3");
+    expect(next).toBeDisabled();
+
+    await user.click(previous);
+    expect(events()).toEqual(eventRange(6, 10));
+    expect(noruloApi.billing.getPlan).toHaveBeenCalledOnce();
+  });
+
+  it("does not paginate five or fewer subscription activity records", async () => {
+    noruloApi.billing.getPlan.mockResolvedValue({
+      ...billingCatalog,
+      account: {
+        status: "active",
+        plan: "pro",
+        interval: "month",
+        subscriptionEvents: subscriptionEvents(5),
+      },
+    });
+    render(<BillingScreen go={vi.fn()} navigate={vi.fn()} />);
+
+    const { section, events } = await subscriptionActivitySection();
+    expect(events()).toEqual(eventRange(1, 5));
+    expect(within(section).queryByRole("navigation")).not.toBeInTheDocument();
+  });
+
+  it("returns subscription activity to its newest page after a fresh billing read", async () => {
+    noruloApi.billing.getPlan
+      .mockResolvedValueOnce({
+        ...billingCatalog,
+        account: {
+          status: "active",
+          plan: "pro",
+          interval: "month",
+          subscriptionEvents: subscriptionEvents(12, 2),
+        },
+      })
+      .mockResolvedValueOnce({
+        ...billingCatalog,
+        account: {
+          status: "active",
+          plan: "pro",
+          interval: "month",
+          subscriptionEvents: subscriptionEvents(13),
+        },
+      });
+    const user = userEvent.setup();
+    render(<BillingScreen go={vi.fn()} navigate={vi.fn()} />);
+
+    const { events } = await subscriptionActivitySection();
+    await user.click(screen.getByRole("button", { name: "Next" }));
+    await user.click(screen.getByRole("button", { name: "Next" }));
+    expect(events()).toEqual(eventRange(12, 13));
+
+    await user.click(screen.getByRole("button", { name: "Refresh usage" }));
+    const refreshed = await subscriptionActivitySection();
+    await waitFor(() => expect(refreshed.events()).toEqual(eventRange(1, 5)));
+    expect(screen.getByRole("navigation", { name: "Subscription activity pagination" }))
+      .toHaveTextContent("Page 1 of 3");
+    expect(noruloApi.billing.getPlan).toHaveBeenCalledTimes(2);
   });
 
   it("does not expose a Creem portal entry for active paid subscribers", async () => {

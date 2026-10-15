@@ -26,6 +26,20 @@ export default {
 };
 
 export async function proxyApiRequest(request, env, incomingUrl = new URL(request.url)) {
+  if (incomingUrl.pathname === "/api/connect/authorize") {
+    if (!env.NORULO_CONNECT_AUTH) return json({ message: "Norulo connection service is unavailable." }, 503);
+    if (!["GET", "POST"].includes(request.method)) return json({ message: "Method not allowed." }, 405);
+    const headers = withoutClientProxyHeaders(request.headers);
+    const edgeClientIp = request.headers.get("CF-Connecting-IP");
+    if (edgeClientIp) headers.set("CF-Connecting-IP", edgeClientIp);
+    // Keep the browser's exact Norulo origin and cookie. The binding's named entrypoint is not public.
+    try {
+      return await env.NORULO_CONNECT_AUTH.fetch(new Request(request, { headers, redirect: "manual" }));
+    } catch {
+      console.error(JSON.stringify({ code: "NORULO_CONNECT_UNREACHABLE", status: 502 }));
+      return json({ message: "Unable to reach Norulo connection service." }, 502);
+    }
+  }
   const origin = env.NORULO_API_ORIGIN;
   if (!origin) {
     return json({ message: "NORULO_API_ORIGIN is not configured." }, 500);

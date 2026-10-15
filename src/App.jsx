@@ -21,6 +21,7 @@ import {
   subscribeSystemTheme,
 } from "./lib/theme.js";
 import { pathFromScreen, screenFromPath } from "./lib/navigation.js";
+import { rememberConnectReturn, consumeConnectReturn } from "./lib/connect-return.js";
 import { applyCurrentSeoMetadata } from "./lib/seo-client.js";
 import { NotFoundScreen } from "./screens/error.jsx";
 import { LandingScreen, LoginScreen, OAuthScreen } from "./screens/public.jsx";
@@ -169,6 +170,14 @@ export function App() {
   const [reportedNavigation, setReportedNavigation] = useState({ owner: "", active: false });
   const [renderedNavigation, setRenderedNavigation] = useState({ owner: "", active: false });
   const [auth, setAuth] = useState({ status: "checking", authenticated: false, session: null });
+  useEffect(() => {
+    rememberConnectReturn(window.location.search, window.sessionStorage);
+  }, []);
+  useEffect(() => {
+    if (auth.status !== "ready" || !auth.authenticated) return;
+    const destination = consumeConnectReturn(window.location.search, window.sessionStorage);
+    if (destination) window.location.assign(destination);
+  }, [auth.status, auth.authenticated]);
   const [repositoryAuthorizationError, setRepositoryAuthorizationError] = useState("");
   const [repositoryAuthorizationRevision, setRepositoryAuthorizationRevision] = useState(0);
   const [showBackToTop, setShowBackToTop] = useState(false);

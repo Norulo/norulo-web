@@ -25,7 +25,10 @@
     "NORULO_MODE": "production",
     "NORULO_API_ORIGIN": "https://api.norulo.com"
   },
-  "services": [{"binding": "NORULO_SERVER", "service": "norulo-server-production"}],
+  "services": [
+    {"binding": "NORULO_SERVER", "service": "norulo-server-production"},
+    {"binding": "NORULO_CONNECT_AUTH", "service": "norulo-connect", "entrypoint": "Authorization"}
+  ],
   "observability": {
     "enabled": true,
     "issues": { "enabled": true },

@@ -1,5 +1,6 @@
 // Public connector privacy and support copy.
 export const CONNECT_SUPPORT_PHRASES = {
+  "Plugins": "플러그인",
   "Support": "지원",
   "Norulo support": "Norulo 지원",
   "Help with Norulo and the ChatGPT or Codex connector.": "Norulo 및 ChatGPT·Codex 커넥터 사용 지원.",

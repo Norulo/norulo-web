@@ -51,6 +51,18 @@ const PAGE_DEFINITIONS = {
     },
     schemaType: "article",
   },
+  plugins: {
+    path: "/plugins",
+    title: {
+      en: "Norulo Plugins — Use Norulo in ChatGPT",
+      zh: "Norulo 插件 — 在 ChatGPT 中使用 Norulo",
+    },
+    description: {
+      en: "Configure Norulo in ChatGPT with a custom MCP connection and OAuth, then choose the ledger, projects and permissions ChatGPT can access.",
+      zh: "通过自定义 MCP 连接和 OAuth 在 ChatGPT 中配置 Norulo，并选择 ChatGPT 可访问的账本、项目和权限。",
+    },
+    schemaType: "article",
+  },
   privacy: {
     path: "/privacy",
     title: {

@@ -43,6 +43,7 @@ const LedgerOverviewScreen = lazyScreen(
   "LedgerOverviewScreen"
 );
 const MembersScreen = lazyScreen(() => import("./screens/members.jsx"), "MembersScreen");
+const PluginsScreen = lazyScreen(() => import("./screens/plugins.jsx"), "PluginsScreen");
 const DocsScreen = lazyScreen(() => import("./screens/docs.jsx"), "DocsScreen");
 const SettingsScreen = lazyScreen(() => import("./screens/settings.jsx"), "SettingsScreen");
 const PrivacyScreen = lazyScreen(() => import("./screens/legal.jsx"), "PrivacyScreen");
@@ -66,6 +67,7 @@ const PUBLIC_SCREENS = new Set([
   "pricing",
   "docs",
   "api",
+  "plugins",
   "privacy",
   "terms",
   "support",
@@ -1251,6 +1253,9 @@ export function App() {
         break;
       case "api":
         body = <ApiDocsScreen go={go} auth={auth} />;
+        break;
+      case "plugins":
+        body = <PluginsScreen go={go} auth={auth} />;
         break;
       case "privacy":
         body = <PrivacyScreen go={go} auth={auth} />;

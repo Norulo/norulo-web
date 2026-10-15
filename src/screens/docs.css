@@ -127,7 +127,8 @@
     border-bottom-color: var(--accent);
   }
   .docs-h1,
-  .docs-main .docs-h2 {
+  .docs-main .docs-h2,
+  .docs-agent-steps h3[id] {
     scroll-margin-top: calc(44px + var(--space-6));
   }
 }
@@ -307,13 +308,13 @@
   list-style: none;
   counter-reset: agent-step;
 }
-.docs-agent-steps li {
+.docs-agent-steps > li {
   position: relative;
   min-width: 0;
   padding-inline-start: 2.5rem;
   counter-increment: agent-step;
 }
-.docs-agent-steps li::before {
+.docs-agent-steps > li::before {
   content: counter(agent-step);
   position: absolute;
   top: 0;
@@ -331,6 +332,14 @@
 .docs-agent-steps h3 {
   margin: 0 0 var(--space-1);
   line-height: 1.625rem;
+  scroll-margin-top: var(--space-6);
+}
+.docs-agent-examples {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 .docs-main .docs-agent-steps p {
   margin-bottom: var(--space-2);
@@ -712,7 +721,7 @@
   .docs-agent-setup {
     padding: var(--space-6) var(--space-5);
   }
-  .docs-agent-steps li {
+  .docs-agent-steps > li {
     padding-inline-start: 2.25rem;
   }
   .docs-table-r {

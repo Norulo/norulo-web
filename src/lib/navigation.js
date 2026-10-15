@@ -13,6 +13,7 @@ const SCREEN_TO_PATH = {
   pricing: "/pricing",
   docs: "/developers/docs",
   api: "/developers/api",
+  plugins: "/plugins",
   privacy: "/privacy",
   terms: "/terms",
   support: "/support",

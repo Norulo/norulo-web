@@ -9,6 +9,7 @@ const HEADER_NAV = [
   { key: "pricing", labelEn: "Pricing", labelZh: "价格" },
   { key: "docs", labelEn: "Docs", labelZh: "Docs" },
   { key: "api", labelEn: "API", labelZh: "API" },
+  { key: "plugins", labelEn: "Plugins", labelZh: "插件" },
   { key: "status", labelEn: "Status", labelZh: "状态" },
 ];
 
@@ -19,6 +20,7 @@ const FOOTER_LINKS = [
   { key: "pricing", labelEn: "Pricing", labelZh: "价格" },
   { key: "docs", labelEn: "Docs", labelZh: "Docs" },
   { key: "api", labelEn: "API", labelZh: "API" },
+  { key: "plugins", labelEn: "Plugins", labelZh: "插件" },
   { key: "status", labelEn: "Status", labelZh: "状态" },
 ];
 

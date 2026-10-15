@@ -156,3 +156,11 @@
   min-width: 0;
   color: inherit;
 }
+
+/* In Settings the email form sits among inline section actions, so its submit
+   button sizes to its label instead of spanning the field like on sign-in. */
+.settings-sign-in-panel .email-sign-in-submit {
+  justify-self: start;
+  width: auto;
+  padding-inline: var(--space-5);
+}

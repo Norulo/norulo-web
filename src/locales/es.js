@@ -86,6 +86,9 @@ export const PHRASES = {
   "per year": "por año",
   "per month": "por mes",
   "Billed once a year": "Facturado una vez al año",
+  "Trial": "Prueba",
+  "Renewal canceled": "Renovación cancelada",
+  "Active": "Activo",
   "Billed every month": "Facturado cada mes",
   "Final amount is calculated by Creem": "Importe final calculado por Creem",
   "Listed prices and tax are shown by Norulo. The exact charge for this change is calculated by Creem at confirmation.":

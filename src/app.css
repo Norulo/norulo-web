@@ -55,14 +55,14 @@
   font: 600 var(--fs-sm)/1 var(--font-mono);
   letter-spacing: 0.02em;
   transition:
-    transform 180ms var(--ease-spring),
+    border-color 150ms var(--ease-out),
     background 150ms var(--ease-out);
 }
 
 .lang-toggle:hover,
 .lang-toggle.active {
-  transform: translateY(-2px);
   background: var(--bg-soft);
+  border-color: var(--border-strong);
 }
 
 .lang-menu {
@@ -125,13 +125,13 @@
   place-items: center;
   cursor: pointer;
   transition:
-    transform 180ms var(--ease-spring),
+    border-color 150ms var(--ease-out),
     background 150ms var(--ease-out);
 }
 
 .theme-toggle:hover {
-  transform: translateY(-2px);
   background: var(--bg-soft);
+  border-color: var(--border-strong);
 }
 
 .theme-toggle svg {
@@ -156,7 +156,7 @@
   pointer-events: none;
   transition:
     opacity 180ms var(--ease-out),
-    transform 220ms var(--ease-spring),
+    transform 180ms var(--ease-out),
     background 150ms var(--ease-out);
 }
 
@@ -166,8 +166,8 @@
   pointer-events: auto;
 }
 
-.back-to-top:hover {
-  transform: translateY(-2px);
+.back-to-top.visible:hover {
+  border-color: var(--border-strong);
   background: var(--bg-soft);
 }
 

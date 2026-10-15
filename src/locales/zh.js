@@ -86,6 +86,9 @@ export const PHRASES = {
   "per year": "每年",
   "per month": "每月",
   "Billed once a year": "按年计费，每年一次",
+  "Trial": "试用中",
+  "Renewal canceled": "已取消续订",
+  "Active": "生效中",
   "Billed every month": "按月计费，每月一次",
   "Final amount is calculated by Creem": "最终金额由 Creem 计算",
   "Listed prices and tax are shown by Norulo. The exact charge for this change is calculated by Creem at confirmation.":

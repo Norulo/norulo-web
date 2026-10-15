@@ -66,21 +66,26 @@
 .recurring-expenses-pending .panel-h {
   margin-bottom: 8px;
 }
+/* Pending dates read as a compact table: the date leads, and the amount and
+   action share a right-aligned edge separated by hairline rules. */
 .recurring-expenses-pending-list {
   display: grid;
-  gap: 8px;
   list-style: none;
   padding: 0;
   margin-top: 12px;
+  border-bottom: 1px solid var(--border);
 }
 .recurring-expenses-pending-list > li {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
   gap: 8px 16px;
+  padding-block: 8px;
+  border-top: 1px solid var(--border);
 }
 .recurring-expenses-pending-list > li > div {
   display: grid;
+  flex: 1 1 10rem;
   gap: 4px;
   min-width: 0;
   overflow-wrap: anywhere;

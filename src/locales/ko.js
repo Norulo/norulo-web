@@ -86,6 +86,9 @@ export const PHRASES = {
   "per year": "연간",
   "per month": "월간",
   "Billed once a year": "연 1회 청구",
+  "Trial": "체험 중",
+  "Renewal canceled": "갱신 취소됨",
+  "Active": "활성",
   "Billed every month": "매월 청구",
   "Final amount is calculated by Creem": "최종 금액은 Creem이 계산",
   "Listed prices and tax are shown by Norulo. The exact charge for this change is calculated by Creem at confirmation.":

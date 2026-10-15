@@ -129,8 +129,11 @@
   box-sizing: border-box;
   min-height: 44px;
   padding: 10px var(--space-3);
-  border: 1px solid var(--border);
-  background: var(--bg-soft);
+  /* A fixed role is a static label, not a disabled control. */
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-2);
+  font-weight: 500;
   font-family: inherit;
   font-size: inherit;
   line-height: inherit;

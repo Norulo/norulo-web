@@ -395,7 +395,20 @@ function planName(plan) {
 }
 
 function planLabel(plan) {
-  return String(plan?.id || "").toUpperCase() || T("Plan", "套餐");
+  const id = String(plan?.id || "");
+  return id ? id.charAt(0).toUpperCase() + id.slice(1) : T("Plan", "套餐");
+}
+
+// Provider status codes stay machine values; the summary shows readable copy.
+function subscriptionStatusLabel(status) {
+  switch (String(status || "").toLowerCase()) {
+    case "trialing":
+      return T("Trial", "试用中");
+    case "canceling":
+      return T("Renewal canceled", "已取消续订");
+    default:
+      return T("Active", "生效中");
+  }
 }
 
 function usageText(key) {
@@ -1040,12 +1053,12 @@ export function BillingScreen({ go, navigate = (url) => window.location.assign(u
                           <div>
                             <b>{planName(currentPlan) || T("Free", "免费")}</b>
                             <div className="muted">
-                              {accountStatus} -{" "}
                               {activePaid
-                                ? T(
-                                    `Billed ${subscriptionInterval}`,
-                                    `按 ${subscriptionInterval} 计费`
-                                  )
+                                ? `${subscriptionStatusLabel(accountStatus)} · ${
+                                    subscriptionInterval === "year"
+                                      ? T("Billed once a year", "按年计费，每年一次")
+                                      : T("Billed every month", "按月计费，每月一次")
+                                  }`
                                 : T("Upgrade from Pricing", "前往价格页升级")}
                             </div>
                           </div>

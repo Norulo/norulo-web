@@ -14,7 +14,7 @@ const CONNECTION_DETAILS = [
   "Authentication: OAuth",
 ].join("\n");
 
-const URL_PATTERN = /(https:\/\/[^\s，。、）)]+[^\s，。、）).])/g;
+const URL_PATTERN = /(https:\/\/[A-Za-z0-9][A-Za-z0-9./?=&%_~+#:@-]*[A-Za-z0-9/#])/g;
 
 // Renders the URLs written inside translated copy as links.
 function Linked({ text }) {

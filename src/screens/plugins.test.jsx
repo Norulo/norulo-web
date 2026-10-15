@@ -45,6 +45,14 @@ describe("Plugins page", () => {
     expect(container).toHaveTextContent("cannot charge cards, pay vendors or cancel external subscriptions");
   });
 
+  it.each(["en", "zh", "ja", "ko", "fr", "es"])("keeps setup URLs exact in %s", (lang) => {
+    setLang(lang);
+    const { container } = render(<PluginsScreen go={vi.fn()} auth={{ authenticated: false }} />);
+    for (const href of ["https://norulo.com", "https://chatgpt.com/plugins"]) {
+      expect(container.querySelector(`a[href="${href}"]`)).not.toBeNull();
+    }
+  });
+
   it("translates every guide string into all five non-English locales", () => {
     const pairs = [];
     const collect = (value) => {

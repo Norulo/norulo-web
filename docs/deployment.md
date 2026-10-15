@@ -1,3 +1,38 @@
+# GitHub Actions production deployment, 2026-10-15
+
+Web source `bde82c6631a3bfe44db993527ee8f45ce364b263` is published at
+100% traffic as Worker version `416f75c8-43d7-4495-8c19-7a68a1c11f14`.
+Deployment ID is `9bcd6385-1c4d-4d82-a9b9-2f9a1ebc516c`; publication time is
+2026-10-15T23:57:43.021+08:00 (Asia/Shanghai). This includes the latest homepage
+ChatGPT plugin panel from `7a0d63df18ffb6ae14c64312252e68279258d72b`.
+Server main `54aa841142d34f3f5202716e6455e0c1df61cf7c` was already published
+and remains version `570e4123-44d0-4d1f-b412-95b66a8898a7` at 100%.
+No Server upload or database migration was needed.
+
+[The production deployment run](https://github.com/Norulo/norulo-web/actions/runs/38764556576)
+passed lint, all 1,950 tests in 93 files, production build, offline Worker
+configuration checks, Wrangler dry-run, effective-config preflight, deployment
+and post-deployment verification. Direct and Web-proxied health endpoints
+returned HTTP 200 with `ok: true` and D1 configured. Eight deployed entry,
+plugin and locale assets matched the production build byte-for-byte.
+
+The existing production WAF applies Managed Challenge to browser document
+routes. The original run deployed successfully but its non-browser homepage
+check received HTTP 403. The corrected check recognizes only Cloudflare's
+explicit `cf-mitigated: challenge` response, reports that limitation separately
+and still requires successful API health and exact deployed asset bytes.
+Arbitrary 403 responses still fail. Cloudflare Browser Rendering independently
+loaded the normal homepage and verified the current entry asset, ChatGPT panel
+and plugin link. WAF rules were preserved.
+
+Cloudflare API readback verified both Workers' settings against the
+pre-deployment snapshot, apart from version annotations. Public variables,
+service/resource bindings, compatibility settings and observability are
+preserved. Both Web custom domains are enabled and preview URLs remain disabled.
+The production workflow uses the repository `CLOUDFLARE_API_TOKEN` secret and
+runs on main pushes or manual dispatch. No credential values are stored in
+source or release evidence.
+
 # Jev usage display release, 2026-10-14
 
 Jev Billing usage now shows Used, Total allowance and the native usage meter,

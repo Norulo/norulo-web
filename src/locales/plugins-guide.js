@@ -280,5 +280,15 @@ export const PLUGINS_GUIDE = {
     "N’envoyez jamais de mot de passe, code de vérification, clé API ou jeton via ChatGPT ou un message au support. Norulo ne vous les demandera jamais.",
     "Nunca envíes contraseñas, códigos de verificación, claves API ni tokens por ChatGPT o mensajes de soporte. Norulo nunca te los pedirá."
   ),
+  landingTitle: copy("Ask about your expenses in ChatGPT.", "在 ChatGPT 中查询你的支出。", "ChatGPT で支出について質問。", "ChatGPT에서 지출을 물어보세요.", "Interrogez vos dépenses dans ChatGPT.", "Pregunta por tus gastos en ChatGPT."),
+  landingText: copy(
+    "Add Norulo to ChatGPT as a custom MCP connection with OAuth. Choose the ledger, projects and permissions it can use, then review spending, export records and record expenses through conversation.",
+    "通过 OAuth 将 Norulo 作为自定义 MCP 连接添加到 ChatGPT。选择可使用的账本、项目和权限，即可在对话中查看支出、导出记录并记账。",
+    "OAuth を使い、Norulo をカスタム MCP 接続として ChatGPT に追加します。利用できる帳簿、プロジェクト、権限を選べば、会話で支出の確認、記録のエクスポート、記帳ができます。",
+    "OAuth로 Norulo를 ChatGPT에 사용자 지정 MCP 연결로 추가하세요. 사용할 장부, 프로젝트, 권한을 선택하면 대화로 지출을 검토하고 기록을 내보내고 지출을 기록할 수 있습니다.",
+    "Ajoutez Norulo à ChatGPT comme connexion MCP personnalisée avec OAuth. Choisissez le registre, les projets et les autorisations, puis consultez vos dépenses, exportez et enregistrez des dépenses par la conversation.",
+    "Añade Norulo a ChatGPT como conexión MCP personalizada con OAuth. Elige el libro, los proyectos y los permisos, y luego revisa gastos, exporta registros y registra gastos mediante la conversación."
+  ),
+  landingLink: copy("Set up Norulo in ChatGPT", "在 ChatGPT 中配置 Norulo", "ChatGPT で Norulo を設定", "ChatGPT에서 Norulo 설정", "Configurer Norulo dans ChatGPT", "Configurar Norulo en ChatGPT"),
   emailSupport: copy("Email support", "发邮件联系支持", "サポートにメール", "지원팀에 이메일", "Écrire au support", "Escribir a soporte"),
 };

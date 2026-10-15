@@ -12,6 +12,7 @@ import { requestErrorText } from "../lib/request-error.js";
 import { screenLinkProps } from "../lib/navigation.js";
 import { PublicFooter, PublicHeader } from "./public-layout.jsx";
 import { AGENT_GUIDE } from "../locales/agent-guide.js";
+import { PLUGINS_GUIDE } from "../locales/plugins-guide.js";
 import { LANDING_COPY } from "../locales/landing.js";
 import { FinancialValue } from "../components/financial-value.jsx";
 
@@ -368,6 +369,23 @@ export function LandingScreen({ go, auth }) {
               </a>
               <a className="auth-link" href="/developers/api#overview">
                 {T(...AGENT_GUIDE.steps[0].label)}
+              </a>
+            </div>
+          </div>
+        </section>
+
+        <section className="lp-agent" aria-labelledby="lp-plugins-title">
+          <div className="lp-agent-panel">
+            <div>
+              <h2 id="lp-plugins-title">{T(...PLUGINS_GUIDE.landingTitle)}</h2>
+              <p>{T(...PLUGINS_GUIDE.landingText)}</p>
+            </div>
+            <div className="lp-agent-actions">
+              <a className="btn lg" {...screenLinkProps(go, "plugins")}>
+                <I.Package /> {T(...PLUGINS_GUIDE.landingLink)}
+              </a>
+              <a className="auth-link" href="/plugins#troubleshooting">
+                {T(...PLUGINS_GUIDE.troubleshootingTitle)}
               </a>
             </div>
           </div>

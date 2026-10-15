@@ -351,6 +351,10 @@
   margin: 0 auto;
   padding: 0 var(--space-10) var(--space-16);
 }
+/* Consecutive integration panels read as one group. */
+.lp-agent:has(+ .lp-agent) {
+  padding-bottom: var(--space-6);
+}
 .lp-agent-panel {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;

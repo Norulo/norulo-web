@@ -15,6 +15,7 @@ const SCREEN_TO_PATH = {
   api: "/developers/api",
   privacy: "/privacy",
   terms: "/terms",
+  support: "/support",
   status: "/status",
   notfound: "/404",
 };

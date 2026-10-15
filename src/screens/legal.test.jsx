@@ -51,7 +51,7 @@ describe("legal pages", () => {
   it("shows the current legal document update date", () => {
     render(<PrivacyScreen go={vi.fn()} />);
 
-    expect(screen.getByText("2026-10-09")).toBeInTheDocument();
+    expect(screen.getByText("2026-10-15")).toBeInTheDocument();
   });
 
   it("keeps billing terms aligned with implemented renewal controls", () => {

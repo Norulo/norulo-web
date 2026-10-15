@@ -1,3 +1,4 @@
+import { CONNECT_SUPPORT_PHRASES } from "./connect-support.js";
 import { JEV_PHRASES, JEV_LONG_PHRASES } from "../jev-copy.js";
 // Ledger, screen, documentation and legal copy for this locale.
 // Keep English keys identical to the source phrase passed to T().
@@ -55,6 +56,7 @@ export const LEDGER_PHRASES = {
 };
 
 export const LEDGER_LONG_PHRASES = {
+  ...CONNECT_SUPPORT_PHRASES,
   ...JEV_LONG_PHRASES.zh,
   "DELETE /api/v1/projects/{id} requires the actual ledger Owner, projects:write and the current project's If-Match revision. Cookie sessions and Owner API keys are supported; keys must have current ledger and project target permission. Admin, Editor and Viewer cannot remove projects. Confirmation permanently deletes the project, its currently assigned expenses, all its recurring schedules in every state and related business history. Existing expenses moved to another project or the shared pool remain. Success is 204; a stale revision is 412 and requires an explicit reload. Archive remains a separate action that preserves records.": "DELETE /api/v1/projects/{id} 需要实际账本 Owner、projects:write 及当前项目版本的 If-Match。支持 Cookie 会话及 Owner API 密钥；密钥须具备当前账本和项目目标权限。Admin、Editor 和 Viewer 不能移除项目。确认后永久删除项目、当前归属于它的支出、所有状态的周期计划及相关业务历史。已移到其他项目或公共池的现存支出保留。成功返回 204；旧版本返回 412，须主动重新加载。归档仍是独立且保留账目的操作。",
   "Member REST reads require members:read; governance writes require members:write and the issuer's current Owner or Admin role. Owner manages Admins; Admin manages only Editors and Viewers. Governance keys must omit projectIds and remain bound to one ledger. Only the original inviter can approve or reject requests, using the request's If-Match revision. GET /api/v1/workspaces and GET /api/v1/workspace-invitation-requests expose only a key's bound ledger. Invitation preview and application still require the applicant's independent cookie account; a management key cannot join on their behalf.": "成员 REST 读取需要 members:read；管理写入需要 members:write 及发行者当前的 Owner 或 Admin 角色。Owner 管理 Admin，Admin 只能管理 Editor 和 Viewer。管理密钥不能设置 projectIds，且始终绑定一个账本。只有原邀请人能使用申请版本的 If-Match 批准或拒绝申请。GET /api/v1/workspaces 和 GET /api/v1/workspace-invitation-requests 仅向密钥返回其绑定账本的数据。邀请预览和申请仍需要申请人自己的独立 Cookie 账户，管理密钥不能代其加入。",

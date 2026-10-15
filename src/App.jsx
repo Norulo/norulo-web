@@ -48,6 +48,7 @@ const SettingsScreen = lazyScreen(() => import("./screens/settings.jsx"), "Setti
 const PrivacyScreen = lazyScreen(() => import("./screens/legal.jsx"), "PrivacyScreen");
 const StatusScreen = lazyScreen(() => import("./screens/legal.jsx"), "StatusScreen");
 const TermsScreen = lazyScreen(() => import("./screens/legal.jsx"), "TermsScreen");
+const SupportScreen = lazyScreen(() => import("./screens/legal.jsx"), "SupportScreen");
 
 function ScreenFallback() {
   return (
@@ -67,6 +68,7 @@ const PUBLIC_SCREENS = new Set([
   "api",
   "privacy",
   "terms",
+  "support",
   "status",
   "notfound",
 ]);
@@ -1255,6 +1257,9 @@ export function App() {
         break;
       case "terms":
         body = <TermsScreen go={go} auth={auth} />;
+        break;
+      case "support":
+        body = <SupportScreen go={go} auth={auth} />;
         break;
       case "status":
         body = <StatusScreen go={go} auth={auth} />;

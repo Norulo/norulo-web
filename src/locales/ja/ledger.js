@@ -1,3 +1,4 @@
+import { CONNECT_SUPPORT_PHRASES } from "./connect-support.js";
 import { JEV_PHRASES, JEV_LONG_PHRASES } from "../jev-copy.js";
 // Ledger, screen, documentation and legal copy for this locale.
 // Keep English keys identical to the source phrase passed to T().
@@ -55,6 +56,7 @@ export const LEDGER_PHRASES = {
 };
 
 export const LEDGER_LONG_PHRASES = {
+  ...CONNECT_SUPPORT_PHRASES,
   ...JEV_LONG_PHRASES.ja,
   "DELETE /api/v1/projects/{id} requires the actual ledger Owner, projects:write and the current project's If-Match revision. Cookie sessions and Owner API keys are supported; keys must have current ledger and project target permission. Admin, Editor and Viewer cannot remove projects. Confirmation permanently deletes the project, its currently assigned expenses, all its recurring schedules in every state and related business history. Existing expenses moved to another project or the shared pool remain. Success is 204; a stale revision is 412 and requires an explicit reload. Archive remains a separate action that preserves records.": "DELETE /api/v1/projects/{id} には実際の台帳所有者、projects:write、現在のプロジェクトリビジョンの If-Match が必要です。Cookie セッションと所有者の API キーが使えます。キーには現在の台帳と対象プロジェクトの権限が必要です。Admin、Editor、Viewer は削除できません。確認によりプロジェクト、現在の支出、すべての状態の定期スケジュールと関連業務履歴を完全に削除します。他のプロジェクトや共有プールに移動済みの支出は残ります。成功は204、古いリビジョンは412で明示的な再読み込みが必要です。アーカイブは記録を保持する別の操作です。",
   "Member REST reads require members:read; governance writes require members:write and the issuer's current Owner or Admin role. Owner manages Admins; Admin manages only Editors and Viewers. Governance keys must omit projectIds and remain bound to one ledger. Only the original inviter can approve or reject requests, using the request's If-Match revision. GET /api/v1/workspaces and GET /api/v1/workspace-invitation-requests expose only a key's bound ledger. Invitation preview and application still require the applicant's independent cookie account; a management key cannot join on their behalf.": "メンバーの REST 読み取りには members:read、管理書き込みには members:write と発行者の現在の Owner または Admin 権限が必要です。Owner は Admin を管理し、Admin は Editor と Viewer のみを管理します。管理キーでは projectIds を省略し、1つの台帳に紐付けます。元の招待者だけが申請リビジョンの If-Match で承認・却下できます。GET /api/v1/workspaces と GET /api/v1/workspace-invitation-requests はキーに紐付いた台帳のみを返します。招待のプレビューと申請には申請者自身の独立した Cookie アカウントが必要で、管理キーは代理参加できません。",

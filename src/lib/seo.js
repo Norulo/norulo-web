@@ -75,6 +75,18 @@ const PAGE_DEFINITIONS = {
     },
     schemaType: "page",
   },
+  support: {
+    path: "/support",
+    title: {
+      en: "Norulo Support — Accounts and Connections",
+      zh: "Norulo 支持 — 账户与连接",
+    },
+    description: {
+      en: "Contact Norulo support and manage your ChatGPT or Codex connection and API-key access.",
+      zh: "联系 Norulo 支持，管理 ChatGPT、Codex 连接及 API 密钥访问。",
+    },
+    schemaType: "page",
+  },
   status: {
     path: "/status",
     title: {

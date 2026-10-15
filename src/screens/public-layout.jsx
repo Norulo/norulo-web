@@ -13,6 +13,7 @@ const HEADER_NAV = [
 ];
 
 const FOOTER_LINKS = [
+  { key: "support", labelEn: "Support", labelZh: "支持" },
   { key: "privacy", labelEn: "Privacy", labelZh: "隐私" },
   { key: "terms", labelEn: "Terms", labelZh: "条款" },
   { key: "pricing", labelEn: "Pricing", labelZh: "价格" },

@@ -22,7 +22,16 @@ function LegalChrome({ go, current, children, auth }) {
   );
 }
 
-function LegalDocLayout({ go, current, sections, title, subtitle, children, auth }) {
+function LegalDocLayout({
+  go,
+  current,
+  sections,
+  title,
+  subtitle,
+  children,
+  auth,
+  lastUpdated = LAST_UPDATED,
+}) {
   return (
     <LegalChrome go={go} current={current} auth={auth}>
       <div className="legal-shell">
@@ -35,7 +44,7 @@ function LegalDocLayout({ go, current, sections, title, subtitle, children, auth
           ))}
           <div className="legal-side-foot">
             <div className="legal-side-l">{T("Last updated", "最后更新")}</div>
-            <div className="legal-side-d">{LAST_UPDATED}</div>
+            <div className="legal-side-d">{lastUpdated}</div>
           </div>
         </aside>
         <main id="main-content" tabIndex={-1} className="legal-main">
@@ -86,6 +95,7 @@ export function PrivacyScreen({ go, auth }) {
     { id: "data", title: T("Data we collect", "我们收集的数据") },
     { id: "use", title: T("How we use data", "数据用途") },
     { id: "sharing", title: T("Processors and sharing", "处理方与共享") },
+    { id: "connector", title: T("ChatGPT, Codex and OAuth", "ChatGPT、Codex 与 OAuth") },
     { id: "storage", title: T("Cookies and browser storage", "Cookie 与浏览器存储") },
     { id: "retention", title: T("Retention", "保留期限") },
     { id: "rights", title: T("Your choices and rights", "你的选择与权利") },
@@ -97,6 +107,7 @@ export function PrivacyScreen({ go, auth }) {
       go={go}
       auth={auth}
       current="privacy"
+      lastUpdated="2026-10-15"
       sections={sections}
       title={T("Privacy Policy", "隐私政策")}
       subtitle={T(
@@ -186,7 +197,33 @@ export function PrivacyScreen({ go, auth }) {
           )}
         </p>
       </Section>
-      <Section id="storage" title={sections[4].title}>
+      <Section id="connector" title={sections[4].title}>
+        <p>
+          {T(
+            "You can connect Norulo to ChatGPT, Codex or a compatible MCP client using OAuth. You choose the ledger, projects, shared-expense access and read or write permissions. Access remains subject to your current ledger role and the approved restrictions. Read-only authorization does not permit expense writes. The connection does not grant access to GitHub repository source code.",
+            "你可以通过 OAuth 将 Norulo 连接到 ChatGPT、Codex 或兼容的 MCP 客户端，自行选择账本、项目、公共费用以及读取或写入权限。访问仍受当前账本角色和已批准范围限制。只读授权不允许写入支出，连接也不授予 GitHub 仓库源代码访问权。"
+          )}
+        </p>
+        <p>
+          {T(
+            "When you request a tool, Norulo returns authorized account, project, category, expense, recurring-rule, report or export results to that client. Results may include names, dates, amounts, currencies, purposes and notes, and enter the ChatGPT or Codex conversation. The client provider processes them under its own applicable terms and privacy policy. Only request data you are entitled to share with that client. Credentials are not returned as ledger tool results.",
+            "当你请求工具时，Norulo 向该客户端返回获准范围内的账户、项目、分类、支出、周期规则、报表或导出结果。结果可能包含名称、日期、金额、币种、用途和备注，并进入 ChatGPT 或 Codex 对话，由客户端提供方按其适用条款与隐私政策处理。请只请求你有权向该客户端分享的数据。凭据本身不会作为账本工具结果返回。"
+          )}
+        </p>
+        <p>
+          {T(
+            "The Norulo connector at connect.norulo.com is hosted by ChatGPT Sites. It separates connections by ChatGPT user identity and encrypts access and refresh tokens in Cloudflare R2 storage. Norulo's OAuth service encrypts delegated credentials in Cloudflare KV; the ledger backend stores API-key hashes. Other clients connecting directly to MCP manage their own token storage.",
+            "connect.norulo.com 上的 Norulo 连接器由 ChatGPT Sites 托管，按 ChatGPT 用户身份隔离连接，并将访问令牌和刷新令牌加密保存在 Cloudflare R2 中。Norulo 的 OAuth 服务将委托凭据加密保存在 Cloudflare KV，账本后端保存 API 密钥哈希。直接连接 MCP 的其他客户端自行管理令牌存储。"
+          )}
+        </p>
+        <p>
+          {T(
+            "Access tokens currently last one hour. Refresh authorization and its delegated API key last at most thirty days; a new authorization is needed after expiry. Expiry alone does not delete saved connector credentials. Disconnecting on the connector page deletes its saved credentials and requests refresh-token revocation. You can revoke the corresponding OAuth key in Norulo API Keys to stop its backend access. Disconnecting or revoking does not delete ledger history or recall copies already delivered to a client, conversation or export. The retention provisions below continue to apply.",
+            "当前访问令牌有效期为一小时，刷新授权和对应委托 API 密钥最多有效三十天，到期后需要重新授权。到期本身不会删除连接器保存的凭据。在连接页断开连接会删除其保存的凭据，并请求撤销刷新令牌。你也可以在 Norulo 的 API Keys 中撤销对应 OAuth 密钥，停止其后端访问。断开或撤销不会删除账本历史，也无法收回已经交付客户端、对话或导出的副本。下文保留条款继续适用。"
+          )}
+        </p>
+      </Section>
+      <Section id="storage" title={sections[5].title}>
         <p>
           {T(
             "Norulo uses a secure, HttpOnly session cookie for sign-in and a short-lived verification cookie to bind email code requests to your browser. Browser local storage remembers your language and theme, and session storage records a pending GitHub access refresh. Signing out clears the session cookie; you can clear browser storage in your browser settings. Blocking these cookies prevents sign-in or verification. GitHub and Creem may use their own cookies when you visit their services.",
@@ -194,7 +231,7 @@ export function PrivacyScreen({ go, auth }) {
           )}
         </p>
       </Section>
-      <Section id="retention" title={sections[5].title}>
+      <Section id="retention" title={sections[6].title}>
         <p>
           {T(
             "Signing out, revoking GitHub access or removing a member does not erase ledger history. Removed expenses are hidden from active lists, reports and exports, while stored records and audit history remain. Archiving a project also preserves its history. Account, API key, payment, model-assistance and operational records are retained for service, security, tax, audit or legal needs. Contact us about account closure or deletion; product removal controls do not promise immediate permanent erasure.",
@@ -202,7 +239,7 @@ export function PrivacyScreen({ go, auth }) {
           )}
         </p>
       </Section>
-      <Section id="rights" title={sections[6].title}>
+      <Section id="rights" title={sections[7].title}>
         <p>
           {T(
             `Contact ${CONTACT_EMAIL} to request access, export, correction or deletion of account data. We may verify your identity and consider applicable law and other ledger members' rights before acting. You can export authorized expenses as CSV, manage members and GitHub access according to your permissions, and revoke your API keys in the product.`,
@@ -210,7 +247,7 @@ export function PrivacyScreen({ go, auth }) {
           )}
         </p>
       </Section>
-      <Section id="security" title={sections[7].title}>
+      <Section id="security" title={sections[8].title}>
         <p>
           {T(
             "Norulo uses scoped, hashed API keys, ledger role and ownership checks, GitHub authorization checks, encrypted GitHub token storage and backend-held secrets. These controls reduce risk but cannot guarantee absolute security. Protect your sessions, API keys and invitation links.",
@@ -218,12 +255,64 @@ export function PrivacyScreen({ go, auth }) {
           )}
         </p>
       </Section>
-      <Section id="contact" title={sections[8].title}>
+      <Section id="contact" title={sections[9].title}>
         <p>
           {T(
             `Contact ${SECURITY_EMAIL} with privacy or security questions.`,
             `隐私或安全问题请联系 ${SECURITY_EMAIL}。`
           )}
+        </p>
+      </Section>
+    </LegalDocLayout>
+  );
+}
+
+export function SupportScreen({ go, auth }) {
+  useLang();
+  const sections = [
+    { id: "contact", title: T("Contact", "联系方式") },
+    { id: "connections", title: T("Connections and access", "连接与访问") },
+  ];
+  return (
+    <LegalDocLayout
+      go={go}
+      auth={auth}
+      current="support"
+      sections={sections}
+      title={T("Norulo support", "Norulo 支持")}
+      subtitle={T(
+        "Help with Norulo and the ChatGPT or Codex connector.",
+        "Norulo 及 ChatGPT、Codex 连接器使用支持。"
+      )}
+      lastUpdated="2026-10-15"
+    >
+      <Section id="contact" title={sections[0].title}>
+        <p>
+          <a className="btn primary" href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
+        </p>
+        <p>
+          {T(
+            "Tell us the time, error message and what you were trying to do. Do not send API keys, tokens, verification codes or unrelated ledger data.",
+            "请提供发生时间、错误提示和你要执行的操作。请勿发送 API 密钥、令牌、验证码或无关账本数据。"
+          )}
+        </p>
+      </Section>
+      <Section id="connections" title={sections[1].title}>
+        <p>
+          {T(
+            "For connection or permission problems, open the connector and start authorization again. Select the intended ledger, projects and permissions. Manage or revoke OAuth keys in Norulo API Keys; sign in to Norulo if prompted.",
+            "遇到连接或权限问题，请打开连接页重新授权，选择所需账本、项目和权限。可在 Norulo 的 API Keys 中管理或撤销 OAuth 密钥；如有提示，请先登录 Norulo。"
+          )}
+        </p>
+        <p>
+          <a className="btn" href="https://connect.norulo.com/">
+            {T("Open Norulo connector", "打开 Norulo 连接页")}
+          </a>
+        </p>
+        <p>
+          <a className="btn" {...screenLinkProps(go, "apiKeys")}>
+            {T("Manage API keys", "管理 API 密钥")}
+          </a>
         </p>
       </Section>
     </LegalDocLayout>

@@ -1,3 +1,4 @@
+import { CONNECT_SUPPORT_PHRASES } from "./connect-support.js";
 import { JEV_PHRASES, JEV_LONG_PHRASES } from "../jev-copy.js";
 // Ledger, screen, documentation and legal copy for this locale.
 // Keep English keys identical to the source phrase passed to T().
@@ -55,6 +56,7 @@ export const LEDGER_PHRASES = {
 };
 
 export const LEDGER_LONG_PHRASES = {
+  ...CONNECT_SUPPORT_PHRASES,
   ...JEV_LONG_PHRASES.ko,
   "DELETE /api/v1/projects/{id} requires the actual ledger Owner, projects:write and the current project's If-Match revision. Cookie sessions and Owner API keys are supported; keys must have current ledger and project target permission. Admin, Editor and Viewer cannot remove projects. Confirmation permanently deletes the project, its currently assigned expenses, all its recurring schedules in every state and related business history. Existing expenses moved to another project or the shared pool remain. Success is 204; a stale revision is 412 and requires an explicit reload. Archive remains a separate action that preserves records.": "DELETE /api/v1/projects/{id}는 실제 장부 소유자, projects:write와 현재 프로젝트 리비전의 If-Match가 필요합니다. 쿠키 세션과 소유자 API 키를 지원하며 키에는 현재 장부와 프로젝트 대상 권한이 필요합니다. Admin, Editor, Viewer는 삭제할 수 없습니다. 확인하면 프로젝트, 현재 할당된 지출, 모든 상태의 반복 일정과 관련 업무 기록을 영구 삭제합니다. 다른 프로젝트나 공유 풀로 옮긴 지출은 남습니다. 성공은 204이며 오래된 리비전은 412로 직접 새로고침해야 합니다. 보관은 기록을 유지하는 별도 작업입니다.",
   "Member REST reads require members:read; governance writes require members:write and the issuer's current Owner or Admin role. Owner manages Admins; Admin manages only Editors and Viewers. Governance keys must omit projectIds and remain bound to one ledger. Only the original inviter can approve or reject requests, using the request's If-Match revision. GET /api/v1/workspaces and GET /api/v1/workspace-invitation-requests expose only a key's bound ledger. Invitation preview and application still require the applicant's independent cookie account; a management key cannot join on their behalf.": "멤버 REST 읽기는 members:read, 관리 쓰기는 members:write와 발급자의 현재 Owner 또는 Admin 역할이 필요합니다. Owner는 Admin을 관리하고 Admin은 Editor와 Viewer만 관리합니다. 관리 키는 projectIds를 생략하고 한 장부에 연결되어야 합니다. 원래 초대자만 신청 리비전의 If-Match로 승인하거나 거부할 수 있습니다. GET /api/v1/workspaces와 GET /api/v1/workspace-invitation-requests는 키에 연결된 장부만 반환합니다. 초대 미리보기와 신청에는 신청자 자신의 독립된 쿠키 계정이 필요하며 관리 키는 대신 가입할 수 없습니다.",

@@ -12,8 +12,8 @@ import { requestErrorText } from "../lib/request-error.js";
 import { screenLinkProps } from "../lib/navigation.js";
 import { PublicFooter, PublicHeader } from "./public-layout.jsx";
 import { AGENT_GUIDE } from "../locales/agent-guide.js";
-import { PLUGINS_GUIDE } from "../locales/plugins-guide.js";
-import { LANDING_COPY } from "../locales/landing.js";
+import { MCP_SERVER_URL, PLUGINS_GUIDE } from "../locales/plugins-guide.js";
+import { LANDING_COPY, LANDING_SECTIONS } from "../locales/landing.js";
 import { FinancialValue } from "../components/financial-value.jsx";
 
 export function GitHubOAuthFailureScreen({ code }) {
@@ -184,10 +184,12 @@ function landingFeatures() {
       ),
     },
     {
+      icon: I.Trend,
       h: T("Review category reports", "查看类别报表"),
       p: T("See where costs occur by category and date.", "按类别和日期查看成本分布。"),
     },
     {
+      icon: I.Layers,
       h: T("Compare currencies separately", "逐币查看汇总"),
       p: T(
         "View totals separately for each currency. Norulo does not convert currencies.",
@@ -195,6 +197,7 @@ function landingFeatures() {
       ),
     },
     {
+      icon: I.Lock,
       h: T("Control API access", "控制 API 访问"),
       p: T(
         "Use scoped API keys with project and shared-pool restrictions.",
@@ -263,6 +266,125 @@ function ExampleLedger() {
   );
 }
 
+function section(key) {
+  return T(...LANDING_SECTIONS[key]);
+}
+
+// The MCP server URL with a copy action; the visible URL stays selectable.
+function McpServerUrl() {
+  const [copied, setCopied] = useState(false);
+  useEffect(() => {
+    if (!copied) return;
+    const timer = setTimeout(() => setCopied(false), 2000);
+    return () => clearTimeout(timer);
+  }, [copied]);
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(MCP_SERVER_URL);
+      setCopied(true);
+    } catch {
+      setCopied(false);
+    }
+  };
+  return (
+    <div className="lp-mcp-url">
+      <span className="lp-mcp-url-label">{section("serverUrl")}</span>
+      <code>{MCP_SERVER_URL}</code>
+      <button
+        type="button"
+        className="btn lp-mcp-copy"
+        onClick={copy}
+        aria-label={section("copyUrlLabel")}
+      >
+        {copied ? <I.Check /> : <I.Copy />}
+        <span aria-live="polite">{copied ? section("copiedUrl") : section("copyUrl")}</span>
+      </button>
+    </div>
+  );
+}
+
+// Illustrative exchange over the example ledger's figures, not account data.
+function McpConversation() {
+  return (
+    <figure className="lp-mcp-chat" aria-labelledby="lp-mcp-chat-title">
+      <div className="lp-mcp-chat-bar">
+        <span id="lp-mcp-chat-title" className="lp-mcp-chat-kicker">
+          {section("chatTitle")}
+        </span>
+        <span className="lp-mcp-chat-status">
+          <span className="dot" aria-hidden="true" />
+          {section("connected")}
+        </span>
+      </div>
+      <div className="lp-mcp-chat-body">
+        <p className="lp-mcp-msg lp-mcp-msg-user">{section("chatPrompt")}</p>
+        <div className="lp-mcp-tool">
+          <I.Package aria-hidden="true" />
+          <span>{section("chatTool")}</span>
+          <code>getLedgerSummary</code>
+        </div>
+        <div className="lp-mcp-msg lp-mcp-msg-agent">
+          <p>{section("chatReply")}</p>
+          <ul>
+            {EXAMPLE_TOTALS.map(([currency, value]) => (
+              <li key={currency}>
+                <FinancialValue currency={currency} value={value} />
+              </li>
+            ))}
+          </ul>
+          <p>{section("chatFollowUp")}</p>
+        </div>
+      </div>
+      <McpServerUrl />
+    </figure>
+  );
+}
+
+function McpSpotlight({ go }) {
+  return (
+    <section className="lp-mcp" aria-labelledby="lp-plugins-title">
+      <div className="lp-mcp-inner">
+        <div className="lp-mcp-copy">
+          <p className="lp-kicker lp-kicker-accent">{section("mcpKicker")}</p>
+          <h2 id="lp-plugins-title">{T(...PLUGINS_GUIDE.landingTitle)}</h2>
+          <p className="lp-mcp-lede">{T(...PLUGINS_GUIDE.landingText)}</p>
+          <ul className="lp-mcp-points">
+            {LANDING_SECTIONS.mcpPoints.map((point) => (
+              <li key={point.title[0]}>
+                <I.Check aria-hidden="true" />
+                <div>
+                  <h3>{T(...point.title)}</h3>
+                  <p>{T(...point.text)}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+          <p className="lp-mcp-clients">
+            <span>{section("worksWith")}</span> Claude · ChatGPT · Codex · {section("anyClient")}
+          </p>
+          <div className="lp-mcp-actions">
+            <a className="btn primary lg" {...screenLinkProps(go, "plugins")}>
+              <I.Package /> {T(...PLUGINS_GUIDE.landingLink)}
+            </a>
+            <div className="lp-mcp-links">
+              <a className="auth-link" href="/plugins#claude">
+                {section("claudeSetup")}
+              </a>
+              <a className="auth-link" href="/plugins#chatgpt">
+                {section("chatgptSetup")}
+              </a>
+              <a className="auth-link" href="/plugins#troubleshooting">
+                {T(...PLUGINS_GUIDE.troubleshootingTitle)}
+              </a>
+            </div>
+          </div>
+        </div>
+        <McpConversation />
+      </div>
+    </section>
+  );
+}
+
 export function LandingScreen({ go, auth }) {
   useLang();
   const checkingSession = auth?.status === "checking";
@@ -291,6 +413,9 @@ export function LandingScreen({ go, auth }) {
       {primaryActionIcon} {primaryActionLabel}
     </a>
   );
+  const features = landingFeatures();
+  const coreFeatures = features.slice(0, 3);
+  const moreFeatures = features.slice(3);
   return (
     <div className="landing fade-in">
       <PublicHeader go={go} current="landing" auth={auth} />
@@ -337,6 +462,7 @@ export function LandingScreen({ go, auth }) {
 
         <section className="lp-capabilities" aria-labelledby="lp-capabilities-title">
           <div className="lp-section-head">
+            <p className="lp-kicker">{section("ledgerKicker")}</p>
             <h2 id="lp-capabilities-title">
               {T("How Norulo organizes costs.", "Norulo 如何整理成本。")}
             </h2>
@@ -347,19 +473,40 @@ export function LandingScreen({ go, auth }) {
               )}
             </p>
           </div>
+          {/* The core flow leads; supporting capabilities follow in a quieter row. */}
+          <ol className="lp-steps" role="list">
+            {coreFeatures.map((feature, index) => (
+              <li key={feature.h}>
+                <article className="lp-step">
+                  <span className="lp-step-n" aria-hidden="true">
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                  <h3>{feature.h}</h3>
+                  <p>{feature.p}</p>
+                </article>
+              </li>
+            ))}
+          </ol>
+          <h3 className="lp-kicker lp-more-title">{section("alsoIncluded")}</h3>
           <div className="lp-features">
-            {landingFeatures().map((feature) => (
+            {moreFeatures.map((feature) => (
               <article key={feature.h} className="lp-feat">
-                <h3>{feature.h}</h3>
-                <p>{feature.p}</p>
+                <feature.icon aria-hidden="true" />
+                <div>
+                  <h3>{feature.h}</h3>
+                  <p>{feature.p}</p>
+                </div>
               </article>
             ))}
           </div>
         </section>
 
+        <McpSpotlight go={go} />
+
         <section className="lp-agent" aria-labelledby="lp-agent-title">
           <div className="lp-agent-panel">
             <div>
+              <p className="lp-kicker">{section("developersKicker")}</p>
               <h2 id="lp-agent-title">{T(...AGENT_GUIDE.landingTitle)}</h2>
               <p>{T(...AGENT_GUIDE.landingText)}</p>
             </div>
@@ -369,23 +516,6 @@ export function LandingScreen({ go, auth }) {
               </a>
               <a className="auth-link" href="/developers/api#overview">
                 {T(...AGENT_GUIDE.steps[0].label)}
-              </a>
-            </div>
-          </div>
-        </section>
-
-        <section className="lp-agent" aria-labelledby="lp-plugins-title">
-          <div className="lp-agent-panel">
-            <div>
-              <h2 id="lp-plugins-title">{T(...PLUGINS_GUIDE.landingTitle)}</h2>
-              <p>{T(...PLUGINS_GUIDE.landingText)}</p>
-            </div>
-            <div className="lp-agent-actions">
-              <a className="btn lg" {...screenLinkProps(go, "plugins")}>
-                <I.Package /> {T(...PLUGINS_GUIDE.landingLink)}
-              </a>
-              <a className="auth-link" href="/plugins#troubleshooting">
-                {T(...PLUGINS_GUIDE.troubleshootingTitle)}
               </a>
             </div>
           </div>

@@ -1,4 +1,4 @@
-import { render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { LandingScreen } from "./public.jsx";
 
@@ -30,15 +30,51 @@ describe("landing positioning", () => {
     expect(screen.getByRole("link", { name: "Open API · Copy for Agent" })).toHaveAttribute("href", "/developers/api#overview");
   });
 
-  it("showcases AI agent connector setup after the Coding Agent panel", () => {
+  it("spotlights the MCP connector before the Coding Agent panel", () => {
     render(<LandingScreen go={vi.fn()} auth={{ authenticated: false }} />);
 
     const plugins = screen.getByRole("region", { name: "Ask about your expenses with AI agents." });
     const agent = screen.getByRole("region", { name: "Let your Coding Agent organize expenses." });
-    expect(agent.compareDocumentPosition(plugins) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    const capabilities = screen.getByRole("region", { name: /how norulo organizes costs/i });
+    expect(capabilities.compareDocumentPosition(plugins) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(plugins.compareDocumentPosition(agent) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(within(plugins).getByRole("link", { name: "Set up Norulo in your AI agent" })).toHaveAttribute("href", "/plugins");
+    expect(within(plugins).getByRole("link", { name: "Claude setup" })).toHaveAttribute("href", "/plugins#claude");
+    expect(within(plugins).getByRole("link", { name: "ChatGPT setup" })).toHaveAttribute("href", "/plugins#chatgpt");
     expect(within(plugins).getByRole("link", { name: "Troubleshooting" })).toHaveAttribute("href", "/plugins#troubleshooting");
     expect(within(plugins).queryByRole("link", { name: /download/i })).toBeNull();
+    expect(plugins).toHaveTextContent("https://mcp.norulo.com/mcp");
+    expect(plugins).toHaveTextContent("Claude · ChatGPT · Codex");
+    expect(within(plugins).getAllByRole("heading", { level: 3 }).map((h) => h.textContent)).toEqual([
+      "Ask in plain language",
+      "You decide what it can access",
+      "No API key to copy",
+    ]);
+    const chat = within(plugins).getByRole("figure", { name: "Example conversation" });
+    expect(chat).toHaveTextContent("getLedgerSummary");
+    expect(chat).toHaveTextContent("USD 44.00");
+    expect(chat).toHaveTextContent("EUR 49.00");
+  });
+
+  it("copies the MCP server URL", async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, "clipboard", { value: { writeText }, configurable: true });
+    render(<LandingScreen go={vi.fn()} auth={{ authenticated: false }} />);
+    fireEvent.click(screen.getByRole("button", { name: "Copy the MCP server URL" }));
+    expect(writeText).toHaveBeenCalledWith("https://mcp.norulo.com/mcp");
+    expect(await screen.findByText("Copied")).toBeInTheDocument();
+  });
+
+  it("leads the capabilities with the three-step core flow", () => {
+    render(<LandingScreen go={vi.fn()} auth={{ authenticated: false }} />);
+    const capabilities = screen.getByRole("region", { name: /how norulo organizes costs/i });
+    const steps = within(capabilities).getAllByRole("list")[0];
+    expect(within(steps).getAllByRole("heading", { level: 3 }).map((h) => h.textContent)).toEqual([
+      "Create projects",
+      "Record project expenses",
+      "Record shared expenses",
+    ]);
+    expect(within(capabilities).getByRole("heading", { name: "Also included" })).toBeInTheDocument();
   });
 
   it("leads with the product and places Coding Agent setup after the capabilities", () => {
@@ -56,8 +92,8 @@ describe("landing positioning", () => {
       "lp-title",
       "lp-preview-title",
       "lp-capabilities-title",
-      "lp-agent-title",
       "lp-plugins-title",
+      "lp-agent-title",
       "lp-cta-title",
     ]);
 

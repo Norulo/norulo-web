@@ -293,7 +293,19 @@
   background: var(--accent);
 }
 
-/* Capabilities: a quiet typographic grid. */
+/* Shared mono section label for homepage sections. */
+.lp-kicker {
+  margin: 0 0 var(--space-3);
+  color: var(--text-3);
+  font: 600 var(--fs-xs)/1.4 var(--font-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.lp-kicker-accent {
+  color: var(--accent);
+}
+
+/* Capabilities: the core three-step flow leads, supporting features follow. */
 .lp-capabilities {
   width: min(100%, 1240px);
   margin: 0 auto;
@@ -302,10 +314,11 @@
 }
 .lp-section-head {
   max-width: 40rem;
-  margin-bottom: var(--space-12);
+  margin-bottom: var(--space-10);
 }
 .lp-section-head h2,
-.lp-cta-band h2 {
+.lp-cta-band h2,
+.lp-mcp h2 {
   margin: 0;
   font-size: clamp(1.75rem, 1.2rem + 1.8vw, 2.5rem);
   font-weight: 650;
@@ -313,26 +326,77 @@
   letter-spacing: -0.025em;
   text-wrap: balance;
 }
-.lp-section-head p {
+.lp-section-head p:not(.lp-kicker) {
   margin: var(--space-3) 0 0;
   color: var(--text-2);
   font-size: var(--fs-2xl);
   line-height: 1.6;
 }
+.lp-steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border: 1px solid var(--border-strong);
+  background: var(--bg-elev);
+}
+.lp-steps > li {
+  min-width: 0;
+}
+.lp-steps > li + li {
+  border-left: 1px solid var(--border);
+}
+.lp-step {
+  height: 100%;
+  padding: var(--space-8) var(--space-8) var(--space-10);
+  border-top: 2px solid var(--accent);
+}
+.lp-step-n {
+  display: block;
+  margin-bottom: var(--space-6);
+  color: var(--accent);
+  font: 600 var(--fs-md)/1 var(--font-mono);
+  letter-spacing: 0.04em;
+}
+.lp-step h3 {
+  margin: 0 0 var(--space-2);
+  font-size: var(--fs-4xl);
+  font-weight: 650;
+  line-height: 1.25;
+  letter-spacing: -0.015em;
+}
+.lp-step p {
+  max-width: 34ch;
+  margin: 0;
+  color: var(--text-2);
+  font-size: var(--fs-xl);
+  line-height: 1.6;
+}
+.lp-more-title {
+  margin: var(--space-12) 0 var(--space-5);
+}
 .lp-features {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--space-10) var(--space-8);
+  gap: var(--space-8);
   margin: 0;
   padding: 0;
 }
 .lp-feat {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--space-3);
   min-width: 0;
   padding-top: var(--space-5);
   border-top: 1px solid var(--border-strong);
 }
+.lp-feat > svg {
+  margin-top: 3px;
+  color: var(--accent);
+}
 .lp-feat h3 {
-  margin: 0 0 var(--space-2);
+  margin: 0 0 var(--space-1);
   font-size: var(--fs-2xl);
   font-weight: 600;
   line-height: 1.4;
@@ -345,15 +409,198 @@
   line-height: 1.6;
 }
 
-/* Coding Agent setup: secondary path, after the product is explained. */
+/* MCP connector spotlight: a full-bleed tinted band in the lower half. */
+.lp-mcp {
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  background: var(--accent-soft);
+}
+.lp-mcp-inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 30rem);
+  align-items: center;
+  gap: var(--space-12) var(--space-16);
+  width: min(100%, 1240px);
+  margin: 0 auto;
+  padding: var(--space-16) var(--space-10);
+}
+.lp-mcp-copy {
+  min-width: 0;
+}
+.lp-mcp-lede {
+  max-width: 38rem;
+  margin: var(--space-4) 0 0;
+  color: var(--text-2);
+  font-size: var(--fs-2xl);
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.lp-mcp-points {
+  display: grid;
+  gap: var(--space-4);
+  margin: var(--space-8) 0 0;
+  padding: 0;
+  list-style: none;
+}
+.lp-mcp-points li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--space-3);
+}
+.lp-mcp-points li > svg {
+  margin-top: 3px;
+  color: var(--accent);
+}
+.lp-mcp-points h3 {
+  margin: 0;
+  font-size: var(--fs-2xl);
+  font-weight: 600;
+  line-height: 1.4;
+}
+.lp-mcp-points p {
+  margin: 2px 0 0;
+  color: var(--text-2);
+  font-size: var(--fs-lg);
+  line-height: 1.6;
+}
+.lp-mcp-clients {
+  margin: var(--space-8) 0 0;
+  color: var(--text);
+  font-size: var(--fs-lg);
+  font-weight: 500;
+}
+.lp-mcp-clients span {
+  margin-right: var(--space-2);
+  color: var(--text-3);
+  font: 600 var(--fs-xs)/1.4 var(--font-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.lp-mcp-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3) var(--space-6);
+  margin-top: var(--space-6);
+}
+.lp-mcp-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--space-5);
+}
+.lp-mcp-links .auth-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-size: var(--fs-md);
+  font-weight: 500;
+}
+.lp-mcp-chat {
+  min-width: 0;
+  margin: 0;
+  border: 1px solid var(--border-strong);
+  background: var(--bg-elev);
+}
+.lp-mcp-chat-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  min-height: 44px;
+  padding: var(--space-2) var(--space-5);
+  border-bottom: 1px solid var(--border);
+}
+.lp-mcp-chat-kicker,
+.lp-mcp-chat-status,
+.lp-mcp-url-label {
+  color: var(--text-3);
+  font: 600 var(--fs-xs)/1.4 var(--font-mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.lp-mcp-chat-status {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  white-space: nowrap;
+}
+.lp-mcp-chat-status .dot {
+  width: 6px;
+  height: 6px;
+  background: var(--accent);
+}
+.lp-mcp-chat-body {
+  display: grid;
+  gap: var(--space-4);
+  padding: var(--space-6) var(--space-5);
+}
+.lp-mcp-msg {
+  margin: 0;
+  font-size: var(--fs-lg);
+  line-height: 1.6;
+}
+.lp-mcp-msg-user {
+  justify-self: end;
+  max-width: 85%;
+  padding: var(--space-3) var(--space-4);
+  background: var(--bg-soft);
+  color: var(--text);
+}
+.lp-mcp-tool {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--text-3);
+  font-size: var(--fs-sm);
+}
+.lp-mcp-tool code {
+  padding: 1px var(--space-2);
+  border: 1px solid var(--border);
+  color: var(--text-2);
+  font-family: var(--font-mono);
+}
+.lp-mcp-msg-agent p {
+  margin: 0;
+  color: var(--text-2);
+}
+.lp-mcp-msg-agent ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3) var(--space-6);
+  margin: var(--space-3) 0;
+  padding: 0;
+  list-style: none;
+}
+.lp-mcp-msg-agent li {
+  --financial-size: var(--fs-value-row-compact);
+}
+.lp-mcp-url {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-1) var(--space-3);
+  padding: var(--space-4) var(--space-5);
+  border-top: 1px solid var(--border);
+}
+.lp-mcp-url-label {
+  grid-column: 1 / -1;
+}
+.lp-mcp-url code {
+  min-width: 0;
+  color: var(--text);
+  font: 500 var(--fs-lg)/1.4 var(--font-mono);
+  overflow-wrap: anywhere;
+}
+.lp-mcp-copy {
+  min-height: 36px;
+}
+
+/* Coding Agent setup: the secondary, developer-facing path. */
 .lp-agent {
   width: min(100%, 1240px);
   margin: 0 auto;
-  padding: 0 var(--space-10) var(--space-16);
-}
-/* Consecutive integration panels read as one group. */
-.lp-agent:has(+ .lp-agent) {
-  padding-bottom: var(--space-6);
+  padding: var(--space-16) var(--space-10);
 }
 .lp-agent-panel {
   display: grid;
@@ -373,7 +620,7 @@
   line-height: 1.25;
   letter-spacing: -0.01em;
 }
-.lp-agent p {
+.lp-agent p:not(.lp-kicker) {
   max-width: 40rem;
   margin: 0;
   color: var(--text-2);
@@ -448,6 +695,14 @@
 @media (max-width: 1000px) {
   .lp-features {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .lp-mcp-inner {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .lp-mcp-chat {
+    max-width: 36rem;
   }
 
   .lp-preview-body {
@@ -576,13 +831,62 @@
     margin-bottom: var(--space-8);
   }
 
+  .lp-steps {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .lp-steps > li + li {
+    border-top: 1px solid var(--border);
+    border-left: 0;
+  }
+
+  .lp-step {
+    padding: var(--space-6) var(--space-5);
+  }
+
+  .lp-steps > li + li .lp-step {
+    border-top: 0;
+  }
+
+  .lp-step-n {
+    margin-bottom: var(--space-3);
+  }
+
+  .lp-more-title {
+    margin-top: var(--space-10);
+  }
+
   .lp-features {
     grid-template-columns: minmax(0, 1fr);
     gap: var(--space-6);
   }
 
+  .lp-mcp-inner {
+    gap: var(--space-10);
+    padding: var(--space-12) var(--space-5);
+  }
+
+  .lp-mcp-actions,
+  .lp-mcp-actions .btn {
+    width: 100%;
+  }
+
+  .lp-mcp-actions .btn {
+    justify-content: center;
+  }
+
+  .lp-mcp-chat-body,
+  .lp-mcp-url {
+    padding-right: var(--space-4);
+    padding-left: var(--space-4);
+  }
+
+  .lp-mcp-copy {
+    min-height: 44px;
+  }
+
   .lp-agent {
-    padding: 0 var(--space-5) var(--space-12);
+    padding: var(--space-12) var(--space-5);
   }
 
   .lp-agent-panel {
@@ -644,6 +948,7 @@
   .lp-hero,
   .lp-preview,
   .lp-capabilities,
+  .lp-mcp-inner,
   .lp-agent,
   .lp-cta-band,
   .lp-foot {

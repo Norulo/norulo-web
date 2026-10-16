@@ -961,3 +961,14 @@ To enable it, create an API token limited to **Account Analytics: Read** for
 account `NORULO_CF_ACCOUNT_ID` (set in `wrangler.jsonc`) and store it as the
 `NORULO_CF_ANALYTICS_TOKEN` Worker secret. Without the secret the page shows
 that activity data is not enabled and still reports MCP reachability.
+# GitHub plugin API contract, 2026-10-16
+
+Web source `815c4c48efabe51004389ab578ccf08ae980cf70` is deployed as
+`82b7022a-e1e4-4ca2-9409-fcd56ad9d969` at 100% production traffic. The existing
+production workflow passed all checks and publication. The public OpenAPI file
+matches the committed generated artifact and documents explicit delegated
+GitHub renewal. All 1,989 local Web tests, lint, build and configuration checks
+passed. Existing variables, resource bindings, Secret names and domains remain
+unchanged. The Server/MCP release and authenticated 100-repository query proof
+are recorded in
+[`github-plugin-access-production-2026-10-16.json`](https://github.com/Norulo/norulo-server/blob/main/docs/validation/github-plugin-access-production-2026-10-16.json).

@@ -90,6 +90,83 @@ describe("BillingScreen", () => {
     });
   });
 
+  it.each([
+    ["active", false, "creem", "month", "Next renewal", "Automatic renewal on"],
+    ["active", false, "creem", "year", "Next renewal", "Automatic renewal on"],
+    ["canceling", false, "creem", "month", "Access until", "Automatic renewal off"],
+    ["active", true, "creem", "month", "Access until", "Automatic renewal off"],
+    ["trialing", false, "preview_grant", "month", "Access until", null],
+    ["active", null, "creem", "month", "Current period ends", null],
+  ])(
+    "shows truthful timing for %s/%s/%s/%s",
+    async (status, cancelAtPeriodEnd, provider, interval, label, renewal) => {
+      noruloApi.billing.getPlan.mockResolvedValue({
+        ...billingCatalog,
+        account: {
+          status,
+          plan: "pro",
+          provider,
+          interval,
+          cancelAtPeriodEnd,
+          subscriptionId: provider === "creem" ? "sub_1" : null,
+          currentPeriodEnd: 1700000000,
+        },
+      });
+      render(<BillingScreen go={vi.fn()} navigate={vi.fn()} />);
+      const timing = await screen.findByText(`${label}:`, { exact: false });
+      expect(timing).toHaveTextContent("2023-11-14 22:13 UTC");
+      expect(timing.querySelector("time")).toHaveAttribute("dateTime", "2023-11-14T22:13:20.000Z");
+      if (renewal) expect(screen.getByText(renewal)).toBeInTheDocument();
+      else expect(screen.queryByText(/Automatic renewal/)).not.toBeInTheDocument();
+    }
+  );
+
+  it.each([null, 0, "invalid", 1700000000000])(
+    "does not invent a renewal date for %s",
+    async (currentPeriodEnd) => {
+      noruloApi.billing.getPlan.mockResolvedValue({
+        ...billingCatalog,
+        account: {
+          status: "active",
+          plan: "pro",
+          provider: "creem",
+          subscriptionId: "sub_1",
+          cancelAtPeriodEnd: false,
+          currentPeriodEnd,
+        },
+      });
+      render(<BillingScreen go={vi.fn()} navigate={vi.fn()} />);
+      expect(await screen.findByText("Next renewal: Date unavailable")).toBeInTheDocument();
+    }
+  );
+
+  it.each([
+    ["en", "Automatic renewal on", "Next renewal"],
+    ["zh", "自动续费已开启", "下次续费"],
+    ["ja", "自動更新オン", "次回更新"],
+    ["ko", "자동 갱신 켜짐", "다음 갱신"],
+    ["fr", "Renouvellement automatique activé", "Prochain renouvellement"],
+    ["es", "Renovación automática activada", "Próxima renovación"],
+  ])("localizes subscription timing in %s", async (lang, renewal, label) => {
+    await setLang(lang);
+    noruloApi.billing.getPlan.mockResolvedValue({
+      ...billingCatalog,
+      account: {
+        status: "active",
+        plan: "pro",
+        provider: "creem",
+        subscriptionId: "sub_1",
+        cancelAtPeriodEnd: false,
+        currentPeriodEnd: 1700000000,
+      },
+    });
+    render(<BillingScreen go={vi.fn()} navigate={vi.fn()} />);
+    expect(await screen.findByText(renewal)).toBeInTheDocument();
+    expect(screen.getByText(`${label}:`, { exact: false })).toHaveTextContent(
+      "2023-11-14 22:13 UTC"
+    );
+  });
+
   function withUsage(planId, projects, expenseRecords) {
     return {
       ...billingCatalog,

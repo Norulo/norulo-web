@@ -13,6 +13,7 @@ import { formatBillingTimestamp } from "../lib/billing-date.js";
 import { safeBillingRedirectUrl } from "../lib/trusted-redirects.js";
 import { useModalFocus } from "../lib/modal-focus.js";
 import { useModalBackdrop } from "../lib/modal-backdrop.js";
+import { BILLING_SUBSCRIPTION_COPY } from "../locales/billing-subscription.js";
 import { BILLING_USAGE_COPY } from "../locales/billing-usage.js";
 import { Sidebar, Topbar } from "../shell.jsx";
 import { ConsoleLayout } from "../components/console-layout.jsx";
@@ -409,6 +410,36 @@ function subscriptionStatusLabel(status) {
     default:
       return T("Active", "生效中");
   }
+}
+
+function BillingSubscriptionTiming({ account }) {
+  const text = (key) => T(...BILLING_SUBSCRIPTION_COPY[key]);
+  const ends = formatBillingTimestamp(account.currentPeriodEnd);
+  const canceled = account.cancelAtPeriodEnd === true || account.status === "canceling";
+  const grant = account.provider === "preview_grant";
+  const renews =
+    !grant &&
+    !canceled &&
+    account.provider === "creem" &&
+    Boolean(account.subscriptionId) &&
+    account.cancelAtPeriodEnd === false;
+  const label =
+    grant || canceled ? text("accessUntil") : renews ? T("Next renewal") : text("periodEnd");
+  return (
+    <div className="muted billing-subscription-timing">
+      {(canceled || renews) && <div>{text(canceled ? "renewalOff" : "renewalOn")}</div>}
+      <div>
+        {label}:{" "}
+        {ends ? (
+          <time dateTime={new Date(Number(account.currentPeriodEnd) * 1000).toISOString()}>
+            {ends}
+          </time>
+        ) : (
+          text("dateUnavailable")
+        )}
+      </div>
+    </div>
+  );
 }
 
 function usageText(key) {
@@ -1061,6 +1092,7 @@ export function BillingScreen({ go, navigate = (url) => window.location.assign(u
                                   }`
                                 : T("Upgrade from Pricing", "前往价格页升级")}
                             </div>
+                            {activePaid && <BillingSubscriptionTiming account={account} />}
                           </div>
                         </div>
                         {activePaid && (

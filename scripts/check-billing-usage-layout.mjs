@@ -162,6 +162,10 @@ function createFixture() {
           status: usage === freeUsage ? "none" : "trialing",
           plan: usage === freeUsage ? "free" : "max",
           interval: "month",
+          provider: usage === freeUsage ? null : "creem",
+          subscriptionId: usage === freeUsage ? null : "sub_layout",
+          cancelAtPeriodEnd: false,
+          currentPeriodEnd: usage === freeUsage ? null : 1794787200,
         },
         ledgerUsage: usage,
       };

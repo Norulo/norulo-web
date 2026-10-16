@@ -981,3 +981,20 @@ passed. Existing variables, resource bindings, Secret names and domains remain
 unchanged. The Server/MCP release and authenticated 100-repository query proof
 are recorded in
 [`github-plugin-access-production-2026-10-16.json`](https://github.com/Norulo/norulo-server/blob/main/docs/validation/github-plugin-access-production-2026-10-16.json).
+
+## Status monitoring migration release, 2026-10-16
+
+Web source `82a82d816bc6fb12fda93b51291e440d22e8b581` is published as
+`be5fb290-ecf3-48c1-8c0b-6e438a986fe3` at 100% traffic. The production workflow
+passed lint, all 1,992 tests, build, upload validation and live API/asset checks.
+The separate CI passed all browser layout/interaction checks and dependency audit.
+Web now forwards status data to Server, with no analytics credential/query
+references in its deployed code. The user removed the old Web Secret. The
+unused public account variable was also removed; both service bindings,
+static assets, domains and logging settings remain unchanged.
+
+Eleven online checks passed across Server/Web status, cache reuse, HEAD,
+unsupported methods, health and anonymous auth. Both public status endpoints
+return `available: true`, reachable MCP and the latest natural scheduler result.
+The matching Server release, local/native tests and configuration readback are
+in the [production record](https://github.com/Norulo/norulo-server/blob/main/docs/validation/status-monitoring-production-2026-10-16.json).

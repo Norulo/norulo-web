@@ -1,3 +1,34 @@
+# Billing renewal display release, 2026-10-16
+
+Source `b0e3adcb197bc2b7d5f83916dcf8c8493ec64393` was pushed to main and
+published at 100% traffic as Web version
+`44463887-45e1-41e8-8c85-1a2746207d88`, deployment
+`32e79761-1558-4cdc-ae10-b259c2d38287` at 2026-10-16T00:24:47.752567Z.
+Billing now displays confirmed automatic renewal status and the next renewal
+time, or the access end for canceled renewal and complimentary grants, in six
+languages. Missing or invalid dates remain explicitly unavailable. Dates use UTC.
+
+[Production job](https://github.com/Norulo/norulo-web/actions/runs/38829105393)
+passed lint, 1,966 tests in 93 files, build, offline configuration checks,
+Wrangler dry-run, production binding/domain preflight and the production upload.
+The job failed its initial post-deployment byte comparison for the entry script.
+A separate finite readback verified all ten selected deployed entry, Billing,
+plugin and locale assets byte-for-byte against a fresh locked local build,
+including that same entry script. The initial failure is retained; no automatic
+redeployment was performed. Direct/proxied health and the Billing document
+returned HTTP 200. Anonymous checks do not verify an authenticated subscription.
+
+[Exact-source CI](https://github.com/Norulo/norulo-web/actions/runs/38829105407)
+also passed every step, including cross-browser date layouts, phone/tablet,
+Billing, overview, currency, Projects and repository-picker layouts, production
+dependency audit and Worker syntax. Later documentation commits do not change
+the deployed application.
+
+Cloudflare readback confirms the source annotation and 100% traffic; settings
+are unchanged apart from deployment annotations. No Server deployment, migration
+or authenticated business request was needed. See the
+[release evidence](validation/billing-renewal-production-2026-10-16.json).
+
 # GitHub Actions production deployment, 2026-10-15
 
 Web source `bde82c6631a3bfe44db993527ee8f45ce364b263` is published at

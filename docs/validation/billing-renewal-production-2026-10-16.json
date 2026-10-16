@@ -1,0 +1,149 @@
+{
+  "sourceCommit": "b0e3adcb197bc2b7d5f83916dcf8c8493ec64393",
+  "deployment": {
+    "id": "32e79761-1558-4cdc-ae10-b259c2d38287",
+    "versions": [
+      {
+        "version_id": "44463887-45e1-41e8-8c85-1a2746207d88",
+        "percentage": 100
+      }
+    ],
+    "annotations": {
+      "workers/message": "Deploy Web main b0e3adcb197bc2b7d5f83916dcf8c8493ec64393; GitHub Actions 38829105393",
+      "workers/triggered_by": "deployment"
+    },
+    "created_on": "2026-10-16T00:24:47.752567Z"
+  },
+  "checks": [
+    {
+      "asset": "billing-BZWohlKJ.js",
+      "status": 200,
+      "sha256": "27b1588db86bf2b51095a23aec72b919437ed2201258968ab788d33a246a4d27",
+      "bytes": 45287,
+      "matchesLocalBuild": true
+    },
+    {
+      "asset": "billing-Dt-xcYfP.css",
+      "status": 200,
+      "sha256": "c8fc036ee25c9827dc5764b57feb8d304b4cedd6beeeb276fa82c42a4ce1c32c",
+      "bytes": 13208,
+      "matchesLocalBuild": true
+    },
+    {
+      "asset": "catalog-CB_8youO.js",
+      "status": 200,
+      "sha256": "74076487f9d284384984adf5c68b81be732f102ea853fd6a87e4a7636d10f6c5",
+      "bytes": 144026,
+      "matchesLocalBuild": true
+    },
+    {
+      "asset": "catalog-CdHrIQB9.js",
+      "status": 200,
+      "sha256": "db4e4032802af7f168b059bf0d9d1d8a8ea87c35fb9f30402601ac8898109797",
+      "bytes": 148717,
+      "matchesLocalBuild": true
+    },
+    {
+      "asset": "catalog-DX5Htxk3.js",
+      "status": 200,
+      "sha256": "31a44207fc9812def93362c158270152dffd4153d773d2b29729ea4f1ffc38c0",
+      "bytes": 160507,
+      "matchesLocalBuild": true
+    },
+    {
+      "asset": "catalog-Z0u_vM7z.js",
+      "status": 200,
+      "sha256": "8959eaf0726bdcab0f7dbf63bf31750e442796bc775b4c47ad2fa75e1375a6c0",
+      "bytes": 148504,
+      "matchesLocalBuild": true
+    },
+    {
+      "asset": "catalog-nqpNXnuU.js",
+      "status": 200,
+      "sha256": "4f3ac1af1e50f65155cb70f8349e488d21ff858ffe560caf1483d1b0903ad7bf",
+      "bytes": 126773,
+      "matchesLocalBuild": true
+    },
+    {
+      "asset": "index-DeEyBSVP.js",
+      "status": 200,
+      "sha256": "6dcd66496d04c0ddcc18857a3a27c418b16ee120598ee7691daebbb7fc330a71",
+      "bytes": 177459,
+      "matchesLocalBuild": true
+    },
+    {
+      "asset": "index-Dgr6lFpt.css",
+      "status": 200,
+      "sha256": "b92a3f8cdc1734aec09a2025a605738853f418bb271d01643021f535f9a0be3f",
+      "bytes": 67216,
+      "matchesLocalBuild": true
+    },
+    {
+      "asset": "plugins-Berluom5.js",
+      "status": 200,
+      "sha256": "61432d8e2f05756a0cb2cc0a1025b4fadb2e8a7696bd47a213ac15159f5296f9",
+      "bytes": 4045,
+      "matchesLocalBuild": true
+    },
+    {
+      "url": "https://api.norulo.com/health",
+      "status": 200,
+      "challenge": null
+    },
+    {
+      "url": "https://norulo.com/api/health",
+      "status": 200,
+      "challenge": null
+    },
+    {
+      "url": "https://norulo.com/billing",
+      "status": 200,
+      "challenge": null
+    }
+  ],
+  "recordedAt": "2026-10-16T00:26:38.564513+00:00",
+  "tests": {
+    "files": 93,
+    "passed": 1966,
+    "source": "GitHub production deployment job"
+  },
+  "deploymentWorkflow": {
+    "url": "https://github.com/Norulo/norulo-web/actions/runs/38829105393",
+    "result": "failure at post-deployment verification; production upload succeeded",
+    "failedCheck": "Initial index-DeEyBSVP.js bytes differed from the build",
+    "followup": "Independent finite readback: all 10 selected deployed assets match a fresh local locked build byte-for-byte"
+  },
+  "settingsReadback": {
+    "changedKeys": [
+      "annotations"
+    ],
+    "otherSettingsPreserved": true
+  },
+  "scope": {
+    "serverDeployment": false,
+    "databaseMigration": false,
+    "authenticatedBusinessRequests": false
+  },
+  "limitations": [
+    "Anonymous Billing HTTP 200 verifies document availability, not authenticated subscription data.",
+    "Initial deployment workflow remains failed; no automatic redeployment was performed."
+  ],
+  "sourceCI": {
+    "url": "https://github.com/Norulo/norulo-web/actions/runs/38829105407",
+    "conclusion": "success",
+    "coverage": [
+      "lint",
+      "1966 tests in 93 files",
+      "browser asset build",
+      "cross-engine date layouts",
+      "Chromium/WebKit phone and tablet layouts",
+      "Billing usage layouts",
+      "overview layouts",
+      "currency picker layouts",
+      "Projects layouts and accessibility",
+      "repository picker layouts",
+      "production dependency audit",
+      "Worker syntax"
+    ]
+  }
+}

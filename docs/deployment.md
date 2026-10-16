@@ -1,3 +1,30 @@
+# GitHub account unlinking release, 2026-10-16
+
+Web main source `33cd662fe41ea36862910447b3366538ca18ce9b` is published as
+version `bf18d473-cb4d-43ee-b641-82a775bf2ad6`, deployment
+`d15264fb-7bc0-4b68-8f6a-5264412d299e`, at 100% production traffic. Server source
+`ceac04d6f28f5a56bfd6b8b657708656898690b4` is version
+`d794e9f0-374b-48b7-8eac-faa980f6b719` at 100%.
+
+Settings now offers GitHub unlinking after a verified email is linked, with
+confirmation and six-language guidance. The email cannot be unlinked or changed.
+Account and ledger history remain intact; late authorization and refresh results
+cannot restore the removed GitHub connection.
+
+[The production job](https://github.com/Norulo/norulo-web/actions/runs/38874895847)
+passed all 1,989 tests in 95 files, lint, build, dry-run, production preflight,
+upload and anonymous health/asset checks. Server exact-source CI passed
+3,319 tests. Local final Settings/App checks passed 119 tests, and ten unlink
+browser profiles plus 22 existing Chromium account-onboarding profiles passed.
+Independent anonymous GETs confirm the direct/proxied new route, session status,
+byte-identical Settings assets and the published unlink API contract. The
+existing homepage Managed Challenge remains in place.
+
+Variables, Secret names, bindings, runtime settings and the daily Server cron
+are preserved. No migration or authenticated customer mutation was needed.
+Later evidence commits change documentation only. See the
+[release evidence](validation/github-account-unlink-production-2026-10-16.json).
+
 # Billing renewal display release, 2026-10-16
 
 Source `b0e3adcb197bc2b7d5f83916dcf8c8493ec64393` was pushed to main and

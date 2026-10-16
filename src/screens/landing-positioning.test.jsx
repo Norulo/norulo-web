@@ -30,13 +30,13 @@ describe("landing positioning", () => {
     expect(screen.getByRole("link", { name: "Open API · Copy for Agent" })).toHaveAttribute("href", "/developers/api#overview");
   });
 
-  it("showcases the ChatGPT plugin setup after the Coding Agent panel", () => {
+  it("showcases AI agent connector setup after the Coding Agent panel", () => {
     render(<LandingScreen go={vi.fn()} auth={{ authenticated: false }} />);
 
-    const plugins = screen.getByRole("region", { name: "Ask about your expenses in ChatGPT." });
+    const plugins = screen.getByRole("region", { name: "Ask about your expenses with AI agents." });
     const agent = screen.getByRole("region", { name: "Let your Coding Agent organize expenses." });
     expect(agent.compareDocumentPosition(plugins) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(within(plugins).getByRole("link", { name: "Set up Norulo in ChatGPT" })).toHaveAttribute("href", "/plugins");
+    expect(within(plugins).getByRole("link", { name: "Set up Norulo in your AI agent" })).toHaveAttribute("href", "/plugins");
     expect(within(plugins).getByRole("link", { name: "Troubleshooting" })).toHaveAttribute("href", "/plugins#troubleshooting");
     expect(within(plugins).queryByRole("link", { name: /download/i })).toBeNull();
   });

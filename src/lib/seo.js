@@ -54,12 +54,12 @@ const PAGE_DEFINITIONS = {
   plugins: {
     path: "/plugins",
     title: {
-      en: "Norulo Plugins — Use Norulo in ChatGPT",
-      zh: "Norulo 插件 — 在 ChatGPT 中使用 Norulo",
+      en: "Norulo Plugins — Use Norulo in Claude and ChatGPT",
+      zh: "Norulo 插件 — 在 Claude 和 ChatGPT 中使用 Norulo",
     },
     description: {
-      en: "Configure Norulo in ChatGPT with a custom MCP connection and OAuth, then choose the ledger, projects and permissions ChatGPT can access.",
-      zh: "通过自定义 MCP 连接和 OAuth 在 ChatGPT 中配置 Norulo，并选择 ChatGPT 可访问的账本、项目和权限。",
+      en: "Connect Norulo to Claude as a custom connector or to ChatGPT as a custom MCP server with OAuth, then choose the ledger, projects and permissions the AI agent can access.",
+      zh: "通过 OAuth 将 Norulo 作为自定义连接器添加到 Claude，或作为自定义 MCP 服务器添加到 ChatGPT，并选择 AI 智能体可访问的账本、项目和权限。",
     },
     schemaType: "article",
   },

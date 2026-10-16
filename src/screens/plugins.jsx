@@ -3,16 +3,15 @@ import { useEffect } from "react";
 import { I } from "../icons.jsx";
 import { T, useLang } from "../i18n.jsx";
 import { screenLinkProps } from "../lib/navigation.js";
-import { MCP_SERVER_URL, PLUGINS_GUIDE, SUPPORT_EMAIL } from "../locales/plugins-guide.js";
+import { PLUGINS_GUIDE, SUPPORT_EMAIL } from "../locales/plugins-guide.js";
 import { DocsCode, DocsSideNav } from "./docs-layout.jsx";
 import { PublicFooter, PublicHeader } from "./public-layout.jsx";
 
-// ChatGPT's own field labels stay in English so they match its interface.
-const CONNECTION_DETAILS = [
-  "Name: Norulo",
-  `MCP server URL: ${MCP_SERVER_URL}`,
-  "Authentication: OAuth",
-].join("\n");
+// Each AI app gets its own ordered setup; both share Norulo's OAuth MCP server.
+const SETUPS = [
+  { id: "chatgpt", title: PLUGINS_GUIDE.groupChatGPT, steps: PLUGINS_GUIDE.chatgptSteps },
+  { id: "claude", title: PLUGINS_GUIDE.groupClaude, steps: PLUGINS_GUIDE.claudeSteps },
+];
 
 const URL_PATTERN = /(https:\/\/[A-Za-z0-9][A-Za-z0-9./?=&%_~+#:@-]*[A-Za-z0-9/#])/g;
 
@@ -52,11 +51,11 @@ export function PluginsScreen({ go, auth }) {
         <DocsSideNav
           label={T(...PLUGINS_GUIDE.sections)}
           groups={[
-            {
-              key: "setup",
-              label: T(...PLUGINS_GUIDE.groupSetup),
-              items: PLUGINS_GUIDE.steps.map((step) => ({ id: step.id, label: T(...step.title) })),
-            },
+            ...SETUPS.map((setup) => ({
+              key: setup.id,
+              label: T(...setup.title),
+              items: setup.steps.map((step) => ({ id: step.id, label: T(...step.title) })),
+            })),
             {
               key: "help",
               label: T(...PLUGINS_GUIDE.groupHelp),
@@ -81,42 +80,56 @@ export function PluginsScreen({ go, auth }) {
               <p>{T(...PLUGINS_GUIDE.noDownload)}</p>
             </div>
           </div>
-          <section className="docs-section docs-agent-setup" aria-labelledby="setup">
-            <h2 id="setup" className="docs-h2">
-              {T(...PLUGINS_GUIDE.groupSetup)}
-            </h2>
-            <p>{T(...PLUGINS_GUIDE.interfaceNote)}</p>
-            {/* The explicit role keeps list semantics with custom step markers. */}
-            <ol className="docs-agent-steps" role="list">
-              {PLUGINS_GUIDE.steps.map((step) => (
-                <li key={step.id}>
-                  <h3 id={step.id}>{T(...step.title)}</h3>
-                  {step.text.map((text) => (
-                    <p key={text[0]}>
-                      <Linked text={T(...text)} />
-                    </p>
-                  ))}
-                  {step.details && (
-                    <DocsCode title={T(...PLUGINS_GUIDE.detailsTitle)}>{CONNECTION_DETAILS}</DocsCode>
-                  )}
-                  {step.examples && (
-                    <ul className="docs-agent-examples" role="list">
-                      {step.examples.map((example) => (
-                        <li key={example[0]} className="docs-agent-prompt">
-                          “{T(...example)}”
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                  {step.apiKeysLink && (
-                    <a className="auth-link" {...screenLinkProps(go, "apiKeys")}>
-                      {T(...step.apiKeysLink)}
-                    </a>
-                  )}
-                </li>
-              ))}
-            </ol>
-          </section>
+          <p>{T(...PLUGINS_GUIDE.interfaceNote)}</p>
+          {SETUPS.map((setup) => (
+            <section
+              key={setup.id}
+              className="docs-section docs-agent-setup"
+              aria-labelledby={setup.id}
+            >
+              <h2 id={setup.id} className="docs-h2">
+                {T(...setup.title)}
+              </h2>
+              {/* The explicit role keeps list semantics with custom step markers. */}
+              <ol className="docs-agent-steps" role="list">
+                {setup.steps.map((step) => (
+                  <li key={step.id}>
+                    <h3 id={step.id}>{T(...step.title)}</h3>
+                    {step.text.map((text) => (
+                      <p key={text[0]}>
+                        <Linked text={T(...text)} />
+                      </p>
+                    ))}
+                    {step.details && (
+                      <DocsCode title={T(...PLUGINS_GUIDE.detailsTitle)}>{step.details}</DocsCode>
+                    )}
+                    {step.command && (
+                      <DocsCode title={T(...PLUGINS_GUIDE.commandTitle)}>{step.command}</DocsCode>
+                    )}
+                    {step.examples && (
+                      <ul className="docs-agent-examples" role="list">
+                        {step.examples.map((example) => (
+                          <li key={example[0]} className="docs-agent-prompt">
+                            “{T(...example)}”
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                    {step.after?.map((text) => (
+                      <p key={text[0]}>
+                        <Linked text={T(...text)} />
+                      </p>
+                    ))}
+                    {step.apiKeysLink && (
+                      <a className="auth-link" {...screenLinkProps(go, "apiKeys")}>
+                        {T(...step.apiKeysLink)}
+                      </a>
+                    )}
+                  </li>
+                ))}
+              </ol>
+            </section>
+          ))}
           <section className="docs-section">
             <h2 id="troubleshooting" className="docs-h2">
               {T(...PLUGINS_GUIDE.troubleshootingTitle)}

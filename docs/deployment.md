@@ -919,3 +919,18 @@ scheduler failures, read-only natural-run checks and coordinated D1/DO recovery.
 No new email alert is enabled or test message sent. The dated
 [free-launch record](https://github.com/Norulo/norulo-server/blob/main/docs/validation/production-free-launch-2026-10-11.json)
 separates local validation from actual production readback.
+
+## Status page activity data
+
+`/status/traffic.json` is served by the `norulo-web` Worker and powers the
+Status page heatmaps. It queries Cloudflare's GraphQL Analytics API
+(`workersInvocationsAdaptive`, `workersInvocationsScheduled`) for the
+`norulo-web`, `norulo-server-production` and `norulo-connect` scripts and
+returns only relative activity levels (0-4), coarse error levels, MCP
+reachability and the last scheduled run outcome; it never returns request
+counts, the token or Cloudflare error text. Results are cached for 10 minutes.
+
+To enable it, create an API token limited to **Account Analytics: Read** for
+account `NORULO_CF_ACCOUNT_ID` (set in `wrangler.jsonc`) and store it as the
+`NORULO_CF_ANALYTICS_TOKEN` Worker secret. Without the secret the page shows
+that activity data is not enabled and still reports MCP reachability.

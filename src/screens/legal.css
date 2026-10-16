@@ -424,3 +424,193 @@
     flex-wrap: wrap;
   }
 }
+
+/* Status page activity heatmaps: relative levels only, no request counts. */
+.traffic-card {
+  padding: var(--space-2);
+}
+.traffic-intro {
+  max-width: 72ch;
+  margin: 0;
+  padding: var(--space-4) var(--space-5) 0;
+  color: var(--text-2);
+  font-size: var(--fs-md);
+  line-height: 1.6;
+}
+.traffic-message {
+  margin: 0;
+  padding: var(--space-6) var(--space-5);
+  color: var(--text-3);
+  font-size: var(--fs-md);
+}
+.traffic-legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-2);
+  padding: var(--space-4) var(--space-5) 0;
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+}
+.traffic-legend .traffic-cell {
+  width: 12px;
+  height: 12px;
+}
+.traffic-legend-gap {
+  width: var(--space-3);
+}
+.traffic-services {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-6);
+  padding: var(--space-5);
+}
+.traffic-service {
+  min-width: 0;
+}
+.traffic-service-h {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+.traffic-service-h h3 {
+  margin: 0;
+  font-size: var(--fs-xl);
+  font-weight: 600;
+}
+.traffic-host {
+  color: var(--text-3);
+  font: var(--fs-xs)/1.4 var(--font-mono);
+}
+.traffic-now {
+  display: grid;
+  justify-items: end;
+  gap: 2px;
+}
+.traffic-now-label {
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+}
+.traffic-badge {
+  padding: 1px var(--space-2);
+  border: 1px solid var(--border-strong);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.traffic-badge.lvl-3,
+.traffic-badge.lvl-4 {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.traffic-grid {
+  display: grid;
+  gap: 2px;
+}
+.traffic-row {
+  display: grid;
+  grid-template-columns: 3.25rem repeat(24, minmax(0, 1fr));
+  align-items: center;
+  gap: 2px;
+}
+.traffic-axis span {
+  color: var(--text-4);
+  font: var(--fs-micro)/1 var(--font-mono);
+  white-space: nowrap;
+}
+.traffic-day {
+  overflow: hidden;
+  color: var(--text-3);
+  font: var(--fs-micro)/1 var(--font-mono);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.traffic-cell {
+  position: relative;
+  display: block;
+  aspect-ratio: 1;
+  min-width: 0;
+  background: var(--bg-soft);
+}
+.traffic-cell.traffic-blank {
+  background: transparent;
+}
+.traffic-cell.lvl-0 {
+  outline: 1px solid var(--border);
+  outline-offset: -1px;
+}
+.traffic-cell.lvl-1 {
+  background: color-mix(in oklch, var(--accent) 20%, var(--bg-elev));
+}
+.traffic-cell.lvl-2 {
+  background: color-mix(in oklch, var(--accent) 42%, var(--bg-elev));
+}
+.traffic-cell.lvl-3 {
+  background: color-mix(in oklch, var(--accent) 68%, var(--bg-elev));
+}
+.traffic-cell.lvl-4 {
+  background: var(--accent);
+}
+.traffic-cell.err-1::after,
+.traffic-cell.err-2::after {
+  content: "";
+  position: absolute;
+  inset: 30%;
+  background: var(--sev-medium);
+}
+.traffic-cell.err-2::after {
+  background: var(--sev-critical);
+}
+.traffic-cell.current {
+  outline: 1px solid var(--text);
+  outline-offset: 1px;
+}
+.traffic-service-f {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-1) var(--space-3);
+  margin-top: var(--space-3);
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+}
+.traffic-service-f b {
+  color: var(--text);
+  font-weight: 600;
+}
+.traffic-errors b {
+  color: var(--sev-critical);
+}
+.traffic-foot {
+  margin: 0;
+  padding: 0 var(--space-5) var(--space-4);
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+}
+
+@media (max-width: 1100px) {
+  .traffic-services {
+    grid-template-columns: minmax(0, 1fr);
+    max-width: 40rem;
+  }
+}
+@media (max-width: 760px) {
+  .traffic-intro,
+  .traffic-legend,
+  .traffic-message,
+  .traffic-foot {
+    padding-right: var(--space-4);
+    padding-left: var(--space-4);
+  }
+
+  .traffic-services {
+    padding: var(--space-4);
+  }
+
+  .traffic-row {
+    grid-template-columns: 2.75rem repeat(24, minmax(0, 1fr));
+    gap: 1px;
+  }
+}

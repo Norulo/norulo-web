@@ -23,7 +23,8 @@
   },
   "vars": {
     "NORULO_MODE": "production",
-    "NORULO_API_ORIGIN": "https://api.norulo.com"
+    "NORULO_API_ORIGIN": "https://api.norulo.com",
+    "NORULO_CF_ACCOUNT_ID": "84e421f26c708c0cf437e287eed11fa1"
   },
   "services": [
     {"binding": "NORULO_SERVER", "service": "norulo-server-production"},

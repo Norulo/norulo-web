@@ -3,6 +3,7 @@ import {
   STATIC_SECURITY_HEADERS,
   STRICT_TRANSPORT_SECURITY,
 } from "./security-headers.js";
+import { STATUS_TRAFFIC_PATH, handleStatusTraffic } from "./status-traffic.js";
 
 const API_PREFIX = "/api";
 const DEFAULT_PROXY_MAX_BODY_BYTES = 1024 * 1024;
@@ -15,6 +16,9 @@ const HTML_SHELL_SECURITY_HEADERS = htmlSecurityHeaders();
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+    if (url.pathname === STATUS_TRAFFIC_PATH) {
+      return withTransportSecurity(await handleStatusTraffic(request, env), url);
+    }
     if (isApiRequest(url)) {
       return withTransportSecurity(await proxyApiRequest(request, env, url), url);
     }

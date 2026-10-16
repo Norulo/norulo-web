@@ -6,6 +6,8 @@ import { I } from "../icons.jsx";
 import { T, useLang } from "../i18n.jsx";
 import { screenLinkProps } from "../lib/navigation.js";
 import { PublicFooter, PublicHeader } from "./public-layout.jsx";
+import { STATUS_TRAFFIC_COPY } from "../locales/status-traffic.js";
+import { StatusActivity, useStatusTraffic } from "./status-traffic.jsx";
 
 const CONTACT_EMAIL = "contact@norulo.com";
 const SECURITY_EMAIL = CONTACT_EMAIL;
@@ -450,6 +452,7 @@ export function StatusScreen({ go, auth }) {
   const [loading, setLoading] = useState(true);
   const [requestRevision, setRequestRevision] = useState(0);
   const requestPending = useRef(false);
+  const traffic = useStatusTraffic(requestRevision);
   useErrorNotification(error, {
     title: T("Status error", "Status error"),
     key: `status:${error}`,
@@ -537,6 +540,14 @@ export function StatusScreen({ go, auth }) {
   const databaseDetail = health?.database?.type
     ? `${health.database.type}: ${T("backend reported by API", "API 返回的后端信息")}`
     : T("No database information reported.", "未返回数据库信息。");
+  const trafficText = (key) => T(...STATUS_TRAFFIC_COPY[key]);
+  const mcpReachable = traffic.data?.mcp?.reachable;
+  const scheduler = traffic.data?.scheduler || null;
+  const schedulerAt = scheduler?.lastRunAt ? new Date(scheduler.lastRunAt) : null;
+  const schedulerTime =
+    schedulerAt && Number.isFinite(schedulerAt.getTime())
+      ? `${schedulerAt.toISOString().slice(0, 16).replace("T", " ")} UTC · `
+      : "";
   const apiLabel = health?.ok
     ? T("Reachable", "可访问")
     : error
@@ -577,7 +588,9 @@ export function StatusScreen({ go, auth }) {
         </section>
 
         <section className="status-section">
-          <div className="status-card card">
+          <StatusActivity traffic={traffic} />
+
+          <div className="status-card card status-card-reported">
             <div className="status-card-h">
               <h2>{T("Current connection", "当前连接")}</h2>
               <span className="muted">
@@ -609,6 +622,42 @@ export function StatusScreen({ go, auth }) {
               }
               detail={databaseDetail}
             />
+            <StatusRow
+              icon={<I.Package size={14} />}
+              title={T(...STATUS_TRAFFIC_COPY.services.mcp)}
+              status={
+                mcpReachable === true ? "operational" : mcpReachable === false ? "incident" : "degraded"
+              }
+              label={
+                mcpReachable === true
+                  ? trafficText("mcpReachable")
+                  : mcpReachable === false
+                    ? trafficText("mcpUnreachable")
+                    : trafficText("notChecked")
+              }
+              detail={`mcp.norulo.com · ${trafficText("checksNote")}`}
+            />
+            {traffic.data?.available && (
+              <StatusRow
+                icon={<I.Clock size={14} />}
+                title={trafficText("scheduler")}
+                status={
+                  scheduler?.outcome === "success"
+                    ? "operational"
+                    : scheduler?.outcome === "failure"
+                      ? "incident"
+                      : "degraded"
+                }
+                label={
+                  scheduler?.outcome === "success"
+                    ? trafficText("schedulerSuccess")
+                    : scheduler?.outcome === "failure"
+                      ? trafficText("schedulerFailure")
+                      : trafficText("schedulerUnknown")
+                }
+                detail={`${schedulerTime}${trafficText("schedulerDetail")}`}
+              />
+            )}
           </div>
 
           {readinessAvailable(health) && (

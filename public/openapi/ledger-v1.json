@@ -1284,7 +1284,7 @@
             "$ref": "#/components/parameters/AuthOrigin"
           }
         ],
-        "description": "Renew the signed-in account's own expiring GitHub App credential using\nits encrypted refresh token. Requires a current cookie session and a\ntrusted Origin or Referer; Bearer credentials cannot refresh an account.\nA credential with more than sixty seconds remaining is a successful\nno-op. One durable claim admits one provider exchange, and publication\nfences the original account, session and token generation. Unknown\nexchange or storage outcomes do not repeat the old refresh token.\nThis operation preserves the Norulo session, memberships, ledger\ndata and repository bindings. It never exposes either token. Old\naccounts without saved refresh credentials require one explicit GitHub\nreconnection. A read with githubRefreshRequired true may be followed\nby this POST and one repeated read; business writes must not be replayed.\n",
+        "description": "Renew the signed-in account's own expiring GitHub App credential using\nits encrypted refresh token. Requires a current cookie session and a\ntrusted Origin or Referer; Bearer credentials cannot refresh an account.\nA credential with more than sixty seconds remaining is a successful\nno-op. One durable claim admits one provider exchange, and publication\nfences the original account, session and token generation. Unknown\nexchange or storage outcomes do not repeat the old refresh token.\nThis operation preserves the Norulo session, memberships, ledger\ndata and repository bindings. It never exposes either token. Old\naccounts without saved refresh credentials require one explicit GitHub\nreconnection. A read with githubRefreshRequired true may be followed\nby this POST and one repeated read; business writes must not be replayed.\nAPI-key clients use the separate /api/v1/integrations/github/refresh route.\n",
         "responses": {
           "200": {
             "description": "Credential renewed or already current",
@@ -2257,7 +2257,103 @@
             }
           },
           "503": {
-            "description": "GitHub temporarily unavailable, rate limited, or credential decryption/configuration failure; no automatic retry or token refresh",
+            "description": "GitHub temporarily unavailable, rate limited, credential failure or an internal failure; no automatic retry. Internal failures include an opaque requestId for private diagnostics",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/integrations/github/refresh": {
+      "post": {
+        "operationId": "refreshLedgerGitHubAccess",
+        "x-norulo-scope": "projects:read",
+        "security": [
+          {
+            "bearerKey": []
+          }
+        ],
+        "tags": [
+          "Authentication"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/WorkspaceHeader"
+          }
+        ],
+        "description": "Explicitly renew the API key actor's existing GitHub App credential.\nRequires projects:read in the key's bound ledger and current membership;\nrefreshes the actor's own credentials, never the ledger owner's.\nUses the same durable rotation claim as the browser refresh endpoint.\nRechecks the key, scopes, restrictions, membership and token generation\natomically before the provider exchange and credential publication.\nNo token is returned and no new GitHub permission is granted. When a\nread returns githubRefreshRequired true, make this POST once and repeat\nthe read once after success. Never retry an uncertain exchange or replay\na business write. A pending claim returns 409 GITHUB_REFRESH_PENDING;\nmissing, expired, revoked or uncertain refresh credentials require\nexplicit GitHub reconnection on the Web.\n",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "maxProperties": 0
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Credential renewed or already current",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "ok",
+                    "refreshed"
+                  ],
+                  "properties": {
+                    "ok": {
+                      "type": "boolean",
+                      "const": true
+                    },
+                    "refreshed": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "409": {
+            "description": "GITHUB_REFRESH_PENDING or ACCOUNT_CHANGED; no provider retry",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "$ref": "#/components/responses/InvalidInput"
+          },
+          "502": {
+            "description": "Invalid GitHub credential response; no retry",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Provider or internal failure; no retry of an uncertain exchange",
             "content": {
               "application/json": {
                 "schema": {
@@ -4592,6 +4688,11 @@
                 "type": "string",
                 "minLength": 1
               },
+              "requestId": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{32}$",
+                "description": "Opaque correlation ID for private Server diagnostics; no request or credential data"
+              },
               "message": {
                 "type": "string",
                 "description": "Optional human-readable detail; branch client logic on code"
@@ -5697,11 +5798,11 @@
               "lost",
               "reauthorization_required"
             ],
-            "description": "Expired or revoked credentials never revoke the Norulo session or write on a GET. When githubRefreshRequired is true, cookie clients may POST /integrations/github/refresh and repeat this read once. Otherwise reconnect requires explicit GitHub login. Unavailable/unknown grants return an error rather than a successful empty page."
+            "description": "Expired or revoked credentials never revoke the Norulo session or write on a GET. When githubRefreshRequired is true, cookie clients may POST /integrations/github/refresh and API keys may POST /api/v1/integrations/github/refresh, then repeat this read once after success. Otherwise reconnect requires explicit GitHub login. Unavailable/unknown grants return an error rather than a successful empty page."
           },
           "githubRefreshRequired": {
             "type": "boolean",
-            "description": "A saved refresh credential permits one separate cookie-authenticated refresh attempt; no token material is returned"
+            "description": "A saved refresh credential permits one separate authenticated refresh attempt; no token material is returned"
           }
         }
       },
@@ -6126,7 +6227,7 @@
           },
           "githubRefreshRequired": {
             "type": "boolean",
-            "description": "The actual actor may renew their own GitHub credential through the separate cookie-authenticated refresh endpoint"
+            "description": "The actual actor may renew their own GitHub credential through the separate cookie or API-key authenticated refresh endpoint"
           },
           "canCreateExpense": {
             "type": "boolean",
@@ -7683,5 +7784,5 @@
       }
     }
   },
-  "x-norulo-source-sha256": "8a5232407b9621bd30ecfa2afe27962465cec1223fa3d56c58e2a81a432a56c5"
+  "x-norulo-source-sha256": "5c8335ea0864475a554a04e08db40229e9f72487b1d21868fcf53b67e1b4e086"
 }

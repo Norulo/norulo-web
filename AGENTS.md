@@ -1,5 +1,13 @@
 # Norulo Web
 
+## 2026-10-16 status monitoring boundary
+
+Web only forwards /status/traffic.json through NORULO_SERVER. Analytics queries,
+credentials, aggregation and caching belong to Server. Do not reintroduce the
+analytics account variable or Secret dependency in Web. Preserve the public
+version-1 payload, fixed target, GET/HEAD, stripped browser credentials and
+Cloudflare ingress IP for Server frequency admission.
+
 ## 2026-10-14 Jev calls and paid plan allowances
 
 Default Max capacity is 200,000 retained expenses with a $12/month Jev allowance;

@@ -949,18 +949,27 @@ separates local validation from actual production readback.
 
 ## Status page activity data
 
-`/status/traffic.json` is served by the `norulo-web` Worker and powers the
-Status page heatmaps. It queries Cloudflare's GraphQL Analytics API
+`/status/traffic.json` powers the Status page heatmaps. The Web Worker forwards
+GET/HEAD through its existing `NORULO_SERVER` service binding to the same path
+on Server. Server queries Cloudflare's GraphQL Analytics API
 (`workersInvocationsAdaptive`, `workersInvocationsScheduled`) for the
 `norulo-web`, `norulo-server-production` and `norulo-connect` scripts and
 returns only relative activity levels (0-4), coarse error levels, MCP
 reachability and the last scheduled run outcome; it never returns request
-counts, the token or Cloudflare error text. Results are cached for 10 minutes.
+counts, the token or Cloudflare error text. Successful results are cached for
+10 minutes on Server (browser cache at most five minutes); unavailable results
+are cached for one minute. Cache hits never extend the original expiry.
 
 To enable it, create an API token limited to **Account Analytics: Read** for
-account `NORULO_CF_ACCOUNT_ID` (set in `wrangler.jsonc`) and store it as the
-`NORULO_CF_ANALYTICS_TOKEN` Worker secret. Without the secret the page shows
-that activity data is not enabled and still reports MCP reachability.
+account `NORULO_CF_ACCOUNT_ID` (set in Server's production config) and store it
+as the `NORULO_CF_ANALYTICS_TOKEN` secret on **norulo-server-production**.
+Web needs neither analytics variable nor token. Without the Server secret the
+page shows that activity data is not enabled and still reports MCP reachability.
+The status endpoint uses Server's existing frequency admission but does not
+touch D1, Durable Objects, ledger auth or business providers. Fixed-code private
+Server diagnostics distinguish traffic and scheduler failures without logging
+provider responses or credentials. This is an in-process status endpoint;
+an independent monitor would still be needed to observe a complete Server outage.
 # GitHub plugin API contract, 2026-10-16
 
 Web source `815c4c48efabe51004389ab578ccf08ae980cf70` is deployed as

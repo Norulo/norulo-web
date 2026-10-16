@@ -1412,30 +1412,54 @@ details.panel[open] > summary.panel-h::after,
 .empty > :last-child {
   margin-bottom: 0;
 }
-/* Navigation and actions avoid accidental selection; record data and prose
-   remain selectable, including ordinary links and informational tags. */
+/* Interface chrome is never selected by accident: navigation, controls,
+   menus, tabs, option lists, toggles, choice labels, resize handles, icons,
+   images, loading placeholders and chart scaffolding. Everything a person may
+   want to copy stays selectable: record names, descriptions, exact amounts,
+   dates, links inside records, tags, messages, prose, code and form values. */
 .topbar,
 .crumbs,
 .side,
+.view-tabs,
 .modal-foot,
 .lang-picker,
 .kbd,
+.preferences,
 .badge,
 .dot,
+.status-dot,
 .notfound-suggest-i,
 .seg-i,
 .pricing-toggle,
 .lp-top,
 .lp-foot-links,
+.lp-mcp-chat-bar,
 .auth-back-home,
 .docs-side,
 .docs-crumbs,
+.docs-code-h,
 .legal-side-h,
 .legal-side-i,
 .legal-crumbs,
 .set-side,
-.status-dot {
+.ledger-project-head,
+.expense-chart-svg,
+.traffic-axis,
+.traffic-legend,
+.traffic-cell,
+.skeleton,
+.spin,
+:is([role="tab"], [role="tablist"], [role="menu"], [role="menuitemradio"], [role="option"], [role="listbox"]),
+label:has(> input:is([type="checkbox"], [type="radio"])),
+:where(svg, img, .ic, .brand-mark) {
   user-select: none;
+}
+:where(img, .brand-mark) {
+  -webkit-user-drag: none;
+}
+/* Values a person copies stay selectable inside otherwise inert chrome. */
+:is(pre, code, .financial-value, .numeric-count) {
+  user-select: text;
 }
 
 @media (max-width: 899px) {

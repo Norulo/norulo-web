@@ -277,6 +277,29 @@ describe("Design token discipline", () => {
     expect(stylesOf("src/App.jsx")).not.toContain("fontSize: 16");
     expect(stylesOf("src/screens/public.jsx")).not.toContain("fontSize: 16");
   });
+  it("keeps interface chrome unselectable while record values stay selectable", () => {
+    const base = stylesOf("styles/base.css");
+    const inert = base.match(/\n(?<selectors>[^{}]*)\{\s*user-select:\s*none;\s*\}\n:where\(img/)
+      ?.groups?.selectors;
+    expect(inert).toBeTruthy();
+    for (const selector of [
+      ".topbar",
+      ".side",
+      ".view-tabs",
+      ".skeleton",
+      '[role="option"]',
+      '[role="menuitemradio"]',
+      'label:has(> input:is([type="checkbox"], [type="radio"]))',
+      ":where(svg, img, .ic, .brand-mark)",
+    ]) {
+      expect(inert, selector).toContain(selector);
+    }
+    for (const content of [".financial-value", ".tag", ".ledger-list", "pre", "code", "p,"]) {
+      expect(inert.split(/,\s*/), content).not.toContain(content);
+    }
+    expect(base).toMatch(/:is\(pre, code, \.financial-value, \.numeric-count\)\s*\{\s*user-select:\s*text;/);
+    expect(base).toMatch(/input,\s*textarea,\s*select\s*\{[^}]*user-select:\s*text;/);
+  });
   it("keeps the stylesheet free of dead rules, duplicates, and mojibake", () => {
     const base = stylesOf("styles/base.css");
     const screens = stylesOf("styles/screens.css");

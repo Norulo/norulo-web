@@ -23,7 +23,7 @@ vi.mock("./api/norulo.js", () => ({
       getExpenseRetention: vi.fn(),
       updateExpenseRetention: vi.fn(),
     },
-    integrations: { list: vi.fn(), getGitHubAuthorizeUrl: vi.fn() },
+    integrations: { list: vi.fn(), getGitHubAuthorizeUrl: vi.fn(), disconnect: vi.fn() },
   },
 }));
 const harness = vi.hoisted(() => ({
@@ -574,6 +574,37 @@ it("allows navigation during a Settings read and ignores its late signed-out res
   await act(async () => read.resolve({ authenticated: false }));
   expect(window.location.pathname).toBe("/projects");
   expect(screen.queryByRole("button", { name: "Continue with GitHub" })).not.toBeInTheDocument();
+});
+
+it("invalidates old GitHub and request scopes after unlinking while retaining the email account", async () => {
+  window.history.replaceState({}, "", "/settings");
+  const linked = {
+    authenticated: true,
+    user: { id: "alice", name: "Alice", email: "alice@example.com", emailVerified: true, providers: ["email", "github"] },
+  };
+  const unlinked = {
+    ...linked,
+    user: { ...linked.user, providers: ["email"] },
+    github: { identityConnected: false, repositoriesConnected: false },
+  };
+  noruloApi.auth.getSession.mockResolvedValue(linked);
+  noruloApi.integrations.disconnect.mockResolvedValueOnce(unlinked);
+  render(<App />);
+  fireEvent.click(await screen.findByRole("button", { name: "Unlink GitHub account" }));
+  const githubScope = captureGitHubRefreshScope();
+  const requestScope = captureRequestSessionScope();
+  fireEvent.click(within(screen.getByRole("dialog")).getByRole("button", { name: "Unlink GitHub account" }));
+  expect(await screen.findByText("GitHub account unlinked. You can sign in with your verified email.")).toBeVisible();
+  expect(githubScope.controller.signal.aborted).toBe(true);
+  expect(captureGitHubRefreshScope()).not.toBe(githubScope);
+  expect(captureGitHubRefreshScope().identity).toBe("alice");
+  expect(captureRequestSessionScope()).not.toBe(requestScope);
+  const sessionReads = noruloApi.auth.getSession.mock.calls.length;
+  await act(async () => requestSessionRecheck(requestScope));
+  expect(noruloApi.auth.getSession).toHaveBeenCalledTimes(sessionReads);
+  expect(screen.getByRole("button", { name: "Connect GitHub account" })).toBeEnabled();
+  expect(screen.getByText("Verified email")).toBeVisible();
+  expect(window.location.pathname).toBe("/settings");
 });
 
 it("keeps the current ledger and user identity after first email binding from Settings", async () => {

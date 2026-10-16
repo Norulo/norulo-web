@@ -752,7 +752,7 @@
         "tags": [
           "Authentication"
         ],
-        "description": "Request a six-digit code for a normalized ASCII email address. purpose\nlogin verifies an existing email identity or registers a new account\nafter successful verification; it does not disclose account existence.\npurpose link requires the current cookie session, binds the challenge\nto that account and session, and never merges accounts. Changing an\nalready verified login email requires a separate flow and is rejected.\nAn email already owned by another account is rejected before sending\na code, creating a challenge or starting its send cooldown. Ownership\nis checked only for authenticated linking and rechecked at verification.\nA trusted Origin header and at most 8 KiB of strict JSON are required.\nA Referer header does not replace a missing Origin.\nOnly one challenge is active per email; explicit resend after 60 seconds\ninvalidates the earlier challenge. Codes expire after 600 seconds and\nare never returned or logged. Delivery uncertainty is not retried.\nSet-Cookie issues a random nr_email_challenge browser binding, Secure\nand HttpOnly with a 600-second lifetime; verification must use this same\nbrowser. The binding's SameSite policy follows the configured app origin.\n",
+        "description": "Request a six-digit code for a normalized ASCII email address. purpose\nlogin verifies an existing email identity or registers a new account\nafter successful verification; it does not disclose account existence.\npurpose link requires the current cookie session, binds the challenge\nto that account and session, and never merges accounts. Changing an\nalready verified login email is rejected. Once linked, a login email\ncannot be unlinked or changed.\nAn email already owned by another account is rejected before sending\na code, creating a challenge or starting its send cooldown. Ownership\nis checked only for authenticated linking and rechecked at verification.\nA trusted Origin header and at most 8 KiB of strict JSON are required.\nA Referer header does not replace a missing Origin.\nOnly one challenge is active per email; explicit resend after 60 seconds\ninvalidates the earlier challenge. Codes expire after 600 seconds and\nare never returned or logged. Delivery uncertainty is not retried.\nSet-Cookie issues a random nr_email_challenge browser binding, Secure\nand HttpOnly with a 600-second lifetime; verification must use this same\nbrowser. The binding's SameSite policy follows the configured app origin.\n",
         "parameters": [
           {
             "$ref": "#/components/parameters/EmailAuthOrigin"
@@ -1195,6 +1195,67 @@
           },
           "502": {
             "description": "GITHUB_PROFILE_INVALID; no trusted numeric identity",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/integrations/github": {
+      "delete": {
+        "operationId": "unlinkGithubAccount",
+        "x-norulo-scope": "account:auth",
+        "security": [
+          {
+            "cookieSession": []
+          }
+        ],
+        "tags": [
+          "Authentication"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AuthOrigin"
+          }
+        ],
+        "description": "Unlink the current account's GitHub login identity and remove its stored\nGitHub credentials and repository grants. Requires a current cookie\nsession, a trusted Origin or Referer and an independently verified email\nlogin identity belonging to this account. GitHub contact or billing email\nis insufficient. Email remains permanently linked. Account ID, current\nsession, ledger history, projects, project repository associations,\nmemberships, API keys and billing are retained. Pending authorization\ncallbacks cannot restore the removed connection. The released GitHub\nidentity can be linked again explicitly; a later standalone GitHub login\ncannot recover the original email account. No GitHub API call or App\nuninstall is performed. An already unlinked account is a read-only no-op.\n",
+        "responses": {
+          "200": {
+            "description": "GitHub unlinked; current email-backed session",
+            "headers": {
+              "Cache-Control": {
+                "$ref": "#/components/headers/NoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountSession"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "description": "UNTRUSTED_ORIGIN",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "EMAIL_REQUIRED_FOR_GITHUB_UNLINK",
+            "GITHUB_IDENTITY_CONFLICT or ACCOUNT_CHANGED; reload before trying again": null,
             "content": {
               "application/json": {
                 "schema": {
@@ -7622,5 +7683,5 @@
       }
     }
   },
-  "x-norulo-source-sha256": "abf64d17b896e5a129813de9adfacde0e539edbbc0b37f60e53fce4e3dab9f21"
+  "x-norulo-source-sha256": "8a5232407b9621bd30ecfa2afe27962465cec1223fa3d56c58e2a81a432a56c5"
 }

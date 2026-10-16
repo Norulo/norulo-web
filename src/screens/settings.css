@@ -23,6 +23,7 @@
 }
 
 .settings-sign-in-methods,
+.settings-github-method,
 .settings-email-method,
 .settings-sign-in-email-details {
   display: grid;
@@ -34,7 +35,8 @@
   gap: var(--space-4);
 }
 
-.settings-email-method {
+.settings-email-method,
+.settings-github-method {
   gap: var(--space-2);
 }
 

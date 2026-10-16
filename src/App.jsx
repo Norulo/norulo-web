@@ -816,6 +816,15 @@ export function App() {
   const setAuthState = useCallback((nextAuth) => {
     const resolvedAuth = typeof nextAuth === "function" ? nextAuth(authRef.current) : nextAuth;
     const nextIdentity = sessionIdentity(resolvedAuth.authenticated, resolvedAuth.session);
+    if (
+      authRef.current.session?.user?.providers?.includes("github") &&
+      resolvedAuth.authenticated &&
+      !resolvedAuth.session?.user?.providers?.includes("github")
+    ) {
+      setGitHubRefreshIdentity(null);
+      setRequestSessionIdentity(null);
+      setRepositoryAuthorizationRevision((value) => value + 1);
+    }
     setGitHubRefreshIdentity(resolvedAuth.authenticated ? resolvedAuth.session?.user?.id : null);
     setRequestSessionIdentity(resolvedAuth.authenticated ? nextIdentity : null);
     if (authIdentityRef.current !== nextIdentity) {

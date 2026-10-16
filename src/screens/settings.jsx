@@ -7,6 +7,7 @@ import {
   GitHubClosedNotice,
 } from "../components/github-authorization-notice.jsx";
 import { EmailSignIn } from "../components/email-sign-in.jsx";
+import { ConfirmDialog } from "../components/confirm-dialog.jsx";
 import { I } from "../icons.jsx";
 import { T, useLang } from "../i18n.jsx";
 import { requestErrorText, UserFacingError } from "../lib/request-error.js";
@@ -19,10 +20,15 @@ import {
 import { Sidebar, Topbar } from "../shell.jsx";
 import { ConsoleLayout } from "../components/console-layout.jsx";
 import { EXPENSE_RETENTION_COPY } from "../locales/expense-retention.js";
+import { GITHUB_ACCOUNT_COPY } from "../locales/github-account.js";
 import "./settings.css";
 
 function retentionText(key) {
   return T(...EXPENSE_RETENTION_COPY[key]);
+}
+
+function githubAccountText(key) {
+  return T(...GITHUB_ACCOUNT_COPY[key]);
 }
 
 function githubIntegrationReady(value) {
@@ -68,6 +74,9 @@ export function SettingsScreen({ go, onSessionUpdated, onOperationBusy }) {
   const [error, setError] = useState("");
   const [githubClosedNotice, setGithubClosedNotice] = useState(null);
   const [githubReconnectRequired, setGithubReconnectRequired] = useState(false);
+  const [unlinkIdentity, setUnlinkIdentity] = useState(null);
+  const [githubUnlinked, setGithubUnlinked] = useState(false);
+  const [unlinkReloadRequired, setUnlinkReloadRequired] = useState(false);
   const [managingInstallationId, setManagingInstallationId] = useState("");
   const [jevSettings, setJevSettings] = useState(null);
   const [jevReloadRequired, setJevReloadRequired] = useState(false);
@@ -90,6 +99,7 @@ export function SettingsScreen({ go, onSessionUpdated, onOperationBusy }) {
   const retentionSwitchRef = useRef(null);
   const retentionDescriptionRef = useRef(null);
   const retentionFocusRef = useRef(null);
+  const unlinkDescriptionId = useId();
   sessionRef.current = session;
   jevRef.current = jevSettings;
   retentionRef.current = expenseRetention;
@@ -105,6 +115,7 @@ export function SettingsScreen({ go, onSessionUpdated, onOperationBusy }) {
     setLoading(true);
     setError("");
     setGithubClosedNotice(null);
+    setGithubUnlinked(false);
     const [sessionResult, integrationsResult, jevResult, retentionResult] =
       await Promise.allSettled([
         noruloApi.auth.getSession({ signal: controller.signal }),
@@ -115,6 +126,7 @@ export function SettingsScreen({ go, onSessionUpdated, onOperationBusy }) {
     if (controller.signal.aborted || requestId !== requestRef.current) return;
     if (loadControllerRef.current === controller) loadControllerRef.current = null;
     setSession(sessionResult.status === "fulfilled" ? sessionResult.value : null);
+    setUnlinkReloadRequired(sessionResult.status !== "fulfilled");
     setIntegrations(integrationsResult.status === "fulfilled" ? integrationsResult.value : null);
     setGithubReconnectRequired(
       integrationsResult.status === "rejected"
@@ -197,7 +209,7 @@ export function SettingsScreen({ go, onSessionUpdated, onOperationBusy }) {
     };
   }, [load]);
 
-  const runGitHubAction = async (action, installationId = "") => {
+  const runGitHubAction = async (action, { installationId = "", unlink = false } = {}) => {
     if (
       !mountedRef.current ||
       actionRef.current ||
@@ -232,6 +244,7 @@ export function SettingsScreen({ go, onSessionUpdated, onOperationBusy }) {
     setManagingInstallationId(installationId);
     setError("");
     setGithubClosedNotice(null);
+    setGithubUnlinked(false);
     const live = () =>
       mountedRef.current &&
       githubActionRef.current === operation &&
@@ -240,6 +253,33 @@ export function SettingsScreen({ go, onSessionUpdated, onOperationBusy }) {
     try {
       const outcome = await action(operation.controller.signal);
       if (!live()) return;
+      if (unlink) {
+        if (
+          !outcome?.authenticated ||
+          outcome.user?.id !== operation.identity ||
+          outcome.user.emailVerified !== true ||
+          typeof outcome.user.email !== "string" ||
+          !outcome.user.email.trim() ||
+          outcome.user.email !== sessionRef.current?.user?.email ||
+          !Array.isArray(outcome.user.providers) ||
+          !outcome.user.providers.includes("email") ||
+          outcome.user.providers.includes("github") ||
+          outcome.github?.identityConnected !== false ||
+          outcome.github?.repositoriesConnected !== false
+        )
+          throw new UserFacingError(githubAccountText("failed"));
+        await onSessionUpdated?.(outcome);
+        if (!live()) return;
+        setSession(outcome);
+        setIntegrations({
+          github: { connected: false, repositories: [] },
+          githubAccess: "not_connected",
+        });
+        setGithubReconnectRequired(false);
+        setUnlinkIdentity(null);
+        setGithubUnlinked(true);
+        return;
+      }
       if (outcome?.status === "redirecting") {
         operation.redirecting = true;
         return;
@@ -254,11 +294,20 @@ export function SettingsScreen({ go, onSessionUpdated, onOperationBusy }) {
         setGithubClosedNotice({ identity: operation.identity, outcome });
     } catch (failure) {
       if (live()) {
+        if (unlink) {
+          setUnlinkIdentity(null);
+          setUnlinkReloadRequired(true);
+        }
         if (failure?.code === "GITHUB_REAUTHORIZATION_REQUIRED") setGithubReconnectRequired(true);
         setError(
           failure?.code === "GITHUB_REAUTHORIZATION_REQUIRED"
             ? T("Reconnect your GitHub account before checking repository access.")
-            : requestErrorText(failure, T("GitHub authorization failed.", "GitHub 授权失败。"))
+            : requestErrorText(
+                failure,
+                unlink
+                  ? githubAccountText("failed")
+                  : T("GitHub authorization failed.", "GitHub 授权失败。")
+              )
         );
       }
     } finally {
@@ -567,6 +616,11 @@ export function SettingsScreen({ go, onSessionUpdated, onOperationBusy }) {
               {error}
             </div>
           )}
+          {githubUnlinked && (
+            <div className="notice" role="status">
+              {githubAccountText("unlinked")}
+            </div>
+          )}
           <section
             className="panel section-split settings-section settings-profile-panel"
             aria-label={T("Profile", "个人资料")}
@@ -609,31 +663,50 @@ export function SettingsScreen({ go, onSessionUpdated, onOperationBusy }) {
                   </p>
                 )}
                 {canConnectGitHub && (
-                  <div className="panel-actions">
-                    <button
-                      className="btn"
-                      disabled={controlsDisabled}
-                      onClick={() =>
-                        runGitHubAction((signal) =>
-                          startGitHubLogin({
-                            intent: "link",
-                            redirectTo: window.location.href,
-                            signal,
-                          })
-                        )
-                      }
-                    >
-                      <I.Github size={16} />{" "}
-                      {githubProvider || githubReconnectRequired
-                        ? T("Reconnect GitHub", "重新连接 GitHub")
-                        : T("Connect GitHub account", {
-                            zh: "连接 GitHub 账户",
-                            ja: "GitHub アカウントを接続",
-                            ko: "GitHub 계정 연결",
-                            fr: "Connecter un compte GitHub",
-                            es: "Conectar cuenta de GitHub",
-                          })}
-                    </button>
+                  <div className="settings-github-method">
+                    <div className="panel-actions">
+                      <button
+                        className="btn"
+                        disabled={controlsDisabled}
+                        onClick={() =>
+                          runGitHubAction((signal) =>
+                            startGitHubLogin({
+                              intent: "link",
+                              redirectTo: window.location.href,
+                              signal,
+                            })
+                          )
+                        }
+                      >
+                        <I.Github size={16} />{" "}
+                        {githubProvider || githubReconnectRequired
+                          ? T("Reconnect GitHub", "重新连接 GitHub")
+                          : T("Connect GitHub account", {
+                              zh: "连接 GitHub 账户",
+                              ja: "GitHub アカウントを接続",
+                              ko: "GitHub 계정 연결",
+                              fr: "Connecter un compte GitHub",
+                              es: "Conectar cuenta de GitHub",
+                            })}
+                      </button>
+                      {githubProvider && (
+                        <button
+                          className="btn"
+                          disabled={controlsDisabled || !loginEmail || unlinkReloadRequired}
+                          aria-describedby={!loginEmail ? unlinkDescriptionId : undefined}
+                          onClick={() => {
+                            if (!actionRef.current && loginEmail) setUnlinkIdentity(user.id);
+                          }}
+                        >
+                          {githubAccountText("unlink")}
+                        </button>
+                      )}
+                    </div>
+                    {githubProvider && !loginEmail && (
+                      <p className="muted settings-sign-in-description" id={unlinkDescriptionId}>
+                        {githubAccountText("needsEmail")}
+                      </p>
+                    )}
                   </div>
                 )}
                 {loginEmail ? (
@@ -648,10 +721,7 @@ export function SettingsScreen({ go, onSessionUpdated, onOperationBusy }) {
                       </div>
                     </div>
                     <p className="muted settings-sign-in-description">
-                      {T(
-                        "Use email codes to sign in to this account.",
-                        "使用邮箱验证码登录此账户。"
-                      )}
+                      {githubAccountText("emailPermanent")}
                     </p>
                   </div>
                 ) : canLinkEmail ? (
@@ -660,7 +730,8 @@ export function SettingsScreen({ go, onSessionUpdated, onOperationBusy }) {
                       {T(
                         "Link an email to sign in with a code. Your existing account and ledgers stay together.",
                         "绑定邮箱后即可使用验证码登录，现有账户和账本保持不变。"
-                      )}
+                      )}{" "}
+                      {githubAccountText("emailPermanent")}
                     </p>
                     <EmailSignIn
                       key={user.id}
@@ -795,7 +866,8 @@ export function SettingsScreen({ go, onSessionUpdated, onOperationBusy }) {
                   </p>
                   <p className="muted settings-jev-budget">
                     {T("Jev calls", "Jev 次数")}:{" "}
-                    {jevAllowance(jevSettings)?.calls.toLocaleString("en-US")} {T("calls", "次")} ·{" "}
+                    {jevAllowance(jevSettings)?.calls.toLocaleString("en-US")} {T("calls", "次")}{" "}
+                    ·{" "}
                     {jevSettings.period === "lifetime"
                       ? T("One-time trial", "一次性试用")
                       : T("per month", "每月")}
@@ -922,7 +994,7 @@ export function SettingsScreen({ go, onSessionUpdated, onOperationBusy }) {
                                 redirectTo: window.location.href,
                                 signal,
                               }),
-                            installationId
+                            { installationId }
                           );
                         }}
                       />
@@ -934,6 +1006,28 @@ export function SettingsScreen({ go, onSessionUpdated, onOperationBusy }) {
           </section>
         </main>
       </ConsoleLayout>
+      <ConfirmDialog
+        open={Boolean(
+          unlinkIdentity && unlinkIdentity === user?.id && githubProvider && loginEmail
+        )}
+        title={githubAccountText("unlink")}
+        description={githubAccountText("confirmation")}
+        confirmLabel={githubAccountText("unlink")}
+        cancelLabel={T("Cancel", "取消")}
+        onConfirm={() => {
+          if (!loginEmail || unlinkReloadRequired || unlinkIdentity !== user?.id) return;
+          runGitHubAction(
+            (signal) => noruloApi.integrations.disconnect("github", { signal }),
+            { unlink: true }
+          );
+        }}
+        onCancel={() => {
+          if (!actionRef.current) setUnlinkIdentity(null);
+        }}
+        busy={busy}
+        danger
+        dialogId="unlink-github"
+      />
     </div>
   );
 }

@@ -21,7 +21,7 @@ vi.mock("../api/norulo.js", () => ({
       getExpenseRetention: vi.fn(),
       updateExpenseRetention: vi.fn(),
     },
-    integrations: { list: vi.fn() },
+    integrations: { list: vi.fn(), disconnect: vi.fn() },
   },
 }));
 vi.mock("../lib/auth.js", () => ({
@@ -378,6 +378,7 @@ describe("product settings", () => {
     const onSessionUpdated = vi.fn();
     render(<SettingsScreen go={vi.fn()} onSessionUpdated={onSessionUpdated} />);
     const email = await screen.findByRole("textbox", { name: "Email" });
+    expect(screen.getByRole("button", { name: "Unlink GitHub account" })).toBeDisabled();
     expect(screen.queryByText("Verified email")).not.toBeInTheDocument();
     fireEvent.change(email, { target: { value: "login@example.com" } });
     fireEvent.click(screen.getByRole("button", { name: "Send code" }));
@@ -389,6 +390,7 @@ describe("product settings", () => {
     fireEvent.change(code, { target: { value: "012345" } });
     fireEvent.click(screen.getByRole("button", { name: "Verify and link email" }));
     expect(await screen.findByText("Verified email")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Unlink GitHub account" })).toBeEnabled();
     expect(onSessionUpdated).toHaveBeenCalledWith(
       expect.objectContaining({
         user: expect.objectContaining({ id: "taylor", emailVerified: true }),
@@ -888,5 +890,130 @@ describe("product settings", () => {
     expect(integrationsSignal).toBe(sessionSignal);
     view.unmount();
     expect(sessionSignal.aborted).toBe(true);
+  });
+
+  it("requires a verified login email before offering GitHub unlinking", async () => {
+    render(<SettingsScreen go={vi.fn()} />);
+    expect(await screen.findByRole("button", { name: "Unlink GitHub account" })).toBeDisabled();
+    expect(
+      screen.getByText("Link and verify an email before unlinking GitHub so you can still sign in.")
+    ).toBeVisible();
+    expect(noruloApi.integrations.disconnect).not.toHaveBeenCalled();
+  });
+
+  const emailAndGitHub = {
+    ...session,
+    user: { ...session.user, emailVerified: true, providers: ["email", "github"] },
+  };
+  const emailOnly = {
+    ...emailAndGitHub,
+    user: { ...emailAndGitHub.user, providers: ["email"] },
+    github: { identityConnected: false, repositoriesConnected: false },
+  };
+  async function openUnlink() {
+    fireEvent.click(await screen.findByRole("button", { name: "Unlink GitHub account" }));
+    return within(screen.getByRole("dialog", { name: "Unlink GitHub account" }));
+  }
+
+  it.each([
+    ["email", "github"],
+    ["github", "email"],
+  ])(
+    "unlinks either sign-in origin after confirmation and preserves the email session: %j",
+    async (...providers) => {
+      noruloApi.auth.getSession.mockResolvedValue({
+        ...emailAndGitHub,
+        user: { ...emailAndGitHub.user, providers },
+      });
+      noruloApi.integrations.list.mockResolvedValue(connectedGitHub);
+      const pending = deferred();
+      noruloApi.integrations.disconnect.mockReturnValueOnce(pending.promise);
+      const onSessionUpdated = vi.fn();
+      render(<SettingsScreen go={vi.fn()} onSessionUpdated={onSessionUpdated} />);
+      const dialog = await openUnlink();
+      expect(noruloApi.integrations.disconnect).not.toHaveBeenCalled();
+      const confirm = dialog.getByRole("button", { name: "Unlink GitHub account" });
+      fireEvent.click(confirm);
+      fireEvent.click(confirm);
+      expect(noruloApi.integrations.disconnect).toHaveBeenCalledExactlyOnceWith("github", {
+        signal: expect.any(AbortSignal),
+      });
+      expect(confirm).toBeDisabled();
+      expect(
+        dialog.getAllByRole("button", { name: "Cancel" }).every((button) => button.disabled)
+      ).toBe(true);
+      await act(async () => pending.resolve(emailOnly));
+      expect(onSessionUpdated).toHaveBeenCalledExactlyOnceWith(emailOnly);
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+      expect(
+        screen.getByText("GitHub account unlinked. You can sign in with your verified email.")
+      ).toBeVisible();
+      expect(screen.getByRole("button", { name: "Connect GitHub account" })).toBeEnabled();
+      expect(
+        screen.queryByRole("button", { name: "Unlink GitHub account" })
+      ).not.toBeInTheDocument();
+      expect(screen.getByText("Verified email")).toBeVisible();
+      expect(
+        screen.getByText(
+          "Use email codes to sign in. Once linked, this email cannot be unlinked or changed."
+        )
+      ).toBeVisible();
+      expect(screen.queryByRole("textbox", { name: "Email" })).not.toBeInTheDocument();
+      expect(noruloApi.integrations.list).toHaveBeenCalledOnce();
+      expect(noruloApi.auth.getSession).toHaveBeenCalledOnce();
+      expect(githubAccess().getByText(linkAccountGuidance)).toBeVisible();
+    }
+  );
+
+  it("cancels unlink confirmation without calling the API", async () => {
+    noruloApi.auth.getSession.mockResolvedValue(emailAndGitHub);
+    render(<SettingsScreen go={vi.fn()} />);
+    const dialog = await openUnlink();
+    fireEvent.click(dialog.getAllByRole("button", { name: "Cancel" })[1]);
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(noruloApi.integrations.disconnect).not.toHaveBeenCalled();
+  });
+
+  it.each(["network", "wrong-account", "still-connected"])(
+    "requires reload after an unconfirmed %s unlink result",
+    async (failure) => {
+      noruloApi.auth.getSession.mockResolvedValue(emailAndGitHub);
+      if (failure === "network")
+        noruloApi.integrations.disconnect.mockRejectedValueOnce(new Error("Failed to fetch"));
+      else
+        noruloApi.integrations.disconnect.mockResolvedValueOnce(
+          failure === "wrong-account"
+            ? { ...emailOnly, user: { ...emailOnly.user, id: "other" } }
+            : emailAndGitHub
+        );
+      const onSessionUpdated = vi.fn();
+      render(<SettingsScreen go={vi.fn()} onSessionUpdated={onSessionUpdated} />);
+      const dialog = await openUnlink();
+      fireEvent.click(dialog.getByRole("button", { name: "Unlink GitHub account" }));
+      expect(await screen.findByRole("alert")).toBeVisible();
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "Unlink GitHub account" })).toBeDisabled();
+      expect(onSessionUpdated).not.toHaveBeenCalled();
+      expect(noruloApi.integrations.disconnect).toHaveBeenCalledOnce();
+      fireEvent.click(screen.getByRole("button", { name: "Reload" }));
+      await waitFor(() =>
+        expect(screen.getByRole("button", { name: "Unlink GitHub account" })).toBeEnabled()
+      );
+    }
+  );
+
+  it("aborts unlinking on unmount and ignores its late completion", async () => {
+    noruloApi.auth.getSession.mockResolvedValue(emailAndGitHub);
+    const pending = deferred();
+    noruloApi.integrations.disconnect.mockReturnValueOnce(pending.promise);
+    const onSessionUpdated = vi.fn();
+    const view = render(<SettingsScreen go={vi.fn()} onSessionUpdated={onSessionUpdated} />);
+    const dialog = await openUnlink();
+    fireEvent.click(dialog.getByRole("button", { name: "Unlink GitHub account" }));
+    const signal = noruloApi.integrations.disconnect.mock.calls.at(-1)[1].signal;
+    view.unmount();
+    expect(signal.aborted).toBe(true);
+    await act(async () => pending.resolve(emailOnly));
+    expect(onSessionUpdated).not.toHaveBeenCalled();
   });
 });

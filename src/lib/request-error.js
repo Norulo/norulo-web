@@ -1,4 +1,5 @@
 import { T } from "../i18n.jsx";
+import { GITHUB_ACCOUNT_COPY } from "../locales/github-account.js";
 
 // Locally authored, translated guidance may be displayed as-is. Untrusted
 // Server messages remain available on ApiError for diagnostics, not UI copy.
@@ -33,6 +34,7 @@ export function requestErrorText(error, fallback) {
   const code = error?.code || error?.payload?.error?.code || error?.payload?.code;
   const githubMessage = gitHubManageErrorText(code);
   if (githubMessage) return githubMessage;
+  if (code === "EMAIL_REQUIRED_FOR_GITHUB_UNLINK") return T(...GITHUB_ACCOUNT_COPY.needsEmail);
   if (code === "GITHUB_REAUTHORIZATION_REQUIRED")
     return T("Reconnect your GitHub account before checking repository access.", "请先重新连接你的 GitHub 账户，再检查仓库访问权限。");
   if (code === "GITHUB_IDENTITY_REQUIRED")

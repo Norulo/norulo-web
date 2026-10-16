@@ -99,8 +99,11 @@ export const noruloApi = {
         method: "POST",
         body: payload,
       }),
-    disconnect: (provider) =>
-      request(`/integrations/${pathSegment(provider)}`, { method: "DELETE" }),
+    disconnect: (provider, options = {}) =>
+      request(`/integrations/${pathSegment(provider)}`, {
+        method: "DELETE",
+        ...(options.signal ? { signal: options.signal } : {}),
+      }),
   },
 
   billing: {

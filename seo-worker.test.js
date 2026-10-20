@@ -2,6 +2,7 @@
 import { createHash } from "node:crypto";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import worker from "./worker-entry.js";
+import { PUBLIC_PAGE_ASSETS, PUBLIC_PRICING_MARKER } from "./public-pages.js";
 
 const originalFetch = globalThis.fetch;
 
@@ -10,6 +11,76 @@ afterEach(() => {
 });
 
 describe("SEO Worker shell", () => {
+  it.each(Object.entries(PUBLIC_PAGE_ASSETS))("serves the generated public asset for %s", async (path, asset) => {
+    const assets = { fetch: vi.fn(async (request) => {
+      expect(new URL(request.url).pathname).toBe(asset);
+      expect(request.headers.get("If-None-Match")).toBeNull();
+      expect(request.headers.get("Range")).toBeNull();
+      return new Response('<html><head></head><body><main>Public document</main></body></html>', {
+        headers: { "Content-Type": "text/html", ETag: '"source-only"' },
+      });
+    }) };
+    const server = { fetch: vi.fn() };
+    const response = await worker.fetch(new Request(`https://norulo.com${path}`, {
+      headers: { "If-None-Match": '"source-only"', Range: "bytes=0-99" },
+    }), { ASSETS: assets, NORULO_SERVER: server });
+    expect(response.status).toBe(200);
+    expect(await response.text()).toContain("Public document");
+    expect(response.headers.get("ETag")).toBeNull();
+    expect(server.fetch).not.toHaveBeenCalled();
+  });
+
+  it("reads pricing anonymously even when the browser sends account credentials", async () => {
+    const server = { fetch: vi.fn(async (request) => {
+      expect(request.headers.get("Cookie")).toBeNull();
+      expect(request.headers.get("Authorization")).toBeNull();
+      expect(request.headers.get("X-Norulo-Workspace")).toBeNull();
+      return Response.json({ plans: [] });
+    }) };
+    const response = await worker.fetch(new Request("https://norulo.com/pricing?workspaceId=private", {
+      headers: { Cookie: "session=private", Authorization: "Bearer private", "X-Norulo-Workspace": "private" },
+    }), {
+      NORULO_API_ORIGIN: "https://api.norulo.com", NORULO_SERVER: server,
+      ASSETS: { fetch: async () => new Response(`<html><head></head><body>${PUBLIC_PRICING_MARKER}</body></html>`, {
+        headers: { "Content-Type": "text/html" },
+      }) },
+    });
+    expect(response.headers.get("Cache-Control")).toBe("no-store");
+    expect(await response.text()).toContain("Pricing temporarily unavailable");
+    expect(server.fetch).toHaveBeenCalledTimes(1);
+  });
+
+  it("keeps protected navigation on the original empty SPA shell without pricing calls", async () => {
+    const assets = { fetch: vi.fn(async (request) => {
+      expect(request.url).toBe("https://norulo.com/projects/p1");
+      return new Response('<html><head></head><body><div id="root"></div></body></html>', {
+        headers: { "Content-Type": "text/html" },
+      });
+    }) };
+    const server = { fetch: vi.fn() };
+    const response = await worker.fetch(new Request("https://norulo.com/projects/p1"), {
+      ASSETS: assets, NORULO_SERVER: server,
+    });
+    const html = await response.text();
+    expect(html).toContain('<div id="root"></div>');
+    expect(html).toContain('content="noindex,nofollow"');
+    expect(server.fetch).not.toHaveBeenCalled();
+  });
+
+  it("keeps public HEAD bodyless without loading pricing or returning source validators", async () => {
+    const server = { fetch: vi.fn() };
+    const response = await worker.fetch(new Request("https://norulo.com/pricing", { method: "HEAD" }), {
+      NORULO_SERVER: server,
+      ASSETS: { fetch: async () => new Response(null, {
+        headers: { "Content-Type": "text/html", "Content-Length": "1234", ETag: '"source"' },
+      }) },
+    });
+    expect(await response.text()).toBe("");
+    expect(response.headers.get("Content-Length")).toBeNull();
+    expect(response.headers.get("ETag")).toBeNull();
+    expect(response.headers.get("Cache-Control")).toBe("no-store");
+    expect(server.fetch).not.toHaveBeenCalled();
+  });
   it.each([
     [
       "http://preview.norulo.com/signin?redirectTo=%2Fprojects",

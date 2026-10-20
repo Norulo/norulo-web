@@ -1,0 +1,226 @@
+{
+  "recorded_at": "2026-10-20",
+  "scope": "Public HTML only; no Server or Connect source changes, database migrations, customer writes, email sends, model calls or payment operations.",
+  "local": {
+    "full_test_files": 97,
+    "full_tests": 2031,
+    "lint": "passed",
+    "build": "passed",
+    "worker_configuration": "passed",
+    "worker_upload_dry_run": "passed",
+    "public_browser_cases": 22,
+    "projects_contexts": 9,
+    "account_onboarding_contexts": 22,
+    "browser_engine": "Chromium 143.0.7499.4",
+    "browser_limit": "Local fixtures, not real provider/customer acceptance or physical-device testing."
+  },
+  "waf_before": {
+    "description": "",
+    "id": "5e1ae5de570b43049ae5019d4ef101d5",
+    "kind": "zone",
+    "last_updated": "2026-10-15T06:39:36.246639Z",
+    "name": "Norulo callback-safe human verification",
+    "phase": "http_request_firewall_custom",
+    "rules": [
+      {
+        "action": "skip",
+        "action_parameters": {
+          "products": [
+            "bic",
+            "securityLevel"
+          ]
+        },
+        "description": "Norulo exact provider callbacks: skip browser-only checks; retain application authentication",
+        "enabled": true,
+        "expression": "((http.host eq \"norulo.com\" and http.request.method eq \"GET\" and http.request.uri.path in {\"/api/auth/github/callback\" \"/api/integrations/github/callback\"}) or (http.host eq \"api.norulo.com\" and http.request.method eq \"POST\" and http.request.uri.path eq \"/webhooks/creem\"))",
+        "id": "940edae1374843c2af0d6bc427a9f275",
+        "last_updated": "2026-10-12T05:01:08.733195Z",
+        "logging": {
+          "enabled": false
+        },
+        "ref": "norulo_callback_browser_checks_20261012",
+        "version": "1"
+      },
+      {
+        "action": "managed_challenge",
+        "description": "Norulo website pages: Managed Challenge; APIs, callback paths, assets and verified bots excluded",
+        "enabled": true,
+        "expression": "(http.host in {\"norulo.com\" \"www.norulo.com\"} and http.request.method in {\"GET\" \"HEAD\"} and not cf.client.bot and http.request.uri.path ne \"/api\" and not starts_with(http.request.uri.path, \"/api/\") and not starts_with(http.request.uri.path, \"/cdn-cgi/\") and not starts_with(http.request.uri.path, \"/assets/\") and not starts_with(http.request.uri.path, \"/fonts/\") and not starts_with(http.request.uri.path, \"/openapi/\") and not http.request.uri.path in {\"/robots.txt\" \"/sitemap.xml\" \"/favicon.ico\" \"/apple-touch-icon.png\" \"/brand-mark.png\" \"/norulo-logo.png\" \"/social-card.png\" \"/social-card.svg\"})",
+        "id": "b49bd5c1f65b457aab2250a70330e572",
+        "last_updated": "2026-10-12T05:01:08.733195Z",
+        "ref": "norulo_document_managed_challenge_20261012",
+        "version": "1"
+      },
+      {
+        "action": "skip",
+        "action_parameters": {
+          "products": [
+            "bic"
+          ]
+        },
+        "description": "Norulo MCP/OAuth protocol endpoints: skip browser integrity only; retain authentication, WAF and rate limits",
+        "enabled": true,
+        "expression": "(http.host eq \"mcp.norulo.com\" and http.request.method in {\"GET\" \"POST\" \"OPTIONS\"} and http.request.uri.path in {\"/mcp\" \"/oauth/register\" \"/oauth/token\" \"/.well-known/oauth-authorization-server\" \"/.well-known/oauth-protected-resource\" \"/.well-known/oauth-protected-resource/mcp\"})",
+        "id": "eed64cd1b8db4e3aa08a0863446d40ca",
+        "last_updated": "2026-10-15T06:39:36.246639Z",
+        "logging": {
+          "enabled": false
+        },
+        "ref": "norulo_mcp_oauth_browser_integrity_20261015",
+        "version": "1"
+      }
+    ],
+    "source": "firewall_custom",
+    "version": "2"
+  },
+  "waf_after_mutation": {
+    "description": "",
+    "id": "5e1ae5de570b43049ae5019d4ef101d5",
+    "kind": "zone",
+    "last_updated": "2026-10-20T08:13:10.299411Z",
+    "name": "Norulo callback-safe human verification",
+    "phase": "http_request_firewall_custom",
+    "rules": [
+      {
+        "action": "skip",
+        "action_parameters": {
+          "products": [
+            "bic",
+            "securityLevel"
+          ]
+        },
+        "description": "Norulo exact provider callbacks: skip browser-only checks; retain application authentication",
+        "enabled": true,
+        "expression": "((http.host eq \"norulo.com\" and http.request.method eq \"GET\" and http.request.uri.path in {\"/api/auth/github/callback\" \"/api/integrations/github/callback\"}) or (http.host eq \"api.norulo.com\" and http.request.method eq \"POST\" and http.request.uri.path eq \"/webhooks/creem\"))",
+        "id": "940edae1374843c2af0d6bc427a9f275",
+        "last_updated": "2026-10-12T05:01:08.733195Z",
+        "logging": {
+          "enabled": false
+        },
+        "ref": "norulo_callback_browser_checks_20261012",
+        "version": "1"
+      },
+      {
+        "action": "skip",
+        "action_parameters": {
+          "products": [
+            "bic"
+          ]
+        },
+        "description": "Norulo public documentation GET/HEAD: skip browser integrity only; retain WAF, rate limits and application authorization",
+        "enabled": true,
+        "expression": "(http.host in {\"norulo.com\" \"www.norulo.com\"} and http.request.method in {\"GET\" \"HEAD\"} and http.request.uri.path in {\"/\" \"/pricing\" \"/pricing/\" \"/developers/docs\" \"/developers/docs/\" \"/developers/api\" \"/developers/api/\" \"/plugins\" \"/plugins/\" \"/robots.txt\" \"/sitemap.xml\"})",
+        "id": "e5e9fb1067bd4c278d3cceed16ad3483",
+        "last_updated": "2026-10-20T08:12:12.168367Z",
+        "logging": {
+          "enabled": false
+        },
+        "ref": "norulo_public_documents_bic_20261020",
+        "version": "1"
+      },
+      {
+        "action": "managed_challenge",
+        "description": "Norulo private website pages: Managed Challenge; exact public documents, APIs, callbacks, assets and verified bots excluded",
+        "enabled": true,
+        "expression": "(http.host in {\"norulo.com\" \"www.norulo.com\"} and http.request.method in {\"GET\" \"HEAD\"} and not cf.client.bot and http.request.uri.path ne \"/api\" and not starts_with(http.request.uri.path, \"/api/\") and not starts_with(http.request.uri.path, \"/cdn-cgi/\") and not starts_with(http.request.uri.path, \"/assets/\") and not starts_with(http.request.uri.path, \"/fonts/\") and not starts_with(http.request.uri.path, \"/openapi/\") and not http.request.uri.path in {\"/robots.txt\" \"/sitemap.xml\" \"/favicon.ico\" \"/apple-touch-icon.png\" \"/brand-mark.png\" \"/norulo-logo.png\" \"/social-card.png\" \"/social-card.svg\"} and not http.request.uri.path in {\"/\" \"/pricing\" \"/pricing/\" \"/developers/docs\" \"/developers/docs/\" \"/developers/api\" \"/developers/api/\" \"/plugins\" \"/plugins/\" \"/robots.txt\" \"/sitemap.xml\"})",
+        "id": "b49bd5c1f65b457aab2250a70330e572",
+        "last_updated": "2026-10-20T08:13:10.299411Z",
+        "ref": "norulo_document_managed_challenge_20261012",
+        "version": "2"
+      },
+      {
+        "action": "skip",
+        "action_parameters": {
+          "products": [
+            "bic"
+          ]
+        },
+        "description": "Norulo MCP/OAuth protocol endpoints: skip browser integrity only; retain authentication, WAF and rate limits",
+        "enabled": true,
+        "expression": "(http.host eq \"mcp.norulo.com\" and http.request.method in {\"GET\" \"POST\" \"OPTIONS\"} and http.request.uri.path in {\"/mcp\" \"/oauth/register\" \"/oauth/token\" \"/.well-known/oauth-authorization-server\" \"/.well-known/oauth-protected-resource\" \"/.well-known/oauth-protected-resource/mcp\"})",
+        "id": "eed64cd1b8db4e3aa08a0863446d40ca",
+        "last_updated": "2026-10-15T06:39:36.246639Z",
+        "logging": {
+          "enabled": false
+        },
+        "ref": "norulo_mcp_oauth_browser_integrity_20261015",
+        "version": "1"
+      }
+    ],
+    "source": "firewall_custom",
+    "version": "4"
+  },
+  "deployments_before": [
+    {
+      "name": "norulo-web",
+      "status": 200,
+      "success": true,
+      "latest": {
+        "id": "1f616552-a4ee-43e7-b3e0-b902be9041eb",
+        "source": "wrangler",
+        "strategy": "percentage",
+        "author_email": "danuberiverferryman@gmail.com",
+        "annotations": {
+          "workers/message": "Deploy Web main 82a82d816bc6fb12fda93b51291e440d22e8b581; GitHub Actions 38888349913",
+          "workers/triggered_by": "deployment"
+        },
+        "versions": [
+          {
+            "version_id": "be5fb290-ecf3-48c1-8c0b-6e438a986fe3",
+            "percentage": 100
+          }
+        ],
+        "created_on": "2026-10-16T10:37:53.676625Z"
+      }
+    },
+    {
+      "name": "norulo-server-production",
+      "status": 200,
+      "success": true,
+      "latest": {
+        "id": "7f7f36bc-f464-41b4-b030-962018902aeb",
+        "source": "wrangler",
+        "strategy": "percentage",
+        "author_email": "danuberiverferryman@gmail.com",
+        "annotations": {
+          "workers/message": "Move public status analytics into Server; main 75e1c492fff0162ca8addb47a5887f14eed730cb",
+          "workers/triggered_by": "deployment"
+        },
+        "versions": [
+          {
+            "version_id": "f2a77405-19c8-4ef5-936e-ed8630506027",
+            "percentage": 100
+          }
+        ],
+        "created_on": "2026-10-16T10:35:08.225636Z"
+      }
+    },
+    {
+      "name": "norulo-connect",
+      "status": 200,
+      "success": true,
+      "latest": {
+        "id": "86b14a12-89a7-4321-8478-da5866dd0c8a",
+        "source": "wrangler",
+        "strategy": "percentage",
+        "author_email": "danuberiverferryman@gmail.com",
+        "annotations": {
+          "workers/message": "Deploy MCP main 61d6b4c9cd1d534668480fd4df163b461418d425; explicit GitHub access renewal",
+          "workers/triggered_by": "deployment"
+        },
+        "versions": [
+          {
+            "version_id": "72a2b938-25fe-4a27-a677-e0981ae7d8fb",
+            "percentage": 100
+          }
+        ],
+        "created_on": "2026-10-16T09:29:59.757765Z"
+      }
+    }
+  ],
+  "limitations": [
+    "The zone denied access to the security-events GraphQL dataset; historical genuine-crawler activity was not verified.",
+    "Search Console/Bing property access and actual indexing are not established.",
+    "Public catalog endpoint does not expose native D1 row accounting; no zero-row-cost claim."
+  ]
+}

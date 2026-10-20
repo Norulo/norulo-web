@@ -49,6 +49,8 @@ jobs:
         run: node scripts/check-projects-layout.mjs > work/ci-validation/projects-layout.json 2> work/ci-validation/projects-layout.log
       - name: Check repository picker interactions and layouts
         run: node scripts/check-repository-picker-layout.mjs > work/ci-validation/repository-picker-layout.json 2> work/ci-validation/repository-picker-layout.log
+      - name: Check public HTML without JavaScript and normal browser startup
+        run: node scripts/check-public-documents.mjs > work/ci-validation/public-documents.json 2> work/ci-validation/public-documents.log
       - name: Upload browser validation evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2

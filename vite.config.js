@@ -36,6 +36,7 @@ export default defineConfig({
     port: 4173,
   },
   build: {
+    manifest: true,
     target: ["chrome111", "edge111", "firefox114", "safari16.4", "ios16.4"],
     outDir: "dist",
     sourcemap: false,

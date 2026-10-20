@@ -1,6 +1,8 @@
 import baseWorker, { withTransportSecurity } from "./worker.js";
 import { renderSeoHead, seoMetadataForPath } from "./src/lib/seo.js";
 import { htmlContentSecurityPolicy } from "./security-headers.js";
+import { publicPageAsset, PUBLIC_PRICING_MARKER } from "./public-pages.js";
+import { publicPricingHtml } from "./public-pricing.js";
 
 const CANONICAL_HOST = "norulo.com";
 const WWW_HOST = "www.norulo.com";
@@ -31,7 +33,26 @@ export default {
       return canonicalRedirect(url, env, request);
     }
 
-    let response = await baseWorker.fetch(request, env);
+    const publicAsset = ["GET", "HEAD"].includes(request.method)
+      ? publicPageAsset(url.pathname) : null;
+    let assetRequest = request;
+    if (publicAsset) {
+      const headers = new Headers(request.headers);
+      // Validators/ranges belong to the source asset, before metadata and live
+      // public pricing are inserted. They must not produce stale/partial HTML.
+      for (const name of ["If-None-Match", "If-Modified-Since", "Range", "If-Range"]) headers.delete(name);
+      assetRequest = new Request(new URL(publicAsset, url.origin), {
+        method: request.method, headers,
+      });
+    }
+    let response = await baseWorker.fetch(assetRequest, env);
+    if (publicAsset && request.method === "HEAD") {
+      const headers = new Headers(response.headers);
+      headers.delete("Content-Length");
+      headers.delete("ETag");
+      if (publicAsset === "/public-pages/pricing.html") headers.set("Cache-Control", "no-store");
+      response = new Response(null, { status: response.status, statusText: response.statusText, headers });
+    }
     if (env.NORULO_MODE === "preview") {
       const headers = new Headers(response.headers);
       headers.set("X-Robots-Tag", "noindex, nofollow");
@@ -50,7 +71,7 @@ export default {
       lang: "en",
       origin: url.origin,
     });
-    return injectSeoMetadata(response, metadata);
+    return injectSeoMetadata(response, metadata, publicAsset, env);
   },
 };
 
@@ -64,7 +85,7 @@ function isHtmlResponse(response) {
   return (response.headers.get("content-type") || "").toLowerCase().includes("text/html");
 }
 
-async function injectSeoMetadata(response, metadata) {
+async function injectSeoMetadata(response, metadata, publicAsset, env) {
   const html = await response.text();
   const withoutManagedTags = html
     .replace(
@@ -73,11 +94,17 @@ async function injectSeoMetadata(response, metadata) {
     )
     .replace(/<(?:meta|link)\b[^>]*data-seo-managed=["']true["'][^>]*\/?>\s*/gi, "");
   const head = renderSeoHead(metadata);
-  const body = withoutManagedTags.includes("</head>")
+  let body = withoutManagedTags.includes("</head>")
     ? withoutManagedTags.replace("</head>", `    ${head}\n  </head>`)
     : `${head}\n${withoutManagedTags}`;
   const headers = new Headers(response.headers);
   headers.delete("content-length");
+  if (publicAsset) headers.delete("etag");
+  if (response.ok && publicAsset === "/public-pages/pricing.html" && body.includes(PUBLIC_PRICING_MARKER)) {
+    const pricing = await publicPricingHtml(env);
+    body = body.replace(PUBLIC_PRICING_MARKER, () => pricing);
+    headers.set("Cache-Control", "no-store");
+  }
   // Only trust the JSON-LD generated above, never arbitrary inline scripts
   // found in the asset body. The theme bootstrap has its own fixed hash.
   const schemaScript = head.match(/<script\b[^>]*>([\s\S]*?)<\/script>/i)?.[1];

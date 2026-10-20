@@ -91,7 +91,7 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         run: npx --no-install wrangler deploy --keep-vars --message "Deploy Web main ${GITHUB_SHA}; GitHub Actions ${GITHUB_RUN_ID}"
-      - name: Check APIs, deployed assets and homepage challenge
+      - name: Check APIs, deployed assets and readable public documents
         run: |
           node --input-type=module <<'NODE'
           import assert from "node:assert/strict";
@@ -122,19 +122,18 @@ jobs:
             assert.ok(actual.equals(readFileSync("dist/assets/" + name)), "Deployed asset differs from this build: " + name);
             console.log("PASS byte-identical asset " + name);
           }
-          const homepage = await get("https://norulo.com/");
-          // Existing production WAF requires browser challenges on document routes.
-          // Recognize only Cloudflare's explicit challenge signal, never arbitrary 403s.
-          // https://developers.cloudflare.com/cloudflare-challenges/challenge-types/challenge-pages/detect-response/
-          if (homepage.status === 403 && homepage.headers.get("cf-mitigated") === "challenge") {
-            await homepage.body.cancel();
-            console.log("::notice::Homepage has the existing Cloudflare Managed Challenge; browser content verification is separate. API health and deployed asset bytes passed.");
-          } else {
-            assert.equal(homepage.status, 200, "Public homepage status");
-            assert.equal(homepage.headers.get("set-cookie"), null, "Anonymous homepage must not set cookies");
-            const html = await homepage.text();
+          for (const path of ["/", "/pricing", "/developers/docs", "/developers/api", "/plugins"]) {
+            const document = await get("https://norulo.com" + path);
+            assert.equal(document.status, 200, "Public document status: " + path);
+            assert.equal(document.headers.get("cf-mitigated"), null, "Public document must not require a browser challenge");
+            assert.equal(document.headers.get("set-cookie"), null, "Public document must not set cookies");
+            const html = await document.text();
             const entry = assetNames.find(name => /^index-.+\.js$/.test(name));
-            assert.ok(entry && html.includes("/assets/" + entry), "Homepage must reference this build's entry");
-            console.log("PASS https://norulo.com/");
+            assert.ok(entry && html.includes("/assets/" + entry), "Document must reference this build's entry");
+            assert.ok(html.includes('<main id="main-content"') && /<h1\b/.test(html), "Public body missing: " + path);
+            assert.ok(html.includes('href="/pricing"') && html.includes('href="/plugins"'), "Public navigation missing: " + path);
+            assert.ok(!html.includes('<div id="root"></div>'), "Empty public SPA shell: " + path);
+            if (path === "/pricing") assert.ok(html.includes('aria-label="Current public plans"'), "Live public catalog unavailable");
+            console.log("PASS readable public HTML " + path);
           }
           NODE

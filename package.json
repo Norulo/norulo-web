@@ -8,7 +8,7 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && node scripts/prerender-public.mjs",
     "generate:social-card": "node scripts/generate-social-card.mjs",
     "preview": "vite preview",
     "lint": "eslint .",
@@ -21,6 +21,7 @@
     "test:mobile-layout": "node scripts/check-mobile-layout.mjs",
     "test:projects-layout": "node scripts/check-projects-layout.mjs",
     "test:repository-layout": "node scripts/check-repository-picker-layout.mjs",
+    "test:public-documents": "node scripts/check-public-documents.mjs",
     "test:watch": "vitest --passWithNoTests",
     "preview:workers": "npm run build && wrangler dev --var NORULO_API_ORIGIN:http://localhost:8080",
     "check:workers": "node scripts/check-cloudflare-config.mjs",

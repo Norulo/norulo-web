@@ -1,3 +1,30 @@
+# Readable public HTML release, 2026-10-20
+
+[PR #1](https://github.com/Norulo/norulo-web/pull/1) was merged after explicit
+publication approval and successful exact-source CI. Main source
+`27846d42e7b6a5351c066db79bad4876b70dfa23` is published at 100% production traffic
+as Web version `30ac227c-c107-4693-ada3-b3c1f18b005b`, deployment
+`4b08be07-8dbf-4d6b-a992-33ea28434ab2`, created at
+2026-10-20T08:30:48.907419Z (16:30:48 Asia/Shanghai).
+
+[Production workflow](https://github.com/Norulo/norulo-web/actions/runs/39393631641)
+passed tests, build, upload validation, binding/domain preflight and live
+document/API/asset checks. The reviewed source passed all 2,031 tests in 97 files
+and the full browser CI. Local Chromium also passed 22 public/startup cases,
+74 Projects states and 198 account-onboarding states. Native local Workers
+checks verified the real static-assets binding and original private SPA fallback.
+
+Independent online verification passed 28 checks: five initial public HTML
+documents with body and navigation, prices matching the current anonymous
+Server catalog, search discovery files, HEAD/canonical redirect behavior,
+API health/authentication/MCP discovery and 13 byte-identical client assets.
+Web settings, Server/Connect versions and the approved exact-path Cloudflare
+rules were independently read back unchanged. No migration, production customer
+mutation, email send, model call or checkout was used. Actual search indexing
+and genuine crawler history remain unverified. See
+[release evidence](validation/public-html-production-2026-10-20.json) and
+[routing/rollback notes](public-search.md).
+
 # GitHub account unlinking release, 2026-10-16
 
 Web main source `33cd662fe41ea36862910447b3366538ca18ce9b` is published as

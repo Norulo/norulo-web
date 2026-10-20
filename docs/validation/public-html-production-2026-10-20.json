@@ -1,0 +1,277 @@
+{
+  "recorded_at_utc": "2026-10-20T08:32:07.514428+00:00",
+  "publication": "verified at 100% production traffic",
+  "source_commit": "27846d42e7b6a5351c066db79bad4876b70dfa23",
+  "reviewed_head": "e95b5a112260bbe4aa4cf3f129e1ec07d22de466",
+  "pull_request": "https://github.com/Norulo/norulo-web/pull/1",
+  "ci": {
+    "reviewed_source": "https://github.com/Norulo/norulo-web/actions/runs/39392164459",
+    "reviewed_source_result": "success",
+    "tests": 2031,
+    "test_files": 97,
+    "production_workflow": "https://github.com/Norulo/norulo-web/actions/runs/39393631641",
+    "production_result": "success"
+  },
+  "web": {
+    "id": "4b08be07-8dbf-4d6b-a992-33ea28434ab2",
+    "source": "wrangler",
+    "strategy": "percentage",
+    "author_email": "danuberiverferryman@gmail.com",
+    "annotations": {
+      "workers/message": "Deploy Web main 27846d42e7b6a5351c066db79bad4876b70dfa23; GitHub Actions 39393631641",
+      "workers/triggered_by": "deployment"
+    },
+    "versions": [
+      {
+        "version_id": "30ac227c-c107-4693-ada3-b3c1f18b005b",
+        "percentage": 100
+      }
+    ],
+    "created_on": "2026-10-20T08:30:48.907419Z"
+  },
+  "prior_web": {
+    "id": "1f616552-a4ee-43e7-b3e0-b902be9041eb",
+    "source": "wrangler",
+    "strategy": "percentage",
+    "author_email": "danuberiverferryman@gmail.com",
+    "annotations": {
+      "workers/message": "Deploy Web main 82a82d816bc6fb12fda93b51291e440d22e8b581; GitHub Actions 38888349913",
+      "workers/triggered_by": "deployment"
+    },
+    "versions": [
+      {
+        "version_id": "be5fb290-ecf3-48c1-8c0b-6e438a986fe3",
+        "percentage": 100
+      }
+    ],
+    "created_on": "2026-10-16T10:37:53.676625Z"
+  },
+  "server": {
+    "id": "7f7f36bc-f464-41b4-b030-962018902aeb",
+    "source": "wrangler",
+    "strategy": "percentage",
+    "author_email": "danuberiverferryman@gmail.com",
+    "annotations": {
+      "workers/message": "Move public status analytics into Server; main 75e1c492fff0162ca8addb47a5887f14eed730cb",
+      "workers/triggered_by": "deployment"
+    },
+    "versions": [
+      {
+        "version_id": "f2a77405-19c8-4ef5-936e-ed8630506027",
+        "percentage": 100
+      }
+    ],
+    "created_on": "2026-10-16T10:35:08.225636Z"
+  },
+  "connect": {
+    "id": "86b14a12-89a7-4321-8478-da5866dd0c8a",
+    "source": "wrangler",
+    "strategy": "percentage",
+    "author_email": "danuberiverferryman@gmail.com",
+    "annotations": {
+      "workers/message": "Deploy MCP main 61d6b4c9cd1d534668480fd4df163b461418d425; explicit GitHub access renewal",
+      "workers/triggered_by": "deployment"
+    },
+    "versions": [
+      {
+        "version_id": "72a2b938-25fe-4a27-a677-e0981ae7d8fb",
+        "percentage": 100
+      }
+    ],
+    "created_on": "2026-10-16T09:29:59.757765Z"
+  },
+  "preservation": {
+    "web_settings_preserved": true,
+    "server_version_preserved": true,
+    "mcp_version_preserved": true,
+    "waf_unchanged_since_approved_adjustment": true
+  },
+  "native_local": {
+    "runtime": "Wrangler 4.149.0 with actual Workers static-assets binding",
+    "public_paths_200_with_body": [
+      "/",
+      "/plugins",
+      "/pricing",
+      "/developers/docs"
+    ],
+    "private_path": "/projects retained empty SPA shell",
+    "catalog": "Server binding intentionally absent locally; production catalog verified separately"
+  },
+  "http": {
+    "checked_at_utc": "2026-10-20T08:32:07.514428+00:00",
+    "checks": [
+      {
+        "path": "/",
+        "status": 200,
+        "text_characters": 2965,
+        "challenge": false
+      },
+      {
+        "path": "/pricing",
+        "status": 200,
+        "text_characters": 1173,
+        "current_catalog_matches": true,
+        "cache_control": "no-store"
+      },
+      {
+        "path": "/developers/docs",
+        "status": 200,
+        "text_characters": 16393,
+        "challenge": false
+      },
+      {
+        "path": "/developers/api",
+        "status": 200,
+        "text_characters": 42296,
+        "challenge": false
+      },
+      {
+        "path": "/plugins",
+        "status": 200,
+        "text_characters": 8353,
+        "challenge": false
+      },
+      {
+        "check": "simulated_user_agent_only",
+        "user_agent": "OAI-SearchBot/1.4; +https://openai.com/searchbot",
+        "status": 200
+      },
+      {
+        "check": "simulated_user_agent_only",
+        "user_agent": "Claude-SearchBot/1.0",
+        "status": 200
+      },
+      {
+        "url": "https://api.norulo.com/health",
+        "status": 200,
+        "ok": true,
+        "database_configured": true
+      },
+      {
+        "url": "https://norulo.com/api/health",
+        "status": 200,
+        "ok": true,
+        "database_configured": true
+      },
+      {
+        "check": "protected_account_requires_authentication",
+        "status": 401
+      },
+      {
+        "check": "MCP_discovery",
+        "status": 200
+      },
+      {
+        "path": "/robots.txt",
+        "status": 200
+      },
+      {
+        "path": "/sitemap.xml",
+        "status": 200
+      },
+      {
+        "check": "pricing_HEAD",
+        "status": 200,
+        "body_bytes": 0
+      },
+      {
+        "check": "canonical_redirect",
+        "status": 308
+      },
+      {
+        "asset": "ledger-C0NYdyY0.js",
+        "status": 200,
+        "sha256": "11fb1154a0ae089136ca6387a7af3ac3b13c9439e5a2e09edcb049b9caaa9658",
+        "byte_identical": true
+      },
+      {
+        "asset": "ledger-split-Di8l-RfP.js",
+        "status": 200,
+        "sha256": "7dcee74a91eae9ca1f8636b052a62683042bd44b1d33a5271be80b344d40fd8d",
+        "byte_identical": true
+      },
+      {
+        "asset": "ledger-C4xd4FWG.css",
+        "status": 200,
+        "sha256": "71de924deb9bf1e9a4a2a28da4ed654613fba57bf6681bcdc7eecfff727a4aad",
+        "byte_identical": true
+      },
+      {
+        "asset": "index-B-X4-NJa.css",
+        "status": 200,
+        "sha256": "2ed537c9cf4b37689fd890d57dbb8a34ba8aa676b9f5b584de65ccde5aa94e88",
+        "byte_identical": true
+      },
+      {
+        "asset": "ledger-summary-CpJVUPnR.js",
+        "status": 200,
+        "sha256": "8f67f2f78e80b26a479f5cd5371217bfcb684fcff365adb2b2bc21cf5eb40c49",
+        "byte_identical": true
+      },
+      {
+        "asset": "i18n-BBxZnZDX.js",
+        "status": 200,
+        "sha256": "c8812352f0d54c8abd850e451f8dff2ad0b024948dcb36432ad6abbdf9c9b246",
+        "byte_identical": true
+      },
+      {
+        "asset": "plugins-CJsufdkq.js",
+        "status": 200,
+        "sha256": "7fa0ff8f14e92367a36c32e5bbdebe7233868951bca43d1bd709925965b22ee3",
+        "byte_identical": true
+      },
+      {
+        "asset": "index-DMKBqPDp.js",
+        "status": 200,
+        "sha256": "e5c071f97989e9e9737fa0c21c73258a069636ef230b41d3205dba0e13d4666f",
+        "byte_identical": true
+      },
+      {
+        "asset": "billing-DzYsn_FG.js",
+        "status": 200,
+        "sha256": "709b73d28e0cc73ced003ade1d1aabad756cc1338973b25993f8e3162487830b",
+        "byte_identical": true
+      },
+      {
+        "asset": "vendor-react-9XhioiGP.js",
+        "status": 200,
+        "sha256": "109ae04dfb036b92515ae052411c426365e48876c4b00de7f1d7a289e0e6ef75",
+        "byte_identical": true
+      },
+      {
+        "asset": "ledger-overview-BbhszpQR.js",
+        "status": 200,
+        "sha256": "248d33424ecc61e583a3de2289dd700d5e50e954af496d55bb79a6d066674987",
+        "byte_identical": true
+      },
+      {
+        "asset": "billing-Dt-xcYfP.css",
+        "status": 200,
+        "sha256": "c8fc036ee25c9827dc5764b57feb8d304b4cedd6beeeb276fa82c42a4ce1c32c",
+        "byte_identical": true
+      },
+      {
+        "asset": "ledger-B_5ZC-ok.css",
+        "status": 200,
+        "sha256": "00e3ffedb51d451bee846033a0c4f601e1f096221317b0922fff9a5839a4e3eb",
+        "byte_identical": true
+      }
+    ],
+    "genuine_crawler_or_indexing_verified": false,
+    "customer_writes": 0
+  },
+  "boundaries": {
+    "database_migrations": 0,
+    "production_customer_mutations": 0,
+    "production_email_sends": 0,
+    "model_evaluations": 0,
+    "checkout_operations": 0,
+    "manual_cron_runs": 0,
+    "remote_d1_row_metrics": "Public endpoints do not expose row accounting; no zero-row-cost claim."
+  },
+  "limitations": [
+    "HTTP user-agent checks are simulations, not proof that genuine search bots visited.",
+    "Actual indexing/Search Console property status was not verified.",
+    "Authenticated customer/provider journeys were not executed as production tests."
+  ]
+}

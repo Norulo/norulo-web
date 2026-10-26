@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-22.04
     timeout-minutes: 20
     env:
-      CLOUDFLARE_ACCOUNT_ID: "84e421f26c708c0cf437e287eed11fa1"
+      CLOUDFLARE_ACCOUNT_ID: "a659b71fbdcc5e9023f24bd247b76933"
       WRANGLER_SEND_METRICS: "false"
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0

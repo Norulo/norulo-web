@@ -11,6 +11,7 @@ const TOP = 12;
 const BASELINE = 188;
 const PRECISION = 10000n;
 const INDIVIDUAL_POINT_LIMIT = 200;
+const SLOT_LABEL_LIMIT = 6;
 
 function bucketTime(bucket) {
   if (typeof bucket !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(bucket)) return null;
@@ -140,6 +141,8 @@ function CurrencyChart({ currency, points, dimension, formatTotal, title }) {
     return { largest, padding, slotWidth, plotted, line, area, bars, zeros };
   }, [points, width, dimension, dense]);
   const selectedPoint = plotted[selectedIndex];
+  // Category bars sit in equal slots, so a few labels can sit under their own bar.
+  const slotLabels = dimension !== "bucket" && points.length > 1 && points.length <= SLOT_LABEL_LIMIT;
 
   function select(index, focus = false) {
     const point = points[index];
@@ -337,15 +340,27 @@ function CurrencyChart({ currency, points, dimension, formatTotal, title }) {
           })}
         </svg>
       </div>
-      <div
-        className={"expense-chart-axis" + (points.length === 1 ? " single" : "")}
-        aria-hidden="true"
-      >
-        <span title={points[0].label}>{points[0].label}</span>
-        {points.length > 1 && (
-          <span title={points[points.length - 1].label}>{points[points.length - 1].label}</span>
-        )}
-      </div>
+      {slotLabels ? (
+        <div
+          className="expense-chart-axis slots"
+          style={{ paddingInline: `${padding}px` }}
+          aria-hidden="true"
+        >
+          {points.map((point) => (
+            <span key={point.key} title={point.label}>{point.label}</span>
+          ))}
+        </div>
+      ) : (
+        <div
+          className={"expense-chart-axis" + (points.length === 1 ? " single" : "")}
+          aria-hidden="true"
+        >
+          <span title={points[0].label}>{points[0].label}</span>
+          {points.length > 1 && (
+            <span title={points[points.length - 1].label}>{points[points.length - 1].label}</span>
+          )}
+        </div>
+      )}
       <span className="expense-chart-help" id={`${chartId}-help`}>
         {T("Use arrow keys to inspect values.", "使用方向键查看数值")}
       </span>

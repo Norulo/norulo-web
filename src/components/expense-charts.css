@@ -124,6 +124,17 @@
 .expense-chart-axis > span:last-child {
   text-align: right;
 }
+.expense-chart-axis.slots {
+  display: grid;
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
+  gap: 0;
+}
+.expense-chart-axis.slots > span {
+  max-width: none;
+  padding-inline: 4px;
+  text-align: center;
+}
 .expense-chart-axis.single {
   justify-content: center;
 }

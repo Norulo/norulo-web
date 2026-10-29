@@ -25,6 +25,11 @@
 input[type="checkbox"] {
   border-radius: revert;
 }
+input[type="checkbox"],
+input[type="radio"],
+progress {
+  accent-color: var(--accent);
+}
 [hidden] {
   display: none !important;
 }

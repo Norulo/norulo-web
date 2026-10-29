@@ -343,6 +343,11 @@ describe("ExpenseCharts", () => {
     );
     expect(readout("USD")).toHaveTextContent("USD 1.00");
     expect(chart("USD").querySelectorAll(".expense-chart-zero")).toHaveLength(1);
+    expect(
+      [...chart("USD").querySelectorAll(".expense-chart-axis.slots > span")].map(
+        (label) => label.textContent
+      )
+    ).toEqual(["Hosting", longName, "Storage"]);
   });
 
   it("labels removed category metadata without changing its historical totals", () => {

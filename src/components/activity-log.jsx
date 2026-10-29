@@ -59,8 +59,11 @@ const resourceLabel = (kind) =>
     recurring_rule: T("Recurring schedule"),
   })[kind] || T("Record");
 
+const SINGLE_VALUE_ACTIONS = new Set(["create", "generate", "delete"]);
+const isEmpty = (value) => value === null || value === undefined || value === "";
+
 function changeValue(value, field) {
-  if (value === null || value === undefined || value === "") return T("Not set");
+  if (isEmpty(value)) return T("Not set");
   if (field === "status")
     return (
       {
@@ -135,16 +138,27 @@ function ActivityRow({ item, language }) {
       <p className="ledger-meta">{T("Record ID")}: {item.resource.id}</p>
       {item.changes.length > 0 && (
         <dl className="activity-log-changes">
-          {item.changes.map((change, index) => (
-            <div key={`${change.field}:${index}`}>
-              <dt>{fieldLabel(change.field)}</dt>
-              <dd>
-                <span><span className="activity-log-value-label">{T("Before")}: </span><ChangeValue value={change.before} field={change.field} /></span>
-                <I.ArrowR size={14} aria-hidden="true" />
-                <span><span className="activity-log-value-label">{T("After")}: </span><ChangeValue value={change.after} field={change.field} /></span>
-              </dd>
-            </div>
-          ))}
+          {item.changes.map((change, index) => {
+            // A creation has no prior value and a deletion no later one; show
+            // the single value instead of a column of "Not set" placeholders.
+            const only = isEmpty(change.before) ? "after" : isEmpty(change.after) ? "before" : null;
+            return (
+              <div key={`${change.field}:${index}`}>
+                <dt>{fieldLabel(change.field)}</dt>
+                {only && SINGLE_VALUE_ACTIONS.has(item.action) ? (
+                  <dd>
+                    <span><ChangeValue value={change[only]} field={change.field} /></span>
+                  </dd>
+                ) : (
+                  <dd>
+                    <span><span className="activity-log-value-label">{T("Before")}: </span><ChangeValue value={change.before} field={change.field} /></span>
+                    <I.ArrowR size={14} aria-hidden="true" />
+                    <span><span className="activity-log-value-label">{T("After")}: </span><ChangeValue value={change.after} field={change.field} /></span>
+                  </dd>
+                )}
+              </div>
+            );
+          })}
         </dl>
       )}
     </article>

@@ -47,7 +47,7 @@
   font-weight: 400;
 }
 .activity-log-changes {
-  --financial-size: var(--fs-value-secondary);
+  --financial-size: var(--fs-md);
   display: grid;
   gap: 8px;
   margin: 16px 0 0;

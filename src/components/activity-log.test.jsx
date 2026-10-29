@@ -57,6 +57,17 @@ describe("ActivityLog", () => {
     expect(client.activity).toHaveBeenCalledOnce();
   });
 
+  it("shows created values once without before/after placeholders", async () => {
+    const client = { activity: vi.fn().mockResolvedValue(page({ items: [event({
+      action: "create",
+      changes: [{ field: "purpose", before: null, after: "Domain renewal" }],
+    })] })) };
+    render(fixture(client));
+    expect(await screen.findByText("Domain renewal")).toBeVisible();
+    expect(screen.queryByText("Not set")).toBeNull();
+    expect(screen.queryByText(/Before:/)).toBeNull();
+  });
+
   it("defers first read and invalidated reload while a parent write is pending", async () => {
     const client = api();
     const view = render(fixture(client, { disabled: true }));

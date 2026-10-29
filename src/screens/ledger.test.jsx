@@ -1289,7 +1289,7 @@ describe("ledger screens", () => {
     await screen.findByText("No expenses match these filters");
     fireEvent.click(screen.getByRole("button", { name: "Clear filters" }));
     await waitFor(() => expect(screen.getByLabelText("From date")).toHaveValue(""));
-    expect(await screen.findByText("No expenses for this target yet.")).toBeVisible();
+    expect(await screen.findByText("No expenses recorded yet.")).toBeVisible();
   });
 
   it("opens expense entry only on intent and closes it on cancel", async () => {
@@ -2184,7 +2184,7 @@ describe("ledger screens", () => {
     ]);
     api.createExpense.mockRejectedValue({ status: 412 });
     render(<LedgerScreen go={vi.fn()} mode="shared" />);
-    expect(await screen.findByText(/No expenses for this target yet/i)).toBeInTheDocument();
+    expect(await screen.findByText(/No expenses recorded yet/i)).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Add expense" }));
     fireEvent.change(screen.getByLabelText("Paid on"), { target: { value: "2026-09-27" } });
     fireEvent.change(screen.getByLabelText("Amount"), { target: { value: "12.00" } });
@@ -2209,7 +2209,7 @@ describe("ledger screens", () => {
       { id: "cat_1", name: "Tools", revision: 1, archivedAt: null },
     ]);
     render(<LedgerScreen go={vi.fn()} mode="shared" />);
-    await screen.findByText(/No expenses for this target yet/i);
+    await screen.findByText(/No expenses recorded yet/i);
     await openFilters();
     fireEvent.change(screen.getByLabelText("From date"), { target: { value: "2026-09-01" } });
     fireEvent.change(screen.getByLabelText("Before date"), { target: { value: "2026-10-01" } });

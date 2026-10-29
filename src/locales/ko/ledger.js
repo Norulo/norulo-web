@@ -21,7 +21,7 @@ export const LEDGER_PHRASES = {
   "Filter category": "카테고리 필터",
   "All categories": "모든 카테고리",
   "No expenses in this range.": "이 범위에 지출이 없습니다.",
-  "No expenses for this target yet.": "이 대상에는 아직 지출이 없습니다.",
+  "No expenses recorded yet.": "아직 기록된 지출이 없습니다.",
   "Export CSV": "CSV 내보내기",
   "Repository": "저장소",
   "Project description": "프로젝트 설명",

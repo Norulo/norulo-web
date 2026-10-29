@@ -110,7 +110,7 @@ async function settled() {
 async function open(f) {
   const rendered = render(<LedgerScreen {...f.props} />);
   if (f.expenses.length) await screen.findByRole("heading", { name: f.expenses[0].purpose });
-  else await screen.findByRole("heading", { name: "No expenses for this target yet." });
+  else await screen.findByRole("heading", { name: "No expenses recorded yet." });
   await settled();
   return rendered;
 }

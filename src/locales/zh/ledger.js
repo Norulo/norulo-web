@@ -21,7 +21,7 @@ export const LEDGER_PHRASES = {
   "Filter category": "筛选类别",
   "All categories": "所有类别",
   "No expenses in this range.": "此范围内没有支出。",
-  "No expenses for this target yet.": "此目标尚无支出。",
+  "No expenses recorded yet.": "尚无支出记录。",
   "Export CSV": "导出 CSV",
   "Repository": "仓库",
   "Project description": "项目描述",

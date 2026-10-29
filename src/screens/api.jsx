@@ -852,10 +852,12 @@ export function ApiKeysScreen({
                                 <span className="tag">
                                   {T("Created", "已创建")} {formatDate(key.createdAt)}
                                 </span>
-                                <span className="tag">
-                                  {T("Last used", "最近使用")} {key.lastUsedAt
-                                    ? formatDate(key.lastUsedAt) : T("Unavailable", "不可用")}
-                                </span>
+                                {/* Usage tracking is disabled server-side; null is not "never used". */}
+                                {key.lastUsedAt && (
+                                  <span className="tag">
+                                    {T("Last used", "最近使用")} {formatDate(key.lastUsedAt)}
+                                  </span>
+                                )}
                                 {key.scopes.map((scope) => (
                                   <span className="tag" key={scope}>
                                     {scope}

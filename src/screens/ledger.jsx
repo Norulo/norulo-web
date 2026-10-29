@@ -3469,7 +3469,7 @@ function ScopedLedgerScreen({
                             ? T("No expenses match these filters", "没有符合筛选条件的支出")
                             : showCategoryGuide
                               ? categoryGuideTitle
-                              : T("No expenses for this target yet.")}
+                              : T("No expenses recorded yet.")}
                         </h3>
                         <p>
                           {Object.keys(filtered).length

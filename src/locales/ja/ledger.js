@@ -21,7 +21,7 @@ export const LEDGER_PHRASES = {
   "Filter category": "カテゴリで絞り込む",
   "All categories": "すべてのカテゴリ",
   "No expenses in this range.": "この範囲に支出はありません。",
-  "No expenses for this target yet.": "この対象にはまだ支出がありません。",
+  "No expenses recorded yet.": "まだ支出が記録されていません。",
   "Export CSV": "CSV をエクスポート",
   "Repository": "リポジトリ",
   "Project description": "プロジェクトの説明",

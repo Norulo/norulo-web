@@ -21,7 +21,7 @@ export const LEDGER_PHRASES = {
   "Filter category": "Filtrar categoría",
   "All categories": "Todas las categorías",
   "No expenses in this range.": "No hay gastos en este período.",
-  "No expenses for this target yet.": "Aún no hay gastos para este destino.",
+  "No expenses recorded yet.": "Aún no hay gastos registrados.",
   "Export CSV": "Exportar CSV",
   "Repository": "Repositorio",
   "Project description": "Descripción del proyecto",

@@ -1647,7 +1647,8 @@ details.panel[open] > summary.panel-h::after,
   .side-i > span {
     overflow: visible;
     white-space: normal;
-    overflow-wrap: anywhere;
+    overflow-wrap: break-word;
+    hyphens: auto;
     text-align: center;
     line-height: 1.2;
   }
@@ -1754,7 +1755,7 @@ details.panel[open] > summary.panel-h::after,
   .side-i,
   .side-tools {
     padding-inline: 2px;
-    font-size: var(--fs-xs);
+    font-size: 0.6875rem;
   }
   .view-tabs:has(> [role="tab"]:nth-child(4)) {
     grid-auto-flow: row;

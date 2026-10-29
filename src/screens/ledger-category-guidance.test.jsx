@@ -68,7 +68,7 @@ describe("Expense category guidance", () => {
     expect(screen.getAllByRole("button", { name: "Add category" })).toHaveLength(1);
     expect(screen.queryByRole("button", { name: "Add expense" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Manage categories" })).not.toBeInTheDocument();
-    expect(screen.queryByText("No expenses for this target yet.")).not.toBeInTheDocument();
+    expect(screen.queryByText("No expenses recorded yet.")).not.toBeInTheDocument();
     fireEvent.click(addCategory);
     expect(go).toHaveBeenCalledExactlyOnceWith("ledgerCategories");
     expect(api.createExpense).not.toHaveBeenCalled();
@@ -139,7 +139,7 @@ describe("Expense category guidance", () => {
 
   it("keeps a Viewer’s empty ledger free of category setup actions", async () => {
     fixture({ permissions: { manageCategories: false, manageProjects: false, writeExpenses: false } });
-    await screen.findByRole("heading", { name: "No expenses for this target yet." });
+    await screen.findByRole("heading", { name: "No expenses recorded yet." });
     expect(screen.queryByRole("heading", { name: guideTitle })).not.toBeInTheDocument();
     expect(screen.queryByText("Ask an Owner or Admin to add a category before recording an expense.")).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Add category" })).not.toBeInTheDocument();
@@ -152,7 +152,7 @@ describe("Expense category guidance", () => {
     ["unverified GitHub access", { githubAccess: "unavailable", canCreateExpense: false }],
   ])("does not suggest categories when %s already prevents adding project expenses", async (_, projectFields) => {
     fixture({ mode: "project", projectFields });
-    await screen.findByRole("heading", { name: "No expenses for this target yet." });
+    await screen.findByRole("heading", { name: "No expenses recorded yet." });
     expect(screen.queryByRole("heading", { name: guideTitle })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Add category" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Add expense" })).not.toBeInTheDocument();

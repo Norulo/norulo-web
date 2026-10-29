@@ -342,7 +342,7 @@ async function measure(page, engine, profile, stage, expectedIds) {
   for (const row of measured.rows) {
     assert.equal(row.role, "listitem", `Missing row list semantics: ${details}`);
     assert.equal(row.overflow, false, `Project row overflow: ${details}`);
-    assert.equal(row.alignItems, "start", `Project columns are not aligned at the top: ${details}`);
+    assert.equal(row.alignItems, "center", `Project columns are not vertically centered: ${details}`);
     assert.equal(row.columns, measured.headerColumns, `Header and records reflow separately: ${details}`);
     assert.equal(
       row.archivedBadge,

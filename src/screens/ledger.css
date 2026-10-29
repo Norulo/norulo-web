@@ -536,6 +536,11 @@
 .ledger-your-projects .ledger-project-row {
   column-gap: 32px;
 }
+/* Totals and product links sit at the row's vertical center, balanced
+   against the name and description beside them. */
+.ledger-your-projects .ledger-project-row {
+  align-items: center;
+}
 /* The column header caps the project card as its tinted first row. */
 .ledger-your-projects .ledger-project-head {
   padding: 10px 20px;

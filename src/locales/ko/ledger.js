@@ -454,6 +454,8 @@ export const LEDGER_SCREEN_PHRASES = {
   "Development": "개발 환경",
   "Development URL (optional)": "개발 환경 URL(선택 사항)",
   "Product URL (optional)": "제품 URL(선택 사항)",
+  "Admin Console": "관리 콘솔",
+  "Admin Console URL (optional)": "관리 콘솔 URL(선택 사항)",
   "Use an HTTP or HTTPS URL. A bare domain will use HTTPS.": "HTTP 또는 HTTPS URL을 입력하세요. 도메인만 입력하면 HTTPS를 사용합니다.",
   "Development links are shown only when no GitHub repositories are linked.": "개발 환경 링크는 연결된 GitHub 저장소가 없을 때만 표시됩니다.",
   "Project links": "프로젝트 링크",

@@ -454,6 +454,8 @@ export const LEDGER_SCREEN_PHRASES = {
   "Development": "Développement",
   "Development URL (optional)": "URL de développement (facultative)",
   "Product URL (optional)": "URL du produit (facultative)",
+  "Admin Console": "Console d’administration",
+  "Admin Console URL (optional)": "URL de la console d’administration (facultative)",
   "Use an HTTP or HTTPS URL. A bare domain will use HTTPS.": "Utilisez une URL HTTP ou HTTPS. Un domaine sans protocole utilisera HTTPS.",
   "Development links are shown only when no GitHub repositories are linked.": "Les liens de développement ne sont affichés que si aucun dépôt GitHub n’est lié.",
   "Project links": "Liens du projet",

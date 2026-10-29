@@ -454,6 +454,8 @@ export const LEDGER_SCREEN_PHRASES = {
   "Development": "開発環境",
   "Development URL (optional)": "開発環境の URL（任意）",
   "Product URL (optional)": "製品の URL（任意）",
+  "Admin Console": "管理コンソール",
+  "Admin Console URL (optional)": "管理コンソールの URL（任意）",
   "Use an HTTP or HTTPS URL. A bare domain will use HTTPS.": "HTTP または HTTPS の URL を入力してください。ドメイン名だけを入力すると HTTPS を使用します。",
   "Development links are shown only when no GitHub repositories are linked.": "開発環境のリンクは、GitHub リポジトリが連携されていない場合にのみ表示されます。",
   "Project links": "プロジェクトのリンク",

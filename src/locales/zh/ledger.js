@@ -454,6 +454,8 @@ export const LEDGER_SCREEN_PHRASES = {
   "Development": "开发环境",
   "Development URL (optional)": "开发网址（选填）",
   "Product URL (optional)": "产品网址（选填）",
+  "Admin Console": "管理后台",
+  "Admin Console URL (optional)": "管理后台网址（选填）",
   "Use an HTTP or HTTPS URL. A bare domain will use HTTPS.": "使用 HTTP 或 HTTPS 网址；只填写域名时，默认使用 HTTPS。",
   "Development links are shown only when no GitHub repositories are linked.": "仅未关联 GitHub 仓库的项目显示开发链接。",
   "Project links": "项目链接",

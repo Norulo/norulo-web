@@ -84,6 +84,8 @@ const PROJECT_LINKS_AND_RECURRING_COPY = [
   "Development",
   "Development URL (optional)",
   "Product URL (optional)",
+  "Admin Console",
+  "Admin Console URL (optional)",
   "Use an HTTP or HTTPS URL. A bare domain will use HTTPS.",
   "Development links are shown only when no GitHub repositories are linked.",
   "Project links",

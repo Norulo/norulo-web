@@ -24,6 +24,7 @@ const fieldLabel = (field) =>
     description: T("Description"),
     developmentUrl: T("Development URL (optional)"),
     productUrl: T("Product URL (optional)"),
+    adminConsoleUrl: T("Admin Console URL (optional)"),
     status: T("Status"),
     githubRepoIds: T("GitHub repositories"),
     githubOrganizationId: T("GitHub organization"),

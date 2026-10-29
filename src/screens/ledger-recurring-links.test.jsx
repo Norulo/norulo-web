@@ -250,10 +250,15 @@ describe("Project links in the real ledger views", () => {
       githubAccess: "partial",
       developmentUrl: "https://dev.example.com/",
       productUrl: "https://product.example.com/",
+      adminConsoleUrl: "https://admin.example.com/console",
     });
     render(<LedgerScreen api={client(linked)} go={vi.fn()} mode="project" projectId="prj_one" />);
     const productLink = await screen.findByRole("link", { name: "Product" });
     expect(productLink).toHaveAttribute("href", linked.productUrl);
+    expect(screen.getByRole("link", { name: "Admin Console" })).toHaveAttribute(
+      "href",
+      linked.adminConsoleUrl
+    );
     const disclosure = screen.getByText("2 repositories", { selector: "summary" });
     fireEvent.click(disclosure);
     const shortcuts = within(disclosure.closest(".ledger-project-links"));
@@ -281,6 +286,7 @@ describe("Project links in the real ledger views", () => {
       unlinked.developmentUrl
     );
     expect(screen.queryByRole("link", { name: "Product" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Admin Console" })).not.toBeInTheDocument();
   });
 
   it("normalizes optional links on creation without requiring GitHub association", async () => {
@@ -292,6 +298,7 @@ describe("Project links in the real ledger views", () => {
     fireEvent.click(screen.getByText("Project links (optional)", { selector: "summary" }));
     change("Development URL (optional)", "localhost:3000/app");
     change("Product URL (optional)", "example.com/product");
+    change("Admin Console URL (optional)", "admin.example.com/console");
     fireEvent.click(screen.getByRole("button", { name: "Create project" }));
     await waitFor(() => expect(api.createProject).toHaveBeenCalledTimes(1));
     expect(api.createProject.mock.calls[0][0]).toEqual({
@@ -300,6 +307,7 @@ describe("Project links in the real ledger views", () => {
       githubRepoIds: [],
       developmentUrl: "https://localhost:3000/app",
       productUrl: "https://example.com/product",
+      adminConsoleUrl: "https://admin.example.com/console",
     });
     expect(api.repositories).not.toHaveBeenCalled();
     await waitFor(() => expect(go).toHaveBeenCalledWith("ledgerProject", { id: "prj_new" }));
@@ -310,16 +318,18 @@ describe("Project links in the real ledger views", () => {
       project({
         developmentUrl: "https://dev.example.com/",
         productUrl: "https://app.example.com/",
+        adminConsoleUrl: "https://admin.example.com/",
       })
     );
     await settings(api);
     change("Development URL (optional)", "");
+    change("Admin Console URL (optional)", "");
     fireEvent.click(screen.getByRole("button", { name: "Save project" }));
     await waitFor(() => expect(api.updateProject).toHaveBeenCalledTimes(1));
     expect(api.updateProject).toHaveBeenCalledWith(
       "prj_one",
       7,
-      { description: "Local services", developmentUrl: null },
+      { description: "Local services", developmentUrl: null, adminConsoleUrl: null },
       {}
     );
   });

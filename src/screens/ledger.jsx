@@ -565,6 +565,7 @@ function ProjectExternalLinks({ project }) {
   const developmentHref =
     project.githubAccess === "not_linked" ? projectUrlHref(project.developmentUrl) : null;
   const productHref = projectUrlHref(project.productUrl);
+  const adminConsoleHref = projectUrlHref(project.adminConsoleUrl);
   const repositoryLink = ({ id, href, label }) =>
     href ? (
       <a key={id} href={href} target="_blank" rel="noopener noreferrer" draggable={false}>
@@ -603,13 +604,19 @@ function ProjectExternalLinks({ project }) {
           {T("Product", "产品")} <span aria-hidden="true">↗</span>
         </a>
       )}
+      {adminConsoleHref && (
+        <a href={adminConsoleHref} target="_blank" rel="noopener noreferrer" draggable={false}>
+          {T("Admin Console", "管理后台")} <span aria-hidden="true">↗</span>
+        </a>
+      )}
     </div>
   );
 }
 
-function ProjectLinkFields({ developmentUrl, productUrl, onChange, disabled }) {
+function ProjectLinkFields({ developmentUrl, productUrl, adminConsoleUrl, onChange, disabled }) {
   const developmentId = useId();
   const productId = useId();
+  const adminConsoleId = useId();
   return (
     <>
       <div className="ledger-field">
@@ -634,6 +641,20 @@ function ProjectLinkFields({ developmentUrl, productUrl, onChange, disabled }) {
           autoComplete="url"
           disabled={disabled}
           onChange={(event) => onChange("productUrl", event.target.value)}
+        />
+      </div>
+      <div className="ledger-field">
+        <label htmlFor={adminConsoleId}>
+          {T("Admin Console URL (optional)", "管理后台网址（选填）")}
+        </label>
+        <input
+          id={adminConsoleId}
+          value={adminConsoleUrl}
+          maxLength={PROJECT_URL_MAX_BYTES}
+          inputMode="url"
+          autoComplete="url"
+          disabled={disabled}
+          onChange={(event) => onChange("adminConsoleUrl", event.target.value)}
         />
       </div>
       <p className="ledger-help">
@@ -1111,6 +1132,7 @@ function ScopedLedgerScreen({
   const [description, setDescription] = useState("");
   const [developmentUrl, setDevelopmentUrl] = useState("");
   const [productUrl, setProductUrl] = useState("");
+  const [adminConsoleUrl, setAdminConsoleUrl] = useState("");
   const [projectName, setProjectName] = useState("");
   const [projectStatus, setProjectStatus] = useState("active");
   const [selectedRepo, setSelectedRepo] = useState("");
@@ -1377,6 +1399,7 @@ function ScopedLedgerScreen({
       setProjectStatus("active");
       setDevelopmentUrl("");
       setProductUrl("");
+      setAdminConsoleUrl("");
       projectSettingsBase.current = null;
       projectSettingsDirty.current = false;
       setSelectedRepo("");
@@ -1501,12 +1524,14 @@ function ScopedLedgerScreen({
               status: result.project.status || "active",
               developmentUrl: result.project.developmentUrl || null,
               productUrl: result.project.productUrl || null,
+              adminConsoleUrl: result.project.adminConsoleUrl || null,
             };
             setDescription(result.project?.description || "");
             setProjectName(result.project?.name || "");
             setProjectStatus(result.project?.status || "active");
             setDevelopmentUrl(result.project?.developmentUrl || "");
             setProductUrl(result.project?.productUrl || "");
+            setAdminConsoleUrl(result.project?.adminConsoleUrl || "");
             setProjectRepoIds(boundRepositoryIds(result.project));
             setOrganizationId(String(result.project?.githubOrganizationId || ""));
             setLinkRepositories(boundRepositoryIds(result.project).length > 0);
@@ -2133,6 +2158,7 @@ function ScopedLedgerScreen({
       setDescription("");
       setDevelopmentUrl("");
       setProductUrl("");
+      setAdminConsoleUrl("");
       projectSettingsBase.current = null;
       projectSettingsDirty.current = false;
       removalOperationRef.current = null;
@@ -2741,6 +2767,7 @@ function ScopedLedgerScreen({
                           links = {
                             developmentUrl: normalizeProjectUrl(developmentUrl),
                             productUrl: normalizeProjectUrl(productUrl),
+                            adminConsoleUrl: normalizeProjectUrl(adminConsoleUrl),
                           };
                         } catch {
                           setActionError(T("Invalid project URL.", "项目网址无效。"));
@@ -2756,6 +2783,9 @@ function ScopedLedgerScreen({
                                 ? { developmentUrl: links.developmentUrl }
                                 : {}),
                               ...(links.productUrl ? { productUrl: links.productUrl } : {}),
+                              ...(links.adminConsoleUrl
+                                ? { adminConsoleUrl: links.adminConsoleUrl }
+                                : {}),
                               ...(linkRepositories && organizationId
                                 ? { githubOrganizationId: Number(organizationId) }
                                 : {}),
@@ -2802,11 +2832,14 @@ function ScopedLedgerScreen({
                           <ProjectLinkFields
                             developmentUrl={developmentUrl}
                             productUrl={productUrl}
+                            adminConsoleUrl={adminConsoleUrl}
                             disabled={blocked}
                             onChange={(field, value) =>
                               field === "developmentUrl"
                                 ? setDevelopmentUrl(value)
-                                : setProductUrl(value)
+                                : field === "adminConsoleUrl"
+                                  ? setAdminConsoleUrl(value)
+                                  : setProductUrl(value)
                             }
                           />
                         </div>
@@ -3697,6 +3730,7 @@ function ScopedLedgerScreen({
                             links = {
                               developmentUrl: normalizeProjectUrl(developmentUrl),
                               productUrl: normalizeProjectUrl(productUrl),
+                              adminConsoleUrl: normalizeProjectUrl(adminConsoleUrl),
                             };
                           } catch {
                             setActionError(T("Invalid project URL.", "项目网址无效。"));
@@ -3720,6 +3754,9 @@ function ScopedLedgerScreen({
                                   : {}),
                                 ...(links.productUrl !== base.productUrl
                                   ? { productUrl: links.productUrl }
+                                  : {}),
+                                ...(links.adminConsoleUrl !== base.adminConsoleUrl
+                                  ? { adminConsoleUrl: links.adminConsoleUrl }
                                   : {}),
                                 ...(projectName.trim() !== base.name
                                   ? { name: projectName.trim() }
@@ -3963,10 +4000,12 @@ function ScopedLedgerScreen({
                         <ProjectLinkFields
                           developmentUrl={developmentUrl}
                           productUrl={productUrl}
+                          adminConsoleUrl={adminConsoleUrl}
                           disabled={blocked}
                           onChange={(field, value) => {
                             projectSettingsDirty.current = true;
                             if (field === "developmentUrl") setDevelopmentUrl(value);
+                            else if (field === "adminConsoleUrl") setAdminConsoleUrl(value);
                             else setProductUrl(value);
                           }}
                         />

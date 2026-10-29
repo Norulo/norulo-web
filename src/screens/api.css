@@ -1,5 +1,13 @@
 .key-list {
   container-type: inline-size;
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  overflow: clip;
+}
+.key-list:empty {
+  display: none;
 }
 /* Key records: the name leads, its public prefix sits in a mono column and
    dates read as quiet metadata; scopes keep their tag treatment. The section
@@ -10,7 +18,7 @@
   grid-template-areas: "main id action";
   gap: 14px 24px;
   align-items: start;
-  padding-block: var(--space-4);
+  padding-block: 18px;
   border: 0;
   border-bottom: 1px solid var(--border);
   background: transparent;
@@ -85,11 +93,14 @@
   overflow-wrap: anywhere;
 }
 /* Created and last-used dates are metadata, not labels. */
-.key-meta > .tag:nth-child(-n + 2) {
+.key-meta > .tag.key-date {
   padding-inline: 0 var(--space-2);
   border-color: transparent;
   background: transparent;
   color: var(--text-3);
+  font-family: var(--font-sans);
+  font-size: var(--fs-sm);
+  letter-spacing: 0;
 }
 .key-meta {
   display: flex;

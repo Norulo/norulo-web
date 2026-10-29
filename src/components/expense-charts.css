@@ -18,14 +18,19 @@
   min-width: 0;
   container-type: inline-size;
 }
+/* The readout already shows the currency beside its value, so the per-chart
+   caption stays for assistive technology only. */
 .expense-chart-caption {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: var(--text-3);
-  font-size: var(--fs-sm);
-  font-weight: 600;
-  margin-bottom: 12px;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.expense-chart + .expense-chart {
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
 }
 .expense-chart-readout {
   display: grid;
@@ -81,6 +86,9 @@
 .expense-chart-marker,
 .expense-chart-bar {
   fill: var(--accent);
+}
+rect.expense-chart-bar {
+  rx: 3px;
 }
 .expense-chart-marker {
   opacity: 0.45;

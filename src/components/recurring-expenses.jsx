@@ -521,7 +521,7 @@ export function RecurringExpenses({
                       numeric={money}
                       value={money ? formatTotal(rule) : T("Unavailable")}
                     />
-                    <span className="tag">{statusName(rule.status)}</span>
+                    <span className="tag status-tag" data-status={rule.status}>{statusName(rule.status)}</span>
                     {(editable || deletable) && (
                       <div className="panel-actions">
                         {editable && (

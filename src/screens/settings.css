@@ -143,7 +143,7 @@
 
 .settings-screen .github-next-step {
   color: var(--text-2);
-  font-size: var(--fs-lg);
+  font-size: var(--fs-md);
   line-height: 1.7;
   max-width: 520px;
 }
@@ -165,4 +165,10 @@
   justify-self: start;
   width: auto;
   padding-inline: var(--space-5);
+}
+
+/* Explanations step down a size so headings and controls lead each section. */
+.settings-screen .section-body p.muted {
+  font-size: var(--fs-md);
+  line-height: 1.65;
 }

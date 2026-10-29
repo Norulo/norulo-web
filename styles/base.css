@@ -25,6 +25,28 @@
 input[type="checkbox"] {
   border-radius: revert;
 }
+/* Soft corners for controls and surfaces; layout boxes stay square. */
+:where(
+    .btn,
+    input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+    select,
+    textarea,
+    .kbd,
+    .tag,
+    .count,
+    .badge,
+    .notice,
+    .lang-toggle,
+    .theme-toggle,
+    .back-to-top,
+    .lang-menu,
+    .lang-option
+  ) {
+  border-radius: var(--radius-sm);
+}
+:where(.card, .empty, .modal, dialog) {
+  border-radius: var(--radius);
+}
 input[type="checkbox"],
 input[type="radio"],
 progress {
@@ -36,12 +58,18 @@ progress {
 
 :root {
   color-scheme: light;
-  --bg: #f8f7f6;
+  --bg: #f6f6f4;
   --bg-elev: #ffffff;
-  --bg-soft: #f1f0ef;
-  --bg-tint: rgba(0, 0, 0, 0.018);
-  --border: rgba(0, 0, 0, 0.1);
-  --border-strong: rgba(0, 0, 0, 0.18);
+  --bg-soft: #f0efed;
+  --bg-tint: rgba(0, 0, 0, 0.022);
+  --border: rgba(0, 0, 0, 0.085);
+  --border-strong: rgba(0, 0, 0, 0.16);
+  --radius-sm: 6px;
+  --radius: 8px;
+  --radius-lg: 12px;
+  --shadow-xs: 0 1px 1px rgba(16, 16, 24, 0.03);
+  --shadow-card: 0 1px 2px rgba(16, 16, 24, 0.04), 0 2px 8px -2px rgba(16, 16, 24, 0.04);
+  --shadow-float: 0 4px 16px -4px rgba(16, 16, 24, 0.12), 0 1px 3px rgba(16, 16, 24, 0.06);
   --text: #0d0d0d;
   --text-2: #4a4a4a;
   --text-3: #666666;
@@ -69,17 +97,17 @@ progress {
     "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
   --fs-micro: 0.75rem;
   --fs-xs: 0.75rem;
-  --fs-sm: 0.75rem;
-  --fs-md: 0.8125rem;
-  --fs-lg: 0.875rem;
-  --fs-xl: 0.9375rem;
-  --fs-2xl: 1rem;
+  --fs-sm: 0.8125rem;
+  --fs-md: 0.875rem;
+  --fs-lg: 0.9375rem;
+  --fs-xl: 1rem;
+  --fs-2xl: 1.0625rem;
   --fs-3xl: 1.125rem;
   --fs-4xl: 1.375rem;
-  --fs-page-title: 1.5rem;
+  --fs-page-title: 1.75rem;
   /* Public document, pricing and status page titles share one scale. */
   --fs-public-title: clamp(2rem, 1.5rem + 1.6vw, 2.75rem);
-  --fs-section-title: 1.0625rem;
+  --fs-section-title: 1.125rem;
   --fs-value-primary: 2rem;
   --fs-value-primary-compact: 1.75rem;
   --fs-value-row: 1.5rem;
@@ -124,9 +152,12 @@ progress {
 
 [data-theme="dark"] {
   color-scheme: dark;
-  --bg: #080808;
-  --bg-elev: #0d0d0d;
-  --bg-soft: #141414;
+  --bg: #09090a;
+  --bg-elev: #111113;
+  --bg-soft: #18181b;
+  --shadow-xs: none;
+  --shadow-card: 0 0 0 1px rgba(255, 255, 255, 0.02);
+  --shadow-float: 0 8px 24px -6px rgba(0, 0, 0, 0.6);
   --bg-2: rgba(255, 255, 255, 0.04);
   --bg-tint: rgba(255, 255, 255, 0.02);
   --border: rgba(255, 255, 255, 0.1);
@@ -615,11 +646,19 @@ a.crumb-button:where(:not([aria-disabled="true"])):hover {
 }
 :is(.ledger-split-resizer, .console-sidebar-resizer)::after {
   top: 50%;
-  width: 8px;
-  height: 28px;
-  border-inline: 2px solid var(--text-3);
-  background: var(--bg);
+  width: 6px;
+  height: 32px;
+  border-radius: 3px;
+  border: 1px solid var(--border-strong);
+  background: var(--bg-elev);
   transform: translate(-50%, -50%);
+  opacity: 0;
+  transition: opacity 140ms var(--ease-out);
+}
+:is(.ledger-split-resizer, .console-sidebar-resizer):not([aria-disabled="true"]):hover::after,
+:is(.ledger-split-resizer, .console-sidebar-resizer):focus-visible::after,
+.is-resizing > :is(.ledger-split-resizer, .console-sidebar-resizer)::after {
+  opacity: 1;
 }
 :is(.ledger-split-resizer, .console-sidebar-resizer):not([aria-disabled="true"]):hover::before,
 :is(.ledger-split-resizer, .console-sidebar-resizer):focus-visible::before,
@@ -690,14 +729,14 @@ a.crumb-button:where(:not([aria-disabled="true"])):hover {
 }
 .side-h {
   font-size: var(--fs-micro);
-  font-weight: 600;
-  letter-spacing: 0.08em;
+  font-weight: 500;
+  letter-spacing: 0.06em;
   color: var(--text-4);
   text-transform: uppercase;
   padding: var(--space-2) 10px 6px;
 }
-/* Quiet resting items; the current page gets a neutral fill, an accent icon
-   and a hard 2px accent edge so location reads at a glance. */
+/* Quiet resting items; the current page sits on a raised surface with an
+   accent icon so location reads at a glance. */
 .side-i {
   display: flex;
   align-items: center;
@@ -707,7 +746,7 @@ a.crumb-button:where(:not([aria-disabled="true"])):hover {
   font-size: var(--fs-md);
   color: var(--text-2);
   border: 0;
-  border-left: 2px solid transparent;
+  border-radius: var(--radius-sm);
   background: transparent;
   text-align: left;
   min-width: 0;
@@ -726,16 +765,16 @@ a.crumb-button:where(:not([aria-disabled="true"])):hover {
   color: var(--text);
 }
 .side-i.active {
-  background: var(--bg-soft);
+  background: var(--bg-elev);
   color: var(--text);
   font-weight: 600;
-  border-left-color: var(--accent);
+  box-shadow: var(--shadow-xs), inset 0 0 0 1px var(--border);
 }
 .side-i .ic {
-  width: 15px;
-  height: 15px;
+  width: 16px;
+  height: 16px;
   flex: 0 0 auto;
-  opacity: 0.7;
+  opacity: 0.75;
 }
 .side-i.active .ic {
   color: var(--accent);
@@ -1023,7 +1062,7 @@ a.crumb-button:where(:not([aria-disabled="true"])):hover {
 .key-list > .key-row,
 .sub-record-list > .sub-record-row,
 .gh-install-list > .gh-install-row {
-  padding-inline: var(--space-4);
+  padding-inline: var(--space-5);
 }
 .ledger-list > a {
   user-select: text;
@@ -1165,6 +1204,38 @@ a.crumb-button:where(:not([aria-disabled="true"])):hover {
   overflow-wrap: anywhere;
   text-overflow: clip;
   white-space: normal;
+}
+
+/* Lifecycle status: a sans pill with a colored dot, not a code tag. */
+.tag.status-tag {
+  gap: 6px;
+  padding: 3px 9px 3px 8px;
+  border-radius: 999px;
+  font: 500 var(--fs-sm)/1.25 var(--font-sans);
+  letter-spacing: 0;
+}
+.tag.status-tag::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--text-4);
+}
+.tag.status-tag[data-status="active"] {
+  background: color-mix(in srgb, var(--ok) 10%, var(--bg-elev));
+  border-color: color-mix(in srgb, var(--ok) 24%, transparent);
+  color: var(--ok);
+}
+.tag.status-tag[data-status="active"]::before {
+  background: var(--ok);
+}
+.tag.status-tag:is([data-status="paused"], [data-status="blocked"]) {
+  background: color-mix(in srgb, var(--warn) 10%, var(--bg-elev));
+  border-color: color-mix(in srgb, var(--warn) 24%, transparent);
+  color: var(--warn);
+}
+.tag.status-tag:is([data-status="paused"], [data-status="blocked"])::before {
+  background: var(--warn);
 }
 
 /* Shared inline notice: soft box for messages, guides and suggestion panels.
@@ -1675,6 +1746,7 @@ details.panel[open] > summary.panel-h::after,
   .side-i.active {
     color: var(--accent);
     background: transparent;
+    box-shadow: none;
   }
 
   .side-i .ic {
@@ -1892,7 +1964,10 @@ details.panel[open] > summary.panel-h::after,
   margin: 0;
   padding: 0;
   border: 1px solid var(--border);
-  background: var(--bg);
+  border-radius: var(--radius-lg);
+  background: var(--bg-elev);
+  box-shadow: var(--shadow-card);
+  overflow: clip;
 }
 .api-scope-panel > .auth-field {
   padding: var(--space-4) 14px;

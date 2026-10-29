@@ -60,18 +60,21 @@
 }
 /* All-time project spend from the Server, one figure per currency. */
 .ledger-project-summary {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 6px 16px;
+  display: grid;
+  gap: 6px;
+  width: fit-content;
+  max-width: 100%;
   margin-top: var(--space-5);
+  padding: 14px 20px 16px;
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
 }
 .ledger-project-summary dt {
   color: var(--text-3);
-  font-size: var(--fs-micro);
+  font-size: var(--fs-sm);
   font-weight: 500;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
 }
 .ledger-project-summary dd {
   --financial-size: var(--fs-value-secondary);
@@ -85,20 +88,31 @@
   margin: 0;
   font-variant-numeric: tabular-nums;
 }
+/* Links and the project ID share one quiet metadata line under the lead. */
 .ledger-project-identity > .ledger-project-shortcuts {
-  display: flex;
+  display: inline-flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 8px 20px;
-  margin-top: 8px;
+  max-width: 100%;
+  margin: 12px 24px 0 0;
+  vertical-align: middle;
 }
 .ledger-project-identity > .ledger-project-id {
-  display: flex;
+  display: inline-flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 6px 10px;
-  margin-top: 8px;
+  max-width: 100%;
+  margin-top: 12px;
   font-size: var(--fs-md);
+  vertical-align: middle;
+}
+.ledger-project-id > code {
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-soft);
+  font-size: var(--fs-sm);
 }
 .ledger-project-id-label {
   color: var(--text-3);
@@ -196,6 +210,7 @@
   min-width: 0;
   min-height: 44px;
   border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
   padding: 0 6px 0 12px;
   margin-bottom: 16px;
   background: var(--bg-elev);
@@ -521,14 +536,24 @@
 .ledger-your-projects .ledger-project-row {
   column-gap: 32px;
 }
+/* The column header caps the project card as its tinted first row. */
 .ledger-your-projects .ledger-project-head {
-  padding-block: 10px;
-  border-bottom-color: var(--border-strong);
+  padding: 10px 20px;
+  border: 1px solid var(--border);
+  border-bottom: 0;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  background: var(--bg-soft);
   color: var(--text-3);
   font-size: var(--fs-micro);
   font-weight: 500;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
+}
+.ledger-your-projects .ledger-project-head ~ .ledger-project-list {
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+}
+.ledger-your-projects .ledger-project-head ~ .empty {
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
 }
 .ledger-your-projects .ledger-project-count .count {
   color: var(--text-2);
@@ -576,14 +601,13 @@
 }
 .ledger-your-projects .ledger-project-archived {
   margin-top: 10px;
-  padding: 1px 6px;
+  padding: 2px 9px;
   border-color: var(--border);
+  border-radius: 999px;
   background: var(--bg-soft);
   color: var(--text-3);
-  font-family: var(--font-mono);
-  font-size: var(--fs-micro);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  font-size: var(--fs-sm);
+  font-weight: 500;
 }
 .ledger-screen .ledger-your-projects .ledger-project-row-archived .ledger-row-main h2 > a {
   color: var(--text-2);
@@ -732,8 +756,19 @@
 .ledger-screen .ledger-list:not(.ledger-project-list) {
   container-type: inline-size;
 }
+/* Record lists sit on one raised card; rows divide with hairlines. */
+.ledger-screen .ledger-list:empty {
+  display: none;
+}
+.ledger-screen .ledger-list {
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  overflow: clip;
+}
 .ledger-screen .ledger-list > article {
-  padding-block: var(--ledger-row-padding, 16px);
+  padding-block: var(--ledger-row-padding, 18px);
   border-bottom: 1px solid var(--border);
   min-width: 0;
 }
@@ -749,6 +784,7 @@
   overflow-wrap: anywhere;
   font-size: var(--fs-xl);
   font-weight: 600;
+  letter-spacing: -0.015em;
 }
 .ledger-screen .ledger-list p {
   color: var(--text-2);
@@ -858,13 +894,13 @@
   justify-self: end;
   text-align: right;
 }
-/* Keep the currency above the exact value; the whole money stack shares the
-   action pair's vertical center. */
+/* Currency badge and value share one baseline at the money column's edge. */
 .ledger-screen .ledger-expense-row .financial-value-money {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 4px;
+  display: inline-flex;
+  align-items: baseline;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 4px 8px;
 }
 .ledger-screen .ledger-expense-row .financial-value-currency {
   margin-inline-end: 0;
@@ -1204,18 +1240,28 @@
 .ledger-screen .ledger-reports {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
-  gap: 0 48px;
+  gap: 16px;
   align-items: start;
+  padding-top: var(--space-6);
   container: ledger-reports / inline-size;
+}
+/* Each report is a card holding its own per-currency charts. */
+.ledger-screen .ledger-reports > .panel {
+  padding: 22px 24px 24px;
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
 }
 .ledger-summary {
   container: ledger-summary / inline-size;
 }
 .ledger-summary-currencies {
   display: grid;
-  gap: 32px;
+  gap: 16px;
   min-width: 0;
 }
+/* Each currency is its own card: the total on the left, its split right. */
 .ledger-summary-currency {
   display: grid;
   grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.4fr);
@@ -1223,10 +1269,11 @@
   gap: 24px 48px;
   min-width: 0;
   margin: 0;
-}
-.ledger-summary-currency + .ledger-summary-currency {
-  padding-top: 32px;
-  border-top: 1px solid var(--border);
+  padding: 24px 28px;
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
 }
 .ledger-summary-primary,
 .ledger-summary-primary > div {
@@ -1274,8 +1321,9 @@
 }
 .ledger-summary-track {
   display: flex;
-  height: 12px;
+  height: 10px;
   gap: 0;
+  border-radius: 999px;
   background: var(--bg-soft);
   overflow: hidden;
 }
@@ -1311,6 +1359,7 @@
   width: 8px;
   height: 8px;
   flex: 0 0 8px;
+  border-radius: 2px;
   background: var(--accent);
 }
 [data-target="shared"] .ledger-summary-key {
@@ -1333,8 +1382,6 @@
 }
 .ledger-summary-shared .ledger-summary-currency {
   grid-template-columns: minmax(0, 1fr);
-  padding-top: 0;
-  border-top: 0;
 }
 .ledger-summary-shared .ledger-summary-primary .financial-value {
   --financial-size: var(--fs-value-secondary);
@@ -1401,6 +1448,7 @@
   .ledger-summary-currency {
     grid-template-columns: minmax(0, 1fr);
     gap: 24px;
+    padding: 20px;
   }
   .ledger-summary-primary .financial-value {
     --financial-size: var(--fs-value-primary);

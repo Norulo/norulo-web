@@ -197,20 +197,21 @@
 .billing-usage-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: var(--space-6) var(--space-8);
+  gap: var(--space-4);
   margin-block: var(--space-6);
 }
 
+/* Each allowance is its own card: label, used/total, then the meter. */
 .billing-usage-row {
   display: flex;
   flex-direction: column;
   gap: var(--space-5);
   min-width: 0;
-}
-
-.billing-usage-row + .billing-usage-row {
-  padding-top: var(--space-6);
-  border-top: 1px solid var(--border);
+  padding: 20px 24px 24px;
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
 }
 
 .billing-usage-label {
@@ -233,11 +234,21 @@
   overflow-wrap: anywhere;
 }
 
+/* Used and total share a row while both fit; very long counts wrap the total
+   onto its own line instead of squeezing the used value. */
 .billing-usage-values {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: end;
-  gap: var(--space-4);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-4);
+}
+.billing-usage-used {
+  flex: 1 1 auto;
+}
+.billing-usage-total {
+  flex: 0 1 auto;
+  margin-inline-start: auto;
 }
 
 .billing-usage-values > div {
@@ -282,29 +293,30 @@
   block-size: 8px;
   margin-block-start: auto;
   border: 0;
-  border-radius: 0;
-  background: var(--border);
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--bg-soft);
   accent-color: var(--accent);
 }
 
 .billing-usage-meter::-webkit-meter-bar {
   block-size: 100%;
   border: 0;
-  border-radius: 0;
-  background: var(--border);
+  border-radius: 999px;
+  background: var(--bg-soft);
   box-shadow: none;
 }
 
 .billing-usage-meter::-webkit-meter-optimum-value,
 .billing-usage-meter::-webkit-meter-suboptimum-value,
 .billing-usage-meter::-webkit-meter-even-less-good-value {
-  border-radius: 0;
+  border-radius: 999px;
   background: var(--accent);
 }
 
 .billing-usage-meter::-moz-meter-bar {
   border: 0;
-  border-radius: 0;
+  border-radius: 999px;
   background: var(--accent);
 }
 
@@ -320,12 +332,7 @@
   .billing-ledger-section .billing-usage-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-  .billing-ledger-section .billing-usage-row + .billing-usage-row {
-    padding-top: 0;
-    padding-left: var(--space-8);
-    border-top: 0;
-    border-left: 1px solid var(--border);
-  }
+
 }
 
 @media (any-pointer: coarse) {

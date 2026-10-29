@@ -849,12 +849,12 @@ export function ApiKeysScreen({
                             <div className="key-main">
                               <div className="key-t">{key.name}</div>
                               <div className="key-meta">
-                                <span className="tag">
+                                <span className="tag key-date">
                                   {T("Created", "已创建")} {formatDate(key.createdAt)}
                                 </span>
                                 {/* Usage tracking is disabled server-side; null is not "never used". */}
                                 {key.lastUsedAt && (
-                                  <span className="tag">
+                                  <span className="tag key-date">
                                     {T("Last used", "最近使用")} {formatDate(key.lastUsedAt)}
                                   </span>
                                 )}

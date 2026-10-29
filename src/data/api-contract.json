@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Norulo Project Expense Ledger API",
-    "version": "0.10.0",
+    "version": "0.11.0",
     "description": "Current ledger contract for Norulo, the project expense tracker for\ndevelopers and teams at norulo.com. Users and authorized API clients\nenter expenses; bank or vendor transactions are not imported. Platform\nsubscription payments remain separate from ledger expenses.\nWeb uses its same-origin /api proxy; direct\nclients call these paths on the Server Worker. All private responses are\nCache-Control: no-store. Money is grouped by currency without conversion.\nProduction admits every request through approximate per-Cloudflare-location\nfrequency windows before authentication or storage work: each client\nIPv4 address or IPv6 /64 network may send 300 requests per 10 seconds and\n1,200 per minute, and each presented session or API key 120 per 10 seconds\nand 600 per minute. There is no total request quota. Exceeding a window\nreturns 429 API_RATE_LIMIT with Retry-After; wait instead of retrying in a\nloop. Ledger owner write allowances are separate.\nEach user's existing personal ledger is an immutable workspace. Explicit\ninvitations share all existing and future ledger data after the original\ninviter approves the authenticated applicant. Links do not require a named\nrecipient. Pending or rejected requests grant no ledger access. Invitations\ndo not grant GitHub organization or repository access. Select a ledger with\nX-Norulo-Workspace, or workspaceId on CSV links. Conflicting selectors are\nrejected. API keys are permanently bound to one ledger and intersect the\nissuing member's current role; membership revision changes invalidate team\nkeys. All members use the ledger owner's plan, capacity and model budget.\nAccount billing remains the signed-in user's own account service.\nProjects can be standalone with a nonblank name and no GitHub repository or\norganization association. Connecting repositories is optional and continues\nto require the current actor's GitHub authorization. The shared expense pool\nis shared across projects in a ledger, never publicly accessible. AI assistance\ndepends on the ledger owner's Pro or Max plan, current activation and usage budget;\nan explicit category permits manual entry when assistance is unavailable.\nProject development and product links are optional absolute HTTP(S) URLs.\nOnly the selected ledger Owner using a current cookie session or an API key\nwith projects:write and permission for that project may remove a\nproject. Removal permanently erases that project, its current expenses,\nrecurring plans and attributable business history. Archived projects remain\nrecoverable until explicitly removed. Current expenses already moved to\nanother project or Shared pool survive, while their erased-project snapshots\ndisappear. Unrelated schedules retain consumed-period fences without a\nremoved expense identifier. Project capacity and active expense capacity\nare released;\nprior write and model-fee counters remain charged. Ledger-wide categories,\naccount identity, billing and membership remain.\nRecurring expense rules use the same REST resource for browser sessions and\nAPI keys with explicit expense authority. A key-created or key-resumed rule\nretains only a credential hash; execution rechecks its current key scopes,\nexpiration, revocation, ledger binding and target restrictions. Each\n\ngenerated occurrence uses the current ledger owner's plan and the rule\nsaved execution actor's current membership and GitHub access. A rule records one ordinary\nexpense per calendar period without making a payment or extending a\nsubscription. Each occurrence is a separate expense record, even when its\nother values match a previous occurrence; amounts are never accumulated\ninto an existing expense. A start date on or before today in the schedule's\ntimezone records exactly one initial expense on that start date. A future\nstart waits for its scheduled occurrence. Future plans do not count as spent.\nCapacity failures retain at most ten unresolved occurrences per rule for\nexplicit manual posting and notify the saved execution actor by English\nemail to a usable verified address, otherwise by Norulo inbox. Later\nfailed occurrences are discarded while ten remain unresolved.\nStopping a rule preserves its previously recorded expenses.\nEmail verification codes provide independent registration and sign-in.\nGitHub identity and repository connections are optional. Verified email and\nexplicit GitHub links preserve the immutable account ID, personal ledger,\nmemberships and billing. Matching provider or billing contact emails never\nmerge accounts. Authentication endpoints do not grant API-key scopes.\nProject and shared-pool activity records identify the authenticated actor,\noperation time and exact changed record. Only the latest rolling 24 hours\nare visible, using the Server clock. History starts when activity logging\nis enabled; old financial audit events are not backfilled or deleted.\nMember governance requires explicit members:read or members:write scopes.\nGovernance keys must omit projectIds, and every key remains bound to its\none ledger and issuer's current role. Owner/Admin can manage members; only\nOwner can manage Admin, and only an invitation's original inviter can review\nits applicants. Previewing or applying to an invitation uses the applicant's\nbrowser account session rather than a ledger-bound key.\n"
   },
   "servers": [
@@ -3624,6 +3624,156 @@
         }
       }
     },
+    "/api/v1/reports/projects/{projectId}/monthly": {
+      "get": {
+        "operationId": "getProjectMonthlyExpenses",
+        "x-norulo-scope": "expenses:read",
+        "description": "Project expenses whose business date falls in one calendar month, from its first through its last day. Totals are grouped by currency and never combined or converted; they always cover the whole period, while itemized expenses are paginated in occurredOn,id order. Requires expenses:read because itemized records are returned. Archived projects keep their history; removed or unknown projects return 404.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ReportProjectPath"
+          },
+          {
+            "$ref": "#/components/parameters/Year"
+          },
+          {
+            "$ref": "#/components/parameters/Month"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          },
+          {
+            "$ref": "#/components/parameters/PeriodCursor"
+          },
+          {
+            "$ref": "#/components/parameters/WorkspaceHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Per-currency totals and itemized project expenses for the period",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectPeriodReport"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/InvalidInput"
+          }
+        }
+      }
+    },
+    "/api/v1/reports/projects/{projectId}/quarterly": {
+      "get": {
+        "operationId": "getProjectQuarterlyExpenses",
+        "x-norulo-scope": "expenses:read",
+        "description": "Project expenses whose business date falls in one calendar quarter (Q1 January-March through Q4 October-December). Totals are grouped by currency and never combined or converted; they always cover the whole period, while itemized expenses are paginated in occurredOn,id order. Requires expenses:read because itemized records are returned. Archived projects keep their history; removed or unknown projects return 404.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ReportProjectPath"
+          },
+          {
+            "$ref": "#/components/parameters/Year"
+          },
+          {
+            "$ref": "#/components/parameters/Quarter"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          },
+          {
+            "$ref": "#/components/parameters/PeriodCursor"
+          },
+          {
+            "$ref": "#/components/parameters/WorkspaceHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Per-currency totals and itemized project expenses for the period",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectPeriodReport"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/InvalidInput"
+          }
+        }
+      }
+    },
+    "/api/v1/reports/projects/{projectId}/annual": {
+      "get": {
+        "operationId": "getProjectAnnualExpenses",
+        "x-norulo-scope": "expenses:read",
+        "description": "Project expenses whose business date falls in one calendar year, January 1 through December 31. Totals are grouped by currency and never combined or converted; they always cover the whole period, while itemized expenses are paginated in occurredOn,id order. Requires expenses:read because itemized records are returned. Archived projects keep their history; removed or unknown projects return 404.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ReportProjectPath"
+          },
+          {
+            "$ref": "#/components/parameters/Year"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          },
+          {
+            "$ref": "#/components/parameters/PeriodCursor"
+          },
+          {
+            "$ref": "#/components/parameters/WorkspaceHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Per-currency totals and itemized project expenses for the period",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectPeriodReport"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/InvalidInput"
+          }
+        }
+      }
+    },
     "/api/v1/expense-suggestions": {
       "post": {
         "parameters": [
@@ -4008,6 +4158,59 @@
           "type": "string",
           "pattern": "^[A-Za-z0-9_-]{1,120}$"
         }
+      },
+      "ReportProjectPath": {
+        "name": "projectId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{1,120}$"
+        }
+      },
+      "Year": {
+        "name": "year",
+        "in": "query",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "pattern": "^[0-9]{4}$"
+        },
+        "description": "Four-digit calendar year 0001 through 9999"
+      },
+      "Month": {
+        "name": "month",
+        "in": "query",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "pattern": "^[0-9]{1,2}$"
+        },
+        "description": "Calendar month 1 through 12; a leading zero is accepted"
+      },
+      "Quarter": {
+        "name": "quarter",
+        "in": "query",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "1",
+            "2",
+            "3",
+            "4"
+          ]
+        }
+      },
+      "PeriodCursor": {
+        "name": "cursor",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "maxLength": 131,
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}_[A-Za-z0-9_-]{1,120}$"
+        },
+        "description": "Opaque nextCursor returned by the same period report"
       },
       "Limit": {
         "name": "limit",
@@ -7726,6 +7929,126 @@
           }
         ]
       },
+      "ProjectPeriodReport": {
+        "type": "object",
+        "required": [
+          "project",
+          "period",
+          "totals",
+          "items",
+          "nextCursor"
+        ],
+        "properties": {
+          "project": {
+            "type": "object",
+            "required": [
+              "id",
+              "name",
+              "status"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "active",
+                  "archived"
+                ]
+              }
+            }
+          },
+          "period": {
+            "type": "object",
+            "required": [
+              "granularity",
+              "year",
+              "startOn",
+              "endOn"
+            ],
+            "description": "Inclusive business-date bounds. Expense dates have no time or zone, so no timezone conversion applies.",
+            "properties": {
+              "granularity": {
+                "type": "string",
+                "enum": [
+                  "month",
+                  "quarter",
+                  "year"
+                ]
+              },
+              "year": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 9999
+              },
+              "month": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 12
+              },
+              "quarter": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 4
+              },
+              "startOn": {
+                "type": "string",
+                "format": "date"
+              },
+              "endOn": {
+                "type": "string",
+                "format": "date"
+              }
+            }
+          },
+          "totals": {
+            "type": "array",
+            "description": "One entry per currency present in the period, sorted by currency code. Amounts in different currencies are never combined.",
+            "items": {
+              "type": "object",
+              "required": [
+                "currency",
+                "amount",
+                "amountMinor",
+                "expenseCount"
+              ],
+              "properties": {
+                "currency": {
+                  "type": "string",
+                  "pattern": "^[A-Z]{3}$"
+                },
+                "amount": {
+                  "type": "string",
+                  "description": "Exact decimal total in the currency's standard exponent"
+                },
+                "amountMinor": {
+                  "$ref": "#/components/schemas/AggregateMinor"
+                },
+                "expenseCount": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              }
+            }
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Expense"
+            }
+          },
+          "nextCursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
       "Report": {
         "type": "object",
         "required": [
@@ -7784,5 +8107,5 @@
       }
     }
   },
-  "x-norulo-source-sha256": "5c8335ea0864475a554a04e08db40229e9f72487b1d21868fcf53b67e1b4e086"
+  "x-norulo-source-sha256": "aea434398abfd5a33bc6b1fa0a5b8d084c33e365957cfea0072fa8b8a4386337"
 }

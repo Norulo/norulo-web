@@ -92,6 +92,22 @@
   gap: 8px 20px;
   margin-top: 8px;
 }
+.ledger-project-identity > .ledger-project-id {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  margin-top: 8px;
+  font-size: var(--fs-md);
+}
+.ledger-project-id-label {
+  color: var(--text-3);
+}
+.ledger-project-id > code {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  user-select: all;
+}
 .ledger-project-shortcuts > .ledger-meta {
   color: var(--text-3);
 }

@@ -550,6 +550,58 @@ const projectLabel = (project, fallback = T("Project", "项目")) =>
   project.description ||
   fallback;
 
+function ProjectIdentifier({ id }) {
+  const [copyState, setCopyState] = useState("idle");
+  const copyRequest = useRef(0);
+  useEffect(() => {
+    setCopyState("idle");
+    copyRequest.current += 1;
+  }, [id]);
+  useEffect(() => {
+    if (copyState !== "copied") return undefined;
+    const timer = setTimeout(() => setCopyState("idle"), 2000);
+    return () => clearTimeout(timer);
+  }, [copyState]);
+  const copy = async () => {
+    const request = ++copyRequest.current;
+    try {
+      if (typeof navigator.clipboard?.writeText !== "function")
+        throw new Error("Clipboard unavailable");
+      await navigator.clipboard.writeText(id);
+      if (copyRequest.current === request) setCopyState("copied");
+    } catch {
+      if (copyRequest.current === request) setCopyState("failed");
+    }
+  };
+  return (
+    <div className="ledger-project-id">
+      <span className="ledger-project-id-label">{T("Project ID", "项目 ID")}</span>
+      <code translate="no">{id}</code>
+      <button
+        className="btn ghost sm"
+        type="button"
+        aria-label={T("Copy project ID", "复制项目 ID")}
+        onClick={copy}
+      >
+        {copyState === "copied" ? (
+          <I.Check size={12} aria-hidden="true" />
+        ) : (
+          <I.Copy size={12} aria-hidden="true" />
+        )}
+        <span aria-live="polite">{copyState === "copied" ? T("Copied") : T("Copy")}</span>
+      </button>
+      {copyState === "failed" && (
+        <span className="ledger-meta" role="status">
+          {T(
+            "Copy unavailable. Select and copy the project ID.",
+            "无法自动复制，请选择并复制项目 ID。"
+          )}
+        </span>
+      )}
+    </div>
+  );
+}
+
 function ProjectExternalLinks({ project }) {
   const repositories = [...new Set(boundRepositoryIds(project))].map((id) => {
     const repository = project.repositories?.find((item) => item.githubRepoId === id);
@@ -2485,6 +2537,9 @@ function ScopedLedgerScreen({
               </p>
               {mode === "project" && data?.project && (
                 <ProjectExternalLinks project={data.project} />
+              )}
+              {mode === "project" && data?.project?.id && (
+                <ProjectIdentifier id={data.project.id} />
               )}
               {mode === "project" &&
                 Array.isArray(data?.project?.totals) &&

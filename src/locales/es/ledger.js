@@ -456,6 +456,8 @@ export const LEDGER_SCREEN_PHRASES = {
   "Product URL (optional)": "URL del producto (opcional)",
   "Admin Console": "Consola de administración",
   "Admin Console URL (optional)": "URL de la consola de administración (opcional)",
+  "Copy project ID": "Copiar ID del proyecto",
+  "Copy unavailable. Select and copy the project ID.": "No se pudo copiar automáticamente. Selecciona y copia el ID del proyecto.",
   "Use an HTTP or HTTPS URL. A bare domain will use HTTPS.": "Usa una URL HTTP o HTTPS. Si introduces solo un dominio, se usará HTTPS.",
   "Development links are shown only when no GitHub repositories are linked.": "Los enlaces de desarrollo solo se muestran cuando no hay repositorios de GitHub vinculados.",
   "Project links": "Enlaces del proyecto",

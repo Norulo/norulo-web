@@ -677,3 +677,15 @@ describe("Recurring entry in project and shared expenses", () => {
     expect(screen.getByRole("button", { name: "Add expense" })).toBeEnabled();
   });
 });
+
+describe("Project ID under the project title", () => {
+  it("shows the full ID and copies it to the clipboard", async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, "clipboard", { value: { writeText }, configurable: true });
+    render(<LedgerScreen api={client()} go={vi.fn()} mode="project" projectId="prj_one" />);
+    expect(await screen.findByText("prj_one", { selector: "code" })).toBeVisible();
+    fireEvent.click(screen.getByRole("button", { name: "Copy project ID" }));
+    await waitFor(() => expect(writeText).toHaveBeenCalledWith("prj_one"));
+    expect(await screen.findByText("Copied")).toBeVisible();
+  });
+});

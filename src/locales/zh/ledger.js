@@ -456,6 +456,8 @@ export const LEDGER_SCREEN_PHRASES = {
   "Product URL (optional)": "产品网址（选填）",
   "Admin Console": "管理后台",
   "Admin Console URL (optional)": "管理后台网址（选填）",
+  "Copy project ID": "复制项目 ID",
+  "Copy unavailable. Select and copy the project ID.": "无法自动复制，请选择并复制项目 ID。",
   "Use an HTTP or HTTPS URL. A bare domain will use HTTPS.": "使用 HTTP 或 HTTPS 网址；只填写域名时，默认使用 HTTPS。",
   "Development links are shown only when no GitHub repositories are linked.": "仅未关联 GitHub 仓库的项目显示开发链接。",
   "Project links": "项目链接",

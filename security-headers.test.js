@@ -49,10 +49,15 @@ describe("browser security policy", () => {
           return [name, values];
         })
     );
-    expect(directives["script-src"]).toEqual(["'self'", `'${THEME_BOOTSTRAP_HASH}'`]);
+    expect(directives["script-src"]).toEqual([
+      "'self'",
+      `'${THEME_BOOTSTRAP_HASH}'`,
+      "https://static.cloudflareinsights.com",
+    ]);
+    expect(directives["connect-src"]).toEqual(["'self'", "https://cloudflareinsights.com"]);
     expect(directives["script-src-attr"]).toEqual(["'none'"]);
     expect(directives["style-src"]).toEqual(["'self'", "'unsafe-inline'"]);
-    for (const name of ["connect-src", "font-src", "form-action"])
+    for (const name of ["font-src", "form-action"])
       expect(directives[name]).toEqual(["'self'"]);
     for (const name of ["object-src", "base-uri", "frame-src", "frame-ancestors"])
       expect(directives[name]).toEqual(["'none'"]);

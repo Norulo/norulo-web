@@ -1,9 +1,13 @@
 import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { readFileSync } from "node:fs";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, beforeAll } from "vitest";
 import apiContract from "../data/api-contract.json";
 import { setLang } from "../i18n.jsx";
 import { ApiReference, referenceMarkdown } from "./api-reference.jsx";
+import { loadApiContract } from "./api-contract-source.js";
+
+// The page preloads the full contract while idle; tests start from that state.
+beforeAll(() => loadApiContract());
 
 const METHODS = new Set(["get", "post", "put", "patch", "delete", "head", "options", "trace"]);
 

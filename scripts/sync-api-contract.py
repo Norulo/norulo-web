@@ -20,6 +20,26 @@ OUTPUTS = (
     ROOT / "public" / "openapi" / "ledger-v1.json",
     ROOT / "src" / "data" / "api-contract.json",
 )
+# The API page renders its endpoint list from this outline and loads the full
+# contract only when a reader opens an endpoint or copies the documentation.
+OUTLINE = ROOT / "src" / "data" / "api-contract-outline.json"
+METHODS = ("get", "post", "put", "patch", "delete", "head", "options", "trace")
+
+
+def contract_outline(contract):
+    """Method, path and first tag per operation, in contract order."""
+    paths = {}
+    for path, item in contract["paths"].items():
+        paths[path] = {
+            method: {"tags": operation["tags"][:1]} if operation.get("tags") else {}
+            for method, operation in item.items()
+            if method in METHODS
+        }
+    return {
+        "openapi": contract.get("openapi"),
+        "info": {"version": (contract.get("info") or {}).get("version")},
+        "paths": paths,
+    }
 
 
 def validate_references(node, document):
@@ -55,24 +75,28 @@ def main():
         validate_references(contract, contract)
         contract["x-norulo-source-sha256"] = hashlib.sha256(source).hexdigest()
         expected = (json.dumps(contract, ensure_ascii=False, indent=2, allow_nan=False) + "\n").encode()
+        outline = (
+            json.dumps(contract_outline(contract), ensure_ascii=False, indent=2, allow_nan=False)
+            + "\n"
+        ).encode()
     except (OSError, ValueError, KeyError, IndexError, yaml.YAMLError) as error:
         print(f"OpenAPI synchronization failed: {error}", file=sys.stderr)
         return 1
 
     stale = []
-    for output in OUTPUTS:
+    for output, content in [*((output, expected) for output in OUTPUTS), (OUTLINE, outline)]:
         if args.check:
-            if not output.is_file() or output.read_bytes() != expected:
+            if not output.is_file() or output.read_bytes() != content:
                 stale.append(str(output.relative_to(ROOT)))
         else:
             output.parent.mkdir(parents=True, exist_ok=True)
-            output.write_bytes(expected)
+            output.write_bytes(content)
     if stale:
         print("OpenAPI artifacts are stale: " + ", ".join(stale), file=sys.stderr)
         print("Run python3 scripts/sync-api-contract.py after updating the Server contract.", file=sys.stderr)
         return 1
     action = "Verified" if args.check else "Generated"
-    print(f"{action} both OpenAPI artifacts from ledger-v1.yaml ({contract['x-norulo-source-sha256'][:12]}).")
+    print(f"{action} the OpenAPI artifacts from ledger-v1.yaml ({contract['x-norulo-source-sha256'][:12]}).")
     return 0
 
 

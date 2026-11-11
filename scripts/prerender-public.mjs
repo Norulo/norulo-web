@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFile, writeFile, mkdir, rm } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { createServer } from "vite";
+import Beasties from "beasties";
 import { PUBLIC_PAGE_ASSETS } from "../public-pages.js";
 
 const root = resolve(import.meta.dirname, "..");
@@ -26,6 +27,33 @@ function stylesFor(source, seen = new Set()) {
   return [...(entry.css || []), ...(entry.imports || []).flatMap((key) => stylesFor(key, seen))];
 }
 
+// Inline the CSS rules the pre-rendered markup uses and move the full
+// stylesheets to the end of <body>, so first paint does not wait for them.
+// No inline event handlers are added, which the CSP would block.
+const beasties = new Beasties({
+  path: dist,
+  publicPath: "/",
+  preload: "body",
+  noscriptFallback: false,
+  pruneSource: false,
+  reduceInlineStyles: false,
+  inlineFonts: false,
+  preloadFonts: false,
+  logLevel: "warn",
+  // Rules for states the static markup does not show yet: the theme set by
+  // the bootstrap script and the controls React adds after it starts.
+  allowRules: [
+    /data-theme/,
+    /\.preferences/,
+    /\.lang-/,
+    /\.theme-toggle/,
+    /\.back-to-top/,
+    /\.notification-/,
+    /\.spin\b/,
+    /\.fade-in/,
+  ],
+});
+
 // Vite transforms the existing JSX and CSS imports for build-time React SSR.
 // No browser is launched and no network API is called. Browser effects do not run.
 const vite = await createServer({
@@ -43,8 +71,11 @@ try {
     const styles = [...new Set(stylesFor(sources[path]))]
       .filter((file) => !template.includes(`href="/${file}"`))
       .map((file) => `<link rel="stylesheet" href="/${file}" />`).join("\n");
-    const html = template.replace('<div id="root"></div>', () => `<div id="root">${content}</div>`)
-      .replace("</head>", () => `${styles}\n</head>`);
+    const html = await beasties.process(
+      template
+        .replace('<div id="root"></div>', () => `<div id="root">${content}</div>`)
+        .replace("</head>", () => `${styles}\n</head>`)
+    );
     const file = resolve(dist, asset.slice(1));
     await mkdir(dirname(file), { recursive: true });
     await writeFile(file, html);

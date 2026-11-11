@@ -1,0 +1,250 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "version": "0.11.0"
+  },
+  "paths": {
+    "/billing": {
+      "get": {
+        "tags": [
+          "Account Billing"
+        ]
+      }
+    },
+    "/billing/plan": {
+      "get": {
+        "tags": [
+          "Account Billing"
+        ]
+      }
+    },
+    "/api-keys": {
+      "get": {
+        "tags": [
+          "API Keys"
+        ]
+      },
+      "post": {
+        "tags": [
+          "API Keys"
+        ]
+      }
+    },
+    "/api-keys/{id}": {
+      "delete": {
+        "tags": [
+          "API Keys"
+        ]
+      }
+    },
+    "/api/v1/account/expense-retention": {
+      "get": {
+        "tags": [
+          "Authentication"
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Authentication"
+        ]
+      }
+    },
+    "/api/v1/account/jev": {
+      "get": {
+        "tags": [
+          "Authentication"
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Authentication"
+        ]
+      }
+    },
+    "/auth/session": {
+      "get": {
+        "tags": [
+          "Authentication"
+        ]
+      }
+    },
+    "/auth/sign-out": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ]
+      }
+    },
+    "/auth/email/request-code": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ]
+      }
+    },
+    "/auth/email/verify-code": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ]
+      }
+    },
+    "/auth/github/authorize": {
+      "get": {
+        "tags": [
+          "Authentication"
+        ]
+      }
+    },
+    "/auth/github/callback": {
+      "get": {
+        "tags": [
+          "Authentication"
+        ]
+      }
+    },
+    "/integrations/github": {
+      "delete": {
+        "tags": [
+          "Authentication"
+        ]
+      }
+    },
+    "/integrations/github/refresh": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ]
+      }
+    },
+    "/api/v1/workspaces": {
+      "get": {}
+    },
+    "/api/v1/workspaces/{workspaceId}/members": {
+      "get": {}
+    },
+    "/api/v1/workspaces/{workspaceId}/members/{userId}": {
+      "patch": {},
+      "delete": {}
+    },
+    "/api/v1/workspaces/{workspaceId}/invites": {
+      "get": {},
+      "post": {}
+    },
+    "/api/v1/workspaces/{workspaceId}/invites/{id}": {
+      "delete": {}
+    },
+    "/api/v1/workspace-invitations/preview": {
+      "post": {}
+    },
+    "/api/v1/workspace-invitations/accept": {
+      "post": {}
+    },
+    "/api/v1/workspace-invitation-requests": {
+      "get": {}
+    },
+    "/api/v1/recurring-expense-notifications": {
+      "get": {}
+    },
+    "/api/v1/workspaces/{workspaceId}/join-requests": {
+      "get": {}
+    },
+    "/api/v1/workspaces/{workspaceId}/invites/{id}/requests": {
+      "get": {}
+    },
+    "/api/v1/workspaces/{workspaceId}/invites/{id}/requests/{requestId}/approve": {
+      "post": {}
+    },
+    "/api/v1/workspaces/{workspaceId}/invites/{id}/requests/{requestId}/reject": {
+      "post": {}
+    },
+    "/api/v1/me": {
+      "get": {}
+    },
+    "/api/v1/repositories": {
+      "get": {}
+    },
+    "/api/v1/integrations/github/refresh": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ]
+      }
+    },
+    "/api/v1/projects": {
+      "get": {},
+      "post": {}
+    },
+    "/api/v1/projects/{id}": {
+      "get": {},
+      "patch": {},
+      "delete": {}
+    },
+    "/api/v1/categories": {
+      "get": {},
+      "post": {}
+    },
+    "/api/v1/categories/{id}": {
+      "patch": {},
+      "delete": {}
+    },
+    "/api/v1/categories/{id}/remove": {
+      "post": {}
+    },
+    "/api/v1/expenses": {
+      "get": {},
+      "post": {}
+    },
+    "/api/v1/expenses/export": {
+      "get": {}
+    },
+    "/api/v1/expenses/{id}": {
+      "get": {},
+      "patch": {},
+      "delete": {}
+    },
+    "/api/v1/expenses/{id}/review": {
+      "post": {}
+    },
+    "/api/v1/expense-recurring-rules": {
+      "get": {},
+      "post": {}
+    },
+    "/api/v1/expense-recurring-rules/{id}": {
+      "get": {},
+      "patch": {},
+      "delete": {}
+    },
+    "/api/v1/activity": {
+      "get": {
+        "tags": [
+          "Ledger"
+        ]
+      }
+    },
+    "/api/v1/reports/summary": {
+      "get": {}
+    },
+    "/api/v1/reports/timeseries": {
+      "get": {}
+    },
+    "/api/v1/reports/categories": {
+      "get": {}
+    },
+    "/api/v1/reports/projects/{projectId}/monthly": {
+      "get": {}
+    },
+    "/api/v1/reports/projects/{projectId}/quarterly": {
+      "get": {}
+    },
+    "/api/v1/reports/projects/{projectId}/annual": {
+      "get": {}
+    },
+    "/api/v1/expense-suggestions": {
+      "post": {}
+    },
+    "/api/v1/expense-suggestions/{id}/decision": {
+      "post": {}
+    }
+  }
+}

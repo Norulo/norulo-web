@@ -387,30 +387,16 @@ function McpSpotlight({ go }) {
 
 export function LandingScreen({ go, auth }) {
   useLang();
-  const checkingSession = auth?.status === "checking";
-  const signedIn = !checkingSession && Boolean(auth?.authenticated);
-  const primaryActionTarget = signedIn ? "ledgerProjects" : "login";
-  const primaryActionLabel = checkingSession
-    ? T("Checking session...", "正在检查会话...")
-    : signedIn
-      ? T("Open projects", "打开项目")
-      : T("Start with email", "使用邮箱开始");
-  const primaryActionIcon = checkingSession ? (
-    <span className="spin">
-      <I.Refresh />
-    </span>
-  ) : signedIn ? (
-    <I.Layout />
+  // Keep the signed-out actions usable while the session check runs. They only
+  // switch to the signed-in actions once the Server confirms the session.
+  const signedIn = Boolean(auth?.authenticated);
+  const primaryAction = signedIn ? (
+    <a className="btn primary lg" {...screenLinkProps(go, "ledgerProjects")}>
+      <I.Layout /> {T("Open projects", "打开项目")}
+    </a>
   ) : (
-    <I.Mail />
-  );
-  const primaryAction = checkingSession ? (
-    <button className="btn primary lg" type="button" disabled>
-      {primaryActionIcon} {primaryActionLabel}
-    </button>
-  ) : (
-    <a className="btn primary lg" {...screenLinkProps(go, primaryActionTarget)}>
-      {primaryActionIcon} {primaryActionLabel}
+    <a className="btn primary lg" {...screenLinkProps(go, "login")}>
+      <I.Mail /> {T("Start with email", "使用邮箱开始")}
     </a>
   );
   const features = landingFeatures();
@@ -445,7 +431,7 @@ export function LandingScreen({ go, auth }) {
           </p>
           <div className="lp-cta">
             {primaryAction}
-            {!checkingSession && !signedIn && (
+            {!signedIn && (
               <a className="btn lg" {...screenLinkProps(go, "pricing")}>
                 {T("See pricing", "查看价格")}
               </a>
@@ -523,11 +509,9 @@ export function LandingScreen({ go, auth }) {
 
         <section className="lp-cta-band" aria-labelledby="lp-cta-title">
           <h2 id="lp-cta-title">
-            {checkingSession
-              ? T("Restoring your account.", "正在恢复你的账户。")
-              : signedIn
-                ? T("Continue from your account.", "从你的账户继续。")
-                : T("Bring your project costs into view.", "让项目成本清晰可见。")}
+            {signedIn
+              ? T("Continue from your account.", "从你的账户继续。")
+              : T("Bring your project costs into view.", "让项目成本清晰可见。")}
           </h2>
           {primaryAction}
         </section>

@@ -1,4 +1,4 @@
-import apiContract from "../data/api-contract.json";
+import { requireApiContract } from "./api-contract-source.js";
 
 const METHODS = new Set(["get", "post", "put", "patch", "delete", "head", "options"]);
 const OMIT = new Set(["description", "title", "example", "examples", "externalDocs", "xml"]);
@@ -48,7 +48,7 @@ function compactSchema(node, definitions, contract) {
   );
 }
 
-export function agentMarkdown(base, contract = apiContract) {
+export function agentMarkdown(base, contract = requireApiContract()) {
   const definitions = new Map();
   const querySchemas = new Map();
   const endpoints = [];

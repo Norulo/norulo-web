@@ -28,4 +28,12 @@ describe("search engine ownership verification", () => {
     const head = indexHtml.slice(0, indexHtml.indexOf("</head>"));
     expect(head).toContain('<meta name="msvalidate.01" content="FAC02BC8739E7276352818F68957948B" />');
   });
+
+  it("keeps the Google Search Console tag in the HTML head", () => {
+    const indexHtml = readFileSync(join(process.cwd(), "index.html"), "utf-8");
+    const head = indexHtml.slice(0, indexHtml.indexOf("</head>"));
+    expect(head).toContain(
+      '<meta name="google-site-verification" content="Omc337gUD8R2I033vzm_IBsUHwJCaPwiBz_Qq4g-aqI" />'
+    );
+  });
 });

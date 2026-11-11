@@ -21,3 +21,11 @@ describe("search discovery files", () => {
     expect(sitemapFile).not.toContain("/login");
   });
 });
+
+describe("search engine ownership verification", () => {
+  it("keeps the Bing Webmaster Tools tag in the HTML head", () => {
+    const indexHtml = readFileSync(join(process.cwd(), "index.html"), "utf-8");
+    const head = indexHtml.slice(0, indexHtml.indexOf("</head>"));
+    expect(head).toContain('<meta name="msvalidate.01" content="FAC02BC8739E7276352818F68957948B" />');
+  });
+});

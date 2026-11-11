@@ -96,18 +96,18 @@ const AUTHOR_URL = "https://yanzhang.win/";
 // same-origin images. Both variants render; CSS shows the one for the theme.
 function AuthorMark() {
   return (
-    <a className="lp-author-mark" href={AUTHOR_URL} title="Yan Zhang">
+    <a className="lp-author-mark" href={AUTHOR_URL} title="Built by Yan Zhang">
       <img
         className="lp-author-mark-light"
-        src="/badge/mark-light.svg"
-        width="32"
+        src="/badge/built-by-light.svg"
+        width="140"
         height="32"
-        alt="Yan Zhang"
+        alt="Built by Yan Zhang"
       />
       <img
         className="lp-author-mark-dark"
-        src="/badge/mark-dark.svg"
-        width="32"
+        src="/badge/built-by-dark.svg"
+        width="140"
         height="32"
         alt=""
         aria-hidden="true"

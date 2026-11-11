@@ -77,3 +77,17 @@ Connect or touching a database. Cloudflare policy rollback separately restores
 the saved expression of `b49bd5c1f65b457aab2250a70330e572` and removes only the new
 `e5e9fb1067bd4c278d3cceed16ad3483` BIC skip rule. Exact before/after policy and
 publication evidence belong in the dated release record.
+
+## IndexNow
+
+The IndexNow key lives in `indexnow.config.json` and is served as a plain static
+asset at `https://norulo.com/<key>.txt` from `public/<key>.txt`. The key is public
+by design; it only proves that submissions come from the site owner. To rotate it,
+replace both the config value and the key file, then deploy.
+
+`npm run indexnow:submit` reads the live sitemap, checks that the live key file
+returns the key, and POSTs every sitemap URL to `https://api.indexnow.org/indexnow`.
+`npm run deploy:workers` and the production deploy workflow run it after each
+deploy. `--dry-run` prints the request without sending it and `--local` reads
+`public/sitemap.xml` instead of the live sitemap. HTTP 200 and 202 count as
+accepted; anything else fails the command, which does not undo the deploy.

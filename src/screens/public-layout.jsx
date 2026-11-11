@@ -90,11 +90,40 @@ export function PublicHeader({ go, current, auth }) {
   );
 }
 
+const AUTHOR_URL = "https://personal-web.sanchai-a65.workers.dev/";
+
+// The author's badge is self-hosted under /badge because the CSP only allows
+// same-origin images. Both variants render; CSS shows the one for the theme.
+function AuthorMark() {
+  return (
+    <a className="lp-author-mark" href={AUTHOR_URL} title="Yan Zhang">
+      <img
+        className="lp-author-mark-light"
+        src="/badge/mark-light.svg"
+        width="32"
+        height="32"
+        alt="Yan Zhang"
+      />
+      <img
+        className="lp-author-mark-dark"
+        src="/badge/mark-dark.svg"
+        width="32"
+        height="32"
+        alt=""
+        aria-hidden="true"
+      />
+    </a>
+  );
+}
+
 export function PublicFooter({ go, current }) {
   useLang();
   return (
     <footer className="lp-foot">
-      <div>{T("Copyright 2026 Norulo", "版权所有 © 2026 Norulo")}</div>
+      <div className="lp-foot-meta">
+        <div>{T("Copyright 2026 Norulo", "版权所有 © 2026 Norulo")}</div>
+        {current === "landing" ? <AuthorMark /> : null}
+      </div>
       <div className="lp-foot-links">
         {FOOTER_LINKS.map((item) => (
           <a

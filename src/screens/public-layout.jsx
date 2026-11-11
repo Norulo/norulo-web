@@ -1,5 +1,4 @@
 import "./public.css";
-import { I } from "../icons.jsx";
 import { T, useLang } from "../i18n.jsx";
 import { signOut } from "../lib/auth.js";
 import { screenLinkProps } from "../lib/navigation.js";
@@ -26,8 +25,8 @@ const FOOTER_LINKS = [
 
 export function PublicHeader({ go, current, auth }) {
   useLang();
-  const checkingSession = auth?.status === "checking";
-  const signedIn = !checkingSession && Boolean(auth?.authenticated);
+  // Signed-out links stay usable during the session check; see LandingScreen.
+  const signedIn = Boolean(auth?.authenticated);
 
   return (
     <header className="lp-top">
@@ -59,14 +58,7 @@ export function PublicHeader({ go, current, auth }) {
         ))}
       </nav>
       <div className="lp-header-actions">
-        {checkingSession ? (
-          <button className="btn sm" type="button" disabled>
-            <span className="spin">
-              <I.Refresh size={14} />
-            </span>
-            {T("Checking session...", "正在检查会话...")}
-          </button>
-        ) : signedIn ? (
+        {signedIn ? (
           <>
             <button className="btn sm" onClick={signOut}>
               {T("Sign out", "退出登录")}

@@ -1,5 +1,10 @@
-import { useState } from "react";
-import apiContract from "../data/api-contract.json";
+import { useCallback, useState } from "react";
+import {
+  API_CONTRACT_OUTLINE,
+  loadApiContract,
+  loadedApiContract,
+  requireApiContract,
+} from "./api-contract-source.js";
 import { Icon } from "../icons.jsx";
 import { T, useLang } from "../i18n.jsx";
 
@@ -46,6 +51,26 @@ const COPY = {
       ko: "엔드포인트를 펼치면 인증, 매개변수, 요청 필드 및 정의된 모든 응답을 확인할 수 있습니다. 필드 이름과 공식 계약 설명은 영어입니다.",
       fr: "Développez un endpoint pour voir son authentification, ses paramètres, ses champs et toutes les réponses documentées. Les noms des champs et la description du contrat sont en anglais.",
       es: "Abre un endpoint para ver su autenticación, parámetros, campos y todas las respuestas documentadas. Los nombres de los campos y las descripciones del contrato están en inglés.",
+    },
+  ],
+  loading: [
+    "Loading endpoint details…",
+    {
+      zh: "正在加载接口详情…",
+      ja: "エンドポイントの詳細を読み込み中…",
+      ko: "엔드포인트 세부 정보를 불러오는 중…",
+      fr: "Chargement des détails de l’endpoint…",
+      es: "Cargando los detalles del endpoint…",
+    },
+  ],
+  loadFailed: [
+    "Endpoint details could not be loaded. Close and reopen the endpoint to try again, or download the OpenAPI JSON.",
+    {
+      zh: "无法加载接口详情。请收起后重新展开以重试，或下载 OpenAPI JSON。",
+      ja: "エンドポイントの詳細を読み込めませんでした。閉じてから開き直して再試行するか、OpenAPI JSON をダウンロードしてください。",
+      ko: "엔드포인트 세부 정보를 불러오지 못했습니다. 닫았다가 다시 펼쳐 재시도하거나 OpenAPI JSON을 다운로드하세요.",
+      fr: "Impossible de charger les détails de l’endpoint. Refermez-le puis rouvrez-le pour réessayer, ou téléchargez le JSON OpenAPI.",
+      es: "No se pudieron cargar los detalles del endpoint. Ciérralo y vuelve a abrirlo para reintentar, o descarga el JSON de OpenAPI.",
     },
   ],
   download: [
@@ -453,16 +478,21 @@ function Content({ content, document, label }) {
   ));
 }
 
-function Endpoint({ entry, document }) {
+function contractEntry({ method, path }, document) {
+  const item = resolve(document.paths?.[path], document) || {};
+  return { method, path, item, operation: resolve(item[method.toLowerCase()], document) || {} };
+}
+
+function Endpoint({ entry, document, onOpen, loadFailed }) {
   const [open, setOpen] = useState(false);
-  const { method, path, item, operation } = entry;
-  const parameters = parametersFor(item, operation, document);
-  const request = resolve(operation.requestBody, document);
+  const { method, path } = entry;
   return (
     <details
       className="docs-endpoint-card api-reference-endpoint"
       onToggle={(event) => {
-        if (event.target === event.currentTarget) setOpen(event.currentTarget.open);
+        if (event.target !== event.currentTarget) return;
+        setOpen(event.currentTarget.open);
+        if (event.currentTarget.open) onOpen?.();
       }}
     >
       <summary className="docs-endpoint-card-h">
@@ -470,119 +500,139 @@ function Endpoint({ entry, document }) {
           {method}
         </span>
         <code>{path}</code>
-        <Icon
-          className="api-reference-disclosure"
-          d="m6 9 6 6 6-6"
-          size={16}
-          aria-hidden="true"
-        />
+        <Icon className="api-reference-disclosure" d="m6 9 6 6 6-6" size={16} aria-hidden="true" />
       </summary>
-      {open && (
-        <div className="api-reference-content">
-          {operation.operationId && (
-            <p>
-              <code>{operation.operationId}</code>
-            </p>
-          )}
-          {operation.summary && <p lang="en">{operation.summary}</p>}
-          {operation.description && (
-            <p lang="en" className="api-reference-description">
-              {operation.description}
-            </p>
-          )}
-          <h4>{copy("auth")}</h4>
-          <p lang="en">{authentication(operation, document)}</p>
-          {operation["x-norulo-scope"] && (
-            <p>
-              {copy("scope")}: <code>{operation["x-norulo-scope"]}</code>
-            </p>
-          )}
-          {operation.deprecated && <p>{copy("deprecated")}</p>}
-          <h4>{copy("parameters")}</h4>
-          <FieldsTable
-            label={`${method} ${path} · ${copy("parameters")}`}
-            rows={parameters.flatMap((parameter) => {
-              const rows = schemaRows(
-                parameter.schema,
-                document,
-                `${parameter.in}: ${parameter.name}`,
-                parameter.required
-              );
-              if (!rows.length)
-                rows.push({
-                  field: `${parameter.in}: ${parameter.name}`,
-                  required: parameter.required,
-                  constraints: "",
-                  description: "",
-                });
-              rows[0].description = [parameter.description, rows[0].description]
-                .filter(Boolean)
-                .join(" ");
-              return rows;
-            })}
-          />
-          {request && (
-            <>
-              <h4>
-                {copy("request")} · {request.required ? copy("required") : copy("optional")}
-              </h4>
-              {request.description && <p lang="en">{request.description}</p>}
-              <Content
-                content={request.content}
-                document={document}
-                label={`${method} ${path} · ${copy("request")}`}
-              />
-            </>
-          )}
-          <h4>{copy("responses")}</h4>
-          {Object.entries(operation.responses || {}).map(([status, value]) => {
-            const response = resolve(value, document);
-            return (
-              <section key={status} className="api-reference-response">
-                <h5>
-                  <code>{status}</code>
-                </h5>
-                <p lang="en">{response.description}</p>
-                {response.headers && (
-                  <>
-                    <h5>{copy("headers")}</h5>
-                    <FieldsTable
-                      label={`${method} ${path} · ${status} · ${copy("headers")}`}
-                      rows={Object.entries(response.headers).flatMap(([name, header]) => {
-                        const resolved = resolve(header, document);
-                        const rows = schemaRows(resolved.schema, document, name, resolved.required);
-                        if (!rows.length)
-                          rows.push({ field: name, constraints: "", description: "" });
-                        rows[0].description = [resolved.description, rows[0].description]
-                          .filter(Boolean)
-                          .join(" ");
-                        return rows;
-                      })}
-                    />
-                  </>
-                )}
-                {response.content ? (
-                  <Content
-                    content={response.content}
-                    document={document}
-                    label={`${method} ${path} · ${copy("responses")} ${status}`}
-                  />
-                ) : (
-                  <p>{copy("noBody")}</p>
-                )}
-              </section>
-            );
-          })}
-        </div>
-      )}
+      {open &&
+        (document ? (
+          <EndpointDetails entry={contractEntry(entry, document)} document={document} />
+        ) : (
+          <p className="api-reference-loading" role="status">
+            {copy(loadFailed ? "loadFailed" : "loading")}
+          </p>
+        ))}
     </details>
   );
 }
 
-export function ApiReference({ contract = apiContract }) {
+function EndpointDetails({ entry, document }) {
+  const { method, path, item, operation } = entry;
+  const parameters = parametersFor(item, operation, document);
+  const request = resolve(operation.requestBody, document);
+  return (
+    <>
+      <div className="api-reference-content">
+        {operation.operationId && (
+          <p>
+            <code>{operation.operationId}</code>
+          </p>
+        )}
+        {operation.summary && <p lang="en">{operation.summary}</p>}
+        {operation.description && (
+          <p lang="en" className="api-reference-description">
+            {operation.description}
+          </p>
+        )}
+        <h4>{copy("auth")}</h4>
+        <p lang="en">{authentication(operation, document)}</p>
+        {operation["x-norulo-scope"] && (
+          <p>
+            {copy("scope")}: <code>{operation["x-norulo-scope"]}</code>
+          </p>
+        )}
+        {operation.deprecated && <p>{copy("deprecated")}</p>}
+        <h4>{copy("parameters")}</h4>
+        <FieldsTable
+          label={`${method} ${path} · ${copy("parameters")}`}
+          rows={parameters.flatMap((parameter) => {
+            const rows = schemaRows(
+              parameter.schema,
+              document,
+              `${parameter.in}: ${parameter.name}`,
+              parameter.required
+            );
+            if (!rows.length)
+              rows.push({
+                field: `${parameter.in}: ${parameter.name}`,
+                required: parameter.required,
+                constraints: "",
+                description: "",
+              });
+            rows[0].description = [parameter.description, rows[0].description]
+              .filter(Boolean)
+              .join(" ");
+            return rows;
+          })}
+        />
+        {request && (
+          <>
+            <h4>
+              {copy("request")} · {request.required ? copy("required") : copy("optional")}
+            </h4>
+            {request.description && <p lang="en">{request.description}</p>}
+            <Content
+              content={request.content}
+              document={document}
+              label={`${method} ${path} · ${copy("request")}`}
+            />
+          </>
+        )}
+        <h4>{copy("responses")}</h4>
+        {Object.entries(operation.responses || {}).map(([status, value]) => {
+          const response = resolve(value, document);
+          return (
+            <section key={status} className="api-reference-response">
+              <h5>
+                <code>{status}</code>
+              </h5>
+              <p lang="en">{response.description}</p>
+              {response.headers && (
+                <>
+                  <h5>{copy("headers")}</h5>
+                  <FieldsTable
+                    label={`${method} ${path} · ${status} · ${copy("headers")}`}
+                    rows={Object.entries(response.headers).flatMap(([name, header]) => {
+                      const resolved = resolve(header, document);
+                      const rows = schemaRows(resolved.schema, document, name, resolved.required);
+                      if (!rows.length)
+                        rows.push({ field: name, constraints: "", description: "" });
+                      rows[0].description = [resolved.description, rows[0].description]
+                        .filter(Boolean)
+                        .join(" ");
+                      return rows;
+                    })}
+                  />
+                </>
+              )}
+              {response.content ? (
+                <Content
+                  content={response.content}
+                  document={document}
+                  label={`${method} ${path} · ${copy("responses")} ${status}`}
+                />
+              ) : (
+                <p>{copy("noBody")}</p>
+              )}
+            </section>
+          );
+        })}
+      </div>
+    </>
+  );
+}
+
+export function ApiReference({ contract }) {
   useLang();
+  const [loaded, setLoaded] = useState(() => contract ?? loadedApiContract());
+  const [loadFailed, setLoadFailed] = useState(false);
+  const document = contract ?? loaded;
+  const requestContract = useCallback(() => {
+    if (document) return;
+    setLoadFailed(false);
+    loadApiContract().then(setLoaded, () => setLoadFailed(true));
+  }, [document]);
+  const listed = contract ?? API_CONTRACT_OUTLINE;
   const groups = new Map();
-  for (const entry of operations(contract)) {
+  for (const entry of operations(listed)) {
     const name = groupName(entry.path, entry.operation);
     if (!groups.has(name)) groups.set(name, []);
     groups.get(name).push(entry);
@@ -598,7 +648,7 @@ export function ApiReference({ contract = apiContract }) {
           {copy("download")}
         </a>{" "}
         <span>
-          · OpenAPI {contract.openapi} · v{contract.info?.version}
+          · OpenAPI {listed.openapi} · v{listed.info?.version}
         </span>
       </p>
       {[...groups.entries()].map(([name, entries]) => (
@@ -608,7 +658,13 @@ export function ApiReference({ contract = apiContract }) {
           </h3>
           <div className="docs-endpoint-list">
             {entries.map((entry) => (
-              <Endpoint key={`${entry.method}:${entry.path}`} entry={entry} document={contract} />
+              <Endpoint
+                key={`${entry.method}:${entry.path}`}
+                entry={entry}
+                document={document}
+                onOpen={requestContract}
+                loadFailed={loadFailed}
+              />
             ))}
           </div>
         </section>
@@ -621,7 +677,7 @@ function schemaMarkdown(schema, document) {
   return ["```json", JSON.stringify(resolvedTree(schema, document), null, 2), "```"].join("\n");
 }
 
-export function referenceMarkdown(document = apiContract) {
+export function referenceMarkdown(document = requireApiContract()) {
   const lines = [
     "## Complete API reference",
     "",

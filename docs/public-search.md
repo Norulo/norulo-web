@@ -3,7 +3,10 @@
 Norulo pre-renders `/`, `/pricing`, `/developers/docs`, `/developers/api` and
 `/plugins` during the existing production build. `src/entry-public.jsx` renders
 the existing anonymous product, guide and MCP components to HTML, with their
-native navigation links. The build adds each route's existing stylesheet assets.
+native navigation links. The build adds each route's existing stylesheet assets, inlines the CSS rules the
+static markup uses (Beasties) and moves the full stylesheets to the end of
+`<body>`, so first paint does not wait for them. No inline event handlers are
+added, so the CSP is unchanged.
 It makes no network requests and runs no browser effects. Initial documents use
 English, matching their `lang` and SEO metadata; the existing browser startup
 restores the user's selected language and theme as before.

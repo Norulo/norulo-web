@@ -21,11 +21,18 @@ export function htmlSecurityHeaders(inlineScriptHashes = []) {
   };
 }
 
+// Cloudflare Web Analytics is injected at the edge as an external beacon
+// script that reports page views to cloudflareinsights.com. Allow exactly
+// those two origins; no inline script or eval is permitted for it.
+export const CLOUDFLARE_ANALYTICS_SCRIPT_ORIGIN = "https://static.cloudflareinsights.com";
+export const CLOUDFLARE_ANALYTICS_REPORT_ORIGIN = "https://cloudflareinsights.com";
+
 export function htmlContentSecurityPolicy(inlineScriptHashes = []) {
   const scriptSources = [
     "'self'",
     `'${THEME_BOOTSTRAP_HASH}'`,
     ...inlineScriptHashes.map((hash) => `'${hash}'`),
+    CLOUDFLARE_ANALYTICS_SCRIPT_ORIGIN,
   ];
   return [
     "default-src 'self'",
@@ -37,7 +44,8 @@ export function htmlContentSecurityPolicy(inlineScriptHashes = []) {
     "img-src 'self' data:",
     "font-src 'self'",
     // Deployed browser requests use /api; the Worker owns upstream access.
-    "connect-src 'self'",
+    // The analytics beacon is the only cross-origin connection.
+    `connect-src 'self' ${CLOUDFLARE_ANALYTICS_REPORT_ORIGIN}`,
     "object-src 'none'",
     "base-uri 'none'",
     "frame-src 'none'",

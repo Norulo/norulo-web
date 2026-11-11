@@ -1,6 +1,10 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, beforeAll } from "vitest";
 import contract from "../data/api-contract.json";
 import { agentMarkdown } from "./api-agent.js";
+import { loadApiContract } from "./api-contract-source.js";
+
+// The page preloads the full contract while idle; tests start from that state.
+beforeAll(() => loadApiContract());
 
 function definitions(markdown) {
   return JSON.parse(markdown.split("```json\n")[1].split("\n```")[0]).$defs;

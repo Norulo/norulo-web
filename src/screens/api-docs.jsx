@@ -3,6 +3,7 @@ import { useEffect, useId, useRef, useState } from "react";
 import { ApiIntegrationGuide, integrationMarkdown } from "./api-guide.jsx";
 import { ApiReference, referenceMarkdown } from "./api-reference.jsx";
 import { agentMarkdown } from "./api-agent.js";
+import { loadApiContract, loadedApiContract } from "./api-contract-source.js";
 import { ApiDocsCopyButton } from "./api-docs-copy-button.jsx";
 import { API_GUIDE_COPY } from "../locales/api-guide.js";
 import { AGENT_GUIDE } from "../locales/agent-guide.js";
@@ -52,7 +53,7 @@ const EXACT_TOTALS =
 const ACCOUNT_JEV =
   "GET/PATCH /api/v1/account/jev use the signed-in cookie account’s own preference; workspace selection and API keys grant no access to another Owner’s settings. Free can also toggle Jev. Responses expose enabled, revision, eligible, available, monthlyCalls, trialCalls and period; monthlyBudgetUsd is deprecated compatibility data. PATCH accepts only {enabled: boolean} and requires If-Match with the preference revision. After 412, explicitly GET before another choice. No model checks, expense changes or call refunds occur. Members inherit the ledger Owner’s preference.";
 
-function markdown(base, example, createExample, projectExample, reviewExample) {
+function markdown(contract, base, example, createExample, projectExample, reviewExample) {
   return [
     "# Norulo ledger REST API",
     "",
@@ -83,7 +84,7 @@ function markdown(base, example, createExample, projectExample, reviewExample) {
     agentSetupMarkdown(),
     integrationMarkdown(base),
     "",
-    referenceMarkdown(),
+    referenceMarkdown(contract),
     "## Example",
     "",
     "```sh",
@@ -143,6 +144,17 @@ export function ApiDocsScreen({ go, auth }) {
     manualCopyRef.current?.focus({ preventScroll: true });
     manualCopyRef.current?.select();
   }, [copyState]);
+  useEffect(() => {
+    // Fetch the full contract after first paint so copying and opening an
+    // endpoint are instant without putting it on the page's critical path.
+    const preload = () => loadApiContract().catch(() => {});
+    if (typeof window.requestIdleCallback === "function") {
+      const handle = window.requestIdleCallback(preload, { timeout: 4000 });
+      return () => window.cancelIdleCallback?.(handle);
+    }
+    const timer = setTimeout(preload, 1500);
+    return () => clearTimeout(timer);
+  }, []);
   useEffect(() => {
     const anchor = window.location.hash.slice(1);
     if (!anchor) return;
@@ -223,12 +235,17 @@ export function ApiDocsScreen({ go, auth }) {
     if (copyRequestRef.current) return;
     const request = {};
     copyRequestRef.current = request;
-    const content =
-      copyMode === "agent"
-        ? agentMarkdown(base)
-        : markdown(base, example, createExample, projectExample, reviewExample);
     setCopyState("pending");
+    let content = "";
     try {
+      // Normally loaded while the page was idle, which keeps the clipboard
+      // write inside the click's user activation.
+      const contract = loadedApiContract() ?? (await loadApiContract());
+      if (copyRequestRef.current !== request) return;
+      content =
+        copyMode === "agent"
+          ? agentMarkdown(base, contract)
+          : markdown(contract, base, example, createExample, projectExample, reviewExample);
       if (typeof navigator.clipboard?.writeText !== "function")
         throw new Error("Clipboard unavailable");
       await navigator.clipboard.writeText(content);

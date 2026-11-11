@@ -357,6 +357,19 @@
     color: var(--text);
   }
 
+  /* Public pages: a compact icon button so the floating control covers as
+     little body text as possible. The accessible name stays on aria-label. */
+  .app-frame:not([data-console="true"]) .preferences-toggle {
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    box-shadow: var(--shadow-float);
+  }
+
+  .app-frame:not([data-console="true"]) .preferences-toggle > span {
+    display: none;
+  }
+
   .app-frame[data-console="true"] .preferences {
     position: relative;
     top: auto;

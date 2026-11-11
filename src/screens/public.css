@@ -926,22 +926,34 @@
   }
 }
 @media (max-width: 520px) {
+  /* Phone header: brand and account actions on one row, the page links on a
+     single scrollable row beneath, instead of three stacked rows. */
   .lp-top {
-    grid-template-columns: minmax(0, 1fr);
-    justify-items: stretch;
-  }
-
-  .lp-top > :first-child,
-  .lp-top > :last-child {
-    justify-self: stretch;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: var(--space-2) var(--space-3);
+    padding-top: var(--space-3);
+    padding-bottom: var(--space-2);
   }
 
   .lp-top > div:last-child {
-    justify-content: stretch;
+    flex-wrap: nowrap;
   }
 
-  .lp-top > div:last-child .btn {
-    flex: 1 1 130px;
+  .lp-nav {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    margin: 0 calc(-1 * var(--space-5));
+    padding: 0 var(--space-5) 2px;
+    gap: 0;
+  }
+
+  .lp-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .lp-nav .btn {
+    flex: 0 0 auto;
   }
 
   .lp-cta .btn {
@@ -958,8 +970,9 @@
     padding-left: var(--space-4);
   }
 
-  .lp-top > div:last-child .btn:not(.primary) {
-    display: none;
+  .lp-nav {
+    margin: 0 calc(-1 * var(--space-4));
+    padding: 0 var(--space-4) 2px;
   }
 
   .lp-hero,

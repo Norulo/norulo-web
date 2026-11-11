@@ -1,8 +1,12 @@
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi, beforeAll } from "vitest";
 import { ApiDocsScreen } from "./api-docs.jsx";
 import { setLang } from "../i18n.jsx";
 import { agentMarkdown } from "./api-agent.js";
+import { loadApiContract } from "./api-contract-source.js";
+
+// The page preloads the full contract while idle; tests start from that state.
+beforeAll(() => loadApiContract());
 import userEvent from "@testing-library/user-event";
 
 const originalClipboard = Object.getOwnPropertyDescriptor(navigator, "clipboard");

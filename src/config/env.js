@@ -32,7 +32,7 @@ const absoluteUrlOrRootRelativePath = z.string().refine((value) => {
 const envSchema = z.object({
   VITE_API_BASE_URL: absoluteUrlOrRootRelativePath.optional(),
   VITE_PUBLIC_API_BASE_URL: absoluteUrlOrRootRelativePath.optional(),
-  VITE_APP_URL: z.string().url().optional(),
+  VITE_APP_URL: z.url().optional(),
   VITE_GITHUB_APP_SLUG: z.string().optional(),
 });
 

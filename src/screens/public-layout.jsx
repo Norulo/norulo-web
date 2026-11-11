@@ -90,7 +90,7 @@ export function PublicHeader({ go, current, auth }) {
   );
 }
 
-const AUTHOR_URL = "https://personal-web.sanchai-a65.workers.dev/";
+const AUTHOR_URL = "https://yanzhang.win/";
 
 // The author's badge is self-hosted under /badge because the CSP only allows
 // same-origin images. Both variants render; CSS shows the one for the theme.

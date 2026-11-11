@@ -100,15 +100,15 @@ function AuthorMark() {
       <img
         className="lp-author-mark-light"
         src="/badge/built-by-light.svg"
-        width="140"
-        height="32"
+        width="70"
+        height="16"
         alt="Built by Yan Zhang"
       />
       <img
         className="lp-author-mark-dark"
         src="/badge/built-by-dark.svg"
-        width="140"
-        height="32"
+        width="70"
+        height="16"
         alt=""
         aria-hidden="true"
       />

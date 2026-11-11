@@ -137,3 +137,5 @@ jobs:
             console.log("PASS readable public HTML " + path);
           }
           NODE
+      - name: Submit sitemap URLs to IndexNow
+        run: npm run indexnow:submit
